@@ -2794,42 +2794,51 @@
       </div>
 
 
-      <!-- FORM: บันทึกยอดขายหน้าร้าน (daily total per payment type) -->
+      <!-- FORM: บันทึกยอดขายหน้าร้าน — กรอกทุกประเภทการชำระเงิน บันทึกครั้งเดียว -->
       <div style="background:#fff;border:1px solid #ECEEF4;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,40,80,0.04);margin-top:18px">
-        <h3 style="margin:0 0 18px;font-size:16px;font-weight:600">บันทึกรายการยอดขายแพลตฟอร์ม หน้าร้าน</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:15px">
-          <div>
-            <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันที่ <span style="color:#E14B7A">*</span></div>
-            <input type="date" value="{{ storeForm.date }}" onChange="{{ setStoreDate }}" style="width:100%;border:1px solid #E4E7EF;border-radius:10px;padding:10px 13px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;box-sizing:border-box;background:#fff"/>
-          </div>
-          <div>
-            <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ประเภทการชำระเงิน <span style="color:#E14B7A">*</span></div>
-            <div data-store-pay-dd style="position:relative">
-              <div onClick="{{ toggleStorePay }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #E4E7EF;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ storeForm.payType }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
-              <sc-if value="{{ storePayOpen }}" hint-placeholder-val="{{ false }}">
-                <div style="position:absolute;top:48px;left:0;right:0;z-index:40;background:#fff;border:1px solid #ECEEF4;border-radius:12px;box-shadow:0 14px 32px rgba(30,40,80,0.16);padding:7px">
-                  <sc-for list="{{ storePayOptions }}" as="o" hint-placeholder-count="5">
-                    <div onClick="{{ o.onClick }}" style="padding:9px 12px;border-radius:8px;font-size:13px;color:#2B3547;font-weight:{{ o.weight }};cursor:pointer">{{ o.name }}</div>
-                  </sc-for>
-                </div>
-              </sc-if>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">จำนวนเงิน <span style="color:#E14B7A">*</span></div>
-            <div style="display:flex;align-items:center;gap:8px;border:1px solid #E4E7EF;border-radius:10px;padding:0 13px"><span style="color:#C2C9D6;flex:none">฿</span><input value="{{ storeForm.amount }}" onChange="{{ setStoreAmount }}" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0;border:none;outline:none;padding:11px 0;font-size:13.5px;color:#2B3547;text-align:right;background:transparent;font-family:inherit"/></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">บันทึกยอดขายหน้าร้าน — ทั้งวัน</h3>
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="font-size:12.5px;color:#6B7486;font-weight:500">วันที่ <span style="color:#E14B7A">*</span></span>
+            <input type="date" value="{{ storeBatch.date }}" onChange="{{ setStoreBatchDate }}" style="border:1px solid #E4E7EF;border-radius:10px;padding:9px 12px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;background:#fff"/>
           </div>
         </div>
-        <div style="margin-bottom:15px">
-          <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมายเหตุ</div>
-          <textarea value="{{ storeForm.note }}" onChange="{{ setStoreNote }}" placeholder="เช่น ยอดรวมทั้งวัน, ออเดอร์พิเศษ, ขายส่งร้าน..." rows="2" style="width:100%;border:1px solid #E4E7EF;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;outline:none;resize:none;font-family:inherit;box-sizing:border-box"></textarea>
+        <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:9px 12px;align-items:center">
+          <div style="font-size:11.5px;color:#8089A0;font-weight:500">ประเภทการชำระเงิน</div>
+          <div style="font-size:11.5px;color:#8089A0;font-weight:500;text-align:right">ยอดขาย (฿)</div>
+          <div style="font-size:11.5px;color:#8089A0;font-weight:500;text-align:right">ส่วนลด (฿)</div>
+          <sc-for list="{{ storeBatchRows }}" as="r" hint-placeholder-count="6">
+            <div style="font-size:13px;color:#2B3547;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div>
+            <input value="{{ r.amount }}" onChange="{{ r.setAmount }}" inputmode="decimal" placeholder="0" style="min-width:0;border:1px solid #E4E7EF;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit;box-sizing:border-box"/>
+            <input value="{{ r.disc }}" onChange="{{ r.setDisc }}" inputmode="decimal" placeholder="0" style="min-width:0;border:1px solid #E4E7EF;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#D9637F;text-align:right;outline:none;font-family:inherit;box-sizing:border-box"/>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:26px;border-top:1px solid #F2F4F8;margin-top:15px;padding-top:13px;flex-wrap:wrap">
+          <div style="text-align:right">
+            <div style="font-size:11.5px;color:#8089A0">รวมก่อนลด</div>
+            <div style="font-size:17px;font-weight:700;color:#1B2536">{{ storeBatchTotals.before }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11.5px;color:#8089A0">ส่วนลดรวม</div>
+            <div style="font-size:17px;font-weight:700;color:#D9637F">{{ storeBatchTotals.disc }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11.5px;color:#8089A0">รับจริง</div>
+            <div style="font-size:17px;font-weight:700;color:#1E9E63">{{ storeBatchTotals.net }}</div>
+          </div>
+        </div>
+        <div style="margin-top:13px">
+          <input value="{{ storeBatch.note }}" onChange="{{ setStoreBatchNote }}" placeholder="หมายเหตุ (ถ้ามี) เช่น ออเดอร์พิเศษ, ขายส่งร้าน..." style="width:100%;border:1px solid #E4E7EF;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;box-sizing:border-box"/>
         </div>
         <sc-if value="{{ storeFormError }}" hint-placeholder-val="{{ false }}">
-          <div style="background:#FDECEF;border:1px solid #F4A6C2;color:#D9637F;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:15px">{{ storeFormError }}</div>
+          <div style="background:#FDECEF;border:1px solid #F4A6C2;color:#D9637F;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-top:13px">{{ storeFormError }}</div>
         </sc-if>
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:11px">
-          <div onClick="{{ clearStoreForm }}" style="background:#fff;border:1px solid #E4E7EF;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">ล้างข้อมูล</div>
-          <div onClick="{{ saveStoreForm }}" style="background:linear-gradient(135deg,#F2548A,#E8447C);color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(232,68,124,0.32)">{{ storeSaveLabel }}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;flex-wrap:wrap">
+          <span style="font-size:12px;color:#9AA3B2">ช่องที่เว้นว่างจะไม่ถูกบันทึก · ถ้าวันเดียวกันมีข้อมูลเดิมจะถามก่อนเขียนทับ</span>
+          <div style="display:flex;align-items:center;gap:11px">
+            <div onClick="{{ clearStoreBatch }}" style="background:#fff;border:1px solid #E4E7EF;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">ล้างข้อมูล</div>
+            <div onClick="{{ saveStoreBatch }}" style="background:linear-gradient(135deg,#F2548A,#E8447C);color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(232,68,124,0.32)">{{ storeSaveLabel }}</div>
+          </div>
         </div>
       </div>
 
@@ -3125,9 +3134,10 @@ class Component extends DCLogic {
     expError: null,
     recentRows: [],
     salesError: null,
-    // Simple storefront (หน้าร้าน) daily-total entry form
-    storeForm: { date: todayISO(), payType: 'Cash', amount: '', note: '' },
-    storePayOpen: false, storeFormError: null, storeSaving: false
+    // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
+    // saved together with a single click
+    storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' },
+    storeFormError: null, storeSaving: false
   };
 
   onDocClick = (e) => {
@@ -3137,7 +3147,6 @@ class Component extends DCLogic {
       if (this.state.brandOpen && !e.target.closest('[data-brand-dd]')) patch.brandOpen = false;
       if (this.state.channelOpen && !e.target.closest('[data-channel-dd]')) patch.channelOpen = false;
       if (this.state.formDD && !e.target.closest('[data-form-dd]')) patch.formDD = null;
-      if (this.state.storePayOpen && !e.target.closest('[data-store-pay-dd]')) patch.storePayOpen = false;
       if (this.state.saleTypeOpen && !e.target.closest('[data-saletype-dd]')) patch.saleTypeOpen = false;
       if (this.state.salesListDD && !e.target.closest('[data-list-dd]')) patch.salesListDD = null;
       if (this.state.expListDD && !e.target.closest('[data-list-dd]')) patch.expListDD = null;
@@ -4450,54 +4459,81 @@ class Component extends DCLogic {
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'5px', background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 9px', borderRadius:'7px', whiteSpace:'nowrap' } },
         React.createElement('i', { 'data-lucide':c[2], style:{ width:'13px', height:'13px' } }), st);
     };
-    // ---- storefront (หน้าร้าน) daily-total entry form ----
+    // ---- storefront (หน้าร้าน) daily batch entry form ----
+    // One row per payment type, all saved together. Amounts are ยอดก่อนลด; discounts go
+    // to fee so gross/fee/net matches the POS-report convention used everywhere else.
     const STORE_PAY_TYPES = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', 'ขายส่ง'];
-    const storeForm = this.state.storeForm;
-    const setStoreDate = e => { const val = e.target.value; this.setState(s => ({ storeForm: { ...s.storeForm, date: val } })); };
-    const toggleStorePay = () => this.setState(s => ({ storePayOpen: !s.storePayOpen }));
-    const storePayOptions = STORE_PAY_TYPES.map(p => ({
-      name: p, weight: p === storeForm.payType ? '600' : '400',
-      onClick: () => this.setState(s => ({ storeForm: { ...s.storeForm, payType: p }, storePayOpen: false }))
+    const storeBatch = this.state.storeBatch;
+    const sbNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+    const setStoreBatchDate = e => { const val = e.target.value; this.setState(s => ({ storeBatch: { ...s.storeBatch, date: val } })); };
+    const setStoreBatchNote = e => { const val = e.target.value; this.setState(s => ({ storeBatch: { ...s.storeBatch, note: val } })); };
+    const storeBatchRows = STORE_PAY_TYPES.map(p => ({
+      name: p,
+      amount: storeBatch.amounts[p] || '',
+      disc: storeBatch.discounts[p] || '',
+      setAmount: e => { const val = e.target.value; this.setState(s => ({ storeBatch: { ...s.storeBatch, amounts: { ...s.storeBatch.amounts, [p]: val } } })); },
+      setDisc: e => { const val = e.target.value; this.setState(s => ({ storeBatch: { ...s.storeBatch, discounts: { ...s.storeBatch.discounts, [p]: val } } })); }
     }));
-    const setStoreAmount = e => { const val = e.target.value; this.setState(s => ({ storeForm: { ...s.storeForm, amount: val } })); };
-    const setStoreNote = e => { const val = e.target.value; this.setState(s => ({ storeForm: { ...s.storeForm, note: val } })); };
-    const clearStoreForm = () => this.setState({ storeForm: { date: todayISO(), payType: 'Cash', amount: '', note: '' }, storeFormError: null });
-    const saveStoreForm = async () => {
-      if (this.state.storeSaving) return;
-      const f = this.state.storeForm;
-      const amount = parseFloat(String(f.amount).replace(/,/g, ''));
-      if (!f.date) { this.setState({ storeFormError: 'กรุณาเลือกวันที่' }); return; }
-      if (!(amount > 0)) { this.setState({ storeFormError: 'กรุณาใส่จำนวนเงินให้ถูกต้อง' }); return; }
-      const beDate = isoToBEShort(f.date);
-      const row = {
-        date: beDate, time: '23:59', platform: 'หน้าร้าน', brand: 'หน้าร้าน',
-        orderId: f.payType + ' (หน้าร้าน ' + beDate + ')',
-        gross: amount, fee: 0, net: amount, status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: f.payType, attachmentName: ''
-      };
-      this.setState({ storeSaving: true, storeFormError: null });
-      const note = (f.note || '').trim();
-      // Optional sales.note column (migration 0007) — retry without it if absent so the
-      // sale itself is never lost.
-      const dbRow = mapSaleToDbRow(row);
-      let res = note ? await supabaseClient.from('sales').insert({ ...dbRow, note }).select().single() : null;
-      let noteDropped = false;
-      if (!res || (res.error && (res.error.code === 'PGRST204' || res.error.code === '42703'))) {
-        if (res && res.error) noteDropped = true;
-        res = await supabaseClient.from('sales').insert(dbRow).select().single();
-      }
-      if (res.error) {
-        console.error('saveStoreForm failed', res.error);
-        this.setState({ storeSaving: false, storeFormError: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' });
-        return;
-      }
-      this.setState(s => ({
-        storeSaving: false,
-        recentRows: [mapDbRowToSale(res.data), ...s.recentRows],
-        storeForm: { date: todayISO(), payType: 'Cash', amount: '', note: '' },
-        storeFormError: noteDropped ? 'บันทึกยอดสำเร็จ แต่หมายเหตุยังไม่ถูกเก็บ (ต้องรัน migration 0007_sales_note.sql ก่อน)' : null
-      }));
+    let sbBefore = 0, sbDisc = 0, sbCount = 0;
+    STORE_PAY_TYPES.forEach(p => {
+      const a = sbNum(storeBatch.amounts[p]);
+      if (a > 0) { sbCount++; sbBefore += a; sbDisc += sbNum(storeBatch.discounts[p]); }
+    });
+    const storeBatchTotals = {
+      before: '฿' + Math.round(sbBefore).toLocaleString('en-US'),
+      disc: '−฿' + Math.round(sbDisc).toLocaleString('en-US'),
+      net: '฿' + Math.round(sbBefore - sbDisc).toLocaleString('en-US')
     };
-    const storeSaveLabel = this.state.storeSaving ? 'กำลังบันทึก…' : 'บันทึกรายการ';
+    const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' }, storeFormError: null });
+    const saveStoreBatch = async () => {
+      if (this.state.storeSaving) return;
+      const f = this.state.storeBatch;
+      if (!f.date) { this.setState({ storeFormError: 'กรุณาเลือกวันที่' }); return; }
+      const entries = STORE_PAY_TYPES
+        .map(p => ({ p, amount: sbNum(f.amounts[p]), disc: sbNum(f.discounts[p]) }))
+        .filter(x => x.amount > 0);
+      if (!entries.length) { this.setState({ storeFormError: 'กรุณากรอกยอดอย่างน้อย 1 ประเภท' }); return; }
+      const bad = entries.find(x => x.disc < 0 || x.disc > x.amount);
+      if (bad) { this.setState({ storeFormError: 'ส่วนลดของ "' + bad.p + '" มากกว่ายอดขาย — ตรวจอีกครั้ง' }); return; }
+      const beDate = isoToBEShort(f.date);
+      // Same-day same-type rows already saved → confirm overwrite (they get replaced).
+      const dupes = this.state.recentRows.filter(r => r.platform === 'หน้าร้าน' && r.date === beDate && entries.some(x => x.p === r.payment));
+      if (dupes.length && !window.confirm('วันที่ ' + beDate + ' มีข้อมูล ' + dupes.length + ' ประเภทนี้อยู่แล้ว — เขียนทับด้วยค่าที่กรอกใหม่หรือไม่?')) return;
+      this.setState({ storeSaving: true, storeFormError: null });
+      try {
+        if (dupes.length) {
+          const { error: delErr } = await supabaseClient.from('sales').delete().in('id', dupes.map(r => r.id));
+          if (delErr) throw delErr;
+        }
+        const note = (f.note || '').trim();
+        const dbRows = entries.map(x => mapSaleToDbRow({
+          date: beDate, time: '23:59', platform: 'หน้าร้าน', brand: 'หน้าร้าน',
+          orderId: x.p + ' (หน้าร้าน ' + beDate + ')',
+          gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
+          status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: ''
+        }));
+        // Optional sales.note column (migration 0007) — retry without it so the sale
+        // itself is never lost.
+        let noteDropped = false;
+        let res = note ? await supabaseClient.from('sales').insert(dbRows.map(r => ({ ...r, note }))).select() : null;
+        if (!res || (res.error && (res.error.code === 'PGRST204' || res.error.code === '42703'))) {
+          if (res && res.error) noteDropped = true;
+          res = await supabaseClient.from('sales').insert(dbRows).select();
+        }
+        if (res.error) throw res.error;
+        const dupeIds = dupes.map(r => r.id);
+        this.setState(s => ({
+          storeSaving: false,
+          recentRows: [...res.data.map(mapDbRowToSale), ...s.recentRows.filter(r => !dupeIds.includes(r.id))],
+          storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' },
+          storeFormError: noteDropped ? 'บันทึก ' + entries.length + ' รายการสำเร็จ แต่หมายเหตุยังไม่ถูกเก็บ (ต้องรัน migration 0007_sales_note.sql ก่อน)' : null
+        }));
+      } catch (err) {
+        console.error('saveStoreBatch failed', err);
+        this.setState({ storeSaving: false, storeFormError: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' });
+      }
+    };
+    const storeSaveLabel = this.state.storeSaving ? 'กำลังบันทึก…' : (sbCount > 0 ? 'บันทึกทั้งวัน (' + sbCount + ' รายการ)' : 'บันทึกทั้งวัน');
     const setSearch = e => { const val = e.target.value; this.setState({ salesSearch: val }); };
     const setSalesPlatform = p => () => this.setState({ salesPlatform: p });
     const ptabs = [
@@ -5185,8 +5221,8 @@ class Component extends DCLogic {
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
       scrollToSalesForm, exportSalesCsv,
-      storeForm, storePayOpen: this.state.storePayOpen, storePayOptions, storeFormError: this.state.storeFormError,
-      setStoreDate, toggleStorePay, setStoreAmount, setStoreNote, clearStoreForm, saveStoreForm, storeSaveLabel,
+      storeBatch, storeBatchRows, storeBatchTotals, storeFormError: this.state.storeFormError,
+      setStoreBatchDate, setStoreBatchNote, clearStoreBatch, saveStoreBatch, storeSaveLabel,
       openAttachPicker, handleAttachChange, removeAttachment, hasAttachment: !!f.attachmentName,
       salesError: this.state.salesError,
       salesPlatformRows, salesPlatformDonut, paymentRows, paymentDonut, salesTrend: this.salesTrend(skRows, 14), salesTotalLabel,
