@@ -3736,7 +3736,7 @@ class Component extends DCLogic {
     }));
     const brandRowsTotalLabel = ovFmt(ovGross);
 
-    const ovChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#00B14F', 'LINE MAN':'#06C755', 'ShopeeFood':'#EE4D2D' };
+    const ovChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
     const ovChannelOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const byChannelOv = ovSumByKey(ovRows, r => r.platform, r => r.gross);
     const channelRows = ovChannelOrder.filter(p => byChannelOv[p]).map(p => ({ name:p, amount: ovFmt(byChannelOv[p]), pct: ovGross ? (byChannelOv[p] / ovGross * 100).toFixed(1) + '%' : '0%', color: ovChannelColors[p] }));
@@ -3762,7 +3762,7 @@ class Component extends DCLogic {
       const storefront = brandRowsFor.filter(r=>r.platform==='หน้าร้าน').reduce((a,r)=>a+r.gross,0);
       const byPlatformForBrand = ovSumByKey(brandRowsFor, r=>r.platform, r=>r.gross);
       const topPlatform = Object.keys(byPlatformForBrand).sort((a,b)=>byPlatformForBrand[b]-byPlatformForBrand[a])[0];
-      const tagColors = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'Grab':['#E0F5E9','#009142'], 'LINE MAN':['#E4FBEE','#059E44'], 'ShopeeFood':['#FDEAE4','#D8431C'] };
+      const tagColors = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'Grab':['#E7F3EC','#1F7A47'], 'LINE MAN':['#EBF6EF','#328756'], 'ShopeeFood':['#FBECE7','#B84B31'] };
       const tc = tagColors[topPlatform] || ['#EEF0F5','#5A6478'];
       const channelTag = topPlatform ? React.createElement('span', { style:{ background:tc[0], color:tc[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, topPlatform) : '—';
       return { brand:name, dot: ovBrandColors[i % ovBrandColors.length], sales: ovFmt(sales), storefront: ovFmt(storefront), salesPct: ovGross ? (sales/ovGross*100).toFixed(1)+'%' : '0%', exp:'—', expPct:'—', profit:'—', margin:'—', channelTag, weight:'500' };
@@ -3786,7 +3786,7 @@ class Component extends DCLogic {
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'5px', background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 9px', borderRadius:'7px', whiteSpace:'nowrap' } },
         React.createElement('i', { 'data-lucide': c[2], style:{ width:'13px', height:'13px' } }), txt);
     };
-    const finPlatformDots = { 'Grab':'#00B14F', 'LINE MAN':'#06C755', 'ShopeeFood':'#EE4D2D' };
+    const finPlatformDots = { 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
     const byPlatformFin = this.groupBy(finRows, r => r.platform);
     const finDeliveryPlatforms = ['Grab','LINE MAN','ShopeeFood'];
     const payoutRows = finDeliveryPlatforms.filter(p => byPlatformFin[p]).map(p => {
@@ -3847,7 +3847,7 @@ class Component extends DCLogic {
     const rcInTodayRows = rcMoneyIn.filter(r => r.isoDate === rcToday);
     const rcInToday = rcInTodayRows.reduce((a, r) => a + r.net, 0);
     const rcInDays = new Set(rcMoneyIn.map(r => r.isoDate).filter(Boolean)).size;
-    const rcPalette = { 'หน้าร้าน':['#F7E9F0','#C13D6C','store'], 'Grab':['#E0F5E9','#009142','bike'], 'LINE MAN':['#E4FBEE','#059E44','message-circle'], 'ShopeeFood':['#FDEAE4','#D8431C','shopping-bag'] };
+    const rcPalette = { 'หน้าร้าน':['#F7E9F0','#C13D6C','store'], 'Grab':['#E7F3EC','#1F7A47','bike'], 'LINE MAN':['#EBF6EF','#328756','message-circle'], 'ShopeeFood':['#FBECE7','#B84B31','shopping-bag'] };
     const rcOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const rcInByPlat = {}; rcMoneyIn.forEach(r => { rcInByPlat[r.platform] = (rcInByPlat[r.platform] || 0) + r.net; });
     const rcPendByPlat = {}; rcPend.forEach(r => { rcPendByPlat[r.platform] = (rcPendByPlat[r.platform] || 0) + r.net; });
@@ -3876,7 +3876,7 @@ class Component extends DCLogic {
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, s);
     };
     const rcPlatLogo = (p) => {
-      const m = { 'LINE MAN':['#E4FBEE','#059E44','message-circle'], 'Grab':['#E0F5E9','#009142','bike'], 'ShopeeFood':['#FDEAE4','#D8431C','shopping-bag'] };
+      const m = { 'LINE MAN':['#EBF6EF','#328756','message-circle'], 'Grab':['#E7F3EC','#1F7A47','bike'], 'ShopeeFood':['#FBECE7','#B84B31','shopping-bag'] };
       const c = m[p] || ['#EEF0F4','#8089A0','circle'];
       return React.createElement('span', { style:{ width:'30px', height:'30px', borderRadius:'9px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', background:c[0], color:c[1] } },
         React.createElement('i', { 'data-lucide':c[2], style:{ width:'16px', height:'16px' } }));
@@ -3889,7 +3889,7 @@ class Component extends DCLogic {
         statusTag: rcStatus(pend ? 'รอเข้าวันนี้' : 'เข้าบัญชีแล้ว') };
     });
     const rcChCell = (ch) => {
-      const m = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'LINE MAN':['#E4FBEE','#059E44'], 'Grab':['#E0F5E9','#009142'], 'ShopeeFood':['#FDEAE4','#D8431C'] };
+      const m = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'LINE MAN':['#EBF6EF','#328756'], 'Grab':['#E7F3EC','#1F7A47'], 'ShopeeFood':['#FBECE7','#B84B31'] };
       const c = m[ch] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, ch);
     };
@@ -3948,7 +3948,7 @@ class Component extends DCLogic {
       ? this.donut(inexCatNames.map(name => ({ value: byCatInex[name], color: inexCatColors[name] || '#B6BECC' })), 165, 24)
       : inexEmptyDonut(165, 24);
     const inexChannelOrder = ['หน้าร้าน','LINE MAN','Grab','ShopeeFood'];
-    const inexChannelColors = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#06C755', 'Grab':'#00B14F', 'ShopeeFood':'#EE4D2D' };
+    const inexChannelColors = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#57B678', 'Grab':'#2E9E5F', 'ShopeeFood':'#D96549' };
     const inexMaxChannel = Math.max(1, ...inexChannelOrder.map(p => byChannelInex[p] ? byChannelInex[p].gross : 0));
     const inexChannelRows = inexChannelOrder.filter(p => byChannelInex[p]).map(p => ({
       name:p, amount: inexFmt(byChannelInex[p].gross), pct: inexIncomeTotal ? (byChannelInex[p].gross / inexIncomeTotal * 100).toFixed(1) + '%' : '0%',
@@ -4224,7 +4224,7 @@ class Component extends DCLogic {
       { title:'ยอดเฉลี่ย/ออเดอร์', amount:fmtB(salesAvgOrder), delta:noDelta, icon:'trending-up', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(dashDayBuckets12.map(d=>d.count?d.gross/d.count:0),'#CE5C84') },
       { title:'อัตราแปลงการสั่งซื้อ', amount:'0%', delta:'ยังไม่มีข้อมูลผู้เข้าชม', icon:'percent', bg:'#E7F2F0', fg:'#3E9E92', spark:this.spark(dashOrderBuckets12.map(()=>0),'#3E9E92') }
     ];
-    const dashChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#00B14F', 'LINE MAN':'#06C755', 'ShopeeFood':'#EE4D2D' };
+    const dashChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
     const dashChannelOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const byChannel = this.groupBy(salesRows, r => r.platform);
     const dashChannelRows = dashChannelOrder.filter(p => byChannel[p]).map(p => ({
@@ -4254,7 +4254,7 @@ class Component extends DCLogic {
       ? this.donut([{ value: dashRetailGross || 0.0001, color:'#C4638A' },{ value: dashDeliveryGross || 0.0001, color:'#4E9E77' }], 135, 20)
       : emptyDonut(135, 20);
     const pIconCell = (name) => {
-      const m = { 'Grab':['#E0F5E9','#009142','G'], 'LINE MAN':['#E4FBEE','#059E44','L'], 'ShopeeFood':['#FDEAE4','#D8431C','S'] };
+      const m = { 'Grab':['#E7F3EC','#1F7A47','G'], 'LINE MAN':['#EBF6EF','#328756','L'], 'ShopeeFood':['#FBECE7','#B84B31','S'] };
       const c = m[name] || ['#EEF0F5','#5A6478','•'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
         React.createElement('span', { style:{ width:'22px', height:'22px', borderRadius:'7px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:c[0], color:c[1] } }, c[2]),
@@ -4449,7 +4449,7 @@ class Component extends DCLogic {
     const clearButtonLabel = isEditingSales ? 'ยกเลิก' : 'ล้างข้อมูล';
     const scrollToSalesForm = () => { const el = document.getElementById('sales-form-card'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const platformBadge = (name) => {
-      const map = { 'LINE MAN':['#E4FBEE','#059E44'], 'Grab':['#E0F5E9','#009142'], 'ShopeeFood':['#FDEAE4','#D8431C'], 'หน้าร้าน':['#F7E9F0','#C13D6C'] };
+      const map = { 'LINE MAN':['#EBF6EF','#328756'], 'Grab':['#E7F3EC','#1F7A47'], 'ShopeeFood':['#FBECE7','#B84B31'], 'หน้าร้าน':['#F7E9F0','#C13D6C'] };
       const c = map[name] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, name);
     };
@@ -4675,7 +4675,7 @@ class Component extends DCLogic {
       { title:'Net Sales วันนี้', amount:skFmt(skNetToday), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
       { title:'Net Payout รอรับ', amount:skFmt(skReceivable), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'file-text', bg:'#F8F0DC', fg:'#D98A4C', info:false }
     ];
-    const skPlatformColors = { 'Grab':'#00B14F', 'LINE MAN':'#06C755', 'ShopeeFood':'#EE4D2D', 'หน้าร้าน':'#C13D6C' };
+    const skPlatformColors = { 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549', 'หน้าร้าน':'#C13D6C' };
     const skPlatformOrder = ['Grab','LINE MAN','ShopeeFood','หน้าร้าน'];
     const byPlatformSk = this.groupBy(skRows, r => r.platform);
     const salesPlatformRows = skPlatformOrder.filter(p => byPlatformSk[p]).map(p => ({ name:p, amount: skFmt(byPlatformSk[p].gross), pct: skGrossMTD ? (byPlatformSk[p].gross/skGrossMTD*100).toFixed(1)+'%' : '0%', color: skPlatformColors[p] }));
@@ -4832,7 +4832,7 @@ class Component extends DCLogic {
     const dedupeTrackStyle = { width:'38px', height:'22px', borderRadius:'11px', background: dedupeSkip ? '#2E7D5B' : '#D6DAE3', position:'relative', flex:'none', transition:'background .15s' };
     const dedupeKnobStyle = { position:'absolute', top:'2px', left: dedupeSkip ? '18px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)', transition:'left .15s' };
 
-    const platMeta = { 'Grab':{pfg:'#009142',pbg:'#E0F5E9'}, 'LINE MAN':{pfg:'#059E44',pbg:'#E4FBEE'}, 'ShopeeFood':{pfg:'#D8431C',pbg:'#FDEAE4'}, 'หน้าร้าน':{pfg:'#C13D6C',pbg:'#F7E9F0'} };
+    const platMeta = { 'Grab':{pfg:'#1F7A47',pbg:'#E7F3EC'}, 'LINE MAN':{pfg:'#328756',pbg:'#EBF6EF'}, 'ShopeeFood':{pfg:'#B84B31',pbg:'#FBECE7'}, 'หน้าร้าน':{pfg:'#C13D6C',pbg:'#F7E9F0'} };
     const importRows = importRowsFlat.map(r => {
       const greyed = r.isDup && dedupeSkip;
       const neg = r.net < 0;
@@ -5170,7 +5170,7 @@ class Component extends DCLogic {
     const mobFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const mobTotal = mobRows.reduce((a, r) => a + r.gross, 0);
     const mobileSales = mobFmt(mobTotal - this.salesDiscountTotal(mobRows).total);
-    const mobPalette = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#06C755', 'Grab':'#00B14F', 'ShopeeFood':'#EE4D2D' };
+    const mobPalette = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#57B678', 'Grab':'#2E9E5F', 'ShopeeFood':'#D96549' };
     const mobBy = {}; mobRows.forEach(r => { mobBy[r.platform] = (mobBy[r.platform] || 0) + r.gross; });
     const mobileChannels = ['หน้าร้าน','LINE MAN','Grab','ShopeeFood'].filter(p => mobBy[p]).map(p => ({
       name: p, amount: mobFmt(mobBy[p]), pct: mobTotal ? Math.round(mobBy[p] / mobTotal * 100) + '%' : '0%', color: mobPalette[p] || '#9AA3B2'
