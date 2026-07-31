@@ -99,7 +99,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">ภาพรวมผู้บริหาร — สาขาบางโพ</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
           </div>
           <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย และกำไรของสาขาบางโพ</div>
         </div>
@@ -110,7 +110,7 @@
           </div>
           <div style="position:relative;width:46px;height:46px;border-radius:12px;background:#fff;border:1px solid #E7E9ED;display:flex;align-items:center;justify-content:center;color:#5A6478">
             <i data-lucide="bell" style="width:20px;height:20px"></i>
-            <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#CE5C84;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
+            <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#4A6B9E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
           </div>
         </div>
       </div>
@@ -182,12 +182,12 @@
             <div style="display:flex;align-items:center;gap:6px;border:1px solid #E7E9ED;border-radius:9px;padding:6px 11px;font-size:12.5px;color:#5A6478;cursor:pointer">รายวัน <i data-lucide="chevron-down" style="width:14px;height:14px"></i></div>
           </div>
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;font-size:12px;color:#7A8497">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#DFA3BC"></span>ยอดขาย</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#DFA3BC"></span>รายจ่าย</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>ยอดขาย</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>รายจ่าย</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span><span style="width:6px;height:6px;border-radius:50%;background:#2E7D5B;margin-left:-9px"></span>กำไรสุทธิ</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>{{ dailyTargetLabel }}
               <sc-if value="{{ !targetEditing }}" hint-placeholder-val="{{ true }}">
-                <i data-lucide="pencil" onClick="{{ startTargetEdit }}" style="width:12px;height:12px;color:#C13D6C;cursor:pointer;margin-left:2px"></i>
+                <i data-lucide="pencil" onClick="{{ startTargetEdit }}" style="width:12px;height:12px;color:#2C4A7C;cursor:pointer;margin-left:2px"></i>
               </sc-if>
             </span>
             <sc-if value="{{ targetEditing }}" hint-placeholder-val="{{ false }}">
@@ -205,7 +205,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:16px;font-weight:600">ศูนย์แจ้งเตือน CEO</h3>
-            <span style="font-size:12.5px;color:#C13D6C;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+            <span style="font-size:12.5px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <sc-for list="{{ ceoAlerts }}" as="a" hint-placeholder-count="3">
@@ -215,7 +215,7 @@
                   <div style="font-size:13.5px;font-weight:600;color:#222C3D;margin-bottom:3px">{{ a.title }}</div>
                   <div style="font-size:12px;color:#7A8497;line-height:1.4">{{ a.detail }}</div>
                 </div>
-                <span style="font-size:11.5px;color:#C13D6C;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+                <span style="font-size:11.5px;color:#2C4A7C;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
               </div>
             </sc-for>
           </div>
@@ -228,7 +228,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามแบรนด์ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-            <span style="font-size:12px;color:#C13D6C;font-weight:600;cursor:pointer">ดูรายงาน</span>
+            <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:18px;flex:1">
             <sc-for list="{{ brandRows }}" as="b" hint-placeholder-count="3">
@@ -254,7 +254,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-            <span style="font-size:12px;color:#C13D6C;font-weight:600;cursor:pointer">ดูรายงาน</span>
+            <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;align-items:center;gap:18px">
             <div style="position:relative;width:150px;height:150px;flex:none">
@@ -342,7 +342,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">การเงิน — สาขาบางโพ</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
           </div>
           <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย เงินเข้าจริง และต้นทุนของสาขาบางโพ</div>
         </div>
@@ -353,7 +353,7 @@
           </div>
           <div style="position:relative;width:46px;height:46px;border-radius:12px;background:#fff;border:1px solid #E7E9ED;display:flex;align-items:center;justify-content:center;color:#5A6478">
             <i data-lucide="bell" style="width:20px;height:20px"></i>
-            <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#CE5C84;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
+            <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#4A6B9E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
           </div>
         </div>
       </div>
@@ -397,7 +397,7 @@
             </div>
           </sc-if>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;background:#F7E9F0;border:1px solid #F3DCE7;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="store" style="width:16px;height:16px;color:#C13D6C"></i><span style="color:#5A6478">สาขา:</span><span style="font-weight:600;color:#A83359">บางโพ</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#CE5C84"></i></div>
+        <div style="display:flex;align-items:center;gap:8px;background:#ECF1F7;border:1px solid #DEE6F1;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="store" style="width:16px;height:16px;color:#2C4A7C"></i><span style="color:#5A6478">สาขา:</span><span style="font-weight:600;color:#223C66">บางโพ</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#4A6B9E"></i></div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออกข้อมูล</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
         <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8089A0"><span>อัปเดตล่าสุด: วันนี้ 10:30</span><i data-lucide="refresh-cw" style="width:15px;height:15px"></i></div>
@@ -479,9 +479,9 @@
                 <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ p.weight }}">
                   <td style="padding:12px 6px"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.dot }}"></span>{{ p.name }}</span></td>
                   <td style="padding:12px 6px;text-align:right">{{ p.gross }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B95064">{{ p.gp }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B95064">{{ p.vat }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B95064">{{ p.promo }}</td>
+                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.gp }}</td>
+                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.vat }}</td>
+                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.promo }}</td>
                   <td style="padding:12px 6px;text-align:right;font-weight:600">{{ p.net }}</td>
                   <td style="padding:12px 6px;text-align:center">{{ p.statusTag }}</td>
                 </tr>
@@ -509,7 +509,7 @@
         <div style="background:#23262D;border-radius:18px;padding:20px 22px;color:#fff">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px">
             <h3 style="margin:0;font-size:16px;font-weight:600">ศูนย์แจ้งเตือน CEO</h3>
-            <span style="font-size:12px;color:#DFA3BC;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+            <span style="font-size:12px;color:#A9BBD6;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:11px">
             <sc-for list="{{ financeAlerts }}" as="a" hint-placeholder-count="4">
@@ -519,7 +519,7 @@
                   <div style="font-size:13px;font-weight:600;color:{{ a.titleColor }};margin-bottom:2px">{{ a.title }}</div>
                   <div style="font-size:11.5px;color:#A6ADC2;line-height:1.4">{{ a.detail }}</div>
                 </div>
-                <span style="font-size:11px;color:#DFA3BC;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:12px;height:12px"></i></span>
+                <span style="font-size:11px;color:#A9BBD6;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:12px;height:12px"></i></span>
               </div>
             </sc-for>
           </div>
@@ -569,7 +569,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">เงินเข้าระบบ — สาขาบางโพ</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Cash In Dashboard</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Cash In Dashboard</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ตรวจสอบเงินเข้าจริงจากทุกช่องทาง แบบเรียลไทม์</div>
         </div>
@@ -592,7 +592,7 @@
             </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i><span>รีเฟรช</span></div>
-          <div style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
+          <div style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
         </div>
       </div>
       <div style="text-align:right;font-size:12.5px;color:#2E7D5B;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:7px"><i data-lucide="circle-check-big" style="width:15px;height:15px"></i>อัปเดตล่าสุด 22 มิ.ย. 2569 23:59</div>
@@ -618,7 +618,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">เงินเข้าระบบตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-            <span style="color:#C13D6C;font-size:12px;font-weight:600;cursor:pointer">ดูรายละเอียด</span>
+            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูรายละเอียด</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:10px">
             <sc-for list="{{ rcPlatTiles }}" as="p" hint-placeholder-count="5">
@@ -661,7 +661,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">สถานะเงินเข้าจาก Platform</h3>
-            <span style="color:#C13D6C;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <sc-for list="{{ rcPlatStatus }}" as="p" hint-placeholder-count="3">
@@ -692,7 +692,7 @@
           <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">รายการเงินเข้าจริงล่าสุด</h3>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="background:#F7E9F0;color:#C13D6C;font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:9px;cursor:pointer">ทั้งหมด</span>
+              <span style="background:#ECF1F7;color:#2C4A7C;font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:9px;cursor:pointer">ทั้งหมด</span>
               <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">วันนี้</span>
               <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">เมื่อวาน</span>
               <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">7 วันล่าสุด</span>
@@ -752,7 +752,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
               <h3 style="margin:0;font-size:15px;font-weight:600">สรุปเงินเข้าบัญชี <span style="color:#9AA3B2;font-weight:500;font-size:12px">(MTD)</span></h3>
-              <span style="color:#C13D6C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+              <span style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:13px">
               <sc-for list="{{ rcBankRows }}" as="b" hint-placeholder-count="3">
@@ -772,7 +772,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
               <h3 style="margin:0;font-size:15px;font-weight:600">เตือนความเสี่ยง / AI Alert</h3>
-              <span style="color:#C13D6C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+              <span style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:11px">
               <sc-for list="{{ rcAlerts }}" as="a" hint-placeholder-count="3">
@@ -782,7 +782,7 @@
                     <div style="font-size:12px;font-weight:600;color:#2B3547">{{ a.title }}</div>
                     <div style="font-size:10.5px;color:#8089A0">{{ a.desc }}</div>
                   </div>
-                  <span style="font-size:10.5px;color:#C13D6C;font-weight:600;cursor:pointer;white-space:nowrap;flex:none">รายละเอียด →</span>
+                  <span style="font-size:10.5px;color:#2C4A7C;font-weight:600;cursor:pointer;white-space:nowrap;flex:none">รายละเอียด →</span>
                 </div>
               </sc-for>
             </div>
@@ -844,7 +844,7 @@
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:18px 22px;min-width:230px">
           <div style="font-size:12px;color:#8089A0;margin-bottom:6px">ค่าโฆษณา (จริง)</div>
-          <div style="font-size:24px;font-weight:700;color:#C13D6C">{{ mktAdSpendDisplay }}</div>
+          <div style="font-size:24px;font-weight:700;color:#2C4A7C">{{ mktAdSpendDisplay }}</div>
           <div style="font-size:11.5px;color:#9AA3B2;margin-top:4px">จากรายจ่ายหมวดการตลาด</div>
         </div>
       </div>
@@ -864,7 +864,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">รายรับ-รายจ่าย — สาขาบางโพ</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Income & Expense</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Income & Expense</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ภาพรวมรายรับ รายจ่าย และโครงสร้างต้นทุนของสาขาบางโพ</div>
         </div>
@@ -887,7 +887,7 @@
             </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
-          <div style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออก</span></div>
+          <div style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออก</span></div>
         </div>
       </div>
 
@@ -920,8 +920,8 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <h3 style="margin:0 0 8px;font-size:16px;font-weight:600">แนวโน้มรายรับ vs รายจ่าย</h3>
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:6px;font-size:12px;color:#7A8497;flex-wrap:wrap">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#C4638A"></span>รายรับ (บาท)</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#DFA3BC"></span>รายจ่าย (บาท)</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#4A6B9E"></span>รายรับ (บาท)</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>รายจ่าย (บาท)</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span>กำไรสุทธิ (บาท)</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>เป้าหมายกำไร</span>
           </div>
@@ -960,7 +960,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:9px">
               <h3 style="margin:0;font-size:16px;font-weight:600;white-space:nowrap">รายการล่าสุด</h3>
-              <span style="background:#F7E9F0;color:#C13D6C;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:8px;cursor:pointer">ทั้งหมด</span>
+              <span style="background:#ECF1F7;color:#2C4A7C;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:8px;cursor:pointer">ทั้งหมด</span>
               <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:8px;border:1px solid #E7E9ED;cursor:pointer">รายรับ</span>
               <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:8px;border:1px solid #E7E9ED;cursor:pointer">รายจ่าย</span>
             </div>
@@ -995,7 +995,7 @@
               </sc-for>
             </tbody>
           </table>
-          <div style="text-align:center;margin-top:14px"><span style="color:#C13D6C;font-size:12.5px;font-weight:600;cursor:pointer">ดูรายการเพิ่มเติม →</span></div>
+          <div style="text-align:center;margin-top:14px"><span style="color:#2C4A7C;font-size:12.5px;font-weight:600;cursor:pointer">ดูรายการเพิ่มเติม →</span></div>
         </div>
 
         <!-- channels + alerts -->
@@ -1062,8 +1062,8 @@
               </sc-for>
               <tr style="border-top:2px solid #EDEFF4;color:#1B2536;font-weight:700;background:#FBFBFC">
                 <td style="padding:12px 6px">รวมทั้งหมด</td>
-                <td style="padding:12px 6px;text-align:right;color:#C13D6C">{{ inexIncomeTotalLabel }}</td>
-                <td style="padding:12px 6px;text-align:right;color:#C13D6C">{{ inexExpenseTotalLabel }}</td>
+                <td style="padding:12px 6px;text-align:right;color:#2C4A7C">{{ inexIncomeTotalLabel }}</td>
+                <td style="padding:12px 6px;text-align:right;color:#2C4A7C">{{ inexExpenseTotalLabel }}</td>
                 <td style="padding:12px 6px;text-align:right;color:#2E7D5B">{{ inexNetProfitLabel }}</td>
                 <td style="padding:12px 6px;text-align:right">{{ inexMarginLabel }}</td>
               </tr>
@@ -1075,7 +1075,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px"><i data-lucide="sparkles" style="width:17px;height:17px;color:#7A5BA8"></i>AI Insight แนะนำ</h3>
-            <span style="color:#C13D6C;font-size:12px;font-weight:600;cursor:pointer">ดู AI Insights ทั้งหมด →</span>
+            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดู AI Insights ทั้งหมด →</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
             <sc-for list="{{ inexInsights }}" as="g" hint-placeholder-count="3">
@@ -1084,7 +1084,7 @@
                 <div style="font-size:13px;font-weight:600;color:#2B3547">{{ g.title }}</div>
                 <div style="font-size:11px;color:#7A8497;line-height:1.45">{{ g.desc }}</div>
                 <div style="font-size:11px;color:#5A6478;line-height:1.45">{{ g.rec }}</div>
-                <span style="margin-top:auto;font-size:11.5px;font-weight:600;text-align:center;padding:8px 10px;border-radius:9px;cursor:pointer;background:#F9F0F4;color:#C13D6C">{{ g.action }}</span>
+                <span style="margin-top:auto;font-size:11.5px;font-weight:600;text-align:center;padding:8px 10px;border-radius:9px;cursor:pointer;background:#F3F6FA;color:#2C4A7C">{{ g.action }}</span>
               </div>
             </sc-for>
           </div>
@@ -1103,21 +1103,21 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">บันทึกรายจ่าย</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
           </div>
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลรายจ่ายทั้งหมดของร้าน</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
           <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">วันนี้</span><span style="font-weight:600">{{ expHeaderDateDisplay }}</span></div>
           <div onClick="{{ exportExpenseCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ดูรายงาน</span></div>
-          <div onClick="{{ scrollToExpenseForm }}" style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายจ่าย</span></div>
+          <div onClick="{{ scrollToExpenseForm }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายจ่าย</span></div>
         </div>
       </div>
 
       <!-- KPI cards -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:16px;margin-bottom:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#F7E9F0;color:#C13D6C"><i data-lucide="wallet"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500">รายจ่ายวันนี้</span></div>
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#ECF1F7;color:#2C4A7C"><i data-lucide="wallet"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500">รายจ่ายวันนี้</span></div>
           <div style="font-size:27px;font-weight:700;color:#1B2536;letter-spacing:-0.5px;margin-bottom:6px">{{ todaySpentDisplay }}</div>
           <div style="font-size:12.5px;color:#9AA3B2">{{ todayCountDisplay }}</div>
         </div>
@@ -1132,11 +1132,11 @@
             <sc-if value="{{ budgetEditing }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px">
                 <div onClick="{{ confirmBudgetEdit }}" style="color:#2E7D5B;cursor:pointer"><i data-lucide="check" style="width:14px;height:14px"></i></div>
-                <div onClick="{{ cancelBudgetEdit }}" style="color:#B95064;cursor:pointer"><i data-lucide="x" style="width:14px;height:14px"></i></div>
+                <div onClick="{{ cancelBudgetEdit }}" style="color:#B14A4A;cursor:pointer"><i data-lucide="x" style="width:14px;height:14px"></i></div>
               </div>
             </sc-if>
             <sc-if value="{{ !budgetEditing }}" hint-placeholder-val="{{ true }}">
-              <div onClick="{{ startBudgetEdit }}" style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#C13D6C;font-weight:600;cursor:pointer"><i data-lucide="pencil" style="width:12px;height:12px"></i>แก้ไข</div>
+              <div onClick="{{ startBudgetEdit }}" style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#2C4A7C;font-weight:600;cursor:pointer"><i data-lucide="pencil" style="width:12px;height:12px"></i>แก้ไข</div>
             </sc-if>
           </div>
           <sc-if value="{{ budgetEditing }}" hint-placeholder-val="{{ false }}">
@@ -1154,8 +1154,8 @@
           <div style="font-size:12.5px;color:#9AA3B2">คงเหลือ {{ budgetRemainingPctDisplay }}</div>
         </div>
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#F7E9F0;color:#C13D6C"><i data-lucide="calendar-days"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500">รายจ่ายเฉลี่ย/วัน (MTD)</span></div>
-          <div style="font-size:27px;font-weight:700;color:#C13D6C;letter-spacing:-0.5px;margin-bottom:6px">{{ avgPerDayDisplay }}</div>
+          <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#ECF1F7;color:#2C4A7C"><i data-lucide="calendar-days"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500">รายจ่ายเฉลี่ย/วัน (MTD)</span></div>
+          <div style="font-size:27px;font-weight:700;color:#2C4A7C;letter-spacing:-0.5px;margin-bottom:6px">{{ avgPerDayDisplay }}</div>
           <div style="font-size:12.5px;color:#9AA3B2">{{ daysInMonthDisplay }}</div>
         </div>
       </div>
@@ -1169,7 +1169,7 @@
 
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px;margin-bottom:15px">
             <div>
-              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันที่ <span style="color:#C13D6C">*</span></div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันที่ <span style="color:#2C4A7C">*</span></div>
               <div data-form-dd="expDate" style="position:relative">
                 <div onClick="{{ toggleExpDate }}" style="display:flex;align-items:center;justify-content:space-between;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span>{{ expDateDisplay }}</span><i data-lucide="calendar" style="width:16px;height:16px;color:#9AA3B2"></i></div>
                 <sc-if value="{{ expDateOpen }}" hint-placeholder-val="{{ false }}">
@@ -1180,7 +1180,7 @@
               </div>
             </div>
             <div>
-              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่หลัก <span style="color:#C13D6C">*</span></div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่หลัก <span style="color:#2C4A7C">*</span></div>
               <div data-form-dd="mainCat" style="position:relative">
                 <div onClick="{{ expMainDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ expMainDD.value }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
                 <sc-if value="{{ expMainDD.open }}" hint-placeholder-val="{{ false }}">
@@ -1191,7 +1191,7 @@
               </div>
             </div>
             <div>
-              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่ย่อย <span style="color:#C13D6C">*</span></div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่ย่อย <span style="color:#2C4A7C">*</span></div>
               <div data-form-dd="subCat" style="position:relative">
                 <div onClick="{{ expSubDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ expSubDD.value }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
                 <sc-if value="{{ expSubDD.open }}" hint-placeholder-val="{{ false }}">
@@ -1205,7 +1205,7 @@
 
           <div style="display:grid;grid-template-columns:1fr;gap:13px;margin-bottom:15px">
             <div>
-              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">จำนวนเงิน (บาท) <span style="color:#C13D6C">*</span></div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">จำนวนเงิน (บาท) <span style="color:#2C4A7C">*</span></div>
               <div style="display:flex;align-items:center;border:1px solid #DFE2E7;border-radius:10px;padding:0 13px"><input value="{{ expForm.amount }}" onChange="{{ setExpAmount }}" inputmode="decimal" placeholder="0.00" style="flex:1;min-width:0;border:none;outline:none;padding:11px 0;font-size:13.5px;color:#2B3547;text-align:right;background:transparent;font-family:inherit"/></div>
             </div>
           </div>
@@ -1235,7 +1235,7 @@
               </sc-if>
               <sc-if value="{{ hasExpAttachment }}" hint-placeholder-val="{{ true }}">
                 <div onClick="{{ openExpAttachPicker }}" style="border:1.5px dashed #D8DEEA;border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:10px;background:#FBFBFC;cursor:pointer">
-                  <div style="width:30px;height:30px;border-radius:8px;background:#F9F0F4;color:#7A8497;display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="upload" style="width:15px;height:15px"></i></div>
+                  <div style="width:30px;height:30px;border-radius:8px;background:#F3F6FA;color:#7A8497;display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="upload" style="width:15px;height:15px"></i></div>
                   <div style="line-height:1.3"><div style="font-size:12.5px;color:#5A6478;font-weight:500">อัปโหลดไฟล์</div><div style="font-size:11px;color:#B3BAC8">สูงสุด 5MB (jpg, png, pdf)</div></div>
                 </div>
               </sc-if>
@@ -1249,7 +1249,7 @@
 
           <div onClick="{{ toggleAsset }}" style="display:flex;align-items:center;gap:11px;margin-bottom:18px;cursor:pointer">
             <sc-if value="{{ expAsset }}" hint-placeholder-val="{{ false }}">
-              <div style="width:40px;height:22px;border-radius:12px;background:#C13D6C;position:relative;flex:none"><div style="position:absolute;top:2px;left:20px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div></div>
+              <div style="width:40px;height:22px;border-radius:12px;background:#2C4A7C;position:relative;flex:none"><div style="position:absolute;top:2px;left:20px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div></div>
             </sc-if>
             <sc-if value="{{ expAssetOff }}" hint-placeholder-val="{{ true }}">
               <div style="width:40px;height:22px;border-radius:12px;background:#DDE1EA;position:relative;flex:none"><div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div></div>
@@ -1258,16 +1258,16 @@
           </div>
 
           <sc-if value="{{ expError }}" hint-placeholder-val="{{ false }}">
-            <div style="background:#F9E7EA;border:1px solid #DFA3BC;color:#B95064;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:15px">{{ expError }}</div>
+            <div style="background:#F9E7EA;border:1px solid #A9BBD6;color:#B14A4A;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:15px">{{ expError }}</div>
           </sc-if>
 
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
             <div onClick="{{ clearExp }}" style="background:#fff;border:1px solid #DFE2E7;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">{{ expClearButtonLabel }}</div>
             <div style="display:flex;align-items:center;gap:11px">
               <sc-if value="{{ !isEditingExpense }}" hint-placeholder-val="{{ true }}">
-                <div onClick="{{ saveExpAndContinue }}" style="background:#fff;border:1.5px solid #DFA3BC;color:#C13D6C;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer">บันทึกและเพิ่มรายการต่อ</div>
+                <div onClick="{{ saveExpAndContinue }}" style="background:#fff;border:1.5px solid #A9BBD6;color:#2C4A7C;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer">บันทึกและเพิ่มรายการต่อ</div>
               </sc-if>
-              <div onClick="{{ saveExp }}" style="background:#C13D6C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">{{ expSaveButtonLabel }}</div>
+              <div onClick="{{ saveExp }}" style="background:#2C4A7C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">{{ expSaveButtonLabel }}</div>
             </div>
           </div>
         </div>
@@ -1319,7 +1319,7 @@
                   <td style="padding:10px 5px;text-align:center">
                     <div style="display:flex;align-items:center;justify-content:center;gap:10px">
                       <div onClick="{{ r.onDelete }}" style="display:inline-flex;line-height:0;cursor:pointer">
-                        <i data-lucide="trash-2" style="width:15px;height:15px;color:#C08A95"></i>
+                        <i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i>
                       </div>
                     </div>
                   </td>
@@ -1332,7 +1332,7 @@
             <span>แสดง {{ expRowCount }} จาก {{ expTotalCount }} รายการ</span>
             <div style="display:flex;align-items:center;gap:6px">
               <div onClick="{{ expPrevPage }}" style="width:30px;height:30px;border:1px solid #E7E9ED;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9AA3B2;cursor:pointer"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-              <div style="min-width:30px;height:30px;padding:0 8px;background:#F7E9F0;border:1px solid #E9C3D4;color:#C13D6C;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;white-space:nowrap">หน้า {{ expPage }} / {{ expTotalPages }}</div>
+              <div style="min-width:30px;height:30px;padding:0 8px;background:#ECF1F7;border:1px solid #C4D0E1;color:#2C4A7C;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;white-space:nowrap">หน้า {{ expPage }} / {{ expTotalPages }}</div>
               <div onClick="{{ expNextPage }}" style="width:30px;height:30px;border:1px solid #E7E9ED;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
               <div data-list-dd style="position:relative">
                 <div onClick="{{ expPageSizeDD.toggle }}" style="display:flex;align-items:center;gap:5px;border:1px solid #E7E9ED;border-radius:8px;padding:0 10px;height:30px;color:#5A6478;cursor:pointer">{{ expPageSizeDD.value }} <i data-lucide="chevron-down" style="width:13px;height:13px"></i></div>
@@ -1375,7 +1375,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <h3 style="margin:0 0 6px;font-size:15.5px;font-weight:600">แนวโน้มรายจ่าย <span style="color:#9AA3B2;font-weight:500;font-size:13px">(30 วันล่าสุด)</span></h3>
           <div style="display:flex;align-items:center;gap:18px;margin-bottom:6px;font-size:12px;color:#7A8497">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#CE5C84"></span><span style="width:6px;height:6px;border-radius:50%;background:#CE5C84;margin-left:-9px"></span>รายจ่าย</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#4A6B9E"></span><span style="width:6px;height:6px;border-radius:50%;background:#4A6B9E;margin-left:-9px"></span>รายจ่าย</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>งบประมาณ</span>
           </div>
           <div>{{ expenseTrend }}</div>
@@ -1417,7 +1417,7 @@
         <div style="flex:1 1 300px;min-width:0">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
             <h1 style="margin:0;font-size:25px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;white-space:nowrap">ยอดขาย — สาขาบางโพ</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap">Sales Dashboard</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap">Sales Dashboard</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ภาพรวมยอดขาย แยกตามแบรนด์ ช่องทาง และประเภทการขาย</div>
         </div>
@@ -1498,9 +1498,9 @@
             <div style="display:flex;align-items:center;gap:6px;border:1px solid #E7E9ED;border-radius:9px;padding:6px 11px;font-size:12.5px;color:#5A6478;cursor:pointer">รายวัน <i data-lucide="chevron-down" style="width:14px;height:14px"></i></div>
           </div>
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:6px;font-size:12px;color:#7A8497">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#C4638A"></span>ยอดขายรวม</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#4A6B9E"></span>ยอดขายรวม</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span>ยอดขายสุทธิ</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #DFA3BC"></span>{{ dailyTargetLabel }}</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #A9BBD6"></span>{{ dailyTargetLabel }}</span>
           </div>
           <div>{{ salesDashChart }}</div>
         </div>
@@ -1585,7 +1585,7 @@
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายแยกตามแบรนด์ และช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <span style="display:flex;align-items:center;gap:6px;background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer">ดูรายงานยอดขายทั้งหมด <i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
+          <span style="display:flex;align-items:center;gap:6px;background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer">ดูรายงานยอดขายทั้งหมด <i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead>
@@ -1644,9 +1644,9 @@
               <tr style="border-top:1px solid #F1F2F4;color:#2B3547;font-weight:{{ p.weight }}">
                 <td style="padding:12px 8px">{{ p.platform }}</td>
                 <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ p.gross }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B95064;white-space:nowrap">{{ p.gp }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B95064;white-space:nowrap">{{ p.vat }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B95064;white-space:nowrap">{{ p.promo }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.gp }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.vat }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.promo }}</td>
                 <td style="padding:12px 8px;text-align:right;font-weight:600;white-space:nowrap">{{ p.net }}</td>
                 <td style="padding:12px 8px;text-align:center">{{ p.statusTag }}</td>
               </tr>
@@ -1668,7 +1668,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">นำเข้ารายงานออนไลน์</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Grab · LINE MAN · ShopeeFood</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Grab · LINE MAN · ShopeeFood</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ดึงไฟล์รายงานรายวันจากแพลตฟอร์ม แปลงเป็นรายการยอดขายอัตโนมัติทุกสิ้นวัน</div>
         </div>
@@ -1716,14 +1716,14 @@
           <input id="import-file-input" type="file" accept=".csv,.xlsx" multiple onChange="{{ handleImportFilesChange }}" style="display:none"/>
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:26px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
             <div onClick="{{ openImportFilePicker }}" onDrop="{{ handleImportDrop }}" onDragOver="{{ preventDefault }}" style="border:1.8px dashed #C9D2E2;border-radius:16px;padding:46px 24px;text-align:center;background:#FBFBFC;cursor:pointer">
-              <div style="width:64px;height:64px;border-radius:18px;background:#F7E9F0;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="cloud-upload" style="width:30px;height:30px;color:#C13D6C"></i></div>
+              <div style="width:64px;height:64px;border-radius:18px;background:#ECF1F7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="cloud-upload" style="width:30px;height:30px;color:#2C4A7C"></i></div>
               <div style="font-size:17px;font-weight:600;color:#1B2536;margin-bottom:7px">ลากไฟล์รายงานมาวางที่นี่</div>
               <div style="font-size:13.5px;color:#8089A0;margin-bottom:18px;line-height:1.6">รองรับ Grab (.csv) · LINE MAN (.csv) · ShopeeFood (.csv/.xlsx) · หน้าร้าน (.csv) — เลือกได้หลายไฟล์พร้อมกัน<br>ระบบจะตรวจจับแพลตฟอร์มจากหัวคอลัมน์อัตโนมัติ</div>
-              <div style="display:inline-flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 20px;font-size:13.5px;font-weight:600;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="folder-open" style="width:17px;height:17px"></i>เลือกไฟล์รายงานวันนี้</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 20px;font-size:13.5px;font-weight:600;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="folder-open" style="width:17px;height:17px"></i>เลือกไฟล์รายงานวันนี้</div>
             </div>
           </div>
           <sc-if value="{{ importError }}" hint-placeholder-val="{{ false }}">
-            <div style="background:#F9E7EA;border:1px solid #DFA3BC;color:#B95064;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:18px">{{ importError }}</div>
+            <div style="background:#F9E7EA;border:1px solid #A9BBD6;color:#B14A4A;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:18px">{{ importError }}</div>
           </sc-if>
           <div style="font-size:12.5px;color:#9AA3B2;font-weight:600;margin-bottom:12px;padding-left:2px">แพลตฟอร์มที่รองรับ และการจับคู่คอลัมน์</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
@@ -1751,7 +1751,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
               <h3 style="margin:0;font-size:16px;font-weight:600">ไฟล์ที่จะนำเข้า <span style="color:#9AA3B2;font-weight:500;font-size:13px">{{ importFileSummary }}</span></h3>
-              <span onClick="{{ removeImportFiles }}" style="font-size:12.5px;color:#C13D6C;font-weight:600;cursor:pointer">ล้างทั้งหมด</span>
+              <span onClick="{{ removeImportFiles }}" style="font-size:12.5px;color:#2C4A7C;font-weight:600;cursor:pointer">ล้างทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:12px">
               <sc-for list="{{ importFiles }}" as="f" hint-placeholder-count="4">
@@ -1768,7 +1768,7 @@
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div onClick="{{ removeImportFiles }}" style="background:#fff;border:1px solid #DFE2E7;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">เลือกไฟล์ใหม่</div>
-            <div onClick="{{ gotoPreview }}" style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:11px;padding:12px 24px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">วิเคราะห์และดูตัวอย่าง<i data-lucide="arrow-right" style="width:17px;height:17px"></i></div>
+            <div onClick="{{ gotoPreview }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:11px;padding:12px 24px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">วิเคราะห์และดูตัวอย่าง<i data-lucide="arrow-right" style="width:17px;height:17px"></i></div>
           </div>
         </sc-if>
       </sc-if>
@@ -1788,7 +1788,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:16px;font-weight:600">การจับคู่คอลัมน์อัตโนมัติ</h3>
-            <span onClick="{{ noop }}" style="font-size:12.5px;color:#C13D6C;font-weight:600;cursor:pointer">แก้การจับคู่</span>
+            <span onClick="{{ noop }}" style="font-size:12.5px;color:#2C4A7C;font-weight:600;cursor:pointer">แก้การจับคู่</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px">
             <sc-for list="{{ importMaps }}" as="m" hint-placeholder-count="4">
@@ -1842,8 +1842,8 @@
                   <td style="padding:11px 8px;color:#3A4456;font-weight:500;white-space:nowrap">{{ r.oid }}</td>
                   <td style="padding:11px 8px;color:#5A6478;white-space:nowrap">{{ r.pay }}</td>
                   <td style="padding:11px 8px;text-align:right;color:#1B2536;font-weight:600">{{ r.gross }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#C13D6C">{{ r.gp }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#C13D6C">{{ r.vat }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#2C4A7C">{{ r.gp }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#2C4A7C">{{ r.vat }}</td>
                   <td style="{{ r.netStyle }}">{{ r.net }}</td>
                   <td style="padding:11px 8px"><span style="{{ r.statusStyle }}">{{ r.status }}</span></td>
                 </tr>
@@ -1870,13 +1870,13 @@
           <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px">
             <div style="padding:0 30px"><div style="font-size:24px;font-weight:700;color:#1B2536;letter-spacing:-0.4px">{{ doneGrossTotal }}</div><div style="font-size:12px;color:#8089A0;margin-top:3px">ยอดขายรวม</div></div>
             <div style="width:1px;height:38px;background:#E7E9ED"></div>
-            <div style="padding:0 30px"><div style="font-size:24px;font-weight:700;color:#C13D6C;letter-spacing:-0.4px">{{ doneFeeTotal }}</div><div style="font-size:12px;color:#8089A0;margin-top:3px">ค่าธรรมเนียมรวม</div></div>
+            <div style="padding:0 30px"><div style="font-size:24px;font-weight:700;color:#2C4A7C;letter-spacing:-0.4px">{{ doneFeeTotal }}</div><div style="font-size:12px;color:#8089A0;margin-top:3px">ค่าธรรมเนียมรวม</div></div>
             <div style="width:1px;height:38px;background:#E7E9ED"></div>
             <div style="padding:0 30px"><div style="font-size:24px;font-weight:700;color:#2E7D5B;letter-spacing:-0.4px">{{ doneNetTotal }}</div><div style="font-size:12px;color:#8089A0;margin-top:3px">เงินเข้าจริงรวม</div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;gap:12px">
             <div onClick="{{ resetImport }}" style="background:#fff;border:1px solid #DFE2E7;border-radius:11px;padding:11px 20px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">นำเข้าไฟล์ถัดไป</div>
-            <div onClick="{{ goSales }}" style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">ดูในหน้าบันทึกยอดขาย<i data-lucide="arrow-right" style="width:16px;height:16px"></i></div>
+            <div onClick="{{ goSales }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">ดูในหน้าบันทึกยอดขาย<i data-lucide="arrow-right" style="width:16px;height:16px"></i></div>
           </div>
         </div>
       </sc-if>
@@ -1909,7 +1909,7 @@
               <div style="display:flex;flex-direction:column;gap:16px">
                 <sc-for list="{{ autoSteps }}" as="s" hint-placeholder-count="3">
                   <div style="display:flex;gap:13px">
-                    <div style="width:28px;height:28px;border-radius:50%;background:#F7E9F0;color:#A83359;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">{{ s.n }}</div>
+                    <div style="width:28px;height:28px;border-radius:50%;background:#ECF1F7;color:#223C66;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">{{ s.n }}</div>
                     <div><div style="font-size:13.5px;font-weight:600;color:#1B2536;margin-bottom:3px">{{ s.t }}</div><div style="font-size:12.5px;color:#8089A0;line-height:1.5">{{ s.d }}</div></div>
                   </div>
                 </sc-for>
@@ -1981,13 +1981,13 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">กระทบยอดเงินโอน</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Payout Reconciliation</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Payout Reconciliation</span>
           </div>
           <div style="font-size:14px;color:#8089A0">เทียบยอดที่ระบบคาดว่าจะได้ กับเงินที่แพลตฟอร์มโอนเข้าบัญชีจริง</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
           <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วง</span><span style="font-weight:600">7 วันล่าสุด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>กระทบยอดใหม่</div>
+          <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>กระทบยอดใหม่</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
@@ -2440,11 +2440,11 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สิทธิ์ผู้ใช้</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">{{ userCountLabel }}</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">{{ userCountLabel }}</span>
           </div>
           <div style="font-size:14px;color:#8089A0">กำหนดว่าใครเห็นและแก้ไขอะไรได้บ้าง — แยกตามบทบาทและสาขา</div>
         </div>
-        <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#C13D6C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="user-plus" style="width:16px;height:16px"></i>เชิญผู้ใช้</div>
+        <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="user-plus" style="width:16px;height:16px"></i>เชิญผู้ใช้</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ roleDefs }}" as="r" hint-placeholder-count="4">
@@ -2515,7 +2515,7 @@
       <div style="margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
           <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">มุมมองเจ้าของ</h1>
-          <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">มือถือ</span>
+          <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">มือถือ</span>
         </div>
         <div style="font-size:14px;color:#8089A0">สรุปวันสำหรับเจ้าของ — เช็คยอด กำไร และความเสี่ยงได้จบในจอเดียว</div>
       </div>
@@ -2549,7 +2549,7 @@
               </div>
             </div>
             <div style="background:#fff;border-top:1px solid #E7E9ED;padding:13px 30px 20px;display:flex;align-items:center;justify-content:space-between;color:#9AA3B2">
-              <i data-lucide="house" style="width:21px;height:21px;color:#C13D6C"></i>
+              <i data-lucide="house" style="width:21px;height:21px;color:#2C4A7C"></i>
               <i data-lucide="chart-column" style="width:21px;height:21px"></i>
               <i data-lucide="bell" style="width:21px;height:21px"></i>
               <i data-lucide="user" style="width:21px;height:21px"></i>
@@ -2580,7 +2580,7 @@
             <div style="background:#fff;border-top:1px solid #E7E9ED;padding:13px 30px 20px;display:flex;align-items:center;justify-content:space-between;color:#9AA3B2">
               <i data-lucide="house" style="width:21px;height:21px"></i>
               <i data-lucide="chart-column" style="width:21px;height:21px"></i>
-              <i data-lucide="bell" style="width:21px;height:21px;color:#C13D6C"></i>
+              <i data-lucide="bell" style="width:21px;height:21px;color:#2C4A7C"></i>
               <i data-lucide="user" style="width:21px;height:21px"></i>
             </div>
           </div>
@@ -2599,7 +2599,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">บันทึกยอดขาย</h1>
-            <span style="background:#F7E9F0;color:#C13D6C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
           </div>
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลยอดขายทั้งหมดจาก LINE MAN, Grab และ ShopeeFood</div>
         </div>
@@ -2696,14 +2696,14 @@
                   <td style="padding:11px 6px">{{ r.brand }}</td>
                   <td style="padding:11px 6px;color:#5A6478;white-space:nowrap">{{ r.orderId }}<sc-if value="{{ r.note }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#9AA3B2;white-space:normal;max-width:230px;line-height:1.4">{{ r.note }}</div></sc-if></td>
                   <td style="padding:11px 6px;text-align:right;white-space:nowrap">{{ r.gross }}</td>
-                  <td style="padding:11px 6px;text-align:right;color:#B95064;white-space:nowrap">{{ r.gp }}</td>
-                  <td style="padding:11px 6px;text-align:right;color:#B95064;white-space:nowrap">{{ r.vat }}</td>
+                  <td style="padding:11px 6px;text-align:right;color:#B14A4A;white-space:nowrap">{{ r.gp }}</td>
+                  <td style="padding:11px 6px;text-align:right;color:#B14A4A;white-space:nowrap">{{ r.vat }}</td>
                   <td style="padding:11px 6px;text-align:right;font-weight:600;white-space:nowrap">{{ r.net }}</td>
                   <td style="padding:11px 6px;text-align:center">{{ r.status }}</td>
                   <td style="padding:11px 6px;text-align:center">
                     <div style="display:flex;align-items:center;justify-content:center;gap:11px">
                       <div onClick="{{ r.onDelete }}" style="display:inline-flex;line-height:0;cursor:pointer">
-                        <i data-lucide="trash-2" style="width:15px;height:15px;color:#C08A95"></i>
+                        <i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i>
                       </div>
                     </div>
                   </td>
@@ -2716,7 +2716,7 @@
             <span>แสดง {{ rowCount }} จาก {{ salesTotalCount }} รายการ</span>
             <div style="display:flex;align-items:center;gap:6px">
               <div onClick="{{ salesPrevPage }}" style="width:30px;height:30px;border:1px solid #E7E9ED;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9AA3B2;cursor:pointer"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-              <div style="min-width:30px;height:30px;padding:0 8px;background:#F7E9F0;border:1px solid #DFA3BC;color:#A83359;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;white-space:nowrap">หน้า {{ salesPage }} / {{ salesTotalPages }}</div>
+              <div style="min-width:30px;height:30px;padding:0 8px;background:#ECF1F7;border:1px solid #A9BBD6;color:#223C66;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600;white-space:nowrap">หน้า {{ salesPage }} / {{ salesTotalPages }}</div>
               <div onClick="{{ salesNextPage }}" style="width:30px;height:30px;border:1px solid #E7E9ED;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
               <div data-list-dd style="position:relative">
                 <div onClick="{{ salesPageSizeDD.toggle }}" style="display:flex;align-items:center;gap:5px;border:1px solid #E7E9ED;border-radius:8px;padding:0 10px;height:30px;color:#5A6478;cursor:pointer">{{ salesPageSizeDD.value }} <i data-lucide="chevron-down" style="width:13px;height:13px"></i></div>
@@ -2761,7 +2761,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <h3 style="margin:0 0 6px;font-size:15.5px;font-weight:600">แนวโน้มยอดขาย <span style="color:#9AA3B2;font-weight:500;font-size:13px">14 วันล่าสุด</span></h3>
           <div style="display:flex;align-items:center;gap:18px;margin-bottom:6px;font-size:12px;color:#7A8497;flex-wrap:wrap">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#DFA3BC"></span>ยอดขาย (บาท)</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>ยอดขาย (บาท)</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span>ยอดสุทธิ (Net Sales)</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>ค่าเฉลี่ยยอดขาย/วัน</span>
           </div>
@@ -2799,7 +2799,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
           <h3 style="margin:0;font-size:16px;font-weight:600">บันทึกยอดขายหน้าร้าน — ทั้งวัน</h3>
           <div style="display:flex;align-items:center;gap:9px">
-            <span style="font-size:12.5px;color:#6B7486;font-weight:500">วันที่ <span style="color:#C13D6C">*</span></span>
+            <span style="font-size:12.5px;color:#6B7486;font-weight:500">วันที่ <span style="color:#2C4A7C">*</span></span>
             <input type="date" value="{{ storeBatch.date }}" onChange="{{ setStoreBatchDate }}" style="border:1px solid #DFE2E7;border-radius:10px;padding:9px 12px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;background:#fff"/>
           </div>
         </div>
@@ -2810,7 +2810,7 @@
           <sc-for list="{{ storeBatchRows }}" as="r" hint-placeholder-count="6">
             <div style="font-size:13px;color:#2B3547;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div>
             <input value="{{ r.amount }}" onChange="{{ r.setAmount }}" inputmode="decimal" placeholder="0" style="min-width:0;border:1px solid #DFE2E7;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit;box-sizing:border-box"/>
-            <input value="{{ r.disc }}" onChange="{{ r.setDisc }}" inputmode="decimal" placeholder="0" style="min-width:0;border:1px solid #DFE2E7;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#B95064;text-align:right;outline:none;font-family:inherit;box-sizing:border-box"/>
+            <input value="{{ r.disc }}" onChange="{{ r.setDisc }}" inputmode="decimal" placeholder="0" style="min-width:0;border:1px solid #DFE2E7;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#B14A4A;text-align:right;outline:none;font-family:inherit;box-sizing:border-box"/>
           </sc-for>
         </div>
         <div style="display:flex;justify-content:flex-end;gap:26px;border-top:1px solid #F1F2F4;margin-top:15px;padding-top:13px;flex-wrap:wrap">
@@ -2820,7 +2820,7 @@
           </div>
           <div style="text-align:right">
             <div style="font-size:11.5px;color:#8089A0">ส่วนลดรวม</div>
-            <div style="font-size:17px;font-weight:700;color:#B95064">{{ storeBatchTotals.disc }}</div>
+            <div style="font-size:17px;font-weight:700;color:#B14A4A">{{ storeBatchTotals.disc }}</div>
           </div>
           <div style="text-align:right">
             <div style="font-size:11.5px;color:#8089A0">รับจริง</div>
@@ -2831,13 +2831,13 @@
           <input value="{{ storeBatch.note }}" onChange="{{ setStoreBatchNote }}" placeholder="หมายเหตุ (ถ้ามี) เช่น ออเดอร์พิเศษ, ขายส่งร้าน..." style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;box-sizing:border-box"/>
         </div>
         <sc-if value="{{ storeFormError }}" hint-placeholder-val="{{ false }}">
-          <div style="background:#F9E7EA;border:1px solid #DFA3BC;color:#B95064;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-top:13px">{{ storeFormError }}</div>
+          <div style="background:#F9E7EA;border:1px solid #A9BBD6;color:#B14A4A;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-top:13px">{{ storeFormError }}</div>
         </sc-if>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;flex-wrap:wrap">
           <span style="font-size:12px;color:#9AA3B2">ช่องที่เว้นว่างจะไม่ถูกบันทึก · ถ้าวันเดียวกันมีข้อมูลเดิมจะถามก่อนเขียนทับ</span>
           <div style="display:flex;align-items:center;gap:11px">
             <div onClick="{{ clearStoreBatch }}" style="background:#fff;border:1px solid #DFE2E7;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer">ล้างข้อมูล</div>
-            <div onClick="{{ saveStoreBatch }}" style="background:#C13D6C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">{{ storeSaveLabel }}</div>
+            <div onClick="{{ saveStoreBatch }}" style="background:#2C4A7C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)">{{ storeSaveLabel }}</div>
           </div>
         </div>
       </div>
@@ -3247,8 +3247,8 @@ class Component extends DCLogic {
     const bw = 9, gap = 3.5;
     labels.forEach((d, i) => {
       const c = xc(i);
-      els.push(React.createElement('rect', { key:'s'+i, x: c - bw - gap/2, y: yy(salesDays[i]), width: bw, height: Math.max(ch - (yy(salesDays[i]) - mt), 0), rx: 2.5, fill:'#DFA3BC' }));
-      els.push(React.createElement('rect', { key:'e'+i, x: c + gap/2, y: yy(expDays[i]), width: bw, height: Math.max(ch - (yy(expDays[i]) - mt), 0), rx: 2.5, fill:'#DFA3BC' }));
+      els.push(React.createElement('rect', { key:'s'+i, x: c - bw - gap/2, y: yy(salesDays[i]), width: bw, height: Math.max(ch - (yy(salesDays[i]) - mt), 0), rx: 2.5, fill:'#A9BBD6' }));
+      els.push(React.createElement('rect', { key:'e'+i, x: c + gap/2, y: yy(expDays[i]), width: bw, height: Math.max(ch - (yy(expDays[i]) - mt), 0), rx: 2.5, fill:'#A9BBD6' }));
       els.push(React.createElement('text', { key:'d'+i, x: c, y: H - 8, textAnchor:'middle', fontSize:10.5, fill:'#9AA3B2', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, d));
     });
     const pts = net.map((v, i) => [xc(i), yy(v)]);
@@ -3404,7 +3404,7 @@ class Component extends DCLogic {
     const bw = 22;
     labels.forEach((d, i) => {
       const c = xc(i);
-      els.push(React.createElement('rect', { key: 's' + i, x: c - bw / 2, y: yy(sales[i]), width: bw, height: Math.max(ch - (yy(sales[i]) - mt), 0), rx: 4, fill: '#C4638A' }));
+      els.push(React.createElement('rect', { key: 's' + i, x: c - bw / 2, y: yy(sales[i]), width: bw, height: Math.max(ch - (yy(sales[i]) - mt), 0), rx: 4, fill: '#4A6B9E' }));
       els.push(React.createElement('text', { key: 'd' + i, x: c, y: H - 8, textAnchor: 'middle', fontSize: 10, fill: '#9AA3B2', fontFamily: "'IBM Plex Sans Thai',sans-serif" }, d));
     });
     const pts = net.map((v, i) => [xc(i), yy(v)]);
@@ -3420,12 +3420,12 @@ class Component extends DCLogic {
     const netProfit = grossProfit - opex;
     const fmtStep = n => (n < 0 ? '(' + Math.round(-n).toLocaleString('en-US') + ')' : Math.round(n).toLocaleString('en-US'));
     const steps = [
-      { l:['Gross Sales'], from:0, to:grossSales, c:'#DFA3BC', t:fmtStep(grossSales) },
-      { l:['Platform Fee'], from:netSales, to:grossSales, c:'#DFA3BC', t:fmtStep(netSales - grossSales) },
-      { l:['Net Sales'], from:0, to:netSales, c:'#DFA3BC', t:fmtStep(netSales) },
-      { l:['COGS'], from:grossProfit, to:netSales, c:'#DFA3BC', t:fmtStep(grossProfit - netSales) },
+      { l:['Gross Sales'], from:0, to:grossSales, c:'#A9BBD6', t:fmtStep(grossSales) },
+      { l:['Platform Fee'], from:netSales, to:grossSales, c:'#A9BBD6', t:fmtStep(netSales - grossSales) },
+      { l:['Net Sales'], from:0, to:netSales, c:'#A9BBD6', t:fmtStep(netSales) },
+      { l:['COGS'], from:grossProfit, to:netSales, c:'#A9BBD6', t:fmtStep(grossProfit - netSales) },
       { l:['Gross Profit'], from:0, to:grossProfit, c:'#4E9E77', t:fmtStep(grossProfit) },
-      { l:['Operating','Expense'], from:netProfit, to:grossProfit, c:'#DFA3BC', t:fmtStep(netProfit - grossProfit) },
+      { l:['Operating','Expense'], from:netProfit, to:grossProfit, c:'#A9BBD6', t:fmtStep(netProfit - grossProfit) },
       { l:['Net Profit'], from:0, to:netProfit, c:'#4E9E77', t:fmtStep(netProfit) }
     ];
     const W = 760, H = 340, ml = 44, mr = 14, mt = 26, mb = 50;
@@ -3458,7 +3458,7 @@ class Component extends DCLogic {
   navStyle(active) {
     const base = { display:'flex', alignItems:'center', gap:'13px', padding:'11px 14px', borderRadius:'12px', cursor:'pointer' };
     return active
-      ? { ...base, background:'#F7E9F0', color:'#A83359', fontWeight:600 }
+      ? { ...base, background:'#ECF1F7', color:'#223C66', fontWeight:600 }
       : { ...base, color:'#7A8497' };
   }
 
@@ -3482,8 +3482,8 @@ class Component extends DCLogic {
     labels.forEach((d,i)=>{
       const cx = ml + slot*i + slot/2;
       const x1 = cx - bw - gap/2, x2 = cx + gap/2;
-      els.push(React.createElement('rect',{key:'in'+i,x:x1,y:yy(income[i]),width:bw,height:Math.max(ch-(yy(income[i])-mt),0),rx:2.5,fill:'#C4638A'}));
-      els.push(React.createElement('rect',{key:'ex'+i,x:x2,y:yy(expense[i]),width:bw,height:Math.max(ch-(yy(expense[i])-mt),0),rx:2.5,fill:'#DFA3BC'}));
+      els.push(React.createElement('rect',{key:'in'+i,x:x1,y:yy(income[i]),width:bw,height:Math.max(ch-(yy(income[i])-mt),0),rx:2.5,fill:'#4A6B9E'}));
+      els.push(React.createElement('rect',{key:'ex'+i,x:x2,y:yy(expense[i]),width:bw,height:Math.max(ch-(yy(expense[i])-mt),0),rx:2.5,fill:'#A9BBD6'}));
       els.push(React.createElement('text',{key:'d'+i,x:cx,y:H-8,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},d));
     });
     const pts = profit.map((v,i)=>[ml + slot*i + slot/2, yy(v)]);
@@ -3513,10 +3513,10 @@ class Component extends DCLogic {
     const dline = pts.length ? pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ') : '';
     if (pts.length) {
       const area = dline + ` L ${pts[pts.length-1][0].toFixed(1)} ${yy(0)} L ${pts[0][0].toFixed(1)} ${yy(0)} Z`;
-      els.push(React.createElement('path',{key:'area',d:area,fill:'#CE5C84',opacity:0.12}));
+      els.push(React.createElement('path',{key:'area',d:area,fill:'#4A6B9E',opacity:0.12}));
     }
     els.push(React.createElement('line',{key:'bud',x1:ml,x2:W-mr,y1:yy(budget),y2:yy(budget),stroke:'#B9C2D0',strokeWidth:1.4,strokeDasharray:'6 4'}));
-    if (pts.length) els.push(React.createElement('path',{key:'l',d:dline,fill:'none',stroke:'#CE5C84',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}));
+    if (pts.length) els.push(React.createElement('path',{key:'l',d:dline,fill:'none',stroke:'#4A6B9E',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}));
     labels.forEach((lab,i)=>{ if (i % 5 === 0 || i === labels.length-1) els.push(React.createElement('text',{key:'x'+i,x:xc(i),y:H-7,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},lab)); });
     return React.createElement('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:'auto',style:{display:'block'}},els);
   }
@@ -3536,11 +3536,11 @@ class Component extends DCLogic {
     const bw=22;
     days.forEach((d,i)=>{
       const c=xc(i);
-      els.push(React.createElement('rect',{key:'s'+i,x:c-bw/2,y:yy(sales[i]),width:bw,height:ch-(yy(sales[i])-mt),rx:4,fill:'#C4638A'}));
+      els.push(React.createElement('rect',{key:'s'+i,x:c-bw/2,y:yy(sales[i]),width:bw,height:ch-(yy(sales[i])-mt),rx:4,fill:'#4A6B9E'}));
       els.push(React.createElement('text',{key:'v'+i,x:c,y:yy(sales[i])-7,textAnchor:'middle',fontSize:10,fontWeight:600,fill:'#3A4456'},'฿'+sales[i]+'K'));
       els.push(React.createElement('text',{key:'d'+i,x:c,y:H-8,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},d));
     });
-    els.push(React.createElement('line',{key:'tgt',x1:ml,x2:W-mr,y1:yy(100),y2:yy(100),stroke:'#DFA3BC',strokeWidth:1.4,strokeDasharray:'6 4'}));
+    els.push(React.createElement('line',{key:'tgt',x1:ml,x2:W-mr,y1:yy(100),y2:yy(100),stroke:'#A9BBD6',strokeWidth:1.4,strokeDasharray:'6 4'}));
     const pts=net.map((v,i)=>[xc(i),yy(v)]);
     const dp=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
     els.push(React.createElement('path',{key:'np',d:dp,fill:'none',stroke:'#2E7D5B',strokeWidth:2.4,strokeLinecap:'round',strokeLinejoin:'round'}));
@@ -3559,8 +3559,8 @@ class Component extends DCLogic {
       options: options.map(o => ({
         label: o,
         onClick: () => this.setState(s => ({ [sk]: { ...s[sk], [field]: o }, formDD: null })),
-        style: o === cur ? { ...optBase, background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { ...optBase, color:'#3A4456' },
-        check: o === cur ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+        style: o === cur ? { ...optBase, background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { ...optBase, color:'#3A4456' },
+        check: o === cur ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
     };
   }
@@ -3585,7 +3585,7 @@ class Component extends DCLogic {
     const bw=14;
     labels.forEach((d,i)=>{
       const c=xc(i);
-      els.push(React.createElement('rect',{key:'s'+i,x:c-bw/2,y:yy(sales[i]),width:bw,height:Math.max(ch-(yy(sales[i])-mt),0),rx:3,fill:'#DFA3BC'}));
+      els.push(React.createElement('rect',{key:'s'+i,x:c-bw/2,y:yy(sales[i]),width:bw,height:Math.max(ch-(yy(sales[i])-mt),0),rx:3,fill:'#A9BBD6'}));
       els.push(React.createElement('text',{key:'d'+i,x:c,y:H-8,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},d));
     });
     els.push(React.createElement('line',{key:'avg',x1:ml,x2:W-mr,y1:yy(avg),y2:yy(avg),stroke:'#B9C2D0',strokeWidth:1.4,strokeDasharray:'5 4'}));
@@ -3610,8 +3610,8 @@ class Component extends DCLogic {
     const mkOpt = (val, cur, set) => ({
       label: val,
       onClick: () => this.setState(set),
-      style: val === cur ? { ...optBase, background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { ...optBase, color:'#3A4456' },
-      check: val === cur ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+      style: val === cur ? { ...optBase, background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { ...optBase, color:'#3A4456' },
+      check: val === cur ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
     });
     const periodOptions = ['วันนี้','สัปดาห์นี้','เดือนนี้','ปีนี้','เลือกเอง'].map(p => mkOpt(p, period, { period: p, periodOpen: p === 'เลือกเอง' }));
     const customFrom = this.state.customFrom, customTo = this.state.customTo;
@@ -3655,7 +3655,7 @@ class Component extends DCLogic {
           label: n.label, icon: n.icon,
           iconStyle: { width:'16px', height:'16px' },
           labelStyle: { fontSize:'13px', fontWeight: 500 },
-          style: { display:'flex', alignItems:'center', gap:'11px', padding:'8px 14px 8px 32px', borderRadius:'12px', cursor:'pointer', color: active ? '#A83359' : '#8A93A5', background: active ? '#F7E9F0' : 'transparent', fontWeight: active ? 600 : 500 },
+          style: { display:'flex', alignItems:'center', gap:'11px', padding:'8px 14px 8px 32px', borderRadius:'12px', cursor:'pointer', color: active ? '#223C66' : '#8A93A5', background: active ? '#ECF1F7' : 'transparent', fontWeight: active ? 600 : 500 },
           onClick: handled ? go(n.page) : () => {}
         };
       }
@@ -3690,9 +3690,9 @@ class Component extends DCLogic {
     const ovDay12Exp = this.dayBucketsGeneric(ovExpRows, 12, r => r.amount);
     const ovDay12Profit = ovDay12Sales.map((v, i) => v - ovDay12Exp[i]);
     const kpiOverview = [
-      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:ovNoDelta, icon:'shopping-bag', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(ovDay12Sales,'#C4638A') },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด (ก่อนลด ' + ovFmt(ovGross) + ')', icon:'chart-column', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(ovDay12Sales,'#C4638A') },
-      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:ovNoDelta, icon:'circle-arrow-down', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(ovDay12Exp,'#CE5C84') },
+      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:ovNoDelta, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด (ก่อนลด ' + ovFmt(ovGross) + ')', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:ovNoDelta, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
       { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:ovNoDelta, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
       { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:ovNoDelta, icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
       { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:ovNoDelta, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Sales.map(()=>0),'#D98A4C') }
@@ -3710,9 +3710,9 @@ class Component extends DCLogic {
     const finReceivable = finRows.filter(r => r.status === 'รอรับเงิน').reduce((a, r) => a + r.net, 0);
     const finNetProfit = finNet - finExpenseTotal;
     const kpiFinance = [
-      { title:'Gross Sales', amount:fmtFin(finGross), delta:noDeltaFin, icon:'shopping-bag', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.gross),'#C4638A') },
-      { title:'Net Sales', amount:fmtFin(finNet), delta:noDeltaFin, icon:'tag', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net),'#C4638A') },
-      { title:'รายจ่ายรวม', amount:fmtFin(finExpenseTotal), delta:noDeltaFin, icon:'circle-arrow-down', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(this.dayBucketsGeneric(finExpRows,12,r=>r.amount),'#CE5C84') },
+      { title:'Gross Sales', amount:fmtFin(finGross), delta:noDeltaFin, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.gross),'#4A6B9E') },
+      { title:'Net Sales', amount:fmtFin(finNet), delta:noDeltaFin, icon:'tag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net),'#4A6B9E') },
+      { title:'รายจ่ายรวม', amount:fmtFin(finExpenseTotal), delta:noDeltaFin, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finExpRows,12,r=>r.amount),'#4A6B9E') },
       { title:'เงินเข้าจริง (Cash In)', amount:fmtFin(finCashIn), delta:noDeltaFin, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='เงินเข้าจริง'),12,r=>r.net),'#4E9E77') },
       { title:'Platform Receivable', amount:fmtFin(finReceivable), delta:noDeltaFin, icon:'credit-card', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='รอรับเงิน'),12,r=>r.net),'#8B6FB8') },
       { title:'Net Profit', amount:fmtFin(finNetProfit), delta:noDeltaFin, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net).map((v,i)=>v-this.dayBucketsGeneric(finExpRows,12,r=>r.amount)[i]),'#D98A4C') }
@@ -3724,10 +3724,10 @@ class Component extends DCLogic {
     }
     const ovReceivable = ovRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (ovReceivable > 0) {
-      ceoAlerts.push({ title:'มียอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + ovFmt(ovReceivable), icon:'clock', bg:'#F9F0F4', border:'#F3DCE7', iconBg:'#F3DCE7', iconFg:'#C13D6C' });
+      ceoAlerts.push({ title:'มียอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + ovFmt(ovReceivable), icon:'clock', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C' });
     }
 
-    const ovBrandColors = ['#CE5C84','#9C82C4','#DCA96B','#4E9E77','#CE5C84','#3E9E92'];
+    const ovBrandColors = ['#4A6B9E','#9C82C4','#DCA96B','#4E9E77','#4A6B9E','#3E9E92'];
     const byBrandOv = ovSumByKey(ovRows, r => r.brand, r => r.gross);
     const ovBrandNames = Object.keys(byBrandOv);
     const brandRows = ovBrandNames.map((name, i) => ({
@@ -3736,7 +3736,7 @@ class Component extends DCLogic {
     }));
     const brandRowsTotalLabel = ovFmt(ovGross);
 
-    const ovChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
+    const ovChannelColors = { 'หน้าร้าน':'#3A5A8C', 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245' };
     const ovChannelOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const byChannelOv = ovSumByKey(ovRows, r => r.platform, r => r.gross);
     const channelRows = ovChannelOrder.filter(p => byChannelOv[p]).map(p => ({ name:p, amount: ovFmt(byChannelOv[p]), pct: ovGross ? (byChannelOv[p] / ovGross * 100).toFixed(1) + '%' : '0%', color: ovChannelColors[p] }));
@@ -3762,7 +3762,7 @@ class Component extends DCLogic {
       const storefront = brandRowsFor.filter(r=>r.platform==='หน้าร้าน').reduce((a,r)=>a+r.gross,0);
       const byPlatformForBrand = ovSumByKey(brandRowsFor, r=>r.platform, r=>r.gross);
       const topPlatform = Object.keys(byPlatformForBrand).sort((a,b)=>byPlatformForBrand[b]-byPlatformForBrand[a])[0];
-      const tagColors = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'Grab':['#E7F3EC','#1F7A47'], 'LINE MAN':['#EBF6EF','#328756'], 'ShopeeFood':['#FBECE7','#B84B31'] };
+      const tagColors = { 'หน้าร้าน':['#EAF0F8','#3A5A8C'], 'Grab':['#E7F1EA','#26663F'], 'LINE MAN':['#EFEBF6','#5F4A87'], 'ShopeeFood':['#F9ECE7','#A64A31'] };
       const tc = tagColors[topPlatform] || ['#EEF0F5','#5A6478'];
       const channelTag = topPlatform ? React.createElement('span', { style:{ background:tc[0], color:tc[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, topPlatform) : '—';
       return { brand:name, dot: ovBrandColors[i % ovBrandColors.length], sales: ovFmt(sales), storefront: ovFmt(storefront), salesPct: ovGross ? (sales/ovGross*100).toFixed(1)+'%' : '0%', exp:'—', expPct:'—', profit:'—', margin:'—', channelTag, weight:'500' };
@@ -3772,7 +3772,7 @@ class Component extends DCLogic {
     }
 
     // ---- finance page (real data from recentRows + expRows) ----
-    const finCatColors = { 'วัตถุดิบ (COGS)':'#C4638A', 'ค่าแรง':'#D98A4C', 'บรรจุภัณฑ์':'#DFA3BC', 'ค่าน้ำค่าไฟ':'#4E9E77', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#9C82C4', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#8B6FB8', 'อื่นๆ':'#B6BECC' };
+    const finCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#D98A4C', 'บรรจุภัณฑ์':'#A9BBD6', 'ค่าน้ำค่าไฟ':'#4E9E77', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#9C82C4', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#8B6FB8', 'อื่นๆ':'#B6BECC' };
     const finSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byExpCat = finSumByKey(finExpRows, r => r.mainCat, r => r.amount);
     const expCatNames = Object.keys(byExpCat);
@@ -3786,7 +3786,7 @@ class Component extends DCLogic {
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'5px', background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 9px', borderRadius:'7px', whiteSpace:'nowrap' } },
         React.createElement('i', { 'data-lucide': c[2], style:{ width:'13px', height:'13px' } }), txt);
     };
-    const finPlatformDots = { 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
+    const finPlatformDots = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245' };
     const byPlatformFin = this.groupBy(finRows, r => r.platform);
     const finDeliveryPlatforms = ['Grab','LINE MAN','ShopeeFood'];
     const payoutRows = finDeliveryPlatforms.filter(p => byPlatformFin[p]).map(p => {
@@ -3809,15 +3809,15 @@ class Component extends DCLogic {
     const finExpenseToday = finExpRows.filter(finIsToday).reduce((a,r)=>a+r.amount,0);
     const cashflowCards = [
       { label:'เงินสด', value: fmtFin(0), icon:'banknote', bg:'#EFF6F2', border:'#E6F3ED', iconBg:'#E6F3ED', iconFg:'#2E7D5B' },
-      { label:'เงินโอน', value: fmtFin(0), icon:'landmark', bg:'#F9F0F4', border:'#F3DCE7', iconBg:'#F3DCE7', iconFg:'#C13D6C' },
+      { label:'เงินโอน', value: fmtFin(0), icon:'landmark', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C' },
       { label:'Payout เข้า', value: fmtFin(finCashInToday), icon:'arrow-down-to-line', bg:'#F1ECF6', border:'#EBE3F2', iconBg:'#F1ECF6', iconFg:'#7A5BA8' },
-      { label:'รายจ่ายวันนี้', value: fmtFin(finExpenseToday), icon:'receipt', bg:'#F9F0F4', border:'#F9E7EA', iconBg:'#F9E7EA', iconFg:'#BE4F4F' },
+      { label:'รายจ่ายวันนี้', value: fmtFin(finExpenseToday), icon:'receipt', bg:'#F3F6FA', border:'#F9E7EA', iconBg:'#F9E7EA', iconFg:'#BE4F4F' },
       { label:'คงเหลือสุทธิ', value: fmtFin(finCashInToday - finExpenseToday), icon:'piggy-bank', bg:'#EFF6F2', border:'#E6F3ED', iconBg:'#E6F3ED', iconFg:'#2E7D5B' }
     ];
 
     const financeAlerts = [];
     if (finReceivable > 0) {
-      financeAlerts.push({ title:'ยอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + fmtFin(finReceivable), icon:'mail', accent:'#C4638A', border:'rgba(110,151,232,0.38)', iconBg:'rgba(110,151,232,0.2)', iconFg:'#DFA3BC', titleColor:'#DFA3BC' });
+      financeAlerts.push({ title:'ยอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + fmtFin(finReceivable), icon:'mail', accent:'#4A6B9E', border:'rgba(110,151,232,0.38)', iconBg:'rgba(110,151,232,0.2)', iconFg:'#A9BBD6', titleColor:'#A9BBD6' });
     }
     if (this.state.monthlyBudget && finExpenseTotal > this.state.monthlyBudget) {
       financeAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + fmtFin(finExpenseTotal) + ' / งบ ' + fmtFin(this.state.monthlyBudget), icon:'triangle-alert', accent:'#BE4F4F', border:'rgba(226,97,108,0.4)', iconBg:'rgba(226,97,108,0.18)', iconFg:'#DBA3A8', titleColor:'#DBA3A8' });
@@ -3826,7 +3826,7 @@ class Component extends DCLogic {
     const categoryRows = [];
     finDeliveryPlatforms.concat(['หน้าร้าน']).forEach(p => {
       if (!byPlatformFin[p]) return;
-      categoryRows.push({ cat:p, dot: finPlatformDots[p] || '#C4638A', income: fmtFin(byPlatformFin[p].gross), incomePct: finGross ? (byPlatformFin[p].gross / finGross * 100).toFixed(1) + '%' : '0%', expense:'—', expPctRev:'—', expPctExp:'—', note:'—', weight:'500' });
+      categoryRows.push({ cat:p, dot: finPlatformDots[p] || '#4A6B9E', income: fmtFin(byPlatformFin[p].gross), incomePct: finGross ? (byPlatformFin[p].gross / finGross * 100).toFixed(1) + '%' : '0%', expense:'—', expPctRev:'—', expPctExp:'—', note:'—', weight:'500' });
     });
     expCatNames.forEach(cat => {
       categoryRows.push({ cat, dot: finCatColors[cat] || '#B6BECC', income:'—', incomePct:'—', expense: fmtFin(byExpCat[cat]), expPctRev: finGross ? (byExpCat[cat] / finGross * 100).toFixed(1) + '%' : '0%', expPctExp: finExpenseTotal ? (byExpCat[cat] / finExpenseTotal * 100).toFixed(1) + '%' : '0%', note:'—', weight:'500' });
@@ -3847,13 +3847,13 @@ class Component extends DCLogic {
     const rcInTodayRows = rcMoneyIn.filter(r => r.isoDate === rcToday);
     const rcInToday = rcInTodayRows.reduce((a, r) => a + r.net, 0);
     const rcInDays = new Set(rcMoneyIn.map(r => r.isoDate).filter(Boolean)).size;
-    const rcPalette = { 'หน้าร้าน':['#F7E9F0','#C13D6C','store'], 'Grab':['#E7F3EC','#1F7A47','bike'], 'LINE MAN':['#EBF6EF','#328756','message-circle'], 'ShopeeFood':['#FBECE7','#B84B31','shopping-bag'] };
+    const rcPalette = { 'หน้าร้าน':['#EAF0F8','#3A5A8C','store'], 'Grab':['#E7F1EA','#26663F','bike'], 'LINE MAN':['#EFEBF6','#5F4A87','message-circle'], 'ShopeeFood':['#F9ECE7','#A64A31','shopping-bag'] };
     const rcOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const rcInByPlat = {}; rcMoneyIn.forEach(r => { rcInByPlat[r.platform] = (rcInByPlat[r.platform] || 0) + r.net; });
     const rcPendByPlat = {}; rcPend.forEach(r => { rcPendByPlat[r.platform] = (rcPendByPlat[r.platform] || 0) + r.net; });
     const rcKpis = [
       { title:'เงินเข้าจริงวันนี้', amount: rcFmt(rcInToday), sub: rcInTodayRows.length + ' รายการ', delta:'–', icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B', amtColor:'#1B2536' },
-      { title:'เงินเข้าจริง (ช่วงที่เลือก)', amount: rcFmt(rcInNet), sub:'จากยอดขายสุทธิ ' + rcFmt(rcTotalNet), delta:'–', icon:'landmark', bg:'#F7E9F0', fg:'#C13D6C', amtColor:'#1B2536' },
+      { title:'เงินเข้าจริง (ช่วงที่เลือก)', amount: rcFmt(rcInNet), sub:'จากยอดขายสุทธิ ' + rcFmt(rcTotalNet), delta:'–', icon:'landmark', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#1B2536' },
       { title:'ยอดค้างรับ Platform', amount: rcFmt(rcPendNet), sub: rcPend.length + ' รายการยังไม่เข้าบัญชี', delta:'–', icon:'clock', bg:'#F1ECF6', fg:'#7A5BA8', amtColor:'#1B2536', warn:false },
       { title:'อัตราเงินเข้าจริง (Cash In Rate)', amount: rcTotalNet ? ((rcInNet / rcTotalNet) * 100).toFixed(1) + '%' : '0%', sub:'Cash In / Net Sales', delta:'–', icon:'trending-up', bg:'#E7F2F0', fg:'#3E9E92', amtColor:'#1B2536' },
       { title:'ยอดเฉลี่ยเงินเข้าต่อวัน', amount: rcFmt(rcInDays ? rcInNet / rcInDays : 0), sub: rcInDays + ' วันมีเงินเข้า', delta:'–', icon:'landmark', bg:'#F8F0DC', fg:'#D98A4C', amtColor:'#1B2536' }
@@ -3871,12 +3871,12 @@ class Component extends DCLogic {
       ? this.donut(rcOrder.filter(p => rcInByPlat[p]).map(p => ({ value: rcInByPlat[p], color: (rcPalette[p] || ['#EEF0F5','#5A6478'])[1] })), 175, 26)
       : this.donut([{ value: 1, color: '#EEF0F5' }], 175, 26);
     const rcStatus = (s) => {
-      const m = { 'เข้าบัญชีแล้ว':['#E6F3ED','#2E7D5B'], 'รอเข้าวันนี้':['#F8F0DC','#B98317'], 'รอเข้าพรุ่งนี้':['#F9E7EA','#B95064'] };
+      const m = { 'เข้าบัญชีแล้ว':['#E6F3ED','#2E7D5B'], 'รอเข้าวันนี้':['#F8F0DC','#B98317'], 'รอเข้าพรุ่งนี้':['#F9E7EA','#B14A4A'] };
       const c = m[s] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, s);
     };
     const rcPlatLogo = (p) => {
-      const m = { 'LINE MAN':['#EBF6EF','#328756','message-circle'], 'Grab':['#E7F3EC','#1F7A47','bike'], 'ShopeeFood':['#FBECE7','#B84B31','shopping-bag'] };
+      const m = { 'LINE MAN':['#EFEBF6','#5F4A87','message-circle'], 'Grab':['#E7F1EA','#26663F','bike'], 'ShopeeFood':['#F9ECE7','#A64A31','shopping-bag'] };
       const c = m[p] || ['#EEF0F4','#8089A0','circle'];
       return React.createElement('span', { style:{ width:'30px', height:'30px', borderRadius:'9px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', background:c[0], color:c[1] } },
         React.createElement('i', { 'data-lucide':c[2], style:{ width:'16px', height:'16px' } }));
@@ -3889,7 +3889,7 @@ class Component extends DCLogic {
         statusTag: rcStatus(pend ? 'รอเข้าวันนี้' : 'เข้าบัญชีแล้ว') };
     });
     const rcChCell = (ch) => {
-      const m = { 'หน้าร้าน':['#F7E9F0','#C13D6C'], 'LINE MAN':['#EBF6EF','#328756'], 'Grab':['#E7F3EC','#1F7A47'], 'ShopeeFood':['#FBECE7','#B84B31'] };
+      const m = { 'หน้าร้าน':['#EAF0F8','#3A5A8C'], 'LINE MAN':['#EFEBF6','#5F4A87'], 'Grab':['#E7F1EA','#26663F'], 'ShopeeFood':['#F9ECE7','#A64A31'] };
       const c = m[ch] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, ch);
     };
@@ -3900,7 +3900,7 @@ class Component extends DCLogic {
     };
     const rcRowActions = React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
       React.createElement('i', { 'data-lucide':'pencil', style:{ width:'14px', height:'14px', color:'#9AA3B2', cursor:'pointer' } }),
-      React.createElement('i', { 'data-lucide':'trash-2', style:{ width:'14px', height:'14px', color:'#C08A95', cursor:'pointer' } }));
+      React.createElement('i', { 'data-lucide':'trash-2', style:{ width:'14px', height:'14px', color:'#B99090', cursor:'pointer' } }));
     const rcRows = rcMoneyIn.slice(0, 12).map(r => ({
       date: r.date, time: r.time || '—', channel: r.platform, chTag: rcChCell(r.platform),
       type: r.brand || '—', detail: r.orderId || '—', amount: rcFmt(r.net), account: '—',
@@ -3932,14 +3932,14 @@ class Component extends DCLogic {
     const inexStorefront = inexRows.filter(r => r.platform === 'หน้าร้าน').reduce((a, r) => a + (r.gross - r.fee), 0);
     const inexPlatformIncome = inexIncomeTotal - inexStorefront;
     const inexKpis = [
-      { title:'รายรับรวม', amount:inexFmt(inexIncomeTotal), delta:inexNoDelta, icon:'trending-up', bg:'#F7E9F0', fg:'#C13D6C', amtColor:'#1B2536' },
-      { title:'รายจ่ายรวม', amount:inexFmt(inexExpenseTotal), delta:inexNoDelta, icon:'credit-card', bg:'#F7E9F0', fg:'#C13D6C', amtColor:'#C13D6C' },
+      { title:'รายรับรวม', amount:inexFmt(inexIncomeTotal), delta:inexNoDelta, icon:'trending-up', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#1B2536' },
+      { title:'รายจ่ายรวม', amount:inexFmt(inexExpenseTotal), delta:inexNoDelta, icon:'credit-card', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#2C4A7C' },
       { title:'กำไรสุทธิ', amount:inexFmt(inexNetProfit), delta:inexNoDelta, icon:'coins', bg:'#E6F3ED', fg:'#2E7D5B', amtColor:'#2E7D5B' },
       { title:'อัตรากำไรสุทธิ', amount:inexMargin.toFixed(1) + '%', delta:inexNoDelta, icon:'chart-pie', bg:'#F1ECF6', fg:'#7A5BA8', amtColor:'#7A5BA8' },
       { title:'รายรับหน้าร้าน', amount:inexFmt(inexStorefront), delta:inexNoDelta, icon:'store', bg:'#F8F0DC', fg:'#D98A4C', amtColor:'#1B2536' },
       { title:'รายรับแพลตฟอร์ม', amount:inexFmt(inexPlatformIncome), delta:inexNoDelta, icon:'smartphone', bg:'#E7F2F0', fg:'#3E9E92', amtColor:'#1B2536' }
     ];
-    const inexCatColors = { 'วัตถุดิบ (COGS)':'#C4638A', 'ค่าแรง':'#CE5C84', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
+    const inexCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
     const inexSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byCatInex = inexSumByKey(inexExpAll, r => r.mainCat, r => r.amount);
     const inexCatNames = Object.keys(byCatInex);
@@ -3948,19 +3948,19 @@ class Component extends DCLogic {
       ? this.donut(inexCatNames.map(name => ({ value: byCatInex[name], color: inexCatColors[name] || '#B6BECC' })), 165, 24)
       : inexEmptyDonut(165, 24);
     const inexChannelOrder = ['หน้าร้าน','LINE MAN','Grab','ShopeeFood'];
-    const inexChannelColors = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#57B678', 'Grab':'#2E9E5F', 'ShopeeFood':'#D96549' };
+    const inexChannelColors = { 'หน้าร้าน':'#3A5A8C', 'LINE MAN':'#7B62A8', 'Grab':'#35875A', 'ShopeeFood':'#C96245' };
     const inexMaxChannel = Math.max(1, ...inexChannelOrder.map(p => byChannelInex[p] ? byChannelInex[p].gross : 0));
     const inexChannelRows = inexChannelOrder.filter(p => byChannelInex[p]).map(p => ({
       name:p, amount: inexFmt(byChannelInex[p].gross), pct: inexIncomeTotal ? (byChannelInex[p].gross / inexIncomeTotal * 100).toFixed(1) + '%' : '0%',
       w: Math.round(byChannelInex[p].gross / inexMaxChannel * 100) + '%', color: inexChannelColors[p]
     }));
     const inexTypePill = (t) => {
-      const c = t === 'รายรับ' ? ['#2E7D5B','▲'] : ['#C13D6C','▼'];
+      const c = t === 'รายรับ' ? ['#2E7D5B','▲'] : ['#2C4A7C','▼'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'4px', color:c[0], fontWeight:600 } },
         React.createElement('span', { style:{ fontSize:'8px' } }, c[1]), t);
     };
     const inexStatusPill = (s) => {
-      const m = { 'รับแล้ว':['#E6F3ED','#2E7D5B'], 'บันทึกแล้ว':['#F7E9F0','#C13D6C'], 'รอเคลียร์':['#F8F0DC','#B98317'] };
+      const m = { 'รับแล้ว':['#E6F3ED','#2E7D5B'], 'บันทึกแล้ว':['#EAF0F8','#3A5A8C'], 'รอเคลียร์':['#F8F0DC','#B98317'] };
       const c = m[s] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, s);
     };
@@ -3970,14 +3970,14 @@ class Component extends DCLogic {
     const inexRecent = [...inexIncomeEntries, ...inexExpenseEntries]
       .sort((a, b) => b.ts - a.ts)
       .slice(0, 20)
-      .map(r => ({ ...r, typeTag: inexTypePill(r.type), statusTag: inexStatusPill(r.status), amountColor: r.neg ? '#C13D6C' : '#1B2536', amountText: (r.neg ? '-' : '') + inexFmt(r.amountNum) }));
+      .map(r => ({ ...r, typeTag: inexTypePill(r.type), statusTag: inexStatusPill(r.status), amountColor: r.neg ? '#2C4A7C' : '#1B2536', amountText: (r.neg ? '-' : '') + inexFmt(r.amountNum) }));
     const inexSummary = [
       { cat:'Sales', income: inexFmt(inexIncomeTotal), expense:'–', net: inexFmt(inexIncomeTotal), netColor:'#2E7D5B', pct: inexIncomeTotal ? '100.0%' : '0.0%' },
-      ...inexCatNames.map(name => ({ cat:name, income:'–', expense: inexFmt(byCatInex[name]), net: '-' + inexFmt(byCatInex[name]).slice(1), netColor:'#C13D6C', pct: inexIncomeTotal ? (byCatInex[name] / inexIncomeTotal * 100).toFixed(1) + '%' : '0.0%' }))
+      ...inexCatNames.map(name => ({ cat:name, income:'–', expense: inexFmt(byCatInex[name]), net: '-' + inexFmt(byCatInex[name]).slice(1), netColor:'#2C4A7C', pct: inexIncomeTotal ? (byCatInex[name] / inexIncomeTotal * 100).toFixed(1) + '%' : '0.0%' }))
     ];
     const inexAlerts = [];
     if (this.state.monthlyBudget && inexExpenseTotal > this.state.monthlyBudget) {
-      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B95064', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.state.monthlyBudget), action:'ดูรายละเอียด', actionColor:'#B95064' });
+      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.state.monthlyBudget), action:'ดูรายละเอียด', actionColor:'#B14A4A' });
     }
     const inexReceivable = inexRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (inexReceivable > 0) {
@@ -4057,7 +4057,7 @@ class Component extends DCLogic {
     const scrollToExpenseForm = () => { const el = document.getElementById('expense-form-card'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const setExpSearch = e => { const val = e.target.value; this.setState({ expSearch: val }); };
     const payPill = (m) => {
-      const map = { 'โอนเงิน':['#F7E9F0','#C13D6C'], 'เงินสด':['#E6F3ED','#2E7D5B'], 'บัตรเครดิต':['#F1ECF6','#7A5BA8'], 'อื่นๆ':['#F8F0DC','#D98A4C'] };
+      const map = { 'โอนเงิน':['#EAF0F8','#3A5A8C'], 'เงินสด':['#E6F3ED','#2E7D5B'], 'บัตรเครดิต':['#F1ECF6','#7A5BA8'], 'อื่นๆ':['#F8F0DC','#D98A4C'] };
       const c = map[m] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, m);
     };
@@ -4084,8 +4084,8 @@ class Component extends DCLogic {
       options: expPeriodOptions.map(o => ({
         label: o,
         onClick: () => this.setState({ expPeriodFilter: o, expListDD: null, expPage: 1 }),
-        style: o === this.state.expPeriodFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F7E9F0', color:'#C13D6C', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.expPeriodFilter ? React.createElement('span', { style:{ color:'#C13D6C', fontWeight:700 } }, '✓') : null
+        style: o === this.state.expPeriodFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#ECF1F7', color:'#2C4A7C', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: o === this.state.expPeriodFilter ? React.createElement('span', { style:{ color:'#2C4A7C', fontWeight:700 } }, '✓') : null
       }))
     };
     const expPageSizeDDOpen = this.state.expListDD === 'pageSize';
@@ -4096,8 +4096,8 @@ class Component extends DCLogic {
       options: expPageSizeOptions.map(o => ({
         label: o + ' / หน้า',
         onClick: () => this.setState({ expPageSize: o, expListDD: null, expPage: 1 }),
-        style: o === this.state.expPageSize ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F7E9F0', color:'#C13D6C', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.expPageSize ? React.createElement('span', { style:{ color:'#C13D6C', fontWeight:700 } }, '✓') : null
+        style: o === this.state.expPageSize ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#ECF1F7', color:'#2C4A7C', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: o === this.state.expPageSize ? React.createElement('span', { style:{ color:'#2C4A7C', fontWeight:700 } }, '✓') : null
       }))
     };
     const resetExpFilters = () => this.setState({ expSearch: '', expPeriodFilter: 'ทั้งหมด', expPage: 1 });
@@ -4141,7 +4141,7 @@ class Component extends DCLogic {
       return {
         date: r.date, time: r.time, mainCat: r.mainCat, subCat: r.subCat, detail: r.detail,
         amount: '฿' + expFmt(r.amount), payment: payPill(r.payment),
-        docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#C13D6C' : '#C2C9D6',
+        docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#2C4A7C' : '#C2C9D6',
         onEdit: startEditExpenseRow(r),
         onDelete
       };
@@ -4184,7 +4184,7 @@ class Component extends DCLogic {
     const epRows = this.state.expRows;
     const epTotal = epRows.reduce((a,r)=>a+r.amount,0);
     const epTotalLabel = epFmt(epTotal);
-    const epCatColors = { 'วัตถุดิบ (COGS)':'#CE5C84', 'ค่าแรง':'#C4638A', 'บรรจุภัณฑ์':'#4E9E77', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#9C82C4', 'การตลาด':'#3E9E92', 'อุปกรณ์/ของใช้ร้าน':'#8B6FB8', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
+    const epCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#9C82C4', 'การตลาด':'#3E9E92', 'อุปกรณ์/ของใช้ร้าน':'#8B6FB8', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
     const epSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byCatEp = epSumByKey(epRows, r => r.mainCat, r => r.amount);
     const epCatNames = Object.keys(byCatEp);
@@ -4192,7 +4192,7 @@ class Component extends DCLogic {
     const expCatDonut = epTotal > 0
       ? this.donut(epCatNames.map(name => ({ value: byCatEp[name], color: epCatColors[name] || '#B6BECC' })), 150, 22)
       : epEmptyDonut(150, 22);
-    const epPayColors = { 'โอนเงิน':'#C4638A', 'เงินสด':'#4E9E77', 'บัตรเครดิต':'#9C82C4', 'อื่นๆ':'#D98A4C' };
+    const epPayColors = { 'โอนเงิน':'#4A6B9E', 'เงินสด':'#4E9E77', 'บัตรเครดิต':'#9C82C4', 'อื่นๆ':'#D98A4C' };
     const byPayEp = epSumByKey(epRows, r => r.payment, r => r.amount);
     const epPayNames = Object.keys(byPayEp);
     const expPayRows = epPayNames.map(name => ({ name, amount: epFmt(byPayEp[name]), pct: epTotal ? (byPayEp[name]/epTotal*100).toFixed(1)+'%' : '0%', color: epPayColors[name] || '#B6BECC' }));
@@ -4217,14 +4217,14 @@ class Component extends DCLogic {
     const dashDayBuckets12 = this.dayBuckets(salesRows, 12);
     const dashOrderBuckets12 = dashDayBuckets12.map(d => d.count);
     const salesDashKpis = [
-      { title:'ยอดขายรวม (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ก่อนลด ' + fmtB(salesTotalGross) + ' − ส่วนลด ' + fmtB(salesDisc.total), icon:'shopping-bag', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#C4638A') },
+      { title:'ยอดขายรวม (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ก่อนลด ' + fmtB(salesTotalGross) + ' − ส่วนลด ' + fmtB(salesDisc.total), icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#4A6B9E') },
       { title:'ยอดขายสุทธิ (Net Sales)', amount:fmtB(salesTotalNet), delta:noDelta, icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(dashDayBuckets12.map(d=>d.net),'#4E9E77') },
       { title:'ออเดอร์รวม', amount:String(salesOrderCount), delta:noDelta, icon:'shopping-cart', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(dashOrderBuckets12,'#8B6FB8') },
       { title:'ลูกค้าใหม่', amount:'0', delta:'ยังไม่มีระบบติดตามลูกค้า', icon:'user-plus', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(dashOrderBuckets12.map(()=>0),'#D98A4C') },
-      { title:'ยอดเฉลี่ย/ออเดอร์', amount:fmtB(salesAvgOrder), delta:noDelta, icon:'trending-up', bg:'#F7E9F0', fg:'#C13D6C', spark:this.spark(dashDayBuckets12.map(d=>d.count?d.gross/d.count:0),'#CE5C84') },
+      { title:'ยอดเฉลี่ย/ออเดอร์', amount:fmtB(salesAvgOrder), delta:noDelta, icon:'trending-up', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.count?d.gross/d.count:0),'#4A6B9E') },
       { title:'อัตราแปลงการสั่งซื้อ', amount:'0%', delta:'ยังไม่มีข้อมูลผู้เข้าชม', icon:'percent', bg:'#E7F2F0', fg:'#3E9E92', spark:this.spark(dashOrderBuckets12.map(()=>0),'#3E9E92') }
     ];
-    const dashChannelColors = { 'หน้าร้าน':'#C13D6C', 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549' };
+    const dashChannelColors = { 'หน้าร้าน':'#3A5A8C', 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245' };
     const dashChannelOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const byChannel = this.groupBy(salesRows, r => r.platform);
     const dashChannelRows = dashChannelOrder.filter(p => byChannel[p]).map(p => ({
@@ -4233,7 +4233,7 @@ class Component extends DCLogic {
     const dashChannelDonut = salesTotalGross > 0
       ? this.donut(dashChannelRows.map(c => ({ value: byChannel[c.name].gross, color: c.color })), 150, 22)
       : emptyDonut(150, 22);
-    const dashBrandColors = ['#CE5C84','#9C82C4','#4E9E77','#C4638A','#D98A4C','#3E9E92'];
+    const dashBrandColors = ['#4A6B9E','#9C82C4','#4E9E77','#4A6B9E','#D98A4C','#3E9E92'];
     const byBrand = this.groupBy(salesRows, r => r.brand);
     const dashBrandNames = Object.keys(byBrand);
     const dashBrandRows = dashBrandNames.map((name, i) => ({
@@ -4245,23 +4245,23 @@ class Component extends DCLogic {
     const dashRetailGross = byChannel['หน้าร้าน'] ? byChannel['หน้าร้าน'].gross : 0;
     const dashDeliveryGross = salesTotalGross - dashRetailGross;
     const dashTypeRows = [
-      { name:'Retail Sales (หน้าร้าน)', amount:fmtB(dashRetailGross), pct: salesTotalGross ? (dashRetailGross/salesTotalGross*100).toFixed(1)+'%' : '0%', color:'#C4638A' },
+      { name:'Retail Sales (หน้าร้าน)', amount:fmtB(dashRetailGross), pct: salesTotalGross ? (dashRetailGross/salesTotalGross*100).toFixed(1)+'%' : '0%', color:'#4A6B9E' },
       { name:'Delivery Platform Sales', amount:fmtB(dashDeliveryGross), pct: salesTotalGross ? (dashDeliveryGross/salesTotalGross*100).toFixed(1)+'%' : '0%', color:'#4E9E77' },
       { name:'Custom Cake', amount:fmtB(0), pct:'0%', color:'#9C82C4' },
       { name:'Wholesale (บางโพ)', amount:fmtB(0), pct:'0%', color:'#D98A4C' }
     ];
     const dashTypeDonut = salesTotalGross > 0
-      ? this.donut([{ value: dashRetailGross || 0.0001, color:'#C4638A' },{ value: dashDeliveryGross || 0.0001, color:'#4E9E77' }], 135, 20)
+      ? this.donut([{ value: dashRetailGross || 0.0001, color:'#4A6B9E' },{ value: dashDeliveryGross || 0.0001, color:'#4E9E77' }], 135, 20)
       : emptyDonut(135, 20);
     const pIconCell = (name) => {
-      const m = { 'Grab':['#E7F3EC','#1F7A47','G'], 'LINE MAN':['#EBF6EF','#328756','L'], 'ShopeeFood':['#FBECE7','#B84B31','S'] };
+      const m = { 'Grab':['#E7F1EA','#26663F','G'], 'LINE MAN':['#EFEBF6','#5F4A87','L'], 'ShopeeFood':['#F9ECE7','#A64A31','S'] };
       const c = m[name] || ['#EEF0F5','#5A6478','•'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
         React.createElement('span', { style:{ width:'22px', height:'22px', borderRadius:'7px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:c[0], color:c[1] } }, c[2]),
         name);
     };
     const dashStatus = (txt, type) => {
-      const map = { ok:['#E6F3ED','#2E7D5B'], wait:['#F8F0DC','#B98317'], late:['#F9E7EA','#B95064'] };
+      const map = { ok:['#E6F3ED','#2E7D5B'], wait:['#F8F0DC','#B98317'], late:['#F9E7EA','#B14A4A'] };
       const c = map[type] || map.wait;
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, txt);
     };
@@ -4347,7 +4347,7 @@ class Component extends DCLogic {
       const totalNet = sumBy((p,g)=>g.net);
       dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), gp: fmtB(totalGp), vat: fmtB(totalVat), promo: fmtB(totalPromo), net: fmtB(totalNet), statusTag:'—', weight:'700' });
       // Reconcile ก่อนลด → หลังหักส่วนลด (matches the POS report's ยอดรวม concept)
-      dashPayoutRows.push({ platform: React.createElement('span', { style:{ color:'#8089A0' } }, 'ส่วนลดรวม (หน้าร้าน ' + fmtB(salesDisc.store) + ' + Delivery ' + fmtB(salesDisc.delivery) + ')'), gross: React.createElement('span', { style:{ color:'#B95064' } }, '−' + fmtB(salesDisc.total)), gp:'', vat:'', promo:'', net:'', statusTag:'', weight:'500' });
+      dashPayoutRows.push({ platform: React.createElement('span', { style:{ color:'#8089A0' } }, 'ส่วนลดรวม (หน้าร้าน ' + fmtB(salesDisc.store) + ' + Delivery ' + fmtB(salesDisc.delivery) + ')'), gross: React.createElement('span', { style:{ color:'#B14A4A' } }, '−' + fmtB(salesDisc.total)), gp:'', vat:'', promo:'', net:'', statusTag:'', weight:'500' });
       dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'ยอดขายหลังหักส่วนลด'), gross: fmtB(salesAfterDiscount), gp:'', vat:'', promo:'', net:'', statusTag:'', weight:'700' });
     }
     const dashMatrixRows = dashBrandNames.map(name => {
@@ -4449,7 +4449,7 @@ class Component extends DCLogic {
     const clearButtonLabel = isEditingSales ? 'ยกเลิก' : 'ล้างข้อมูล';
     const scrollToSalesForm = () => { const el = document.getElementById('sales-form-card'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     const platformBadge = (name) => {
-      const map = { 'LINE MAN':['#EBF6EF','#328756'], 'Grab':['#E7F3EC','#1F7A47'], 'ShopeeFood':['#FBECE7','#B84B31'], 'หน้าร้าน':['#F7E9F0','#C13D6C'] };
+      const map = { 'LINE MAN':['#EFEBF6','#5F4A87'], 'Grab':['#E7F1EA','#26663F'], 'ShopeeFood':['#F9ECE7','#A64A31'], 'หน้าร้าน':['#EAF0F8','#3A5A8C'] };
       const c = map[name] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, name);
     };
@@ -4537,7 +4537,7 @@ class Component extends DCLogic {
     const setSearch = e => { const val = e.target.value; this.setState({ salesSearch: val }); };
     const setSalesPlatform = p => () => this.setState({ salesPlatform: p });
     const ptabs = [
-      { label:'ทุกแพลตฟอร์ม', badge:'◉', bg:'#F7E9F0', fg:'#C13D6C' },
+      { label:'ทุกแพลตฟอร์ม', badge:'◉', bg:'#ECF1F7', fg:'#2C4A7C' },
       { label:'LINE MAN', badge:'L', bg:'#E6F3ED', fg:'#2E7D5B' },
       { label:'Grab', badge:'G', bg:'#E6F3ED', fg:'#2E7D5B' },
       { label:'ShopeeFood', badge:'S', bg:'#F7ECE1', fg:'#C77435' }
@@ -4549,7 +4549,7 @@ class Component extends DCLogic {
         iconStyle: { width:'20px', height:'20px', borderRadius:'6px', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:t.bg, color:t.fg },
         onClick: setSalesPlatform(t.label),
         style: active
-          ? { display:'flex', alignItems:'center', gap:'8px', background:'#fff', border:'1.5px solid #DFA3BC', borderRadius:'10px', padding:'8px 14px', fontSize:'13px', fontWeight:600, color:'#A83359', cursor:'pointer' }
+          ? { display:'flex', alignItems:'center', gap:'8px', background:'#fff', border:'1.5px solid #A9BBD6', borderRadius:'10px', padding:'8px 14px', fontSize:'13px', fontWeight:600, color:'#223C66', cursor:'pointer' }
           : { display:'flex', alignItems:'center', gap:'8px', background:'#fff', border:'1px solid #E7E9ED', borderRadius:'10px', padding:'8px 14px', fontSize:'13px', fontWeight:500, color:'#5A6478', cursor:'pointer' }
       };
     });
@@ -4578,8 +4578,8 @@ class Component extends DCLogic {
       options: salesStatusOptions.map(o => ({
         label: o,
         onClick: () => this.setState({ salesStatusFilter: o, salesListDD: null, salesPage: 1 }),
-        style: o === this.state.salesStatusFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.salesStatusFilter ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+        style: o === this.state.salesStatusFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: o === this.state.salesStatusFilter ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
     };
     const salesPeriodDDOpen = this.state.salesListDD === 'period';
@@ -4590,8 +4590,8 @@ class Component extends DCLogic {
       options: salesPeriodOptions.map(o => ({
         label: o,
         onClick: () => this.setState({ salesPeriodFilter: o, salesListDD: null, salesPage: 1 }),
-        style: o === this.state.salesPeriodFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.salesPeriodFilter ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+        style: o === this.state.salesPeriodFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: o === this.state.salesPeriodFilter ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
     };
     const salesPageSizeDDOpen = this.state.salesListDD === 'pageSize';
@@ -4602,8 +4602,8 @@ class Component extends DCLogic {
       options: salesPageSizeOptions.map(o => ({
         label: o + ' / หน้า',
         onClick: () => this.setState({ salesPageSize: o, salesListDD: null, salesPage: 1 }),
-        style: o === this.state.salesPageSize ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.salesPageSize ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+        style: o === this.state.salesPageSize ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: o === this.state.salesPageSize ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
     };
     const resetSalesFilters = () => this.setState({ salesSearch: '', salesPlatform: 'ทุกแพลตฟอร์ม', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด', salesPage: 1 });
@@ -4669,13 +4669,13 @@ class Component extends DCLogic {
     const skNetToday = skTodayRows.reduce((a,r)=>a+r.net,0);
     const skReceivable = skRows.filter(r=>r.status==='รอรับเงิน').reduce((a,r)=>a+r.net,0);
     const salesKpis = [
-      { title:'ยอดขายวันนี้', amount:skFmt(skGrossToday), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#F7E9F0', fg:'#C13D6C', info:false },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:skFmt(skGrossMTD), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#F7E9F0', fg:'#C13D6C', info:false },
-      { title:'ออเดอร์วันนี้', amount:String(skTodayRows.length), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'users', bg:'#F7E9F0', fg:'#C13D6C', info:true },
+      { title:'ยอดขายวันนี้', amount:skFmt(skGrossToday), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
+      { title:'ยอดขายเดือนนี้ (MTD)', amount:skFmt(skGrossMTD), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
+      { title:'ออเดอร์วันนี้', amount:String(skTodayRows.length), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'users', bg:'#ECF1F7', fg:'#2C4A7C', info:true },
       { title:'Net Sales วันนี้', amount:skFmt(skNetToday), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
       { title:'Net Payout รอรับ', amount:skFmt(skReceivable), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'file-text', bg:'#F8F0DC', fg:'#D98A4C', info:false }
     ];
-    const skPlatformColors = { 'Grab':'#2E9E5F', 'LINE MAN':'#57B678', 'ShopeeFood':'#D96549', 'หน้าร้าน':'#C13D6C' };
+    const skPlatformColors = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245', 'หน้าร้าน':'#3A5A8C' };
     const skPlatformOrder = ['Grab','LINE MAN','ShopeeFood','หน้าร้าน'];
     const byPlatformSk = this.groupBy(skRows, r => r.platform);
     const salesPlatformRows = skPlatformOrder.filter(p => byPlatformSk[p]).map(p => ({ name:p, amount: skFmt(byPlatformSk[p].gross), pct: skGrossMTD ? (byPlatformSk[p].gross/skGrossMTD*100).toFixed(1)+'%' : '0%', color: skPlatformColors[p] }));
@@ -4750,7 +4750,7 @@ class Component extends DCLogic {
     const curIdx = stepOrder.indexOf(importStep);
     const importStepItems = impSteps.map((s,i) => {
       const st = i < curIdx ? 'done' : (i === curIdx ? 'active' : 'todo');
-      const circleBg = st === 'done' ? '#2E7D5B' : (st === 'active' ? '#C13D6C' : '#EEF1F6');
+      const circleBg = st === 'done' ? '#2E7D5B' : (st === 'active' ? '#2C4A7C' : '#EEF1F6');
       const circleFg = st === 'todo' ? '#A8B0C0' : '#fff';
       return {
         n: s.n, label: s.label,
@@ -4783,7 +4783,7 @@ class Component extends DCLogic {
         { f:'Order ID', c:'Order ID (+ Pick up ID)' },
         { f:'หัก ณ ที่จ่าย', c:'WHT' }
       ]},
-      { platform:'หน้าร้าน (POS)', initial:'ร', fileType:'ไฟล์ .csv', pfg:'#C13D6C', pbg:'#F7E9F0', rows:[
+      { platform:'หน้าร้าน (POS)', initial:'ร', fileType:'ไฟล์ .csv', pfg:'#2C4A7C', pbg:'#ECF1F7', rows:[
         { f:'ยอดขาย', c:'ยอดรวม (หลังหักส่วนลด)' },
         { f:'เงินเข้าจริง', c:'รวมสุทธิ' },
         { f:'ช่องทางที่นับ', c:'Cash · QR PromptPay (POS Pay) · K+shop' },
@@ -4795,7 +4795,7 @@ class Component extends DCLogic {
       grab: { label: 'Grab', pfg: '#2E7D5B', pbg: '#E6F3ED' },
       lineman: { label: 'LINE MAN', pfg: '#7A5BA8', pbg: '#F1ECF6' },
       shopee: { label: 'ShopeeFood', pfg: '#D98A4C', pbg: '#F8F0DC' },
-      pos: { label: 'หน้าร้าน', pfg: '#C13D6C', pbg: '#F7E9F0' },
+      pos: { label: 'หน้าร้าน', pfg: '#2C4A7C', pbg: '#ECF1F7' },
       unknown: { label: 'ไม่รู้จัก', pfg: '#8089A0', pbg: '#EFF0F3' }
     };
     const importFiles = this.state.importFilesRaw.map(f => {
@@ -4823,8 +4823,8 @@ class Component extends DCLogic {
     });
     const importIncluded = importRowsFlat.filter(r => !(r.isDup && dedupeSkip));
     const importStats = [
-      { label:'รายการยอดขาย', value: String(importRowsFlat.length), icon:'receipt', fg:'#C13D6C', bg:'#F7E9F0' },
-      { label:'ซ้ำกับระบบ', value: String(importRowsFlat.filter(r => r.isDup).length), icon:'copy', fg:'#C13D6C', bg:'#F7E9F0' },
+      { label:'รายการยอดขาย', value: String(importRowsFlat.length), icon:'receipt', fg:'#2C4A7C', bg:'#ECF1F7' },
+      { label:'ซ้ำกับระบบ', value: String(importRowsFlat.filter(r => r.isDup).length), icon:'copy', fg:'#2C4A7C', bg:'#ECF1F7' },
       { label:'ยอดขายรวม (ที่จะนำเข้า)', value: '฿' + fmt2(importIncluded.reduce((s,r) => s + r.gross, 0)), icon:'trending-up', fg:'#2E7D5B', bg:'#E6F3ED' },
       { label:'เงินเข้าจริงรวม (ที่จะนำเข้า)', value: '฿' + fmt2(importIncluded.reduce((s,r) => s + r.net, 0)), icon:'wallet', fg:'#7A5BA8', bg:'#F1ECF6' }
     ];
@@ -4832,14 +4832,14 @@ class Component extends DCLogic {
     const dedupeTrackStyle = { width:'38px', height:'22px', borderRadius:'11px', background: dedupeSkip ? '#2E7D5B' : '#D6DAE3', position:'relative', flex:'none', transition:'background .15s' };
     const dedupeKnobStyle = { position:'absolute', top:'2px', left: dedupeSkip ? '18px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)', transition:'left .15s' };
 
-    const platMeta = { 'Grab':{pfg:'#1F7A47',pbg:'#E7F3EC'}, 'LINE MAN':{pfg:'#328756',pbg:'#EBF6EF'}, 'ShopeeFood':{pfg:'#B84B31',pbg:'#FBECE7'}, 'หน้าร้าน':{pfg:'#C13D6C',pbg:'#F7E9F0'} };
+    const platMeta = { 'Grab':{pfg:'#26663F',pbg:'#E7F1EA'}, 'LINE MAN':{pfg:'#5F4A87',pbg:'#EFEBF6'}, 'ShopeeFood':{pfg:'#A64A31',pbg:'#F9ECE7'}, 'หน้าร้าน':{pfg:'#3A5A8C',pbg:'#EAF0F8'} };
     const importRows = importRowsFlat.map(r => {
       const greyed = r.isDup && dedupeSkip;
       const neg = r.net < 0;
       let status, statusStyle;
       if (r.isDup) {
         status = dedupeSkip ? 'ซ้ำ — จะข้าม' : 'ซ้ำ — จะนำเข้า';
-        statusStyle = { background:'#F7E9F0', color:'#C13D6C', fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' };
+        statusStyle = { background:'#ECF1F7', color:'#2C4A7C', fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' };
       } else {
         status = 'พร้อมนำเข้า';
         statusStyle = { background:'#E6F3ED', color:'#2E7D5B', fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' };
@@ -4850,7 +4850,7 @@ class Component extends DCLogic {
         oid: r.orderId, pay: r.payment, gross: '฿' + fmt2(r.gross), fee: '฿' + fmt2(r.fee),
         gp: '฿' + fmt2(r.fee - vatN), vat: '฿' + fmt2(vatN), net: '฿' + fmt2(r.net), status, statusStyle,
         rowStyle: { borderTop:'1px solid #F1F2F4', opacity: greyed ? 0.42 : 1 },
-        netStyle: { padding:'11px 8px', textAlign:'right', fontWeight:600, color: neg ? '#C13D6C' : '#1B2536', textDecoration: greyed ? 'line-through' : 'none' }
+        netStyle: { padding:'11px 8px', textAlign:'right', fontWeight:600, color: neg ? '#2C4A7C' : '#1B2536', textDecoration: greyed ? 'line-through' : 'none' }
       };
     });
     const IMPORT_PREVIEW_LIMIT = 10;
@@ -4906,7 +4906,7 @@ class Component extends DCLogic {
       { key:'upload', label:'นำเข้าไฟล์', icon:'upload' },
       { key:'auto', label:'นำเข้าอัตโนมัติ', icon:'zap' },
       { key:'history', label:'ประวัตินำเข้า', icon:'history' }
-    ].map(t => ({ label:t.label, icon:t.icon, onClick:setImportTab(t.key), style: t.key === importTab ? { ...impTabBase, background:'#F7E9F0', color:'#A83359' } : { ...impTabBase, color:'#8089A0', background:'transparent' } }));
+    ].map(t => ({ label:t.label, icon:t.icon, onClick:setImportTab(t.key), style: t.key === importTab ? { ...impTabBase, background:'#ECF1F7', color:'#223C66' } : { ...impTabBase, color:'#8089A0', background:'transparent' } }));
     const impTabUpload = importTab === 'upload', impTabAuto = importTab === 'auto', impTabHistory = importTab === 'history';
 
     const autoConnections = [
@@ -4941,7 +4941,7 @@ class Component extends DCLogic {
     const importHistory = this.state.importHistoryList.map(h => ({
       date: h.date, time: h.time, platforms: h.platforms, rows: h.rowCount, amount: h.amount, by: h.by, byIcon: h.byIcon, status: h.status,
       statusStyle: h.status === 'สำเร็จ' ? { background:'#E6F3ED', color:'#2E7D5B', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px', whiteSpace:'nowrap' } : { background:'#EFF0F3', color:'#8089A0', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px', whiteSpace:'nowrap' },
-      undoStyle: h.canUndo ? { display:'inline-flex', alignItems:'center', gap:'6px', border:'1px solid #DFA3BC', color:'#C13D6C', borderRadius:'9px', padding:'7px 13px', fontSize:'12px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' } : { display:'inline-flex', alignItems:'center', gap:'6px', color:'#C2C9D6', fontSize:'12px', fontWeight:600, whiteSpace:'nowrap' },
+      undoStyle: h.canUndo ? { display:'inline-flex', alignItems:'center', gap:'6px', border:'1px solid #A9BBD6', color:'#2C4A7C', borderRadius:'9px', padding:'7px 13px', fontSize:'12px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' } : { display:'inline-flex', alignItems:'center', gap:'6px', color:'#C2C9D6', fontSize:'12px', fontWeight:600, whiteSpace:'nowrap' },
       undoLabel: h.canUndo ? 'ย้อนกลับ' : 'ย้อนกลับแล้ว',
       onUndo: h.canUndo ? undoImportBatch(h) : (() => {})
     }));
@@ -4956,7 +4956,7 @@ class Component extends DCLogic {
     const pyBy = {}; pyRows.forEach(r => { pyBy[r.platform] = (pyBy[r.platform] || 0) + r.net; });
     const pyExpectedTotal = Object.values(pyBy).reduce((a, v) => a + v, 0);
     const payoutKpis = [
-      { title:'ยอดที่คาดว่าจะเข้า (สุทธิ)', amount: pyFmt(pyExpectedTotal), sub:'จากยอดขายสุทธิจริง', icon:'calculator', bg:'#F7E9F0', fg:'#C13D6C' },
+      { title:'ยอดที่คาดว่าจะเข้า (สุทธิ)', amount: pyFmt(pyExpectedTotal), sub:'จากยอดขายสุทธิจริง', icon:'calculator', bg:'#ECF1F7', fg:'#2C4A7C' },
       { title:'เงินโอนเข้าบัญชีจริง', amount:'—', sub:'ยังไม่เชื่อมข้อมูลธนาคาร', icon:'banknote', bg:'#EFF0F3', fg:'#9AA3B2' },
       { title:'ส่วนต่างที่ต้องตรวจ', amount:'—', sub:'รอข้อมูลธนาคาร', icon:'triangle-alert', bg:'#EFF0F3', fg:'#9AA3B2' },
       { title:'จำนวนช่องทาง', amount: String(Object.keys(pyBy).length), sub:'ที่มียอดคาดว่าจะเข้า', icon:'layers', bg:'#F1ECF6', fg:'#7A5BA8' }
@@ -4996,7 +4996,7 @@ class Component extends DCLogic {
     const subsidyKpis = [
       { title:'เงินรัฐรอรับ (ประมาณการ)', amount: subFmt(subPending.reduce((a, r) => a + r.full, 0)), sub: subPending.length + ' ออเดอร์รัฐ', icon:'hourglass', bg:'#F8F0DC', fg:'#D98A4C' },
       { title:'รับแล้ว (ช่วงที่เลือก)', amount: subFmt(subDone.reduce((a, r) => a + r.full, 0)), sub: subDone.length + ' ออเดอร์', icon:'circle-check-big', bg:'#E6F3ED', fg:'#2E7D5B' },
-      { title:'รอบจ่ายถัดไป', amount: subNextSettle ? isoToBEShort(subNextSettle) : '–', sub:'รัฐโอนเข้า T+3', icon:'calendar-clock', bg:'#F7E9F0', fg:'#C13D6C' },
+      { title:'รอบจ่ายถัดไป', amount: subNextSettle ? isoToBEShort(subNextSettle) : '–', sub:'รัฐโอนเข้า T+3', icon:'calendar-clock', bg:'#ECF1F7', fg:'#2C4A7C' },
       { title:'เกินกำหนดรับ', amount: subFmt(subOverdue.reduce((a, r) => a + r.full, 0)), sub: subOverdue.length + ' ออเดอร์ค้างเกิน 14 วัน', icon:'triangle-alert', bg:'#F9E7EA', fg:'#BE4F4F' }
     ];
     const subStBase = (st) => st === 'รับแล้ว' ? { background:'#E6F3ED', color:'#2E7D5B' } : (st === 'เกินกำหนด' ? { background:'#F9E7EA', color:'#BE4F4F' } : { background:'#F8F0DC', color:'#B98317' });
@@ -5015,7 +5015,7 @@ class Component extends DCLogic {
     }));
 
     // ---- 6. ศูนย์แจ้งเตือน (Anomaly alerts) ----
-    const sevMeta = { high:{ c:'#BE4F4F', bg:'#F9E7EA', bd:'#F9E7EA', ic:'#F9E7EA', label:'สูง' }, mid:{ c:'#B98317', bg:'#FBF5E6', bd:'#F2E6C8', ic:'#F8F0DC', label:'กลาง' }, low:{ c:'#C13D6C', bg:'#F9F0F4', bd:'#F3DCE7', ic:'#F3DCE7', label:'ต่ำ' } };
+    const sevMeta = { high:{ c:'#BE4F4F', bg:'#F9E7EA', bd:'#F9E7EA', ic:'#F9E7EA', label:'สูง' }, mid:{ c:'#B98317', bg:'#FBF5E6', bd:'#F2E6C8', ic:'#F8F0DC', label:'กลาง' }, low:{ c:'#2C4A7C', bg:'#F3F6FA', bd:'#DEE6F1', ic:'#DEE6F1', label:'ต่ำ' } };
     // ---- ศูนย์แจ้งเตือน — real threshold rules over sales data (no fake alerts) ----
     const alRows = this.salesOnly(this.state.recentRows);
     const alToday = todayISO();
@@ -5041,7 +5041,7 @@ class Component extends DCLogic {
     const alertCounts = [
       { label:'ความสำคัญสูง', value: String(alertItems.filter(a => a.sev === 'high').length), fg:'#BE4F4F', bg:'#F9E7EA' },
       { label:'ความสำคัญกลาง', value: String(alertItems.filter(a => a.sev === 'mid').length), fg:'#B98317', bg:'#FBF5E6' },
-      { label:'ความสำคัญต่ำ', value: String(alertItems.filter(a => a.sev === 'low').length), fg:'#C13D6C', bg:'#F9F0F4' },
+      { label:'ความสำคัญต่ำ', value: String(alertItems.filter(a => a.sev === 'low').length), fg:'#2C4A7C', bg:'#F3F6FA' },
       { label:'รวมทั้งหมด', value: String(alertItems.length), fg:'#2E7D5B', bg:'#E6F3ED' }
     ];
     const alertRules = [
@@ -5060,7 +5060,7 @@ class Component extends DCLogic {
     const txFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const taxKpis = [
       { title:'รายได้ (ฐาน Net Sales)', amount: txFmt(txNet), sub:'จากยอดขายสุทธิจริง', icon:'landmark', bg:'#E6F3ED', fg:'#2E7D5B' },
-      { title:'ยอดขายรวม (Gross)', amount: txFmt(txGross), sub:'ก่อนหักค่าธรรมเนียม', icon:'chart-column', bg:'#F7E9F0', fg:'#C13D6C' },
+      { title:'ยอดขายรวม (Gross)', amount: txFmt(txGross), sub:'ก่อนหักค่าธรรมเนียม', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C' },
       { title:'VAT ขาย (7%)', amount:'—', sub:'ต้องยืนยันสถานะจด VAT', icon:'receipt', bg:'#EFF0F3', fg:'#9AA3B2' },
       { title:'หัก ณ ที่จ่ายสะสม', amount:'—', sub:'ยังไม่เก็บภาษีต่อออเดอร์', icon:'scissors', bg:'#EFF0F3', fg:'#9AA3B2' }
     ];
@@ -5086,8 +5086,8 @@ class Component extends DCLogic {
       const options = ['ค่าเช่า','ค่าบริการ/รับจ้าง','ค่าวิชาชีพอิสระ'].map(v => ({
         label: v,
         onClick: () => this.setState(s => ({ taxForms: { ...s.taxForms, pnd3: { ...s.taxForms.pnd3, incomeType: v } }, pnd3TypeOpen: false }), persistTaxForms),
-        style: v === tf.pnd3.incomeType ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'18px', padding:'9px 12px', borderRadius:'8px', fontSize:'13.5px', cursor:'pointer', background:'#F9F0F4', color:'#A83359', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'18px', padding:'9px 12px', borderRadius:'8px', fontSize:'13.5px', cursor:'pointer', color:'#3A4456' },
-        check: v === tf.pnd3.incomeType ? React.createElement('span', { style:{ color:'#A83359', fontWeight:700 } }, '✓') : null
+        style: v === tf.pnd3.incomeType ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'18px', padding:'9px 12px', borderRadius:'8px', fontSize:'13.5px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'18px', padding:'9px 12px', borderRadius:'8px', fontSize:'13.5px', cursor:'pointer', color:'#3A4456' },
+        check: v === tf.pnd3.incomeType ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }));
       return { open, toggle, value: tf.pnd3.incomeType, options };
     })();
@@ -5137,7 +5137,7 @@ class Component extends DCLogic {
     const pnd3IncomeTypeOptions = ['ค่าเช่า','ค่าบริการ/รับจ้าง','ค่าวิชาชีพอิสระ'];
 
     // ---- 8. ตั้งค่า & สิทธิ์ผู้ใช้ ----
-    const roleColor = { 'เจ้าของ':{fg:'#7A5BA8',bg:'#F1ECF6'}, 'ผู้จัดการสาขา':{fg:'#C13D6C',bg:'#F7E9F0'}, 'พนักงานบันทึก':{fg:'#2E7D5B',bg:'#E6F3ED'}, 'บัญชี':{fg:'#D98A4C',bg:'#F8F0DC'} };
+    const roleColor = { 'เจ้าของ':{fg:'#7A5BA8',bg:'#F1ECF6'}, 'ผู้จัดการสาขา':{fg:'#2C4A7C',bg:'#ECF1F7'}, 'พนักงานบันทึก':{fg:'#2E7D5B',bg:'#E6F3ED'}, 'บัญชี':{fg:'#D98A4C',bg:'#F8F0DC'} };
     const users = [
       { name:'คุณวราภรณ์ รัตนวิชัย', initial:'ว', avatar:'#9C82C4', role:'เจ้าของ', scope:'ทุกสาขา · ทุกหน้า', last:'กำลังออนไลน์', active:true }
     ].map(u => { const c = roleColor[u.role]; return { ...u, roleFg:c.fg, roleBg:c.bg,
@@ -5148,7 +5148,7 @@ class Component extends DCLogic {
     const roleCount = role => users.filter(u => u.role === role).length + ' คน';
     const roleDefs = [
       { role:'เจ้าของ', desc:'เข้าถึงทุกอย่าง จัดการผู้ใช้และสิทธิ์', count: roleCount('เจ้าของ'), fg:'#7A5BA8', bg:'#F1ECF6' },
-      { role:'ผู้จัดการสาขา', desc:'ดูและแก้ทุกหน้าของสาขาตัวเอง', count: roleCount('ผู้จัดการสาขา'), fg:'#C13D6C', bg:'#F7E9F0' },
+      { role:'ผู้จัดการสาขา', desc:'ดูและแก้ทุกหน้าของสาขาตัวเอง', count: roleCount('ผู้จัดการสาขา'), fg:'#2C4A7C', bg:'#ECF1F7' },
       { role:'พนักงานบันทึก', desc:'บันทึกยอด รายจ่าย และนำเข้าไฟล์เท่านั้น', count: roleCount('พนักงานบันทึก'), fg:'#2E7D5B', bg:'#E6F3ED' },
       { role:'บัญชี', desc:'อ่านการเงินและส่งออกภาษี ห้ามแก้ไข', count: roleCount('บัญชี'), fg:'#D98A4C', bg:'#F8F0DC' }
     ];
@@ -5170,7 +5170,7 @@ class Component extends DCLogic {
     const mobFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const mobTotal = mobRows.reduce((a, r) => a + r.gross, 0);
     const mobileSales = mobFmt(mobTotal - this.salesDiscountTotal(mobRows).total);
-    const mobPalette = { 'หน้าร้าน':'#C13D6C', 'LINE MAN':'#57B678', 'Grab':'#2E9E5F', 'ShopeeFood':'#D96549' };
+    const mobPalette = { 'หน้าร้าน':'#3A5A8C', 'LINE MAN':'#7B62A8', 'Grab':'#35875A', 'ShopeeFood':'#C96245' };
     const mobBy = {}; mobRows.forEach(r => { mobBy[r.platform] = (mobBy[r.platform] || 0) + r.gross; });
     const mobileChannels = ['หน้าร้าน','LINE MAN','Grab','ShopeeFood'].filter(p => mobBy[p]).map(p => ({
       name: p, amount: mobFmt(mobBy[p]), pct: mobTotal ? Math.round(mobBy[p] / mobTotal * 100) + '%' : '0%', color: mobPalette[p] || '#9AA3B2'
