@@ -2775,7 +2775,7 @@
             <div style="position:relative;width:150px;height:150px;flex:none">
               {{ paymentDonut }}
               <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-                <span style="font-size:17px;font-weight:700;color:#1B2536">฿0</span>
+                <span style="font-size:17px;font-weight:700;color:#1B2536">{{ paymentTotalLabel }}</span>
                 <span style="font-size:12px;color:#9AA3B2">100%</span>
               </div>
             </div>
@@ -4227,12 +4227,29 @@ class Component extends DCLogic {
     const dashChannelColors = { 'หน้าร้าน':'#3A5A8C', 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245' };
     const dashChannelOrder = ['หน้าร้าน','Grab','LINE MAN','ShopeeFood'];
     const byChannel = this.groupBy(salesRows, r => r.platform);
-    const dashChannelRows = dashChannelOrder.filter(p => byChannel[p]).map(p => ({
-      name: p, amount: fmtB(byChannel[p].gross), pct: salesTotalGross ? (byChannel[p].gross / salesTotalGross * 100).toFixed(1) + '%' : '0%', color: dashChannelColors[p]
-    }));
-    const dashChannelDonut = salesTotalGross > 0
-      ? this.donut(dashChannelRows.map(c => ({ value: byChannel[c.name].gross, color: c.color })), 150, 22)
-      : emptyDonut(150, 22);
+    // When the view is narrowed to หน้าร้าน only (channel filter), a single 100% segment
+    // says nothing — split it by POS payment method instead.
+    const DASH_PAY_COLORS = { 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
+    const dashStoreOnly = byChannel['หน้าร้าน'] && dashChannelOrder.filter(p => byChannel[p]).length === 1;
+    let dashChannelRows, dashChannelDonut;
+    if (dashStoreOnly) {
+      const byPay = {};
+      salesRows.filter(r => r.platform === 'หน้าร้าน').forEach(r => { const k = r.payment || 'อื่นๆ'; byPay[k] = (byPay[k] || 0) + r.gross; });
+      const payKeys = Object.keys(byPay).sort((a, b) => byPay[b] - byPay[a]);
+      dashChannelRows = payKeys.map(k => ({
+        name: k, amount: fmtB(byPay[k]), pct: salesTotalGross ? (byPay[k] / salesTotalGross * 100).toFixed(1) + '%' : '0%', color: DASH_PAY_COLORS[k] || '#8A919C'
+      }));
+      dashChannelDonut = salesTotalGross > 0
+        ? this.donut(payKeys.map(k => ({ value: byPay[k], color: DASH_PAY_COLORS[k] || '#8A919C' })), 150, 22)
+        : emptyDonut(150, 22);
+    } else {
+      dashChannelRows = dashChannelOrder.filter(p => byChannel[p]).map(p => ({
+        name: p, amount: fmtB(byChannel[p].gross), pct: salesTotalGross ? (byChannel[p].gross / salesTotalGross * 100).toFixed(1) + '%' : '0%', color: dashChannelColors[p]
+      }));
+      dashChannelDonut = salesTotalGross > 0
+        ? this.donut(dashChannelRows.map(c => ({ value: byChannel[c.name].gross, color: c.color })), 150, 22)
+        : emptyDonut(150, 22);
+    }
     const dashBrandColors = ['#4A6B9E','#9C82C4','#4E9E77','#4A6B9E','#D98A4C','#3E9E92'];
     const byBrand = this.groupBy(salesRows, r => r.brand);
     const dashBrandNames = Object.keys(byBrand);
@@ -4683,9 +4700,20 @@ class Component extends DCLogic {
       ? this.donut(salesPlatformRows.map(c => ({ value: byPlatformSk[c.name].gross, color: c.color })), 150, 22)
       : skEmptyDonut(150, 22);
     const salesTotalLabel = skFmt(skGrossMTD);
-    // Payment method is not retained per sales row once imported/saved, so this breakdown has no real data to show yet.
-    const paymentRows = [];
-    const paymentDonut = skEmptyDonut(150, 22);
+    // หน้าร้าน broken down by payment method (each store row carries its POS payment type).
+    const PAY_METHOD_COLORS = { 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
+    const byPayMethod = {};
+    skRows.filter(r => r.platform === 'หน้าร้าน').forEach(r => { const k = r.payment || 'อื่นๆ'; byPayMethod[k] = (byPayMethod[k] || 0) + r.gross; });
+    const payMethodTotal = Object.values(byPayMethod).reduce((a, b) => a + b, 0);
+    const paymentRows = Object.keys(byPayMethod).sort((a, b) => byPayMethod[b] - byPayMethod[a]).map(k => ({
+      name: k, amount: skFmt(byPayMethod[k]),
+      pct: payMethodTotal ? (byPayMethod[k] / payMethodTotal * 100).toFixed(1) + '%' : '0%',
+      color: PAY_METHOD_COLORS[k] || '#8A919C'
+    }));
+    const paymentDonut = payMethodTotal > 0
+      ? this.donut(paymentRows.map(c => ({ value: byPayMethod[c.name], color: c.color })), 150, 22)
+      : skEmptyDonut(150, 22);
+    const paymentTotalLabel = skFmt(payMethodTotal);
 
     // ---- นำเข้ารายงานออนไลน์ (Import) ----
     const importStep = this.state.importStep || 'upload';
@@ -5225,7 +5253,7 @@ class Component extends DCLogic {
       setStoreBatchDate, setStoreBatchNote, clearStoreBatch, saveStoreBatch, storeSaveLabel,
       openAttachPicker, handleAttachChange, removeAttachment, hasAttachment: !!f.attachmentName,
       salesError: this.state.salesError,
-      salesPlatformRows, salesPlatformDonut, paymentRows, paymentDonut, salesTrend: this.salesTrend(skRows, 14), salesTotalLabel,
+      salesPlatformRows, salesPlatformDonut, paymentRows, paymentDonut, paymentTotalLabel, salesTrend: this.salesTrend(skRows, 14), salesTotalLabel,
       period, periodOpen, togglePeriod, periodOptions, periodDisplay, customFrom, customTo, setCustomFrom, setCustomTo,
       brand, brandOpen, toggleBrand, brandOptions,
       channel, channelOpen, toggleChannel, channelOptions,
