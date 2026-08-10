@@ -877,10 +877,7 @@
     <sc-if value="{{ isMembers }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Members — สมาชิก">
       <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สมาชิก</h1></div>
-      <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:60px 24px;text-align:center;color:#8089A0">
-        <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีระบบสมาชิก</div>
-        <div style="font-size:13px;line-height:1.6">หน้านี้จะแสดงข้อมูลเมื่อมีระบบติดตามลูกค้า/สมาชิก</div>
-      </div>
+      <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:52px 24px;text-align:center;color:#8089A0"><div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลสมาชิก</div><div style="font-size:13px;line-height:1.6;margin-bottom:16px">ระบบสมาชิก (annie-crm) มีข้อมูลอยู่แล้ว — เชื่อมเข้ามาได้เมื่อพร้อม</div><div style="display:inline-flex;align-items:center;gap:8px;background:#ECF1F7;color:#2C4A7C;border-radius:11px;padding:10px 18px;font-size:13px;font-weight:600">ขั้นถัดไป: เชื่อมข้อมูลจาก annie-crm</div></div>
     </div>
     </sc-if>
 
@@ -1397,7 +1394,7 @@
                   <td style="padding:10px 5px"><div style="font-weight:600">{{ r.date }}</div><div style="color:#9AA3B2;font-size:11px">{{ r.time }}</div></td>
                   <td style="padding:10px 5px">{{ r.mainCat }}</td>
                   <td style="padding:10px 5px;color:#5A6478">{{ r.subCat }}</td>
-                  <td style="padding:10px 5px;color:#5A6478">{{ r.detail }}</td>
+                  <td style="padding:10px 5px;color:#5A6478">{{ r.detail }}<sc-if value="{{ r.hasMeta }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#9AA3B2;margin-top:2px">{{ r.meta }}</div></sc-if></td>
                   <td style="padding:10px 5px;text-align:right;font-weight:600;white-space:nowrap">{{ r.amount }}</td>
                   <td style="padding:10px 5px">{{ r.payment }}</td>
                   <td style="padding:10px 5px;text-align:center" title="{{ r.docTitle }}"><i data-lucide="file-text" style="width:15px;height:15px;color:{{ r.docColor }}"></i></td>
@@ -3172,26 +3169,30 @@ function mapDbRowToSale(dbRow) {
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
     type: dbRow.type, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
-    note: dbRow.note || ''
+    note: dbRow.note || '', source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null
   };
 }
 function mapSaleToDbRow(row) {
   return {
     date: row.date, time: row.time, platform: row.platform, brand: row.brand, order_id: row.orderId,
     gross: row.gross, fee: row.fee, net: row.net, status: row.status,
-    type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null
+    type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null,
+    // ที่มาของแถว: ทุกแถวต้องบอกได้ว่ามาจากไหน (POS / import แพลตฟอร์ม / ฟอร์มในแอป)
+    source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null
   };
 }
 function mapDbRowToExpense(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.expense_date || safeBeShortToISO(dbRow.date), time: dbRow.time, mainCat: dbRow.main_cat, subCat: dbRow.sub_cat,
-    detail: dbRow.detail, amount: dbRow.amount, payment: dbRow.payment, attachmentName: dbRow.attachment_name || ''
+    detail: dbRow.detail, amount: dbRow.amount, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
+    source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null
   };
 }
 function mapExpenseToDbRow(row) {
   return {
     date: row.date, time: row.time, main_cat: row.mainCat, sub_cat: row.subCat,
-    detail: row.detail, amount: row.amount, payment: row.payment, attachment_name: row.attachmentName || null
+    detail: row.detail, amount: row.amount, payment: row.payment, attachment_name: row.attachmentName || null,
+    source: row.source || 'MANUAL', source_ref: row.sourceRef || null, created_by: row.createdBy || null
   };
 }
 
@@ -4302,8 +4303,12 @@ class Component extends DCLogic {
         }
       };
       const hasDoc = !!r.attachmentName;
+      // §17/§21: ที่มาของแถว + คนบันทึก แสดงใต้รายละเอียด
+      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า' }[r.source] || '';
+      const meta = [srcLabel, r.createdBy].filter(Boolean).join(' · ');
       return {
         date: r.date, time: r.time, mainCat: r.mainCat, subCat: r.subCat, detail: r.detail,
+        meta, hasMeta: !!meta,
         amount: '฿' + expFmt(r.amount), payment: payPill(r.payment),
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#2C4A7C' : '#C2C9D6',
         onEdit: startEditExpenseRow(r),
@@ -4691,7 +4696,7 @@ class Component extends DCLogic {
           date: beDate, time: '23:59', platform: 'หน้าร้าน', brand: 'หน้าร้าน',
           orderId: x.p + ' (หน้าร้าน ' + beDate + ')',
           gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
-          status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: ''
+          status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: '', source: 'MANUAL_FORM'
         }));
         // Optional sales.note column (migration 0007) — retry without it so the sale
         // itself is never lost.
@@ -5057,7 +5062,8 @@ class Component extends DCLogic {
       const rowsToInsert = included.map(r => ({
         date: r.date || isoToBEShort(this.state.importReportDate), time: r.time,
         platform: r.meta.label, brand: r.brand,
-        orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status
+        orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status,
+        source: r.meta.label === 'หน้าร้าน' || r.meta.label === 'ส่วนลด' ? 'POS' : 'PLATFORM_IMPORT'
       }));
       try {
         const { data, error } = await supabaseClient.from('sales').insert(rowsToInsert.map(mapSaleToDbRow)).select();
