@@ -125,15 +125,31 @@
         <div data-period-dd="1" style="position:relative">
           <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-              <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="5">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-              <div style="border-top:1px solid #EFF0F3;margin-top:6px;padding:8px 6px 2px">
-                <div style="font-size:11px;color:#9AA3B2;margin-bottom:6px">หรือเลือกช่วงวันที่เอง</div>
-                <div style="display:flex;flex-direction:column;gap:6px">
-                  <label style="font-size:10.5px;color:#8089A0">จาก <input type="date" value="{{ customFrom }}" onChange="{{ setCustomFrom }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                  <label style="font-size:10.5px;color:#8089A0">ถึง <input type="date" value="{{ customTo }}" onChange="{{ setCustomTo }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
                 </div>
               </div>
             </div>
@@ -142,10 +158,33 @@
         <div data-brand-dd="1" style="position:relative">
           <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                </div>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -373,15 +412,31 @@
         <div data-period-dd="1" style="position:relative">
           <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-              <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="5">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-              <div style="border-top:1px solid #EFF0F3;margin-top:6px;padding:8px 6px 2px">
-                <div style="font-size:11px;color:#9AA3B2;margin-bottom:6px">หรือเลือกช่วงวันที่เอง</div>
-                <div style="display:flex;flex-direction:column;gap:6px">
-                  <label style="font-size:10.5px;color:#8089A0">จาก <input type="date" value="{{ customFrom }}" onChange="{{ setCustomFrom }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                  <label style="font-size:10.5px;color:#8089A0">ถึง <input type="date" value="{{ customTo }}" onChange="{{ setCustomTo }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
                 </div>
               </div>
             </div>
@@ -390,10 +445,33 @@
         <div data-brand-dd="1" style="position:relative">
           <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                </div>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -592,18 +670,34 @@
           <div data-period-dd="1" style="position:relative">
             <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
             <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="5">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
                 </sc-for>
-                <div style="border-top:1px solid #EFF0F3;margin-top:6px;padding:8px 6px 2px">
-                  <div style="font-size:11px;color:#9AA3B2;margin-bottom:6px">หรือเลือกช่วงวันที่เอง</div>
-                  <div style="display:flex;flex-direction:column;gap:6px">
-                    <label style="font-size:10.5px;color:#8089A0">จาก <input type="date" value="{{ customFrom }}" onChange="{{ setCustomFrom }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                    <label style="font-size:10.5px;color:#8089A0">ถึง <input type="date" value="{{ customTo }}" onChange="{{ setCustomTo }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                  </div>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
                 </div>
               </div>
+            </div>
             </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i><span>รีเฟรช</span></div>
@@ -1036,18 +1130,34 @@
           <div data-period-dd="1" style="position:relative">
             <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
             <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="5">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
                 </sc-for>
-                <div style="border-top:1px solid #EFF0F3;margin-top:6px;padding:8px 6px 2px">
-                  <div style="font-size:11px;color:#9AA3B2;margin-bottom:6px">หรือเลือกช่วงวันที่เอง</div>
-                  <div style="display:flex;flex-direction:column;gap:6px">
-                    <label style="font-size:10.5px;color:#8089A0">จาก <input type="date" value="{{ customFrom }}" onChange="{{ setCustomFrom }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                    <label style="font-size:10.5px;color:#8089A0">ถึง <input type="date" value="{{ customTo }}" onChange="{{ setCustomTo }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                  </div>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
                 </div>
               </div>
+            </div>
             </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
@@ -1370,7 +1480,22 @@
                 <div onClick="{{ toggleExpDate }}" style="display:flex;align-items:center;justify-content:space-between;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span>{{ expDateDisplay }}</span><i data-lucide="calendar" style="width:16px;height:16px;color:#9AA3B2"></i></div>
                 <sc-if value="{{ expDateOpen }}" hint-placeholder-val="{{ false }}">
                   <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:10px">
-                    <input type="date" value="{{ expForm.date }}" onChange="{{ setExpDate }}" style="width:100%;border:1px solid #DFE2E7;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ expCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ expPickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
                   </div>
                 </sc-if>
               </div>
@@ -1621,18 +1746,34 @@
           <div data-period-dd="1" style="position:relative">
             <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
             <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="5">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
                 </sc-for>
-                <div style="border-top:1px solid #EFF0F3;margin-top:6px;padding:8px 6px 2px">
-                  <div style="font-size:11px;color:#9AA3B2;margin-bottom:6px">หรือเลือกช่วงวันที่เอง</div>
-                  <div style="display:flex;flex-direction:column;gap:6px">
-                    <label style="font-size:10.5px;color:#8089A0">จาก <input type="date" value="{{ customFrom }}" onChange="{{ setCustomFrom }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                    <label style="font-size:10.5px;color:#8089A0">ถึง <input type="date" value="{{ customTo }}" onChange="{{ setCustomTo }}" style="width:100%;border:1px solid #DFE2E7;border-radius:7px;padding:5px 7px;font-size:11.5px;font-family:inherit;outline:none;box-sizing:border-box;margin-top:2px"/></label>
-                  </div>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
                 </div>
               </div>
+            </div>
             </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
@@ -1645,8 +1786,33 @@
         <div data-brand-dd="1" style="position:relative">
           <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:184px">
-              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                </sc-for>
+              </div>
+              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                  <span style="color:#5A6478">{{ rangeLabel }}</span>
+                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                </div>
+              </div>
             </div>
           </sc-if>
         </div>
@@ -1873,7 +2039,22 @@
             <div onClick="{{ toggleImportDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">วันที่รายงาน</span><span style="font-weight:600">{{ importReportDateDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
             <sc-if value="{{ importDateOpen }}" hint-placeholder-val="{{ false }}">
               <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:10px">
-                <input type="date" value="{{ importReportDate }}" onChange="{{ setImportReportDate }}" style="width:100%;border:1px solid #DFE2E7;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ importCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ importPickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
               </div>
             </sc-if>
           </div>
@@ -2881,7 +3062,22 @@
             <div onClick="{{ toggleSalesHeaderDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">{{ headerDateLabel }}</span><span style="font-weight:600">{{ headerDateDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
             <sc-if value="{{ salesHeaderDateOpen }}" hint-placeholder-val="{{ false }}">
               <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:10px">
-                <input type="date" value="{{ salesHeaderDate }}" onChange="{{ setSalesHeaderDate }}" style="width:100%;border:1px solid #DFE2E7;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ salesHeaderCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ salesHeaderPickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
               </div>
             </sc-if>
           </div>
@@ -3073,7 +3269,29 @@
           <h3 style="margin:0;font-size:16px;font-weight:600">บันทึกยอดขายหน้าร้าน — ทั้งวัน</h3>
           <div style="display:flex;align-items:center;gap:9px">
             <span style="font-size:12.5px;color:#6B7486;font-weight:500">วันที่ <span style="color:#2C4A7C">*</span></span>
-            <input type="date" value="{{ storeBatch.date }}" onChange="{{ setStoreBatchDate }}" style="border:1px solid #DFE2E7;border-radius:10px;padding:9px 12px;font-size:13px;color:#2B3547;outline:none;font-family:inherit;background:#fff"/>
+            <div data-form-dd="storeDate" style="position:relative">
+              <div onClick="{{ toggleStoreDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><i data-lucide="calendar" style="width:16px;height:16px;color:#8089A0"></i><span style="font-weight:600">{{ storeDateDisplay }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
+              <sc-if value="{{ storeDateOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:46px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:266px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                  <sc-for list="{{ storeCalCells }}" as="c" hint-placeholder-count="42">
+                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ storePickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
+                </div>
+              </sc-if>
+            </div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr);gap:9px 12px;align-items:center">
@@ -3393,7 +3611,7 @@ function mapExpenseToDbRow(row) {
 class Component extends DCLogic {
   state = {
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
-    saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {},
+    saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
     form: { date: todayISO(), platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
     formDD: null, salesListDD: null, salesPlatform: 'ทุกแพลตฟอร์ม', salesSearch: '', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด',
@@ -3914,7 +4132,11 @@ class Component extends DCLogic {
       style: val === cur ? { ...optBase, background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { ...optBase, color:'#3A4456' },
       check: val === cur ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
     });
-    const periodOptions = ['วันนี้','สัปดาห์นี้','เดือนนี้','ปีนี้','เลือกเอง'].map(p => mkOpt(p, period, { period: p, periodOpen: p === 'เลือกเอง' }));
+    const CHIP = { display:'inline-flex', alignItems:'center', borderRadius:'9px', padding:'7px 13px', fontSize:'12.5px', cursor:'pointer', whiteSpace:'nowrap' };
+    const periodOptions = ['วันนี้','สัปดาห์นี้','เดือนนี้','ปีนี้'].map(p => {
+      const o = mkOpt(p, period, { period: p, periodOpen: false, customFrom: '', customTo: '' });
+      return { ...o, chipStyle: period === p ? { ...CHIP, background:'#2C4A7C', color:'#fff', fontWeight:600 } : { ...CHIP, background:'#F6F6F7', color:'#5A6478', fontWeight:500 } };
+    });
     const customFrom = this.state.customFrom, customTo = this.state.customTo;
     const setCustomFrom = e => this.setState({ customFrom: e.target.value, period: 'เลือกเอง' });
     const setCustomTo = e => this.setState({ customTo: e.target.value, period: 'เลือกเอง' });
@@ -3963,6 +4185,63 @@ class Component extends DCLogic {
         onClick: handled ? go(n.page) : () => {}
       };
     });
+
+    // ---- ปฏิทินกลาง: ใช้ทั้งตัวกรองช่วงเวลาและช่องเลือกวันในฟอร์ม ----
+    const CAL_DOW = ['จ','อ','พ','พฤ','ศ','ส','อา'];
+    const calMonth = this.state.calMonth || todayISO().slice(0, 7);
+    const calShift = (delta) => () => {
+      const [y, m] = calMonth.split('-').map(Number);
+      const d = new Date(y, m - 1 + delta, 1);
+      this.setState({ calMonth: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') });
+    };
+    const calTitle = THAI_MONTHS[Number(calMonth.split('-')[1]) - 1] + ' ' + (Number(calMonth.split('-')[0]) + 543);
+    const CAL_CELL = { display:'flex', alignItems:'center', justifyContent:'center', height:'30px', borderRadius:'8px', fontSize:'12.5px', cursor:'pointer', userSelect:'none' };
+    const calCells = (opts) => {
+      const [y, m] = calMonth.split('-').map(Number);
+      const startDow = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+      const daysInMonth = new Date(y, m, 0).getDate();
+      const today = todayISO();
+      const cells = [];
+      for (let i = 0; i < 42; i++) {
+        const dayNum = i - startDow + 1;
+        if (dayNum < 1 || dayNum > daysInMonth) { cells.push({ label:'', style:{ ...CAL_CELL, cursor:'default' }, onClick: () => {} }); continue; }
+        const iso = y + '-' + String(m).padStart(2, '0') + '-' + String(dayNum).padStart(2, '0');
+        const isSel = opts.selected === iso || opts.from === iso || opts.to === iso;
+        const inRange = opts.from && opts.to && iso > opts.from && iso < opts.to;
+        const isToday = iso === today;
+        let st = { ...CAL_CELL, color:'#2B3547' };
+        if (isSel) st = { ...st, background:'#2C4A7C', color:'#fff', fontWeight:700 };
+        else if (inRange) st = { ...st, background:'#ECF1F7', color:'#223C66' };
+        else if (isToday) st = { ...st, border:'1px solid #2C4A7C', color:'#2C4A7C', fontWeight:600 };
+        cells.push({ label: String(dayNum), style: st, onClick: () => opts.onPick(iso) });
+      }
+      return cells;
+    };
+    const calDowCells = CAL_DOW.map(d => ({ label: d }));
+    const pickRange = (iso) => {
+      const { customFrom, customTo } = this.state;
+      if (!customFrom || (customFrom && customTo)) this.setState({ customFrom: iso, customTo: '', period: 'เลือกเอง' });
+      else if (iso < customFrom) this.setState({ customFrom: iso, customTo: customFrom, period: 'เลือกเอง' });
+      else this.setState({ customTo: iso, period: 'เลือกเอง' });
+    };
+    const periodCalCells = calCells({ from: this.state.customFrom, to: this.state.customTo, onPick: pickRange });
+    const rangeLabel = this.state.customFrom
+      ? (isoToBEShort(this.state.customFrom) + (this.state.customTo ? ' – ' + isoToBEShort(this.state.customTo) : ' – เลือกวันจบ'))
+      : 'ยังไม่ได้เลือกช่วง';
+    const clearRange = () => this.setState({ customFrom: '', customTo: '', period: 'เดือนนี้' });
+    // ปฏิทินเลือกวันเดี่ยวสำหรับฟอร์มต่าง ๆ
+    const singleCal = (value, apply) => calCells({ selected: value, onPick: apply });
+    const expCalCells = singleCal(this.state.expForm.date, (iso) => this.setState(st => ({ expForm: { ...st.expForm, date: iso }, formDD: null })));
+    const importCalCells = singleCal(this.state.importReportDate, (iso) => this.setState({ importReportDate: iso, formDD: null }));
+    const salesHeaderCalCells = singleCal(this.state.salesHeaderDate, (iso) => this.setState({ salesHeaderDate: iso, formDD: null }));
+    const storeCalCells = singleCal(this.state.storeBatch.date, (iso) => this.setState(st => ({ storeBatch: { ...st.storeBatch, date: iso }, formDD: null })));
+    const storeDateOpen = this.state.formDD === 'storeDate';
+    const toggleStoreDate = () => this.setState(st => ({ formDD: st.formDD === 'storeDate' ? null : 'storeDate' }));
+    const storeDateDisplay = this.state.storeBatch.date ? isoToBEShort(this.state.storeBatch.date) : 'เลือกวันที่';
+    const expPickToday = () => this.setState(st => ({ expForm: { ...st.expForm, date: todayISO() }, formDD: null }));
+    const importPickToday = () => this.setState({ importReportDate: todayISO(), formDD: null });
+    const salesHeaderPickToday = () => this.setState({ salesHeaderDate: todayISO(), formDD: null });
+    const storePickToday = () => this.setState(st => ({ storeBatch: { ...st.storeBatch, date: todayISO() }, formDD: null }));
 
     // แท็บของหน้าที่รวมกัน — เนื้อหาเดิมอยู่ครบ แค่ย้ายมาอยู่ใต้เมนูเดียว
     const tabBase = { display:'inline-flex', alignItems:'center', borderRadius:'11px', padding:'8px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' };
@@ -5865,7 +6144,10 @@ class Component extends DCLogic {
       pnd51EstTax: tfFmt(pnd51EstTax), pnd51Installment: tfFmt(pnd51Installment),
       users, roleDefs, permMatrix, userCountLabel: users.length + ' ผู้ใช้',
       mobileSales, mobileChannels, mobileAlerts, mobileProfit, mobileOrders, mobileAlertCount, mobileAlertsEmpty,
-      navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
+      navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs,
+      calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
+      expCalCells, importCalCells, salesHeaderCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
+      expPickToday, importPickToday, salesHeaderPickToday, storePickToday, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini, summaryRows,
       expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, byExpCat['วัตถุดิบ (COGS)'] || 0, finExpenseTotal - (byExpCat['วัตถุดิบ (COGS)'] || 0)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
     };
