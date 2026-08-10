@@ -915,6 +915,38 @@
         </sc-for>
       </div>
 
+      <!-- monthly summary -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">สรุปรายเดือน <span style="color:#9AA3B2;font-weight:500;font-size:13px">(ทุกเดือนในระบบ)</span></h3>
+          <div onClick="{{ exportMonthlyCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#5A6478;cursor:pointer"><i data-lucide="download" style="width:15px;height:15px"></i>Export CSV</div>
+        </div>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+          <thead>
+            <tr style="color:#8089A0;font-size:11.5px;text-align:right">
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">เดือน</th>
+              <th style="padding:0 8px 11px;font-weight:500">รายรับหลังส่วนลด</th>
+              <th style="padding:0 8px 11px;font-weight:500">ค่าธรรมเนียมแพลตฟอร์ม</th>
+              <th style="padding:0 8px 11px;font-weight:500">รายจ่าย</th>
+              <th style="padding:0 8px 11px;font-weight:500">กำไรสุทธิ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ monthlyRows }}" as="m" hint-placeholder-count="2">
+              <tr style="border-top:1px solid #F1F2F4;color:#2B3547;font-weight:500">
+                <td style="padding:11px 8px;font-weight:600">{{ m.label }}</td>
+                <td style="padding:11px 8px;text-align:right;white-space:nowrap">{{ m.income }}</td>
+                <td style="padding:11px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ m.gp }}</td>
+                <td style="padding:11px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ m.exp }}</td>
+                <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap;color:{{ m.profitColor }}">{{ m.profit }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
       <!-- trend + expense donut -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
@@ -3936,7 +3968,10 @@ class Component extends DCLogic {
     const inexRows = this.applySalesFilters(this.state.recentRows);
     const inexExpAll = this.applyExpenseFilters(this.state.expRows);
     const inexIncomeTotal = inexRows.reduce((a, r) => a + r.gross, 0) - this.salesDiscountTotal(inexRows).total;
-    const inexExpenseTotal = inexExpAll.reduce((a, r) => a + r.amount, 0);
+    // GP/ค่าคอมแพลตฟอร์ม is real money withheld from every delivery order — count it as
+    // an automatic expense category so กำไรสุทธิ is honest without double keying.
+    const inexPlatformFees = inexRows.filter(r => ['Grab','LINE MAN','ShopeeFood'].includes(r.platform)).reduce((a, r) => a + r.fee, 0);
+    const inexExpenseTotal = inexExpAll.reduce((a, r) => a + r.amount, 0) + inexPlatformFees;
     const inexNetProfit = inexIncomeTotal - inexExpenseTotal;
     const inexMargin = inexIncomeTotal ? (inexNetProfit / inexIncomeTotal * 100) : 0;
     const byChannelInex = this.groupBy(inexRows, r => r.platform);
@@ -3952,9 +3987,10 @@ class Component extends DCLogic {
       { title:'รายรับหน้าร้าน', amount:inexFmt(inexStorefront), delta:inexNoDelta, icon:'store', bg:'#F8F0DC', fg:'#D98A4C', amtColor:'#1B2536' },
       { title:'รายรับแพลตฟอร์ม', amount:inexFmt(inexPlatformIncome), delta:inexNoDelta, icon:'smartphone', bg:'#E7F2F0', fg:'#3E9E92', amtColor:'#1B2536' }
     ];
-    const inexCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
+    const inexCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าธรรมเนียมแพลตฟอร์ม (อัตโนมัติ)':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
     const inexSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byCatInex = inexSumByKey(inexExpAll, r => r.mainCat, r => r.amount);
+    if (inexPlatformFees > 0) byCatInex['ค่าธรรมเนียมแพลตฟอร์ม (อัตโนมัติ)'] = inexPlatformFees;
     const inexCatNames = Object.keys(byCatInex);
     const inexExpRows = inexCatNames.map(name => ({ name, amount: inexFmt(byCatInex[name]), pct: inexExpenseTotal ? (byCatInex[name] / inexExpenseTotal * 100).toFixed(1) + '%' : '0%', color: inexCatColors[name] || '#B6BECC' }));
     const inexExpDonut = inexExpenseTotal > 0
@@ -3967,6 +4003,29 @@ class Component extends DCLogic {
       name:p, amount: inexFmt(byChannelInex[p].gross), pct: inexIncomeTotal ? (byChannelInex[p].gross / inexIncomeTotal * 100).toFixed(1) + '%' : '0%',
       w: Math.round(byChannelInex[p].gross / inexMaxChannel * 100) + '%', color: inexChannelColors[p]
     }));
+    // สรุปรายเดือน — every month in the DB: รายรับหลังส่วนลด − GP − รายจ่าย = กำไร
+    const monthAgg = {};
+    const mSlot = m => monthAgg[m] || (monthAgg[m] = { gross:0, storeDisc:0, gp:0, exp:0, deliveryDisc:0 });
+    this.salesOnly(this.state.recentRows).forEach(r => {
+      if (!r.isoDate) return;
+      const o = mSlot(r.isoDate.slice(0, 7));
+      o.gross += r.gross;
+      if (r.platform === 'หน้าร้าน') o.storeDisc += r.fee;
+      else if (['Grab','LINE MAN','ShopeeFood'].includes(r.platform)) o.gp += r.fee;
+    });
+    this.state.recentRows.filter(r => r.platform === 'ส่วนลด' && r.isoDate).forEach(r => { mSlot(r.isoDate.slice(0, 7)).deliveryDisc += r.gross; });
+    this.state.expRows.forEach(r => { if (r.isoDate) mSlot(r.isoDate.slice(0, 7)).exp += r.amount; });
+    const monthlyRows = Object.keys(monthAgg).sort().reverse().map(m => {
+      const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
+      const income = o.gross - o.storeDisc - o.deliveryDisc;
+      const profit = income - o.gp - o.exp;
+      return { label: THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543), income: inexFmt(income), gp: inexFmt(o.gp), exp: inexFmt(o.exp), profit: inexFmt(profit), profitColor: profit >= 0 ? '#2E7D5B' : '#B14A4A', _r: { income, gp: o.gp, exp: o.exp, profit } };
+    });
+    const exportMonthlyCsv = () => {
+      const lines = [csvRow(['เดือน','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)','กำไรสุทธิ (฿)'])];
+      monthlyRows.slice().reverse().forEach(r => lines.push(csvRow([r.label, r._r.income.toFixed(2), r._r.gp.toFixed(2), r._r.exp.toFixed(2), r._r.profit.toFixed(2)])));
+      downloadCsv('สรุปรายเดือน-' + todayISO() + '.csv', lines);
+    };
     const inexTypePill = (t) => {
       const c = t === 'รายรับ' ? ['#2E7D5B','▲'] : ['#2C4A7C','▼'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'4px', color:c[0], fontWeight:600 } },
@@ -5288,6 +5347,7 @@ class Component extends DCLogic {
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend),
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
+      monthlyRows, exportMonthlyCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
       expForm: ef, expMainDD, expSubDD, expBrandDD, expPayDD, toggleAsset, expAsset, expAssetOff: !expAsset,
