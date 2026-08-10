@@ -818,10 +818,57 @@
     <!-- ===================== สินค้า PRODUCTS PAGE ===================== -->
     <sc-if value="{{ isProducts }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Products — สินค้า">
-      <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สินค้า</h1></div>
-      <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:60px 24px;text-align:center;color:#8089A0">
-        <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลสินค้ารายตัว</div>
-        <div style="font-size:13px;line-height:1.6">ข้อมูลยอดขายปัจจุบันเป็นระดับออเดอร์ ยังไม่มีรายละเอียดสินค้าต่อชิ้น</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สินค้าขายดี</h1>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">จาก POS จริง</span>
+          </div>
+          <div style="font-size:14px;color:#8089A0">Top 60 สินค้าตามยอดขาย · อัปเดตล่าสุด {{ productAsOf }} · อยากอัปเดตใหม่บอก Claude ว่า "อัปเดตข้อมูลสินค้า"</div>
+        </div>
+        <div style="display:flex;gap:8px;flex:none">
+          <sc-for list="{{ productMonthTabs }}" as="t" hint-placeholder-count="2">
+            <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+          </sc-for>
+          <div onClick="{{ exportProductsCsv }}" style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#5A6478;cursor:pointer"><i data-lucide="download" style="width:15px;height:15px"></i>Export</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px">
+        <sc-for list="{{ productKpis }}" as="k" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
+            <div style="font-size:12.5px;color:#7C8699;font-weight:500;margin-bottom:8px">{{ k.title }}</div>
+            <div style="font-size:19px;font-weight:700;color:#1B2536;letter-spacing:-0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ k.value }}</div>
+            <div style="font-size:12px;color:#9AA3B2;margin-top:3px">{{ k.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:620px">
+          <thead>
+            <tr style="color:#8089A0;font-size:11.5px;text-align:right">
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left;width:36px">#</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">สินค้า</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">หมวดหมู่</th>
+              <th style="padding:0 8px 11px;font-weight:500">จำนวนที่ขาย</th>
+              <th style="padding:0 8px 11px;font-weight:500">ยอดขาย</th>
+              <th style="padding:0 8px 11px;font-weight:500">% ของ Top 60</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ productRows }}" as="p" hint-placeholder-count="10">
+              <tr style="border-top:1px solid #F1F2F4;color:#2B3547">
+                <td style="padding:10px 8px;color:#9AA3B2;font-weight:600">{{ p.rank }}</td>
+                <td style="padding:10px 8px;font-weight:600;color:#1B2536">{{ p.name }}</td>
+                <td style="padding:10px 8px;color:#7C8699">{{ p.cat }}</td>
+                <td style="padding:10px 8px;text-align:right">{{ p.qty }}</td>
+                <td style="padding:10px 8px;text-align:right;font-weight:700">{{ p.gross }}</td>
+                <td style="padding:10px 8px;text-align:right;color:#9AA3B2">{{ p.pct }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
       </div>
     </div>
     </sc-if>
@@ -848,10 +895,16 @@
           <div style="font-size:11.5px;color:#9AA3B2;margin-top:4px">จากรายจ่ายหมวดการตลาด</div>
         </div>
       </div>
-      <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:60px 24px;text-align:center;color:#8089A0">
-        <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลประสิทธิภาพการตลาด</div>
-        <div style="font-size:13px;line-height:1.6">ROAS / Impressions / แคมเปญ จะแสดงเมื่อเชื่อมต่อแพลตฟอร์มโฆษณา — ยอดค่าโฆษณาจริงดึงจากรายจ่ายหมวดการตลาด</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:16px">
+        <sc-for list="{{ mktPerfKpis }}" as="k" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
+            <div style="font-size:12.5px;color:#7C8699;font-weight:500;margin-bottom:8px">{{ k.title }}</div>
+            <div style="font-size:22px;font-weight:700;color:#1B2536;letter-spacing:-0.3px">{{ k.value }}</div>
+            <div style="font-size:12px;color:#9AA3B2;margin-top:4px;line-height:1.4">{{ k.sub }}</div>
+          </div>
+        </sc-for>
       </div>
+      <div style="font-size:12px;color:#9AA3B2;line-height:1.6">หมายเหตุ: บันทึกค่าโฆษณา (Meta/TikTok/Ads แพลตฟอร์ม) ในหน้า "รายจ่าย" หมวด <b style="font-weight:600;color:#7A8497">การตลาด</b> — ROAS จะคำนวณให้อัตโนมัติตามช่วงเวลาที่เลือก</div>
     </div>
     </sc-if>
 
@@ -2164,7 +2217,7 @@
           </div>
           <div style="font-size:14px;color:#8089A0">สรุป VAT และภาษีหัก ณ ที่จ่ายจากทุกช่องทาง พร้อมเอกสารส่งบัญชี/สรรพากร</div>
         </div>
-        <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#7A5BA8;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i>ดาวน์โหลดทั้งหมด</div>
+        <div onClick="{{ exportAllTaxDocs }}" style="display:flex;align-items:center;gap:8px;background:#7A5BA8;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i>ดาวน์โหลดทั้งหมด</div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ taxKpis }}" as="k" hint-placeholder-count="4">
@@ -2183,7 +2236,7 @@
               <div style="display:flex;align-items:center;gap:14px;border:1px solid #E7E9ED;border-radius:13px;padding:14px 16px">
                 <div style="width:42px;height:42px;border-radius:11px;background:#F1ECF6;color:#7A5BA8;display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
                 <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:#1B2536;margin-bottom:3px">{{ d.name }}</div><div style="font-size:12px;color:#8089A0">{{ d.period }} · {{ d.fmt }}</div></div>
-                <div style="text-align:right;flex:none"><div style="font-size:14px;font-weight:700;color:#1B2536;margin-bottom:6px">{{ d.amount }}</div><span onClick="{{ noop }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #C9B3DC;color:#7A5BA8;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer"><i data-lucide="download" style="width:13px;height:13px"></i>ดาวน์โหลด</span></div>
+                <div style="text-align:right;flex:none"><div style="font-size:14px;font-weight:700;color:#1B2536;margin-bottom:6px">{{ d.amount }}</div><span onClick="{{ d.onDownload }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #C9B3DC;color:#7A5BA8;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer"><i data-lucide="download" style="width:13px;height:13px"></i>ดาวน์โหลด</span></div>
               </div>
             </sc-for>
           </div>
@@ -3108,6 +3161,9 @@ function safeBeShortToISO(be) {
 // (LINE MAN vat / ShopeeFood VAT on Commission / Grab Tax on MDR). Bridge lookup so GP/VAT
 // display correctly without a DB migration; superseded by a stored sales.vat column if added.
 const SALES_VAT_BY_ORDER = {"LMF-260709-704801585":3.94,"LMF-260709-787669571":5.92,"LMF-260709-413932190":6.09,"LMF-260709-393224230":2.02,"LMF-260709-692751786":3.07,"LMF-260709-715602127":1.58,"LMF-260709-462287476":2.44,"LMF-260709-890927833":4.65,"LMF-260709-787651836":2.02,"LMF-260709-155690969":6.91,"LMF-260709-725447805":8.02,"LMF-260709-266743635":8.48,"LMF-260709-389876107":6.18,"LMF-260709-681142560":2.23,"LMF-260709-587097997":0.69,"LMF-260709-484208458":3.41,"LMF-260709-444764461":0.69,"LMF-260709-503460076":2.02,"LMF-260709-185052299":4.65,"LMF-260709-220863937":0.69,"LMF-260709-258521595":3.24,"LMF-260709-622871999":0.59,"LMF-260709-306459254":8.23,"LMF-260709-803002201":5.66,"LMF-260709-220113355":1.67,"LMF-260709-449886412":1.92,"LMF-260709-559613632":2.05,"LMF-260709-444711232":0.98,"LMF-260709-495605765":0.69,"LMF-260709-886109869":4.02,"LMF-260709-808412904":1.37,"LMF-260709-700223952":0.69,"LMF-260709-822272149":1.37,"LMF-260709-884894174":0.69,"LMF-260709-834439905":1.65,"LMF-260709-412057678":0.69,"LMF-260709-587301196":1.92,"LMF-260709-456497358":1.92,"LMF-260709-311430879":1.03,"LMF-260709-861692299":2.02,"LMF-260709-360993557":1.92,"LMF-260709-914874294":1.37,"LMF-260709-901772850":0.69,"LMF-260709-031191085":1.03,"LMF-260709-171234633":0.69,"LMF-260709-209138682":2.32,"LMF-260709-703814992":0.69,"LMF-260709-978177258":1.37,"LMF-260709-173093145":4.02,"LMF-260709-793813688":1.92,"LMF-260709-696264678":1.47,"LMF-260709-684613642":2.02,"LMF-260709-098133980":2.02,"LMF-260709-038197653":5.66,"LMF-260709-860440022":0.59,"LMF-260709-745702379":2.88,"LMF-260709-868171460":4.25,"LMF-260709-253310365":3.21,"LMF-260709-903912161":0.89,"LMF-260709-143494368":1.37,"LMF-260709-270426788":0.69,"LMF-260709-963590331":2.78,"LMF-260709-122403641":9.47,"LMF-260709-834337631":2.29,"LME-260709-269169057":4.53,"LMF-260709-866687693":7.08,"LMF-260709-203175726":1.99,"3165324356910592426":1.72,"3165440867973120714":2.67,"3165751359897088041":7.94,"3165815021385728436":2.06,"3165863706376192603":1.89,"3165867421366272789":6.13,"3165902673559040799":3.61,"3165944973000192487":6.87,"3165987704322048395":2.37,"3166085639372288521":12.14,"3165752505612288883":5.02,"3166079655147520985":2.79};
+// Product sales snapshot pulled from the POS "ยอดขายตามสินค้า" report (top 60 by
+// gross per month). Real data; refresh by asking Claude to "อัปเดตข้อมูลสินค้า".
+const PRODUCT_SALES = {"asOf":"10/08/2569","jul":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",1041,100551],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",125,35723],["เค้ก 90 Buttercream เค้กโบราณ","เมนูใหม่ประจำวัน",79,20731],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",47,13061],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",39,12597],["H มะพร้าว","ครึ่งปอนด์",52,12338],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",34,11012],["เค้กมะพร้าว","2 ปอนด์",217,8778],["H Bear Brown Cake","ครึ่งปอนด์",39,8541],["เครปเค้กเรนโบว์","2 ปอนด์",173,8329],["Flowers","เมนูแนะนำ (เมนูใหม่)",25,8153],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",55,7559],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",183,7336],["H ช็อคบราวนี่","ครึ่งปอนด์",33,7317],["เค้กแบล็คฟอเรสต์","2 ปอนด์",168,6769],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",19,6682],["เค้กส้ม","2 ปอนด์",164,6545],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",20,6521],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",163,6510],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",161,6433],["Be Smiles","เค้กมินิมอล",27,6063],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",149,5992],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",150,5915],["เค้กมะพร้าวใบเตย","2 ปอนด์",145,5852],["เค้กบลูเบอร์รี่","2 ปอนด์",148,5775],["เค้กช็อคหน้านิ่ม","2 ปอนด์",147,5768],["Blessing","เค้กมินิมอล",17,5673],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",143,5586],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",133,5257],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",16,5229],["เค้กช็อคโอริโอ้","2 ปอนด์",131,5222],["White Ruby","เมนูแนะนำ (เมนูใหม่)",12,5159],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",16,5073],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",18,4872],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",15,4851],["เค้กเชอร์รี่ช็อกโกแลต","2 ปอนด์",120,4795],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",14,4740],["เค้กมิกซ์เบอร์รี่","2 ปอนด์",118,4599],["เค้กช็อกโกแลต ครัช","2 ปอนด์",115,4585],["เค้กโอริโอ้","2 ปอนด์",118,4571],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",14,4473],["1P เค้กช็อคโก้โอริโอ้","เค้ก 1 ปอนด์",14,4395],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",18,4332],["เค้กเชดด้าชีส","2 ปอนด์",110,4284],["Boy Choco","เค้กช็อกโกแลตหน้านิ่ม",11,4275],["เค้กบลูเลิฟเวอร์","2 ปอนด์",105,4116],["เค้กลูกตาล","2 ปอนด์",100,3913],["H เรนโบว์ช็อค","ครึ่งปอนด์",18,3862],["เค้กชาเขียวมัจฉะ","2 ปอนด์",94,3794],["เค้กช็อคโกแลตพีนัทบัตเตอร์","2 ปอนด์",94,3724],["1P ช็อกโกแลตนูเทลล่า","เค้ก 1 ปอนด์",11,3495],["เค้กฝอยทอง","2 ปอนด์",87,3465],["1P ไวท์ช็อกโกแลต","เค้ก 1 ปอนด์",11,3378],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",80,3160],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",11,3135],["เค้กช็อคโอช็อค","2 ปอนด์",79,3101],["คนพิเศษเกิดวันนี้","เมนูแนะนำ (เมนูใหม่)",9,3037],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",8,2970],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",9,2904],["เค้กไวท์กรีนทีเชอรี่","2 ปอนด์",73,2884]],"aug":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",117,11106],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",18,5924],["H มะพร้าว","ครึ่งปอนด์",21,4819],["Little Boy","เมนูใหม่ประจำวัน",16,3662],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",7,3055],["Flowers","เมนูแนะนำ (เมนูใหม่)",8,2543],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",8,2299],["เค้ก 90 Buttercream Mini × 6","เมนูใหม่ประจำวัน",4,2160],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",6,2086],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",7,2066],["H Bear Brown Cake","ครึ่งปอนด์",9,2031],["เครปเค้กเรนโบว์","2 ปอนด์",41,1917],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",6,1917],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",6,1917],["เค้กมะพร้าวใบเตย","2 ปอนด์",47,1911],["เค้กมะพร้าว","2 ปอนด์",44,1764],["พวงมาลัย (กลาง)","เค้กวันแม่",5,1745],["Red Ruby","เมนูแนะนำ (เมนูใหม่)",4,1705],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",6,1669],["เค้กบลูเลิฟเวอร์","2 ปอนด์",42,1638],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",40,1582],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",5,1578],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",40,1575],["H ช็อคนูเทล่า","ครึ่งปอนด์",7,1573],["เค้กแบล็คฟอเรสต์","2 ปอนด์",38,1449],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",5,1425],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",5,1413],["พวงมาลัย (ใหญ่)","เค้กวันแม่",4,1396],["Blessing","เค้กมินิมอล",4,1377],["H ช็อคโอริโอ้","ครึ่งปอนด์",6,1354],["H ช็อคเลิฟเวอร์","ครึ่งปอนด์",6,1284],["Cherry","เค้กมินิมอล",4,1276],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",33,1260],["เค้กช็อคหน้านิ่ม","2 ปอนด์",32,1239],["เค้กบลูเบอร์รี่","2 ปอนด์",31,1225],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",3,1221],["H มิกซ์เบอร์รี่","ครึ่งปอนด์",5,1145],["Cinderella Princess","เมนูดังคนสั่งเยอะ",3,1142],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",29,1120],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1116],["H Bear Pink Cake","ครึ่งปอนด์",5,1115],["Pink Heart Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1112],["เค้กช็อกโกแลต ครัช","2 ปอนด์",29,1106],["เค้กช็อคโอช็อค","2 ปอนด์",29,1099],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",3,1045],["เค้กเชดด้าชีส","2 ปอนด์",26,1001],["Be Smiles","เค้กมินิมอล",3,957],["Blue Ocean","เค้กมินิมอล",3,956],["เค้กช็อคโอริโอ้","2 ปอนด์",25,952],["เค้กโอริโอ้","2 ปอนด์",24,952],["H เรนโบว์ช็อค","ครึ่งปอนด์",5,945],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",3,939],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",3,939],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",25,938],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",24,931],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",4,926],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",24,924],["เค้กฝอยทอง","2 ปอนด์",23,903],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",23,888],["Girl Choco","เค้กช็อกโกแลตหน้านิ่ม",3,887]]};
 function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: dbRow.brand,
@@ -3960,6 +4016,16 @@ class Component extends DCLogic {
     const mktExp = this.applyExpenseFilters(this.state.expRows);
     const mktAdSpend = mktExp.filter(r => r.mainCat === 'การตลาด').reduce((a, r) => a + r.amount, 0);
     const mktFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    // ประสิทธิภาพจริง: ROAS = ยอดขาย delivery ÷ ค่าโฆษณาที่บันทึกในรายจ่ายหมวดการตลาด
+    const mktSalesRows = this.applySalesFilters(this.state.recentRows);
+    const mktDeliverySales = mktSalesRows.filter(r => ['Grab','LINE MAN','ShopeeFood'].includes(r.platform)).reduce((a, r) => a + r.gross, 0);
+    const mktHasSpend = mktAdSpend > 0;
+    const mktRoas = mktHasSpend ? (mktDeliverySales / mktAdSpend) : 0;
+    const mktPerfKpis = [
+      { title:'ยอดขาย Delivery (ช่วงที่เลือก)', value: mktFmt(mktDeliverySales), sub:'Grab + LINE MAN + ShopeeFood' },
+      { title:'ROAS (ยอดขาย ÷ ค่าโฆษณา)', value: mktHasSpend ? mktRoas.toFixed(1) + 'x' : '—', sub: mktHasSpend ? 'ทุก ฿1 ค่าโฆษณา ได้ยอดขาย ฿' + mktRoas.toFixed(1) : 'จะคำนวณเมื่อบันทึกค่าโฆษณาในรายจ่าย' },
+      { title:'ค่าโฆษณาต่อยอดขาย', value: mktHasSpend && mktDeliverySales > 0 ? (mktAdSpend / mktDeliverySales * 100).toFixed(1) + '%' : '—', sub: mktHasSpend ? 'สัดส่วนงบโฆษณาต่อยอดขาย delivery' : 'บันทึกรายจ่ายหมวด "การตลาด" ก่อน' }
+    ];
 
     // ---- รายรับ-รายจ่าย overview ----
     const inexFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
@@ -4026,6 +4092,32 @@ class Component extends DCLogic {
       monthlyRows.slice().reverse().forEach(r => lines.push(csvRow([r.label, r._r.income.toFixed(2), r._r.gp.toFixed(2), r._r.exp.toFixed(2), r._r.profit.toFixed(2)])));
       downloadCsv('สรุปรายเดือน-' + todayISO() + '.csv', lines);
     };
+    // ---- สินค้าขายดี (POS snapshot — PRODUCT_SALES) ----
+    const productsMonth = this.state.productsMonth || 'aug';
+    const prodTabBase = { display:'flex', alignItems:'center', borderRadius:'11px', padding:'9px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' };
+    const productMonthTabs = [{ key:'jul', label:'ก.ค. 69' }, { key:'aug', label:'ส.ค. 69 (1–9)' }].map(t => ({
+      label: t.label, onClick: () => this.setState({ productsMonth: t.key }),
+      style: t.key === productsMonth ? { ...prodTabBase, background:'#2C4A7C', color:'#fff' } : { ...prodTabBase, background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
+    }));
+    const prodList = PRODUCT_SALES[productsMonth] || [];
+    const prodTotalGross = prodList.reduce((a, p) => a + p[3], 0);
+    const prodTotalQty = prodList.reduce((a, p) => a + p[2], 0);
+    const pFmt = n => '฿' + Math.round(n).toLocaleString('en-US');
+    const productRows = prodList.map((p, i) => ({ rank: i + 1, name: p[0], cat: p[1], qty: p[2].toLocaleString('en-US'), gross: pFmt(p[3]), pct: prodTotalGross ? (p[3] / prodTotalGross * 100).toFixed(1) + '%' : '0%' }));
+    const prodByCat = {};
+    prodList.forEach(p => { prodByCat[p[1]] = (prodByCat[p[1]] || 0) + p[3]; });
+    const prodTopCat = Object.keys(prodByCat).sort((a, b) => prodByCat[b] - prodByCat[a])[0];
+    const productKpis = [
+      { title:'สินค้าขายดีอันดับ 1', value: prodList[0] ? prodList[0][0] : '—', sub: prodList[0] ? pFmt(prodList[0][3]) + ' · ' + prodList[0][2].toLocaleString('en-US') + ' ชิ้น' : '' },
+      { title:'ยอดขายรวม Top 60', value: pFmt(prodTotalGross), sub: prodTotalQty.toLocaleString('en-US') + ' ชิ้น' },
+      { title:'หมวดขายดีสุด', value: prodTopCat || '—', sub: prodTopCat ? pFmt(prodByCat[prodTopCat]) : '' }
+    ];
+    const exportProductsCsv = () => {
+      const lines = [csvRow(['อันดับ','สินค้า','หมวดหมู่','จำนวน','ยอดขาย (฿)'])];
+      prodList.forEach((p, i) => lines.push(csvRow([i + 1, p[0], p[1], p[2], p[3]])));
+      downloadCsv('สินค้าขายดี-' + (productsMonth === 'jul' ? 'กค69' : 'สค69') + '.csv', lines);
+    };
+    const productAsOf = PRODUCT_SALES.asOf;
     const inexTypePill = (t) => {
       const c = t === 'รายรับ' ? ['#2E7D5B','▲'] : ['#2C4A7C','▼'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'4px', color:c[0], fontWeight:600 } },
@@ -5180,7 +5272,29 @@ class Component extends DCLogic {
       { title:'VAT ขาย (7%)', amount:'—', sub:'ต้องยืนยันสถานะจด VAT', icon:'receipt', bg:'#EFF0F3', fg:'#9AA3B2' },
       { title:'หัก ณ ที่จ่ายสะสม', amount:'—', sub:'ยังไม่เก็บภาษีต่อออเดอร์', icon:'scissors', bg:'#EFF0F3', fg:'#9AA3B2' }
     ];
-    const taxDocs = [];
+    // เอกสารสรุปฐานรายได้รายเดือน — generated from real sales/expense data (monthAgg)
+    const taxDocs = Object.keys(monthAgg).sort().reverse().map(m => {
+      const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
+      const label = THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543);
+      const income = o.gross - o.storeDisc - o.deliveryDisc;
+      const fmt2n = n => '฿' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const onDownload = () => {
+        const lines = [csvRow(['รายการ','ค่า (฿)'])];
+        [['เดือน', label], ['ยอดขายก่อนลด', o.gross.toFixed(2)], ['ส่วนลดหน้าร้าน', o.storeDisc.toFixed(2)], ['ส่วนลด Delivery', o.deliveryDisc.toFixed(2)],
+         ['รายรับหลังส่วนลด (ฐานรายได้)', income.toFixed(2)], ['ค่าธรรมเนียมแพลตฟอร์ม (GP)', o.gp.toFixed(2)], ['รายจ่ายที่บันทึก', o.exp.toFixed(2)]
+        ].forEach(r => lines.push(csvRow(r)));
+        downloadCsv('ฐานรายได้-' + label.replace(/\s/g, '') + '.csv', lines);
+      };
+      return { name: 'สรุปฐานรายได้ ' + label, period: label, fmt: 'CSV จากข้อมูลจริง', amount: fmt2n(income), onDownload };
+    });
+    const exportAllTaxDocs = () => {
+      const lines = [csvRow(['เดือน','ยอดขายก่อนลด (฿)','ส่วนลดรวม (฿)','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)'])];
+      Object.keys(monthAgg).sort().forEach(m => {
+        const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
+        lines.push(csvRow([THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543), o.gross.toFixed(2), (o.storeDisc + o.deliveryDisc).toFixed(2), (o.gross - o.storeDisc - o.deliveryDisc).toFixed(2), o.gp.toFixed(2), o.exp.toFixed(2)]));
+      });
+      downloadCsv('ฐานรายได้ทุกเดือน-' + todayISO() + '.csv', lines);
+    };
     const taxWht = [];
 
     // ---- 7b. แบบฟอร์ม ภ.พ./ภ.ง.ด. ----
@@ -5345,9 +5459,10 @@ class Component extends DCLogic {
       page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
-      mktAdSpendDisplay: mktFmt(mktAdSpend),
+      mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       monthlyRows, exportMonthlyCsv,
+      productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
       expForm: ef, expMainDD, expSubDD, expBrandDD, expPayDD, toggleAsset, expAsset, expAssetOff: !expAsset,
@@ -5399,7 +5514,7 @@ class Component extends DCLogic {
       payoutKpis, payoutPlatforms, payoutRecRows,
       subsidyKpis, subsidyRows, subsidyRounds,
       alertItems, alertCounts, alertRules, alertsEmpty, alertCountLabel,
-      taxKpis, taxDocs, taxWht,
+      taxKpis, taxDocs, taxWht, exportAllTaxDocs,
       taxFormsList, taxFormsReadyCount, taxFormsDraftCount, taxFormActive, tf,
       isPp30, isPnd1, isPnd3, isPnd53, isPnd50, isPnd51,
       activeStatusPill, activeStatusLabel, activeIsReady, toggleActiveReady, toggleReadyLabel, toggleReadyIcon,
