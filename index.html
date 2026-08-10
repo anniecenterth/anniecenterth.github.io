@@ -93,6 +93,11 @@
     <!-- ===================== OVERVIEW PAGE ===================== -->
     <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Overview — สาขาบางโพ">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ overviewTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
 
       <!-- header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px">
@@ -336,6 +341,11 @@
     <!-- ===================== FINANCE PAGE ===================== -->
     <sc-if value="{{ isFinance }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Finance — สาขาบางโพ">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ overviewTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
 
       <!-- header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px">
@@ -563,6 +573,11 @@
     <!-- ===================== เช็คยอดเงินเข้าระบบ RECONCILE PAGE ===================== -->
     <sc-if value="{{ isReconcile }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Cash In — เช็คยอดเงินเข้าระบบ">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ cashInTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
 
       <!-- header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
@@ -796,6 +811,11 @@
     <!-- ===================== แคมเปญ CAMPAIGN PAGE ===================== -->
     <sc-if value="{{ isCampaign }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Campaign — แคมเปญ">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ marketingTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">แคมเปญการตลาด</h1></div>
       <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:60px 24px;text-align:center;color:#8089A0">
         <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลแคมเปญ</div>
@@ -807,6 +827,11 @@
     <!-- ===================== คอนเทนต์ CONTENT PAGE ===================== -->
     <sc-if value="{{ isContent }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Content — คอนเทนต์">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ marketingTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">คอนเทนต์</h1></div>
       <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:60px 24px;text-align:center;color:#8089A0">
         <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลคอนเทนต์</div>
@@ -968,6 +993,11 @@
     <!-- ===================== การตลาด MARKETING PAGE ===================== -->
     <sc-if value="{{ isMarketing }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Marketing — การตลาด">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ marketingTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">การตลาด</h1></div>
       <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:18px 22px;min-width:230px">
@@ -2143,6 +2173,11 @@
     <!-- ===================== กระทบยอดเงินโอน PAYOUT PAGE ===================== -->
     <sc-if value="{{ isPayout }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Payout — กระทบยอดเงินโอน">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ cashInTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
@@ -2290,6 +2325,11 @@
     <!-- ===================== ภาษี & ส่งออก TAX PAGE ===================== -->
     <sc-if value="{{ isTax }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Tax — ภาษี & ส่งออก">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ taxPageTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
@@ -2353,6 +2393,11 @@
     <!-- ===================== แบบฟอร์ม ภ.พ./ภ.ง.ด. TAX FORMS PAGE ===================== -->
     <sc-if value="{{ isTaxForms }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Tax Forms — แบบฟอร์ม ภ.พ./ภ.ง.ด.">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ taxPageTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
@@ -2735,6 +2780,11 @@
     <!-- ===================== มุมมองเจ้าของ MOBILE PAGE ===================== -->
     <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Mobile — มุมมองเจ้าของ">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <sc-for list="{{ overviewTabs }}" as="t" hint-placeholder-count="2">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
       <div style="margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
           <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">มุมมองเจ้าของ</h1>
@@ -3877,30 +3927,24 @@ class Component extends DCLogic {
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
     const saleTypeOptions = ['ทุกประเภท','Retail Sales (หน้าร้าน)','Delivery Platform','Custom Cake','Wholesale (บางโพ)'].map(t => mkOpt(t, saleType, { saleType: t, saleTypeOpen: false }));
     const nav = [
-      { label:'ภาพรวม', icon:'house', key:'overview', page:'overview' },
+      { label:'ภาพรวม', icon:'house', key:'overview', page:'overview', group:['overview','finance','mobile'] },
       { label:'ยอดขาย', icon:'trending-up', key:'sales', page:'salesdash' },
-      { label:'การเงิน', icon:'wallet', key:'finance', page:'finance' },
+      { label:'สินค้า', icon:'package', key:'products', page:'products' },
       { label:'รายรับ-รายจ่าย', icon:'arrow-left-right', key:'inex', page:'inex' },
       { label:'รายรับ', icon:'circle-arrow-down', key:'income', sub:true, page:'sales' },
       { label:'รายจ่าย', icon:'circle-arrow-up', key:'expense', sub:true, page:'expenserec' },
-      { label:'เช็คยอดเงินเข้าระบบ', icon:'badge-check', key:'reconcile', sub:true, page:'reconcile' },
-      { label:'นำเข้ารายงานออนไลน์', icon:'file-down', key:'import', sub:true, page:'import' },
-      { label:'กระทบยอดเงินโอน', icon:'arrow-right-left', key:'payout', sub:true, page:'payout' },
+      { label:'เงินเข้า & กระทบยอด', icon:'badge-check', key:'reconcile', sub:true, page:'reconcile', group:['reconcile','payout'] },
       { label:'เงินรัฐรอรับ', icon:'landmark', key:'subsidy', sub:true, page:'subsidy' },
-      { label:'ภาษี & ส่งออก', icon:'file-text', key:'tax', sub:true, page:'tax' },
-      { label:'แบบฟอร์ม ภ.พ./ภ.ง.ด.', icon:'file-edit', key:'taxforms', sub:true, page:'taxforms' },
-      { label:'การตลาด', icon:'megaphone', key:'marketing', page:'marketing' },
-      { label:'แคมเปญ', icon:'flag', key:'campaign', sub:true, page:'campaign' },
-      { label:'คอนเทนต์', icon:'image', key:'content', sub:true, page:'content' },
-      { label:'สินค้า', icon:'package', key:'products', page:'products' },
+      { label:'นำเข้ารายงานออนไลน์', icon:'file-down', key:'import', sub:true, page:'import' },
+      { label:'ภาษี', icon:'file-text', key:'tax', sub:true, page:'tax', group:['tax','taxforms'] },
+      { label:'การตลาด', icon:'megaphone', key:'marketing', page:'marketing', group:['marketing','campaign','content'] },
       { label:'สมาชิก', icon:'users', key:'members', page:'members' },
       { label:'ศูนย์แจ้งเตือน', icon:'bell-ring', key:'alerts', page:'alerts' },
-      { label:'มุมมองเจ้าของ', icon:'smartphone', key:'mobile', page:'mobile' },
       { label:'แหล่งข้อมูล', icon:'database', key:'datasources', page:'datasources' },
       { label:'Annie Brain AI', icon:'sparkles', key:'ai' }
     ];
     const navItems = nav.map(n => {
-      const active = !!n.page && n.page === page;
+      const active = !!n.page && (n.group ? n.group.includes(page) : n.page === page);
       const handled = !!n.page;
       if (n.sub) {
         return {
@@ -3919,6 +3963,18 @@ class Component extends DCLogic {
         onClick: handled ? go(n.page) : () => {}
       };
     });
+
+    // แท็บของหน้าที่รวมกัน — เนื้อหาเดิมอยู่ครบ แค่ย้ายมาอยู่ใต้เมนูเดียว
+    const tabBase = { display:'inline-flex', alignItems:'center', borderRadius:'11px', padding:'8px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' };
+    const mkTabs = (items) => items.map(t => ({
+      label: t.label,
+      onClick: () => this.setState({ page: t.page }),
+      style: page === t.page ? { ...tabBase, background:'#2C4A7C', color:'#fff' } : { ...tabBase, background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
+    }));
+    const overviewTabs = mkTabs([{ label:'ภาพรวม', page:'overview' }, { label:'การเงิน', page:'finance' }, { label:'มุมมองเจ้าของ', page:'mobile' }]);
+    const cashInTabs = mkTabs([{ label:'เงินเข้าจริง', page:'reconcile' }, { label:'กระทบยอดเงินโอน', page:'payout' }]);
+    const taxPageTabs = mkTabs([{ label:'สรุปภาษี & ส่งออก', page:'tax' }, { label:'แบบฟอร์ม ภ.พ./ภ.ง.ด.', page:'taxforms' }]);
+    const marketingTabs = mkTabs([{ label:'ภาพรวมการตลาด', page:'marketing' }, { label:'แคมเปญ', page:'campaign' }, { label:'คอนเทนต์', page:'content' }]);
 
     const ovFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const ovNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
@@ -5809,7 +5865,7 @@ class Component extends DCLogic {
       pnd51EstTax: tfFmt(pnd51EstTax), pnd51Installment: tfFmt(pnd51Installment),
       users, roleDefs, permMatrix, userCountLabel: users.length + ' ผู้ใช้',
       mobileSales, mobileChannels, mobileAlerts, mobileProfit, mobileOrders, mobileAlertCount, mobileAlertsEmpty,
-      navItems, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
+      navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini, summaryRows,
       expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, byExpCat['วัตถุดิบ (COGS)'] || 0, finExpenseTotal - (byExpCat['วัตถุดิบ (COGS)'] || 0)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
     };
