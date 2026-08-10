@@ -876,8 +876,92 @@
     <!-- ===================== สมาชิก MEMBER PAGE ===================== -->
     <sc-if value="{{ isMembers }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Members — สมาชิก">
-      <div style="margin-bottom:18px"><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สมาชิก</h1></div>
-      <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:52px 24px;text-align:center;color:#8089A0"><div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">ยังไม่มีข้อมูลสมาชิก</div><div style="font-size:13px;line-height:1.6;margin-bottom:16px">ระบบสมาชิก (annie-crm) มีข้อมูลอยู่แล้ว — เชื่อมเข้ามาได้เมื่อพร้อม</div><div style="display:inline-flex;align-items:center;gap:8px;background:#ECF1F7;color:#2C4A7C;border-radius:11px;padding:10px 18px;font-size:13px;font-weight:600">ขั้นถัดไป: เชื่อมข้อมูลจาก annie-crm</div></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">สมาชิก</h1>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Annie CRM</span>
+          </div>
+          <div style="font-size:14px;color:#8089A0">{{ crmStatusLabel }} · ข้อมูลจริงจากระบบสมาชิก อัปเดตอัตโนมัติทุกครั้งที่เปิดหน้า</div>
+        </div>
+        <div onClick="{{ exportMembersCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="download" style="width:15px;height:15px"></i>Export CSV</div>
+      </div>
+      <sc-if value="{{ crmHas }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px">
+        <sc-for list="{{ crmKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:11px">
+              <div style="width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ k.bg }};color:{{ k.fg }}"><i data-lucide="{{ k.icon }}" style="width:17px;height:17px"></i></div>
+              <span style="font-size:12.5px;color:#7C8699;font-weight:500;line-height:1.25">{{ k.title }}</span>
+            </div>
+            <div style="font-size:23px;font-weight:700;color:#1B2536;letter-spacing:-0.4px">{{ k.value }}</div>
+            <div style="font-size:11.5px;color:#9AA3B2;margin-top:4px;line-height:1.4">{{ k.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px">
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">สมาชิกแยกตามระดับ</h3>
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+            <div style="position:relative;width:150px;height:150px;flex:none">
+              {{ crmTierDonut }}
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                <span style="font-size:18px;font-weight:700;color:#1B2536">{{ crmTierTotalLabel }}</span>
+                <span style="font-size:12px;color:#9AA3B2">ทั้งหมด</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:150px;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ crmTierRows }}" as="t" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+                  <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ t.color }}"></span>
+                  <span style="flex:1;color:#3A4456">{{ t.name }}</span>
+                  <span style="font-weight:600;color:#2B3547;white-space:nowrap">{{ t.amount }}</span>
+                  <span style="color:#9AA3B2;width:46px;text-align:right">{{ t.pct }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 4px;font-size:16px;font-weight:600">สมาชิกใหม่ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(14 วันล่าสุด)</span></h3>
+          <div style="font-size:26px;font-weight:700;color:#1B2536;letter-spacing:-0.5px;margin:8px 0 4px">{{ crmSignup14 }} <span style="font-size:14px;font-weight:500;color:#8089A0">คน</span></div>
+          <div style="margin-top:10px">{{ crmSignupSpark }}</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">สมาชิกดาวสะสมสูงสุด <span style="color:#9AA3B2;font-weight:500;font-size:13px">(Top 10)</span></h3>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+          <thead>
+            <tr style="color:#8089A0;font-size:11.5px;text-align:right">
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left;width:36px">#</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">ชื่อ</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">รหัสสมาชิก</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">ระดับ</th>
+              <th style="padding:0 8px 11px;font-weight:500">ดาวสะสม</th>
+              <th style="padding:0 8px 11px;font-weight:500">ยอดใช้จ่าย</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ crmTopRows }}" as="m" hint-placeholder-count="5">
+              <tr style="border-top:1px solid #F1F2F4;color:#2B3547">
+                <td style="padding:11px 8px;color:#9AA3B2;font-weight:600">{{ m.rank }}</td>
+                <td style="padding:11px 8px;font-weight:600;color:#1B2536">{{ m.name }}</td>
+                <td style="padding:11px 8px;color:#7C8699">{{ m.code }}</td>
+                <td style="padding:11px 8px;color:#7C8699">{{ m.tier }}</td>
+                <td style="padding:11px 8px;text-align:right;font-weight:700">{{ m.stars }}</td>
+                <td style="padding:11px 8px;text-align:right">{{ m.spend }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:13px;font-size:11.5px;color:#9AA3B2;line-height:1.6">ไม่แสดงเบอร์โทร/อีเมลของลูกค้าในหน้านี้ · จัดการสมาชิกรายคนทำที่ระบบ CRM โดยตรง</div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ !crmHas }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:52px 24px;text-align:center;color:#8089A0"><div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">{{ crmStatusLabel }}</div><div style="font-size:13px;line-height:1.6">หน้านี้ดึงข้อมูลจากระบบสมาชิก annie-crm โดยตรง</div></div>
+      </sc-if>
     </div>
     </sc-if>
 
@@ -3203,6 +3287,10 @@ const importHistoryStore = {
 const SUPABASE_URL = 'https://iyohdeyexnrtsobeoehn.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_OgFmZPwllM_8hcqVXaEJtg_WcMAAVtG';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// ระบบสมาชิก (annie-crm) เป็นคนละโปรเจค Supabase — อ่านอย่างเดียวเพื่อสรุปบนแดชบอร์ด
+const CRM_URL = 'https://srhltwgtcnvhzhtoajcd.supabase.co';
+const CRM_PUBLISHABLE_KEY = 'sb_publishable_swH1RZwrnRFD1P8r8_tqOg_5DgIOkKA';
+const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
 
 // Canonical ISO date is derived from the stored พ.ศ. date text (DD/MM/YY) so the app works
 // whether or not the optional sale_date/expense_date columns exist. If those columns are
@@ -3280,6 +3368,7 @@ class Component extends DCLogic {
     expError: null,
     recentRows: [],
     salesError: null,
+    crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
     storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' },
@@ -3305,6 +3394,7 @@ class Component extends DCLogic {
     this.loadSales();
     this.loadExpenses();
     this.loadSettings();
+    this.loadCrm();
   }
   // Supabase caps each request at 1000 rows — page through with .range() so no row is
   // ever silently dropped once the table grows past 1000 (it already has).
@@ -3333,6 +3423,21 @@ class Component extends DCLogic {
       this.setState({ expRows: data.map(mapDbRowToExpense), expError: null });
     } catch (err) {
       this.setState({ expError: 'โหลดข้อมูลรายจ่ายไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
+    }
+  };
+  // ดึงสรุประบบสมาชิกจากโปรเจค annie-crm (อ่านอย่างเดียว) — หน้าไม่พังถ้าเชื่อมไม่ได้
+  loadCrm = async () => {
+    try {
+      const [mem, tie, cou] = await Promise.all([
+        crmClient.from('members').select('id,member_code,name,tier,reward_stars,spend,registered_at').order('reward_stars', { ascending: false }),
+        crmClient.from('tiers').select('key,name,emoji,color,min_stars,sort').order('sort'),
+        crmClient.from('coupons').select('id,used_at,expire_at')
+      ]);
+      if (mem.error || tie.error || cou.error) throw (mem.error || tie.error || cou.error);
+      this.setState({ crmMembers: mem.data || [], crmTiers: tie.data || [], crmCoupons: cou.data || [], crmLoaded: true, crmError: null });
+    } catch (err) {
+      console.warn('loadCrm failed', err);
+      this.setState({ crmError: 'เชื่อมต่อระบบสมาชิกไม่สำเร็จ', crmLoaded: true });
     }
   };
   loadSettings = async () => {
@@ -4149,6 +4254,61 @@ class Component extends DCLogic {
       const lines = [csvRow(['เดือน','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)','กำไรสุทธิ (฿)'])];
       monthlyRows.slice().reverse().forEach(r => lines.push(csvRow([r.label, r._r.income.toFixed(2), r._r.gp.toFixed(2), r._r.exp.toFixed(2), r._r.profit.toFixed(2)])));
       downloadCsv('สรุปรายเดือน-' + todayISO() + '.csv', lines);
+    };
+    // ---- สมาชิก (CRM) — ข้อมูลจริงจากโปรเจค annie-crm ----
+    const crmMembers = this.state.crmMembers, crmTiersRaw = this.state.crmTiers;
+    const crmFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const crmNum = n => (Number(n) || 0);
+    const crmHas = crmMembers.length > 0;
+    const crmMonthStart = todayISO().slice(0, 7);
+    const crmNewThisMonth = crmMembers.filter(m => (m.registered_at || '').slice(0, 7) === crmMonthStart).length;
+    const crmStars = crmMembers.reduce((a, m) => a + crmNum(m.reward_stars), 0);
+    const crmSpend = crmMembers.reduce((a, m) => a + crmNum(m.spend), 0);
+    const crmCouponsUsed = this.state.crmCoupons.filter(c => c.used_at).length;
+    const crmCouponsActive = this.state.crmCoupons.filter(c => !c.used_at).length;
+    const crmKpis = [
+      { title:'สมาชิกทั้งหมด', value: crmMembers.length.toLocaleString('en-US'), sub:'ใหม่เดือนนี้ ' + crmNewThisMonth + ' คน', icon:'users', bg:'#ECF1F7', fg:'#2C4A7C' },
+      { title:'ดาวสะสมคงค้าง', value: crmStars.toLocaleString('en-US'), sub:'ภาระที่ต้องแลกคืนในอนาคต', icon:'star', bg:'#FBF5E6', fg:'#B98317' },
+      { title:'ยอดใช้จ่ายผ่านระบบสมาชิก', value: crmFmt(crmSpend), sub:'สะสมจากทุกใบเสร็จที่ผูกสมาชิก', icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B' },
+      { title:'คูปอง', value: crmCouponsUsed.toLocaleString('en-US') + ' / ' + (crmCouponsUsed + crmCouponsActive), sub:'ใช้แล้ว / ออกทั้งหมด', icon:'ticket', bg:'#F1ECF6', fg:'#7A5BA8' }
+    ];
+    // สมาชิกแยกตามระดับ — ใช้สีจากตาราง tiers ของ CRM เอง
+    const crmByTier = {};
+    crmMembers.forEach(m => { const k = m.tier || 'unknown'; crmByTier[k] = (crmByTier[k] || 0) + 1; });
+    const crmTierRows = crmTiersRaw.filter(t => crmByTier[t.key]).map(t => ({
+      name: (t.emoji ? t.emoji + ' ' : '') + t.name, amount: crmByTier[t.key].toLocaleString('en-US') + ' คน',
+      pct: crmMembers.length ? (crmByTier[t.key] / crmMembers.length * 100).toFixed(1) + '%' : '0%',
+      color: t.color || '#8A919C', _v: crmByTier[t.key]
+    }));
+    const crmTierDonut = crmTierRows.length
+      ? this.donut(crmTierRows.map(r => ({ value: r._v, color: r.color })), 150, 22)
+      : this.donut([{ value: 1, color: '#EEF0F5' }], 150, 22);
+    const crmTierTotalLabel = crmMembers.length.toLocaleString('en-US') + ' คน';
+    // สมาชิกใหม่ 14 วันล่าสุด
+    const crmDayLabels = [], crmDayCounts = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const iso = dateToISO(d);
+      crmDayLabels.push(iso);
+      crmDayCounts.push(crmMembers.filter(m => (m.registered_at || '').slice(0, 10) === iso).length);
+    }
+    const crmSignupSpark = this.spark(crmDayCounts, '#2C4A7C');
+    const crmSignup14 = crmDayCounts.reduce((a, b) => a + b, 0);
+    // Top สมาชิก (ไม่แสดงเบอร์/อีเมล — เว็บยังไม่มีระบบล็อกอิน)
+    const crmTierName = {};
+    crmTiersRaw.forEach(t => { crmTierName[t.key] = (t.emoji ? t.emoji + ' ' : '') + t.name; });
+    const crmTopRows = crmMembers.slice(0, 10).map((m, i) => ({
+      rank: i + 1, name: m.name || '—', code: m.member_code || '—',
+      tier: crmTierName[m.tier] || (m.tier || '—'),
+      stars: crmNum(m.reward_stars).toLocaleString('en-US'),
+      spend: crmFmt(crmNum(m.spend))
+    }));
+    const crmStatusLabel = this.state.crmError ? this.state.crmError : (this.state.crmLoaded ? 'เชื่อมกับ annie-crm แล้ว' : 'กำลังโหลด…');
+    const crmStatusOk = !this.state.crmError && crmHas;
+    const exportMembersCsv = () => {
+      const lines = [csvRow(['อันดับ','ชื่อ','รหัสสมาชิก','ระดับ','ดาวสะสม','ยอดใช้จ่าย (฿)'])];
+      crmMembers.forEach((m, i) => lines.push(csvRow([i + 1, m.name || '', m.member_code || '', crmTierName[m.tier] || m.tier || '', crmNum(m.reward_stars), crmNum(m.spend)])));
+      downloadCsv('สมาชิก-' + todayISO() + '.csv', lines);
     };
     // ---- แหล่งข้อมูล (Data Sources) — §26: ทุกการเชื่อมต่ออยู่ที่เดียว ----
     const dsToday = todayISO();
@@ -5582,6 +5742,7 @@ class Component extends DCLogic {
       monthlyRows, exportMonthlyCsv,
       productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
       dataSourceRows, dsKpis, exportDataSourcesCsv,
+      crmKpis, crmTierRows, crmTierDonut, crmTierTotalLabel, crmSignupSpark, crmSignup14, crmTopRows, crmStatusLabel, crmStatusOk, crmHas, exportMembersCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
       expForm: ef, expMainDD, expSubDD, expBrandDD, expPayDD, toggleAsset, expAsset, expAssetOff: !expAsset,
