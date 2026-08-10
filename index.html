@@ -2517,6 +2517,62 @@
     </sc-if>
 
     <!-- ===================== ตั้งค่า & สิทธิ์ SETTINGS PAGE ===================== -->
+    <!-- ===================== แหล่งข้อมูล DATA SOURCES ===================== -->
+    <sc-if value="{{ isDataSources }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Data Sources — แหล่งข้อมูล">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">แหล่งข้อมูล</h1>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Data Sources</span>
+          </div>
+          <div style="font-size:14px;color:#8089A0">ทุกช่องทางที่ป้อนข้อมูลเข้าระบบ · เห็นทันทีว่าแหล่งไหนอัปเดตล่าสุดเมื่อไหร่ และแหล่งไหนค้าง</div>
+        </div>
+        <div onClick="{{ exportDataSourcesCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 16px;font-size:13px;font-weight:600;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="download" style="width:15px;height:15px"></i>Export CSV</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:18px">
+        <sc-for list="{{ dsKpis }}" as="k" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
+            <div style="font-size:12.5px;color:#7C8699;font-weight:500;margin-bottom:8px">{{ k.title }}</div>
+            <div style="font-size:24px;font-weight:700;color:#1B2536;letter-spacing:-0.4px">{{ k.value }}</div>
+            <div style="font-size:12px;color:#9AA3B2;margin-top:4px;line-height:1.4">{{ k.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:700px">
+          <thead>
+            <tr style="color:#8089A0;font-size:11.5px;text-align:right">
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">แหล่งข้อมูล</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">ประเภท</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:left">วิธีนำเข้า</th>
+              <th style="padding:0 8px 11px;font-weight:500">จำนวน</th>
+              <th style="padding:0 8px 11px;font-weight:500">ข้อมูลล่าสุด</th>
+              <th style="padding:0 8px 11px;font-weight:500">ยอดรวม</th>
+              <th style="padding:0 8px 11px;font-weight:500;text-align:center">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ dataSourceRows }}" as="d" hint-placeholder-count="7">
+              <tr style="border-top:1px solid #F1F2F4;color:#2B3547">
+                <td style="padding:12px 8px"><span style="display:inline-flex;align-items:center;gap:9px;font-weight:600;color:#1B2536"><span style="width:26px;height:26px;border-radius:8px;background:#ECF1F7;color:#2C4A7C;display:inline-flex;align-items:center;justify-content:center;flex:none"><i data-lucide="{{ d.icon }}" style="width:14px;height:14px"></i></span>{{ d.name }}</span></td>
+                <td style="padding:12px 8px;color:#7C8699">{{ d.kind }}</td>
+                <td style="padding:12px 8px;color:#9AA3B2">{{ d.how }}</td>
+                <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ d.count }}</td>
+                <td style="padding:12px 8px;text-align:right;white-space:nowrap;font-weight:600">{{ d.last }}</td>
+                <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ d.total }}</td>
+                <td style="padding:12px 8px;text-align:center">{{ d.statusTag }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:14px;font-size:11.5px;color:#9AA3B2;line-height:1.6">สถานะคำนวณจากวันที่ของข้อมูลล่าสุดเทียบกับวันนี้ · ยอดขายควรอัปเดตทุกวัน (ค้างเกิน 2 วัน = เตือน) · รายจ่ายยืดหยุ่นกว่า (เกิน 7 วัน = เตือน)</div>
+      </div>
+    </div>
+    </sc-if>
+
     <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Settings — ตั้งค่า & สิทธิ์ผู้ใช้">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
@@ -3735,6 +3791,7 @@ class Component extends DCLogic {
       { label:'สมาชิก', icon:'users', key:'members', page:'members' },
       { label:'ศูนย์แจ้งเตือน', icon:'bell-ring', key:'alerts', page:'alerts' },
       { label:'มุมมองเจ้าของ', icon:'smartphone', key:'mobile', page:'mobile' },
+      { label:'แหล่งข้อมูล', icon:'database', key:'datasources', page:'datasources' },
       { label:'Annie Brain AI', icon:'sparkles', key:'ai' }
     ];
     const navItems = nav.map(n => {
@@ -4092,6 +4149,61 @@ class Component extends DCLogic {
       const lines = [csvRow(['เดือน','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)','กำไรสุทธิ (฿)'])];
       monthlyRows.slice().reverse().forEach(r => lines.push(csvRow([r.label, r._r.income.toFixed(2), r._r.gp.toFixed(2), r._r.exp.toFixed(2), r._r.profit.toFixed(2)])));
       downloadCsv('สรุปรายเดือน-' + todayISO() + '.csv', lines);
+    };
+    // ---- แหล่งข้อมูล (Data Sources) — §26: ทุกการเชื่อมต่ออยู่ที่เดียว ----
+    const dsToday = todayISO();
+    const dsDaysBetween = (iso) => { if (!iso) return null; return Math.round((beShortToDate(isoToBEShort(dsToday)) - beShortToDate(isoToBEShort(iso))) / 86400000); };
+    const dsFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const dsAllSales = this.salesOnly(this.state.recentRows);
+    const dsBuild = (cfg) => {
+      const rows = cfg.rows;
+      const dates = rows.map(r => r.isoDate).filter(Boolean).sort();
+      const lastISO = dates.length ? dates[dates.length - 1] : null;
+      const days = dsDaysBetween(lastISO);
+      let state = 'none', stateLabel = 'ยังไม่มีข้อมูล';
+      if (rows.length) {
+        if (days === null) { state = 'ok'; stateLabel = 'เชื่อมแล้ว'; }
+        else if (days <= cfg.warnAfter) { state = 'ok'; stateLabel = 'เป็นปัจจุบัน'; }
+        else if (days <= cfg.lateAfter) { state = 'warn'; stateLabel = 'ค้าง ' + days + ' วัน'; }
+        else { state = 'late'; stateLabel = 'ค้าง ' + days + ' วัน'; }
+      }
+      const c = { ok:['#E6F3ED','#2E7D5B'], warn:['#FBF5E6','#B98317'], late:['#F9E7EA','#B14A4A'], none:['#EFF0F3','#8089A0'] }[state];
+      return {
+        name: cfg.name, kind: cfg.kind, icon: cfg.icon, how: cfg.how,
+        count: rows.length ? rows.length.toLocaleString('en-US') + ' รายการ' : '—',
+        last: lastISO ? isoToBEShort(lastISO) : '—',
+        total: rows.length ? dsFmt(rows.reduce((a, r) => a + (Number(cfg.amountOf ? cfg.amountOf(r) : r.gross) || 0), 0)) : '—',
+        statusTag: React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, stateLabel),
+        _days: days, _state: state
+      };
+    };
+    const dsExpAll = this.state.expRows;
+    const dataSourceRows = [
+      dsBuild({ name:'POS หน้าร้าน (FoodStory)', kind:'ยอดขาย', icon:'store', how:'ดึงจากรายงาน POS', warnAfter:2, lateAfter:5,
+        rows: dsAllSales.filter(r => r.platform === 'หน้าร้าน' && r.source !== 'MANUAL_FORM') }),
+      dsBuild({ name:'LINE MAN', kind:'ยอดขาย', icon:'message-circle', how:'นำเข้ารายงานรายวัน', warnAfter:2, lateAfter:5,
+        rows: dsAllSales.filter(r => r.platform === 'LINE MAN') }),
+      dsBuild({ name:'Grab', kind:'ยอดขาย', icon:'bike', how:'นำเข้ารายงานรายวัน', warnAfter:2, lateAfter:5,
+        rows: dsAllSales.filter(r => r.platform === 'Grab') }),
+      dsBuild({ name:'ShopeeFood', kind:'ยอดขาย', icon:'shopping-bag', how:'นำเข้ารายงานรายวัน', warnAfter:2, lateAfter:5,
+        rows: dsAllSales.filter(r => r.platform === 'ShopeeFood') }),
+      dsBuild({ name:'ฟอร์มบันทึกหน้าร้าน', kind:'ยอดขาย', icon:'edit', how:'กรอกในแอป', warnAfter:7, lateAfter:30,
+        rows: dsAllSales.filter(r => r.source === 'MANUAL_FORM') }),
+      dsBuild({ name:'Telegram บอทรายจ่าย', kind:'รายจ่าย', icon:'send', how:'พิมพ์/ส่งสลิปในแชท', warnAfter:7, lateAfter:30,
+        rows: dsExpAll.filter(r => r.source === 'TELEGRAM'), amountOf: r => r.amount }),
+      dsBuild({ name:'รายจ่ายกรอกในแอป', kind:'รายจ่าย', icon:'receipt', how:'ฟอร์มหน้ารายจ่าย', warnAfter:7, lateAfter:30,
+        rows: dsExpAll.filter(r => r.source !== 'TELEGRAM'), amountOf: r => r.amount })
+    ];
+    const dsIssues = dataSourceRows.filter(r => r._state === 'warn' || r._state === 'late');
+    const dsKpis = [
+      { title:'แหล่งข้อมูลทั้งหมด', value: String(dataSourceRows.length), sub:'ยอดขาย 5 · รายจ่าย 2' },
+      { title:'เป็นปัจจุบัน', value: String(dataSourceRows.filter(r => r._state === 'ok').length), sub:'อัปเดตตามรอบปกติ' },
+      { title:'ต้องตามข้อมูล', value: String(dsIssues.length), sub: dsIssues.length ? dsIssues.map(r => r.name).join(' · ') : 'ไม่มีแหล่งไหนค้าง' }
+    ];
+    const exportDataSourcesCsv = () => {
+      const lines = [csvRow(['แหล่งข้อมูล','ประเภท','วิธีนำเข้า','จำนวน','ข้อมูลล่าสุด','ยอดรวม','สถานะ'])];
+      dataSourceRows.forEach(r => lines.push(csvRow([r.name, r.kind, r.how, r.count, r.last, r.total, r._state === 'ok' ? 'เป็นปัจจุบัน' : (r._days === null ? 'ยังไม่มีข้อมูล' : 'ค้าง ' + r._days + ' วัน')])));
+      downloadCsv('แหล่งข้อมูล-' + todayISO() + '.csv', lines);
     };
     // ---- สินค้าขายดี (POS snapshot — PRODUCT_SALES) ----
     const productsMonth = this.state.productsMonth || 'aug';
@@ -5462,13 +5574,14 @@ class Component extends DCLogic {
     const mobileAlertsEmpty = alertItems.length === 0;
 
     return {
-      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
+      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       monthlyRows, exportMonthlyCsv,
       productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
+      dataSourceRows, dsKpis, exportDataSourcesCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
       expForm: ef, expMainDD, expSubDD, expBrandDD, expPayDD, toggleAsset, expAsset, expAssetOff: !expAsset,
