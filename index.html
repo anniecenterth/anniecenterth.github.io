@@ -1681,7 +1681,7 @@
               </div>
             </sc-if>
           </div>
-          <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="history" style="width:16px;height:16px"></i><span>ประวัตินำเข้า</span></div>
+          <div onClick="{{ openImportHistory }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="history" style="width:16px;height:16px"></i><span>ประวัตินำเข้า</span></div>
         </div>
       </div>
 
@@ -1925,7 +1925,7 @@
 
       <!-- ===== TAB: ประวัตินำเข้า ===== -->
       <sc-if value="{{ impTabHistory }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <div id="import-history-card" style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <h3 style="margin:0;font-size:16px;font-weight:600">ประวัติการนำเข้า</h3>
             <span style="font-size:12px;color:#9AA3B2">เก็บ Order ID ถาวร — ป้องกันนำเข้าซ้ำข้ามวันอัตโนมัติ</span>
@@ -1987,7 +1987,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
           <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วง</span><span style="font-weight:600">7 วันล่าสุด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>กระทบยอดใหม่</div>
+          <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>กระทบยอดใหม่</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
@@ -2056,7 +2056,7 @@
           </div>
           <div style="font-size:14px;color:#8089A0">ติดตามเงินอุดหนุนรัฐที่ยังไม่เข้าบัญชี — ส่วนที่รัฐจ่ายแยกรอบจากลูกค้า</div>
         </div>
-        <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ส่งออกรายการ</span></div>
+        <div onClick="{{ exportSubsidyCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ส่งออกรายการ</span></div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ subsidyKpis }}" as="k" hint-placeholder-count="4">
@@ -2373,7 +2373,7 @@
 
           <div style="display:flex;gap:10px;justify-content:flex-end">
             <div onClick="{{ toggleActiveReady }}" style="display:flex;align-items:center;gap:8px;border:1px solid #E7E9ED;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;color:#5A6478;cursor:pointer"><i data-lucide="{{ toggleReadyIcon }}" style="width:16px;height:16px"></i><span>{{ toggleReadyLabel }}</span></div>
-            <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#7A5BA8;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i>ดาวน์โหลด</div>
+            <div onClick="{{ exportPnd51Csv }}" style="display:flex;align-items:center;gap:8px;background:#7A5BA8;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i>ดาวน์โหลด</div>
           </div>
         </div>
       </div>
@@ -2391,7 +2391,7 @@
           </div>
           <div style="font-size:14px;color:#8089A0">จับยอดผิดปกติ เงินโอนไม่ตรง และความเสี่ยงอัตโนมัติทุกวัน</div>
         </div>
-        <div onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="check-check" style="width:16px;height:16px"></i><span>ทำเครื่องหมายอ่านแล้ว</span></div>
+        <div onClick="{{ markAlertsRead }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="check-check" style="width:16px;height:16px"></i><span>ทำเครื่องหมายอ่านแล้ว</span></div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ alertCounts }}" as="c" hint-placeholder-count="4">
@@ -3907,6 +3907,18 @@ class Component extends DCLogic {
       statusTag: rcRowStatus('เข้าบัญชีแล้ว'), actions: rcRowActions
     }));
     const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcMoneyIn.length + ' รายการเงินเข้าจริง';
+    // กระทบยอดใหม่: pull everything fresh from Supabase
+    const refreshData = () => { this.loadSales(); this.loadExpenses(); };
+    const downloadCsv = (filename, lines) => {
+      const csv = '﻿' + lines.join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+    const csvRow = arr => arr.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',');
     const rcBankRows = [];
     const rcAlerts = [];
 
@@ -5019,6 +5031,11 @@ class Component extends DCLogic {
     });
     const subPending = subEnriched.filter(r => r.st === 'รอรับ');
     const subDone = subEnriched.filter(r => r.st === 'รับแล้ว');
+    const exportSubsidyCsv = () => {
+      const lines = [csvRow(['วันที่ขาย','ช่องทาง','Order ID','ยอดเต็ม (฿)','กำหนดเงินเข้า (T+3)','สถานะ'])];
+      subEnriched.forEach(r => lines.push(csvRow([r.dateLabel, r.plat, r.oid || '', r.full, r.dueLabel, r.st])));
+      downloadCsv('เงินรัฐรอรับ-' + todayISO() + '.csv', lines);
+    };
     const subOverdue = subEnriched.filter(r => r.st === 'เกินกำหนด');
     const subNextSettle = subPending.map(r => r.settle).filter(Boolean).sort()[0];
     const subsidyKpis = [
@@ -5061,7 +5078,18 @@ class Component extends DCLogic {
     if (alOverdue.length) {
       rawAlerts.push({ sev:'mid', title:'เงินรัฐคนละครึ่งค้างรับเกิน 14 วัน', detail: alOverdue.length + ' ออเดอร์ยังไม่ได้รับเงินอุดหนุน', time:'วันนี้', icon:'hourglass', cat:'การเงิน' });
     }
-    const alertItems = rawAlerts.map(a => { const s = sevMeta[a.sev]; return { ...a, sevC:s.c, sevBg:s.bg, sevBd:s.bd, sevIc:s.ic, sevLabel:s.label,
+    // ทำเครื่องหมายอ่านแล้ว: remember dismissed alert signatures; an alert reappears
+    // only if its content changes (new day / new numbers).
+    const ALERTS_READ_KEY = 'bangpho_alerts_read';
+    const alertSig = a => a.title + '|' + (a.detail || '');
+    let alertsRead = [];
+    try { alertsRead = JSON.parse(window.localStorage.getItem(ALERTS_READ_KEY) || '[]'); } catch (e) { alertsRead = []; }
+    const visibleAlerts = rawAlerts.filter(a => !alertsRead.includes(alertSig(a)));
+    const markAlertsRead = () => {
+      window.localStorage.setItem(ALERTS_READ_KEY, JSON.stringify(rawAlerts.map(alertSig)));
+      this.setState({});
+    };
+    const alertItems = visibleAlerts.map(a => { const s = sevMeta[a.sev]; return { ...a, sevC:s.c, sevBg:s.bg, sevBd:s.bd, sevIc:s.ic, sevLabel:s.label,
       sevPill: { background:s.ic, color:s.c, fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'7px', whiteSpace:'nowrap' },
       catPill: { background:'#EFF0F3', color:'#7A8497', fontSize:'11px', fontWeight:600, padding:'3px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }; });
     const alertsEmpty = alertItems.length === 0;
@@ -5137,6 +5165,15 @@ class Component extends DCLogic {
     // ภ.ง.ด.51
     const pnd51EstTax = tfNum(tf.pnd51.estProfit) * (tfNum(tf.pnd51.rate) / 100);
     const pnd51Installment = pnd51EstTax / 2;
+    const exportPnd51Csv = () => {
+      const lines = [csvRow(['รายการ','ค่า'])];
+      [['แบบฟอร์ม','ภ.ง.ด.51 (ประมาณการครึ่งปี)'], ['งวด', tf.pnd51.period || '-'],
+       ['ประมาณการกำไรสุทธิทั้งปี (฿)', tf.pnd51.estProfit || '0'], ['อัตราภาษี (%)', tf.pnd51.rate || '0'],
+       ['ภาษีประมาณการทั้งปี (฿)', pnd51EstTax.toFixed(2)], ['ชำระงวดนี้ ครึ่งหนึ่ง (฿)', pnd51Installment.toFixed(2)]
+      ].forEach(r => lines.push(csvRow(r)));
+      downloadCsv('ภงด51-' + todayISO() + '.csv', lines);
+    };
+    const openImportHistory = () => this.setState({ importTab: 'history' });
 
     const taxFormsList = [
       { key:'pp30', code:'ภ.พ.30', name:'ภาษีมูลค่าเพิ่ม', freq:'รายเดือน', status: tf.pp30.status },
@@ -5214,6 +5251,7 @@ class Component extends DCLogic {
     return {
       page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
+      refreshData, exportSubsidyCsv, markAlertsRead, exportPnd51Csv, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend),
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
