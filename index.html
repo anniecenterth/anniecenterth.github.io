@@ -73,8 +73,8 @@
         <i data-lucide="sparkles" style="color:#C9B3DC"></i>
         <span style="font-weight:600;font-size:14px">Annie Brain AI</span>
       </div>
-      <div style="font-size:12px;color:#B9BED0;line-height:1.5;margin-bottom:13px">ยังไม่มีข้อมูลเชิงลึกจาก AI</div>
-      <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:9px 13px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer">เปิด AI Insights <i data-lucide="arrow-right" style="width:15px;height:15px"></i></div>
+      <div style="font-size:12px;color:#B9BED0;line-height:1.5;margin-bottom:13px">{{ brainTopInsight }}</div>
+      <div onClick="{{ goDataSources }}" style="background:rgba(255,255,255,0.12);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:9px 13px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer">ดูแหล่งข้อมูล <i data-lucide="arrow-right" style="width:15px;height:15px"></i></div>
     </div>
 
     <div style="display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;border:1px solid #E7E9ED;cursor:pointer">
@@ -100,16 +100,16 @@
       </div>
 
       <!-- header -->
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px">
-        <div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">ภาพรวมผู้บริหาร — สาขาบางโพ</h1>
-            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap">
+        <div style="min-width:0;flex:1 1 260px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;line-height:1.25">ภาพรวมผู้บริหาร — สาขาบางโพ</h1>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap;flex:none">Branch P&L</span>
           </div>
           <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย และกำไรของสาขาบางโพ</div>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;flex:none">
-          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;width:300px;color:#9AA3B2">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;width:300px;max-width:100%;color:#9AA3B2">
             <i data-lucide="search" style="width:18px;height:18px"></i>
             <span style="font-size:13.5px">ค้นหาเมนู, รายงาน, ข้อมูล...</span>
           </div>
@@ -212,7 +212,7 @@
               <span style="font-size:13px;color:#7C8699;font-weight:500;line-height:1.25">{{ k.title }}</span>
             </div>
             <div style="font-size:25px;font-weight:700;color:#1B2536;letter-spacing:-0.5px">{{ k.amount }}</div>
-            <div style="font-size:12px;color:#2E7D5B;font-weight:600;display:flex;align-items:center;gap:4px"><span style="font-size:9px">▲</span>{{ k.delta }}</div>
+            <div style="font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:4px;line-height:1.35;color:{{ k.deltaColor }}"><span style="font-size:9px;flex:none;margin-top:2px">{{ k.arrow }}</span><span style="flex:1;min-width:0">{{ k.delta }}</span></div>
             <div style="height:36px;margin-top:1px">{{ k.spark }}</div>
           </div>
         </sc-for>
@@ -333,8 +333,16 @@
             <span style="font-weight:600;font-size:15px">Annie Brain AI</span>
             <span style="background:rgba(201,182,255,0.18);color:#C9B3DC;font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px">แนะนำ</span>
           </div>
-          <div style="font-size:14px;line-height:1.65;color:#C9CEDE;margin-bottom:20px;max-width:88%">ยังไม่มีข้อมูลวิเคราะห์จาก AI — ระบบจะแสดงคำแนะนำเมื่อเชื่อมต่อ Annie Brain AI</div>
-          <div style="background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.16);border-radius:11px;padding:11px 16px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer">ดูข้อมูลเชิงลึกเพิ่มเติม <i data-lucide="arrow-right" style="width:16px;height:16px"></i></div>
+          <div style="font-size:13.5px;line-height:1.6;color:#E4E8F2;margin-bottom:16px;font-weight:600">{{ brainHeadline }}</div>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:20px">
+            <sc-for list="{{ brainInsights }}" as="s" hint-placeholder-count="4">
+              <div style="display:flex;gap:10px;align-items:flex-start">
+                <i data-lucide="{{ s.icon }}" style="width:15px;height:15px;color:#C9B3DC;flex:none;margin-top:2px"></i>
+                <span style="font-size:12.5px;line-height:1.55;color:#C9CEDE;flex:1;min-width:0">{{ s.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div onClick="{{ goDataSources }}" style="background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.16);border-radius:11px;padding:11px 16px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer">ดูแหล่งข้อมูลทั้งหมด <i data-lucide="arrow-right" style="width:16px;height:16px"></i></div>
           <i data-lucide="sparkles" style="position:absolute;right:-10px;bottom:-10px;width:120px;height:120px;color:rgba(201,182,255,0.13);stroke-width:1"></i>
         </div>
       </div>
@@ -500,7 +508,7 @@
               <span style="font-size:13px;color:#7C8699;font-weight:500;line-height:1.25">{{ k.title }}</span>
             </div>
             <div style="font-size:25px;font-weight:700;color:#1B2536;letter-spacing:-0.5px">{{ k.amount }}</div>
-            <div style="font-size:12px;color:#2E7D5B;font-weight:600;display:flex;align-items:center;gap:4px"><span style="font-size:9px">▲</span>{{ k.delta }}</div>
+            <div style="font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:4px;line-height:1.35;color:{{ k.deltaColor }}"><span style="font-size:9px;flex:none;margin-top:2px">{{ k.arrow }}</span><span style="flex:1;min-width:0">{{ k.delta }}</span></div>
             <div style="height:36px;margin-top:1px">{{ k.spark }}</div>
           </div>
         </sc-for>
@@ -2958,6 +2966,96 @@
     </div>
     </sc-if>
 
+    <!-- ===================== PROCUREMENT PAGE ===================== -->
+    <sc-if value="{{ isProcurement }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="จัดซื้อ">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap">
+        <div style="min-width:0;flex:1 1 260px">
+          <h1 style="margin:0 0 6px;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;line-height:1.25">จัดซื้อ — ประวัติราคา</h1>
+          <div style="font-size:14px;color:#8089A0">ราคาที่จ่ายจริงจาก Shopee ใช้เทียบก่อนสั่งซื้อรอบใหม่</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <input value="{{ procSearch }}" onChange="{{ setProcSearch }}" placeholder="ค้นหาสินค้า หรือร้าน..." style="border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;font-family:inherit;outline:none;width:240px;max-width:100%"/>
+          <div onClick="{{ exportProcurementCsv }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:11px;padding:10px 16px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap"><i data-lucide="download" style="width:16px;height:16px"></i>ส่งออก CSV</div>
+        </div>
+      </div>
+
+      <sc-if value="{{ procError }}" hint-placeholder-val="{{ '' }}">
+        <div style="background:#FAF0F0;border:1px solid #EEDADA;border-radius:12px;padding:13px 16px;margin-bottom:18px;font-size:13px;color:#B14A4A">{{ procError }}</div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:16px;margin-bottom:18px">
+        <sc-for list="{{ procKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 17px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
+            <div style="font-size:13px;color:#7C8699;font-weight:500;margin-bottom:8px">{{ k.label }}</div>
+            <div style="font-size:23px;font-weight:700;color:#1B2536;letter-spacing:-0.5px">{{ k.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ procHasSpike }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:12px;align-items:flex-start;background:#FBF5E6;border:1px solid #F2E6C8;border-radius:13px;padding:14px 16px;margin-bottom:18px">
+          <div style="width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;background:#F8F0DC;color:#B98317"><i data-lucide="triangle-alert" style="width:17px;height:17px"></i></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13.5px;font-weight:600;color:#222C3D;margin-bottom:3px">ราคาล่าสุดสูงกว่าค่าเฉลี่ยเกิน 15%</div>
+            <div style="font-size:12px;color:#7A8497;line-height:1.5">{{ procSpikeText }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <h3 style="margin:0 0 4px;font-size:16px;font-weight:600">สินค้าที่ซื้อซ้ำ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(ตั้งแต่ 3 ครั้งขึ้นไป)</span></h3>
+        <div style="font-size:12.5px;color:#8089A0;margin-bottom:16px">ราคาต่อหน่วยคิดจากยอดที่จ่ายจริงหลังหักส่วนลด ไม่ใช่ราคาป้าย · กดแถวเพื่อดูประวัติทุกครั้งที่ซื้อ</div>
+        <sc-if value="{{ procEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:28px 0;text-align:center;font-size:13.5px;color:#8089A0">ยังไม่มีข้อมูลจัดซื้อ — นำเข้าประวัติจาก Shopee ก่อน</div>
+        </sc-if>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:760px">
+          <thead>
+            <tr style="text-align:left;color:#8089A0;border-bottom:1px solid #EFF0F3">
+              <th style="padding:0 8px 12px;font-weight:500">สินค้า</th>
+              <th style="padding:0 8px 12px;font-weight:500">ร้านล่าสุด</th>
+              <th style="padding:0 8px 12px;font-weight:500;text-align:right">ซื้อ</th>
+              <th style="padding:0 8px 12px;font-weight:500;text-align:right">ราคา/หน่วยล่าสุด</th>
+              <th style="padding:0 8px 12px;font-weight:500;text-align:right">เทียบครั้งก่อน</th>
+              <th style="padding:0 8px 12px;font-weight:500;text-align:right">ต่ำสุด–สูงสุด</th>
+              <th style="padding:0 8px 12px;font-weight:500;width:24px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ procTableRows }}" as="r" hint-placeholder-count="6">
+              <tr onClick="{{ r.onClick }}" style="border-bottom:1px solid #F4F5F7;cursor:pointer">
+                <td style="padding:12px 8px;color:#2B3547">{{ r.title }}</td>
+                <td style="padding:12px 8px;color:#5A6478;white-space:nowrap">{{ r.shop }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#5A6478;white-space:nowrap">{{ r.count }}</td>
+                <td style="padding:12px 8px;text-align:right;font-weight:600;color:#1B2536;white-space:nowrap">{{ r.unit }}</td>
+                <td style="padding:12px 8px;text-align:right;font-weight:600;white-space:nowrap;color:{{ r.chgColor }}">{{ r.chgText }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#8089A0;white-space:nowrap">{{ r.range }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#9AA3B2;transform:{{ r.chevron }}">▼</td>
+              </tr>
+              <sc-if value="{{ r.expanded }}" hint-placeholder-val="{{ false }}">
+                <tr>
+                  <td colspan="7" style="padding:0 8px 14px;background:#FAFBFC">
+                    <div style="font-size:12px;color:#8089A0;padding:10px 0 4px">ประวัติทุกครั้งที่ซื้อ</div>
+                    <sc-for list="{{ r.history }}" as="h" hint-placeholder-count="3">
+                      <div style="display:flex;gap:14px;padding:7px 0;font-size:12.5px;border-top:1px solid #EFF0F3">
+                        <span style="width:92px;flex:none;color:#5A6478">{{ h.date }}</span>
+                        <span style="flex:1;min-width:0;color:#5A6478">{{ h.shop }}</span>
+                        <span style="width:52px;flex:none;text-align:right;color:#8089A0">{{ h.qty }}</span>
+                        <span style="width:92px;flex:none;text-align:right;font-weight:600;color:#2B3547">{{ h.unit }}</span>
+                      </div>
+                    </sc-for>
+                  </td>
+                </tr>
+              </sc-if>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
     <!-- ===================== มุมมองเจ้าของ MOBILE PAGE ===================== -->
     <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Mobile — มุมมองเจ้าของ">
@@ -3636,6 +3734,7 @@ class Component extends DCLogic {
     expError: null,
     recentRows: [],
     salesError: null,
+    purchaseRows: [], purchaseError: '', procSearch: '', procExpanded: '',
     crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
@@ -3663,15 +3762,23 @@ class Component extends DCLogic {
     this.loadExpenses();
     this.loadSettings();
     this.loadCrm();
+    this.loadPurchases();
   }
   // Supabase caps each request at 1000 rows — page through with .range() so no row is
   // ever silently dropped once the table grows past 1000 (it already has).
+  // PostgREST จำกัด 1000 แถว/ครั้ง จึงต้องแบ่งหน้า
+  // ⚠️ ต้องเรียงด้วย id ต่อท้ายเสมอ: ข้อมูลนำเข้าเป็นก้อน ทำให้หลายพันแถวมี created_at
+  // ซ้ำกัน (purchases 3,142 แถวมีแค่ 11 ค่า) ถ้าเรียงด้วยคอลัมน์ที่ซ้ำได้อย่างเดียว
+  // Postgres ไม่รับประกันลำดับ รอยต่อระหว่างหน้าจะดึงบางแถวซ้ำและทำบางแถวหาย
+  // จำนวนแถวรวมยังเท่าเดิมจึงดูเหมือนปกติ แต่ยอดเงินผิด
   fetchAllRows = async (table) => {
     const PAGE = 1000;
     let all = [];
     for (let from = 0; ; from += PAGE) {
       const { data, error } = await supabaseClient.from(table).select('*')
-        .order('created_at', { ascending: false }).range(from, from + PAGE - 1);
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
+        .range(from, from + PAGE - 1);
       if (error) throw error;
       all = all.concat(data);
       if (data.length < PAGE) return all;
@@ -3691,6 +3798,22 @@ class Component extends DCLogic {
       this.setState({ expRows: data.map(mapDbRowToExpense), expError: null });
     } catch (err) {
       this.setState({ expError: 'โหลดข้อมูลรายจ่ายไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
+    }
+  };
+  // ประวัติราคาที่ซื้อจริงจาก Shopee — ใช้เทียบก่อนสั่งซื้อรอบใหม่
+  loadPurchases = async () => {
+    try {
+      const data = await this.fetchAllRows('purchases');
+      this.setState({ purchaseRows: data.map(r => ({
+        itemId: r.item_id, modelId: r.model_id, shopId: r.shop_id,
+        shop: r.shop_name || '', name: r.name || '', model: r.model_name || '',
+        qty: Number(r.qty) || 0,
+        unit: Number(r.unit_price) || 0,
+        paid: Number(r.paid_price) || 0,
+        iso: r.purchased_at || ''
+      })), purchaseError: '' });
+    } catch (err) {
+      this.setState({ purchaseError: 'โหลดข้อมูลจัดซื้อไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
     }
   };
   // ดึงสรุประบบสมาชิกจากโปรเจค annie-crm (อ่านอย่างเดียว) — หน้าไม่พังถ้าเชื่อมไม่ได้
@@ -4162,6 +4285,7 @@ class Component extends DCLogic {
       { label:'การตลาด', icon:'megaphone', key:'marketing', page:'marketing', group:['marketing','campaign','content'] },
       { label:'สมาชิก', icon:'users', key:'members', page:'members' },
       { label:'ศูนย์แจ้งเตือน', icon:'bell-ring', key:'alerts', page:'alerts' },
+      { label:'จัดซื้อ', icon:'shopping-cart', key:'procurement', page:'procurement' },
       { label:'แหล่งข้อมูล', icon:'database', key:'datasources', page:'datasources' },
       { label:'Annie Brain AI', icon:'sparkles', key:'ai' }
     ];
@@ -4276,13 +4400,72 @@ class Component extends DCLogic {
     const ovDay12Sales = this.dayBucketsGeneric(ovRows, 12, r => r.gross);
     const ovDay12Exp = this.dayBucketsGeneric(ovExpRows, 12, r => r.amount);
     const ovDay12Profit = ovDay12Sales.map((v, i) => v - ovDay12Exp[i]);
+    const ovDay12Margin = ovDay12Sales.map((v, i) => v ? (v - ovDay12Exp[i]) / v * 100 : 0);
+
+    // ---- เทียบกับช่วงก่อนหน้าที่ยาวเท่ากัน (ใช้ทำ % เปลี่ยนแปลงบนการ์ด KPI) ----
+    const ovISO = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const ovCurRng = this.periodRange();
+    let ovPrevRng = null;
+    if (ovCurRng) {
+      const d0 = new Date(ovCurRng.from + 'T00:00:00'), d1 = new Date(ovCurRng.to + 'T00:00:00');
+      const days = Math.round((d1 - d0) / 86400000) + 1;
+      const p1 = new Date(d0.getTime() - 86400000);
+      const p0 = new Date(p1.getTime() - (days - 1) * 86400000);
+      ovPrevRng = { from: ovISO(p0), to: ovISO(p1) };
+    }
+    const ovNonPeriodFilters = rows => {
+      const { brand, channel, saleType } = this.state;
+      let out = this.salesOnly(rows);
+      if (brand && brand !== 'ทุกแบรนด์') out = out.filter(r => r.brand === brand);
+      if (channel && channel !== 'ทุกช่องทาง') out = out.filter(r => r.platform === channel);
+      if (saleType && saleType !== 'ทุกประเภท') {
+        if (saleType === 'Retail Sales (หน้าร้าน)') out = out.filter(r => r.platform === 'หน้าร้าน');
+        else if (saleType === 'Delivery Platform') out = out.filter(r => ['Grab', 'LINE MAN', 'ShopeeFood'].includes(r.platform));
+        else out = out.filter(() => false);
+      }
+      return out;
+    };
+    const ovInRng = (rows, rng) => rng ? rows.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to) : [];
+    const ovPrevRows = ovInRng(ovNonPeriodFilters(this.state.recentRows), ovPrevRng);
+    const ovPrevExpRows = ovInRng(this.state.expRows, ovPrevRng);
+    const ovPrevGross = ovPrevRows.reduce((a, r) => a + r.gross, 0);
+    const ovPrevNet = ovPrevRows.reduce((a, r) => a + r.net, 0);
+    const ovPrevExpense = ovPrevExpRows.reduce((a, r) => a + r.amount, 0);
+    const ovPrevCogs = ovSumByKey(ovPrevExpRows, r => r.mainCat, r => r.amount)['วัตถุดิบ (COGS)'] || 0;
+    const ovPrevGrossProfit = ovPrevNet - ovPrevCogs;
+    const ovPrevNetProfit = ovPrevGrossProfit - (ovPrevExpense - ovPrevCogs);
+    const ovPrevMargin = ovPrevNet ? (ovPrevNetProfit / ovPrevNet * 100) : 0;
+
+    const ovDelta = (cur, prev, note) => {
+      if (!prev) return { text: note || ovNoDelta, color: '#8089A0', arrow: '–' };
+      const pct = (cur - prev) / Math.abs(prev) * 100;
+      const up = pct >= 0;
+      return { text: (up ? '+' : '') + pct.toFixed(1) + '% เทียบช่วงก่อน (' + ovFmt(prev) + ')', color: up ? '#2E7D5B' : '#B14A4A', arrow: up ? '▲' : '▼' };
+    };
+    const ovDeltaPP = (cur, prev) => {
+      if (!ovPrevNet) return { text: ovNoDelta, color: '#8089A0', arrow: '–' };
+      const diff = cur - prev;
+      const up = diff >= 0;
+      return { text: (up ? '+' : '') + diff.toFixed(1) + ' จุด เทียบช่วงก่อน (' + prev.toFixed(1) + '%)', color: up ? '#2E7D5B' : '#B14A4A', arrow: up ? '▲' : '▼' };
+    };
+    // ยอดขายวันนี้เทียบเมื่อวาน
+    const ovYesterdayISO = ovISO(new Date(Date.now() - 86400000));
+    const ovSalesYesterday = ovNonPeriodFilters(this.state.recentRows).filter(r => r.isoDate === ovYesterdayISO).reduce((a, r) => a + r.gross, 0);
+
+    const dToday = ovDelta(ovSalesToday, ovSalesYesterday, 'เมื่อวานยังไม่มียอด');
+    const dSales = ovDelta(ovAfterDiscount, ovPrevGross);
+    const dExp   = ovDelta(ovExpenseTotal, ovPrevExpense, 'ช่วงก่อนยังไม่มีรายจ่าย');
+    const dGP    = ovDelta(ovGrossProfit, ovPrevGrossProfit);
+    const dNP    = ovDelta(ovNetProfit, ovPrevNetProfit);
+    const dMg    = ovDeltaPP(ovNetMargin, ovPrevMargin);
+
     const kpiOverview = [
-      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:ovNoDelta, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด (ก่อนลด ' + ovFmt(ovGross) + ')', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:ovNoDelta, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
-      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:ovNoDelta, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
-      { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:ovNoDelta, icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
-      { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:ovNoDelta, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Sales.map(()=>0),'#D98A4C') }
+      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ก่อนลด ' + ovFmt(ovGross) + ' · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
+      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
+      { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
+      { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
     ];
     const fmtFin = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const noDeltaFin = '– (ยังไม่มีข้อมูลเทียบ)';
@@ -4297,12 +4480,12 @@ class Component extends DCLogic {
     const finReceivable = finRows.filter(r => r.status === 'รอรับเงิน').reduce((a, r) => a + r.net, 0);
     const finNetProfit = finNet - finExpenseTotal;
     const kpiFinance = [
-      { title:'Gross Sales', amount:fmtFin(finGross), delta:noDeltaFin, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.gross),'#4A6B9E') },
-      { title:'Net Sales', amount:fmtFin(finNet), delta:noDeltaFin, icon:'tag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net),'#4A6B9E') },
-      { title:'รายจ่ายรวม', amount:fmtFin(finExpenseTotal), delta:noDeltaFin, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finExpRows,12,r=>r.amount),'#4A6B9E') },
-      { title:'เงินเข้าจริง (Cash In)', amount:fmtFin(finCashIn), delta:noDeltaFin, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='เงินเข้าจริง'),12,r=>r.net),'#4E9E77') },
-      { title:'Platform Receivable', amount:fmtFin(finReceivable), delta:noDeltaFin, icon:'credit-card', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='รอรับเงิน'),12,r=>r.net),'#8B6FB8') },
-      { title:'Net Profit', amount:fmtFin(finNetProfit), delta:noDeltaFin, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net).map((v,i)=>v-this.dayBucketsGeneric(finExpRows,12,r=>r.amount)[i]),'#D98A4C') }
+      { title:'Gross Sales', amount:fmtFin(finGross), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.gross),'#4A6B9E') },
+      { title:'Net Sales', amount:fmtFin(finNet), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'tag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net),'#4A6B9E') },
+      { title:'รายจ่ายรวม', amount:fmtFin(finExpenseTotal), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(this.dayBucketsGeneric(finExpRows,12,r=>r.amount),'#4A6B9E') },
+      { title:'เงินเข้าจริง (Cash In)', amount:fmtFin(finCashIn), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='เงินเข้าจริง'),12,r=>r.net),'#4E9E77') },
+      { title:'Platform Receivable', amount:fmtFin(finReceivable), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'credit-card', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(this.dayBucketsGeneric(finRows.filter(r=>r.status==='รอรับเงิน'),12,r=>r.net),'#8B6FB8') },
+      { title:'Net Profit', amount:fmtFin(finNetProfit), delta:noDeltaFin, deltaColor:'#8089A0', arrow:'–', icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(this.dayBucketsGeneric(finRows,12,r=>r.net).map((v,i)=>v-this.dayBucketsGeneric(finExpRows,12,r=>r.amount)[i]),'#D98A4C') }
     ];
 
     const ceoAlerts = [];
@@ -4312,6 +4495,39 @@ class Component extends DCLogic {
     const ovReceivable = ovRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (ovReceivable > 0) {
       ceoAlerts.push({ title:'มียอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + ovFmt(ovReceivable), icon:'clock', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C' });
+    }
+
+    // ---- เตือนเมื่อข้อมูลของช่องทางไหนหยุดอัปเดต (คำนวณจากข้อมูลจริงทั้งหมด ไม่อิงตัวกรอง) ----
+    const ovAllSales = this.salesOnly(this.state.recentRows);
+    const ovLastByPlatform = {};
+    ovAllSales.forEach(r => {
+      if (!r.isoDate) return;
+      if (!ovLastByPlatform[r.platform] || r.isoDate > ovLastByPlatform[r.platform]) ovLastByPlatform[r.platform] = r.isoDate;
+    });
+    const ovDaysAgo = iso => Math.round((new Date(ovTodayISOStr + 'T00:00:00') - new Date(iso + 'T00:00:00')) / 86400000);
+    const ovStale = Object.keys(ovLastByPlatform)
+      .map(p => ({ platform: p, last: ovLastByPlatform[p], gap: ovDaysAgo(ovLastByPlatform[p]) }))
+      .filter(x => x.gap >= 2)
+      .sort((a, b) => b.gap - a.gap);
+    if (ovStale.length) {
+      ceoAlerts.push({
+        title: 'ข้อมูลบางช่องทางไม่อัปเดต',
+        detail: ovStale.map(x => x.platform + ' ค้างที่ ' + isoToBEShort(x.last) + ' (' + x.gap + ' วัน)').join(' · ') + ' — ยอดรวมจะต่ำกว่าความจริง',
+        icon: 'database', bg:'#FBF5E6', border:'#F2E6C8', iconBg:'#F8F0DC', iconFg:'#B98317'
+      });
+    }
+
+    // ---- เตือนเมื่อรายจ่ายน้อยผิดปกติเทียบรายรับ (แปลว่ากำไรที่โชว์สูงเกินจริง) ----
+    if (ovGross > 0 && ovExpenseTotal / ovGross < 0.15) {
+      ceoAlerts.push({
+        title: 'รายจ่ายที่บันทึกไว้น้อยผิดปกติ',
+        detail: 'รายจ่าย ' + ovFmt(ovExpenseTotal) + ' = ' + (ovExpenseTotal / ovGross * 100).toFixed(1) + '% ของยอดขาย — กำไรที่แสดงยังสูงเกินจริง ควรลงรายจ่ายให้ครบ',
+        icon: 'triangle-alert', bg:'#FAF0F0', border:'#EEDADA', iconBg:'#F6E3E3', iconFg:'#B14A4A'
+      });
+    }
+
+    if (!ceoAlerts.length) {
+      ceoAlerts.push({ title:'ไม่มีเรื่องต้องดำเนินการ', detail:'ข้อมูลครบ รายจ่ายอยู่ในงบ และไม่มียอดค้างรับ', icon:'circle-check', bg:'#EDF6F1', border:'#D5E9DF', iconBg:'#E6F3ED', iconFg:'#2E7D5B' });
     }
 
     const ovBrandColors = ['#4A6B9E','#9C82C4','#DCA96B','#4E9E77','#4A6B9E','#3E9E92'];
@@ -4357,6 +4573,53 @@ class Component extends DCLogic {
     if (summaryRows.length) {
       summaryRows.push({ brand:'รวมทั้งสิ้น', dot:'#C7CDD8', sales: ovFmt(ovGross), storefront: ovFmt(byChannelOv['หน้าร้าน']||0), salesPct:'100%', exp: ovFmt(ovExpenseTotal), expPct:'100%', profit: ovFmt(ovNetProfit), margin: ovNetMargin.toFixed(1)+'%', channelTag:'—', weight:'700' });
     }
+
+    // ---- Annie Brain: บทวิเคราะห์จากข้อมูลจริง (คำนวณในเครื่อง ไม่เรียก AI ภายนอก) ----
+    const ovInsights = [];
+    if (!ovRows.length) {
+      ovInsights.push({ icon:'database', text:'ยังไม่มีข้อมูลยอดขายในช่วงที่เลือก — ลองขยายช่วงเวลาหรือนำเข้าข้อมูลก่อน' });
+    } else {
+      // แบรนด์ที่ทำเงินสูงสุด — ยอดหน้าร้านบันทึกรวม ไม่ได้แยกแบรนด์ จึงไม่นับเป็นแบรนด์
+      const realBrands = ovBrandNames.filter(n => n !== 'หน้าร้าน').map(n => ({ n, v: byBrandOv[n] })).sort((a, b) => b.v - a.v);
+      if (realBrands.length) {
+        const topBrand = realBrands[0];
+        ovInsights.push({ icon:'trophy', text:'แบรนด์ทำเงินสูงสุดคือ ' + topBrand.n + ' ' + ovFmt(topBrand.v) + ' คิดเป็น ' + (topBrand.v / ovGross * 100).toFixed(0) + '% ของยอดขายทั้งหมด' });
+      } else if (byBrandOv['หน้าร้าน']) {
+        ovInsights.push({ icon:'store', text:'ช่วงนี้มีแต่ยอดหน้าร้าน ซึ่งบันทึกรวมตามช่องทางรับเงิน ไม่ได้แยกแบรนด์ — จึงยังเทียบแบรนด์ไม่ได้' });
+      }
+
+      // ช่องทางที่โต/หดมากที่สุดเทียบช่วงก่อน
+      if (ovPrevRows.length && Object.keys(byChannelOv).length > 1) {
+        const prevByCh = ovSumByKey(ovPrevRows, r => r.platform, r => r.gross);
+        const moves = Object.keys(byChannelOv)
+          .filter(p => prevByCh[p])
+          .map(p => ({ p, pct: (byChannelOv[p] - prevByCh[p]) / prevByCh[p] * 100 }))
+          .sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct));
+        if (moves.length) {
+          const m = moves[0];
+          ovInsights.push({
+            icon: m.pct >= 0 ? 'trending-up' : 'trending-down',
+            text: m.p + (m.pct >= 0 ? ' โตขึ้น ' : ' ลดลง ') + Math.abs(m.pct).toFixed(0) + '% เทียบช่วงก่อนหน้า — เปลี่ยนแปลงมากที่สุดในบรรดาช่องทางทั้งหมด'
+          });
+        }
+      }
+
+      // วันที่ขายดีที่สุดในช่วง
+      const byDay = ovSumByKey(ovRows.filter(r => r.isoDate), r => r.isoDate, r => r.gross);
+      const bestDay = Object.keys(byDay).map(d => ({ d, v: byDay[d] })).sort((a, b) => b.v - a.v)[0];
+      const avgDay = Object.keys(byDay).length ? ovGross / Object.keys(byDay).length : 0;
+      if (bestDay) ovInsights.push({ icon:'calendar-check', text:'วันที่ขายดีที่สุดคือ ' + isoToBEShort(bestDay.d) + ' ' + ovFmt(bestDay.v) + ' (สูงกว่าค่าเฉลี่ยรายวัน ' + ovFmt(avgDay) + ')' });
+
+      // สุขภาพกำไร
+      if (ovExpenseTotal > 0) {
+        ovInsights.push({ icon:'wallet', text:'ทุกยอดขาย 100 บาท เหลือเป็นกำไรสุทธิ ' + ovNetMargin.toFixed(1) + ' บาท หลังหักรายจ่ายที่บันทึกไว้' });
+      } else {
+        ovInsights.push({ icon:'triangle-alert', text:'ยังไม่มีรายจ่ายในช่วงนี้ ตัวเลขกำไรจึงเท่ากับยอดขาย — ยังใช้ตัดสินใจไม่ได้' });
+      }
+    }
+    const ovBrainHeadline = ovRows.length
+      ? 'ช่วง ' + periodDisplay + ' ยอดขาย ' + ovFmt(ovGross) + ' จาก ' + ovRows.length.toLocaleString('en-US') + ' รายการ ' + (ovStale.length ? '(ข้อมูลบางช่องทางยังไม่ครบ)' : '(ข้อมูลครบทุกช่องทาง)')
+      : 'ยังไม่มีข้อมูลในช่วงที่เลือก';
 
     // ---- finance page (real data from recentRows + expRows) ----
     const finCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#D98A4C', 'บรรจุภัณฑ์':'#A9BBD6', 'ค่าน้ำค่าไฟ':'#4E9E77', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#9C82C4', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#8B6FB8', 'อื่นๆ':'#B6BECC' };
@@ -4700,6 +4963,82 @@ class Component extends DCLogic {
       dataSourceRows.forEach(r => lines.push(csvRow([r.name, r.kind, r.how, r.count, r.last, r.total, r._state === 'ok' ? 'เป็นปัจจุบัน' : (r._days === null ? 'ยังไม่มีข้อมูล' : 'ค้าง ' + r._days + ' วัน')])));
       downloadCsv('แหล่งข้อมูล-' + todayISO() + '.csv', lines);
     };
+
+    // ---- หน้าจัดซื้อ (ประวัติราคาที่จ่ายจริงจาก Shopee) ----
+    const procFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    // ตัดคำโปรยออกจากชื่อสินค้า Shopee — ต้องให้ผลเหมือน displayName() ในบอท Telegram
+    const procClean = s => String(s || '')
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
+      .replace(/พร้อมส่ง|ส่งฟรี|ราคาส่ง|ราคาโรงงาน|ขายส่ง/g, ' ')
+      .replace(/\(\s*\)/g, ' ').replace(/\[\s*\]/g, ' ')
+      .replace(/^[\s\-–·,]+/, '').replace(/\s+/g, ' ').trim();
+    const procRows = this.state.purchaseRows || [];
+    const procQuery = (this.state.procSearch || '').toLowerCase().trim();
+    const procGroupMap = {};
+    procRows.forEach(r => {
+      const k = r.itemId + '|' + (r.modelId || 0);
+      (procGroupMap[k] = procGroupMap[k] || []).push(r);
+    });
+    const procGroups = Object.keys(procGroupMap).map(k => {
+      // แถวไม่มีวันที่ (iso ว่าง) ไปท้ายสุด ไม่ให้ถูกเลือกเป็น "ล่าสุด"
+      const list = procGroupMap[k].slice().sort((a, b) => ((a.iso || '') < (b.iso || '') ? 1 : -1));
+      const latest = list[0];
+      const prev = list[1];
+      const prices = list.map(x => x.unit).filter(p => p > 0);
+      const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+      const chg = prev && prev.unit > 0 ? (latest.unit - prev.unit) / prev.unit * 100 : null;
+      const base = procClean(latest.name);
+      return {
+        key: k, list, latest, count: list.length, avg, chg,
+        title: latest.model ? base + ' · ' + latest.model : base,
+        min: prices.length ? Math.min(...prices) : 0,
+        max: prices.length ? Math.max(...prices) : 0,
+        spike: avg > 0 && latest.unit > avg * 1.15
+      };
+    });
+    const procVisible = procGroups
+      .filter(g => g.count >= 3)
+      .filter(g => !procQuery || (g.title + ' ' + g.latest.shop).toLowerCase().includes(procQuery))
+      .sort((a, b) => b.count - a.count);
+    const procSpikes = procVisible.filter(g => g.spike);
+    const procTableRows = procVisible.map(g => ({
+      key: g.key,
+      title: g.title.length > 68 ? g.title.slice(0, 68) + '…' : g.title,
+      shop: g.latest.shop,
+      count: g.count + ' ครั้ง',
+      unit: procFmt(g.latest.unit),
+      range: procFmt(g.min) + ' – ' + procFmt(g.max),
+      chgText: g.chg === null ? '—' : (g.chg >= 0 ? '▲ ' : '▼ ') + Math.abs(g.chg).toFixed(1) + '%',
+      chgColor: g.chg === null ? '#8089A0' : (g.chg > 0 ? '#B14A4A' : '#2E7D5B'),
+      expanded: this.state.procExpanded === g.key,
+      chevron: this.state.procExpanded === g.key ? 'rotate(180deg)' : 'rotate(0deg)',
+      onClick: () => this.setState({ procExpanded: this.state.procExpanded === g.key ? '' : g.key }),
+      history: g.list.map(h => ({
+        date: h.iso ? isoToBEShort(h.iso) : 'ไม่ระบุวันที่',
+        shop: h.shop, qty: 'x' + h.qty, unit: procFmt(h.unit)
+      }))
+    }));
+    const procPaidTotal = procRows.reduce((a, r) => a + r.paid, 0);
+    const procKpis = [
+      { label: 'สินค้าที่ซื้อซ้ำ', value: procVisible.length.toLocaleString('en-US') + ' รายการ' },
+      { label: 'บรรทัดที่บันทึก', value: procRows.length.toLocaleString('en-US') },
+      { label: 'ยอดซื้อจริงรวม', value: procFmt(procPaidTotal) },
+      { label: 'ราคาขึ้นผิดปกติ', value: procSpikes.length + ' รายการ' }
+    ];
+    const setProcSearch = e => this.setState({ procSearch: e.target.value });
+    const exportProcurementCsv = () => {
+      const lines = [csvRow(['สินค้า', 'ร้าน', 'จำนวนครั้ง', 'ราคาต่อหน่วยล่าสุด', 'ต่ำสุด', 'สูงสุด', 'เปลี่ยนแปลง'])];
+      procVisible.forEach(g => lines.push(csvRow([
+        g.title, g.latest.shop, g.count, g.latest.unit, g.min, g.max,
+        g.chg === null ? '' : g.chg.toFixed(1) + '%'
+      ])));
+      downloadCsv('จัดซื้อ-' + todayISO() + '.csv', lines);
+    };
+    const procSpikeText = procSpikes.length
+      ? procSpikes.slice(0, 3).map(g => g.title.slice(0, 34) + ' ' + procFmt(g.latest.unit)).join(' · ')
+        + (procSpikes.length > 3 ? ' และอีก ' + (procSpikes.length - 3) + ' รายการ' : '')
+      : '';
+
     // ---- สินค้าขายดี (POS snapshot — PRODUCT_SALES) ----
     const productsMonth = this.state.productsMonth || 'aug';
     const prodTabBase = { display:'flex', alignItems:'center', borderRadius:'11px', padding:'9px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' };
@@ -6069,7 +6408,7 @@ class Component extends DCLogic {
     const mobileAlertsEmpty = alertItems.length === 0;
 
     return {
-      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
+      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
@@ -6149,6 +6488,14 @@ class Component extends DCLogic {
       expCalCells, importCalCells, salesHeaderCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
       expPickToday, importPickToday, salesHeaderPickToday, storePickToday, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini, summaryRows,
+      procKpis, procTableRows, procSearch: this.state.procSearch || '', setProcSearch,
+      exportProcurementCsv, procEmpty: procTableRows.length === 0,
+      procError: this.state.purchaseError || '', procHasSpike: procSpikes.length > 0, procSpikeText,
+      brainHeadline: ovBrainHeadline, brainInsights: ovInsights,
+      brainTopInsight: (ovStale.length
+        ? 'ข้อมูล ' + ovStale.map(x => x.platform).join('/') + ' ค้าง ' + ovStale[0].gap + ' วัน — ยอดรวมยังไม่ครบ'
+        : (ovInsights[0] ? ovInsights[0].text : 'ยังไม่มีข้อมูลในช่วงที่เลือก')),
+      goDataSources: () => this.setState({ page: 'datasources' }),
       expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, byExpCat['วัตถุดิบ (COGS)'] || 0, finExpenseTotal - (byExpCat['วัตถุดิบ (COGS)'] || 0)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
     };
   }
