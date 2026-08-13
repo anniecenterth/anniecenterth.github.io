@@ -712,7 +712,7 @@
           <div style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
         </div>
       </div>
-      <div style="text-align:right;font-size:12.5px;color:#2E7D5B;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:7px"><i data-lucide="circle-check-big" style="width:15px;height:15px"></i>อัปเดตล่าสุด 22 มิ.ย. 2569 23:59</div>
+      <div style="text-align:right;font-size:12.5px;color:#2E7D5B;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:7px"><i data-lucide="circle-check-big" style="width:15px;height:15px"></i>{{ dataAsOfLabel }}</div>
 
       <!-- KPI grid -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:16px;margin-bottom:18px">
@@ -1180,7 +1180,7 @@
         <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่องทาง:</span><span style="font-weight:600">ทุกช่องทาง</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
         <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="layers" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">หมวดค่าใช้จ่าย:</span><span style="font-weight:600">ทั้งหมด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
         <div style="flex:1"></div>
-        <div style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>อัปเดตล่าสุด 22 มิ.ย. 2569 23:59</span></div>
+        <div style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
       </div>
 
       <!-- KPI grid -->
@@ -1842,7 +1842,7 @@
         </div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:7px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>อัปเดตข้อมูลล่าสุด</span></div>
-        <span style="font-size:12.5px;color:#9AA3B2">ล่าสุด 22 มิ.ย. 2569 23:59</span>
+        <span style="font-size:12.5px;color:#9AA3B2">{{ dataAsOfLabel }}</span>
       </div>
 
       <!-- KPI grid -->
@@ -5802,13 +5802,23 @@ class Component extends DCLogic {
     const skNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const skEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const skRows = this.salesOnly(this.state.recentRows);
+    /** ป้าย "อัปเดตล่าสุด" ต้องคำนวณจากข้อมูลจริง — เดิมเป็นข้อความตายตัว "22 มิ.ย. 2569 23:59"
+     *  ที่ไม่ตรงกับข้อมูลในระบบเลย ทำให้อ่านแล้วเข้าใจผิดว่าข้อมูลเก่ากว่าความจริง */
+    const skLatestISO = skRows.reduce((m, r) => {
+      try { const d = beShortToISO(r.date); return d > m ? d : m; } catch (e) { return m; }
+    }, '');
+    const dataAsOfLabel = skLatestISO ? 'ข้อมูลถึง ' + isoToBEShort(skLatestISO) : 'ยังไม่มีข้อมูล';
     const skTodayISOStr = this.state.salesHeaderDate;
     const skIsToday = r => { try { return beShortToISO(r.date) === skTodayISOStr; } catch (e) { return false; } };
     const skTodayRows = skRows.filter(skIsToday);
     const skGrossToday = skTodayRows.reduce((a,r)=>a+r.gross,0);
-    const skGrossMTD = skRows.reduce((a,r)=>a+r.gross,0);
-    const skNetToday = skTodayRows.reduce((a,r)=>a+r.net,0);
-    const skReceivable = skRows.filter(r=>r.status==='รอรับเงิน').reduce((a,r)=>a+r.net,0);
+    /** MTD = เฉพาะเดือนของวันที่ที่เลือกไว้บนหัวหน้า ไม่ใช่ทั้งฐานข้อมูล
+     *  (เดิม reduce ทั้ง skRows ทำให้การ์ด "เดือนนี้" โชว์ยอดรวมทุกเดือนที่มีข้อมูล) */
+    const skMonthPrefix = String(skTodayISOStr || todayISO()).slice(0, 7);
+    const skMonthRows = skRows.filter(r => { try { return beShortToISO(r.date).slice(0, 7) === skMonthPrefix; } catch (e) { return false; } });
+    const skGrossMTD = skMonthRows.reduce((a,r)=>a+r.gross,0);
+    const skNetToday = skTodayRows.reduce((a,r)=>a+(r.net||0),0);
+    const skReceivable = skRows.filter(r=>r.status==='รอรับเงิน').reduce((a,r)=>a+(r.net||0),0);
     const salesKpis = [
       { title:'ยอดขายวันนี้', amount:skFmt(skGrossToday), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'ยอดขายเดือนนี้ (MTD)', amount:skFmt(skGrossMTD), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
@@ -5818,7 +5828,7 @@ class Component extends DCLogic {
     ];
     const skPlatformColors = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245', 'หน้าร้าน':'#3A5A8C' };
     const skPlatformOrder = ['Grab','LINE MAN','ShopeeFood','หน้าร้าน'];
-    const byPlatformSk = this.groupBy(skRows, r => r.platform);
+    const byPlatformSk = this.groupBy(skMonthRows, r => r.platform);
     const salesPlatformRows = skPlatformOrder.filter(p => byPlatformSk[p]).map(p => ({ name:p, amount: skFmt(byPlatformSk[p].gross), pct: skGrossMTD ? (byPlatformSk[p].gross/skGrossMTD*100).toFixed(1)+'%' : '0%', color: skPlatformColors[p] }));
     const salesPlatformDonut = skGrossMTD > 0
       ? this.donut(salesPlatformRows.map(c => ({ value: byPlatformSk[c.name].gross, color: c.color })), 150, 22)
@@ -5827,7 +5837,7 @@ class Component extends DCLogic {
     // หน้าร้าน broken down by payment method (each store row carries its POS payment type).
     const PAY_METHOD_COLORS = { 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
     const byPayMethod = {};
-    skRows.filter(r => r.platform === 'หน้าร้าน').forEach(r => { const k = r.payment || 'อื่นๆ'; byPayMethod[k] = (byPayMethod[k] || 0) + r.gross; });
+    skMonthRows.filter(r => r.platform === 'หน้าร้าน').forEach(r => { const k = r.payment || 'อื่นๆ'; byPayMethod[k] = (byPayMethod[k] || 0) + r.gross; });
     const payMethodTotal = Object.values(byPayMethod).reduce((a, b) => a + b, 0);
     const paymentRows = Object.keys(byPayMethod).sort((a, b) => byPayMethod[b] - byPayMethod[a]).map(k => ({
       name: k, amount: skFmt(byPayMethod[k]),
@@ -6463,6 +6473,7 @@ class Component extends DCLogic {
       setStoreBatchDate, setStoreBatchNote, clearStoreBatch, saveStoreBatch, storeSaveLabel,
       openAttachPicker, handleAttachChange, removeAttachment, hasAttachment: !!f.attachmentName,
       salesError: this.state.salesError,
+      dataAsOfLabel,
       salesPlatformRows, salesPlatformDonut, paymentRows, paymentDonut, paymentTotalLabel, salesTrend: this.salesTrend(skRows, 14), salesTotalLabel,
       period, periodOpen, togglePeriod, periodOptions, periodDisplay, customFrom, customTo, setCustomFrom, setCustomTo,
       brand, brandOpen, toggleBrand, brandOptions,
