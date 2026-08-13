@@ -3491,13 +3491,18 @@ function loadObject(key, fallback) {
 function saveObject(key, obj) {
   try { window.localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { /* non-fatal */ }
 }
+/** ชื่อร้านในไฟล์ที่นำเข้า → แบรนด์ ตามทะเบียนร้านสาขาบางโพ (ยืนยัน 13 ส.ค. 2569)
+ *  มีแค่ 2 แบรนด์ — "สวีทซอฟ" กับ "เค้กวันเกิด เค้ก เทศกาล" เป็นร้านของ AnnieCake ไม่ใช่แบรนด์แยก
+ *  หอมมนต์ ต้องอยู่บนสุด เพราะชื่อร้านบางร้านมีคำอื่นปนแล้วไปชนกฎท้ายๆ ได้
+ *  ไม่ใช้ "ถนนประชาราษฏร์สาย 2" เป็นคีย์เวิร์ด — ทั้งร้านสวีทซอฟ (Grab) และร้านหอมมนต์ (Shopee)
+ *  ต่างมีคำนี้ในชื่อ จับแบรนด์จากคำนี้จะแยกไม่ออก */
 const BRAND_KEYWORDS = [
-  { kw: 'สวีทซอฟ', brand: 'สวีทซอฟ' },
-  { kw: 'sweet soft', brand: 'สวีทซอฟ' },
-  { kw: 'เทศกาล', brand: 'สวีทซอฟ' },
-  { kw: 'ถนนประชาราษฏร์สาย 2', brand: 'สวีทซอฟ' },
   { kw: 'หอมมนต์', brand: 'หอมมนต์' },
-  { kw: 'homemade', brand: 'Homemade' }
+  { kw: 'hommon', brand: 'หอมมนต์' },
+  { kw: 'สวีทซอฟ', brand: 'AnnieCake' },
+  { kw: 'sweet soft', brand: 'AnnieCake' },
+  { kw: 'เทศกาล', brand: 'AnnieCake' },
+  { kw: 'annie', brand: 'AnnieCake' }
 ];
 const POS_ALLOWED_PAYMENT_TYPES = ['Cash', 'QR PromptPay (POS Pay)', 'K+shop', 'K+ Shop', 'K+Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount'];
 function detectBrandFromName(name) {
@@ -4266,7 +4271,7 @@ class Component extends DCLogic {
     const periodDisplay = (period === 'เลือกเอง' && (customFrom || customTo))
       ? ((customFrom ? isoToBEShort(customFrom) : '…') + ' – ' + (customTo ? isoToBEShort(customTo) : '…'))
       : period;
-    const brandOptions = ['ทุกแบรนด์','AnnieCake','หอมมนต์','สวีทซอฟ'].map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
+    const brandOptions = ['ทุกแบรนด์','AnnieCake','หอมมนต์'].map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
     const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood','ขายส่ง'].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
@@ -5100,7 +5105,7 @@ class Component extends DCLogic {
     // ---- expense record ----
     const ef = this.state.expForm;
     const expNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g,'')); return isNaN(n) ? 0 : n; };
-    const expFmt = n => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const expFmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const setEF = k => e => { const val = e.target.value; this.setState(s => ({ expForm: { ...s.expForm, [k]: val } })); };
     const setExpAmount = setEF('amount'), setExpChannel = setEF('channel'), setExpNote = setEF('note');
     const setExpDate = e => { const val = e.target.value; this.setState(s => ({ expForm: { ...s.expForm, date: val } })); };
@@ -5507,7 +5512,10 @@ class Component extends DCLogic {
     // ---- sales page ----
     const f = this.state.form;
     const numV = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g,'')); return isNaN(n) ? 0 : n; };
-    const fmt2 = n => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmt2 = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    /** ค่าที่ยังไม่รู้ (null) ต้องแสดง "—" ไม่ใช่ ฿0.00 — รายงานรายวันของ LINE MAN บอกแค่ยอดขาย
+     *  ไม่ได้แยกค่าธรรมเนียม/เงินเข้าจริงรายออเดอร์ ถ้าโชว์ ฿0.00 จะอ่านเป็น "ไม่มีค่าธรรมเนียม" ซึ่งไม่จริง */
+    const money2 = n => (n == null || n === '' ? '—' : '฿' + fmt2(Number(n)));
     const netSalesNum = numV(f.gross) - numV(f.discount) - numV(f.fee) - numV(f.promo);
     const netSales = '฿' + fmt2(netSalesNum);
     const netPayout = netSales;
@@ -5517,7 +5525,7 @@ class Component extends DCLogic {
     const dateOpen = this.state.formDD === 'date';
     const toggleDate = () => this.setState(s => ({ formDD: s.formDD === 'date' ? null : 'date' }));
     const platformDD = this.mkFormDD('platform', ['LINE MAN','Grab','ShopeeFood','หน้าร้าน']);
-    const brandDD = this.mkFormDD('brand', ['AnnieCake','Homemade','หอมมนต์','สวีทซอฟ']);
+    const brandDD = this.mkFormDD('brand', ['AnnieCake','หอมมนต์']);
     const typeDD = this.mkFormDD('type', ['อาหาร / เครื่องดื่ม','เบเกอรี่','เค้กสั่งทำ','อื่น ๆ']);
     const paymentDD = this.mkFormDD('payment', ['ลูกค้าชำระเงินปลายทาง (COD)','ชำระผ่านแอป/บัตร','โอนเงิน']);
     const statusDD = this.mkFormDD('status', ['รอรับเงิน','เงินเข้าจริง']);
@@ -5777,7 +5785,8 @@ class Component extends DCLogic {
       };
       return {
         date: r.date, time: r.time, platform: platformBadge(r.platform), brand: r.brand, orderId: r.orderId, note: r.note || '',
-        gross: '฿' + fmt2(r.gross), fee: '฿' + fmt2(r.fee), gp: '฿' + fmt2(r.fee - r.fee*7/107), vat: '฿' + fmt2(r.fee*7/107), net: '฿' + fmt2(r.net), status: statusBadge(r.status),
+        gross: money2(r.gross), fee: money2(r.fee), gp: money2(r.fee == null ? null : r.fee - r.fee*7/107),
+        vat: money2(r.fee == null ? null : r.fee*7/107), net: money2(r.net), status: statusBadge(r.status),
         onEdit: startEditSalesRow(r),
         onDelete
       };
@@ -6229,7 +6238,7 @@ class Component extends DCLogic {
       const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
       const label = THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543);
       const income = o.gross - o.storeDisc - o.deliveryDisc;
-      const fmt2n = n => '฿' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const fmt2n = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const onDownload = () => {
         const lines = [csvRow(['รายการ','ค่า (฿)'])];
         [['เดือน', label], ['ยอดขายก่อนลด', o.gross.toFixed(2)], ['ส่วนลดหน้าร้าน', o.storeDisc.toFixed(2)], ['ส่วนลด Delivery', o.deliveryDisc.toFixed(2)],
@@ -6251,7 +6260,7 @@ class Component extends DCLogic {
 
     // ---- 7b. แบบฟอร์ม ภ.พ./ภ.ง.ด. ----
     const tfNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g,'')); return isNaN(n) ? 0 : n; };
-    const tfFmt = n => '฿' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const tfFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const tf = this.state.taxForms;
     const taxFormActive = this.state.taxFormActive;
     const selectTaxForm = key => () => this.setState({ taxFormActive: key });
