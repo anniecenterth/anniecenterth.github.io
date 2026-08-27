@@ -3693,7 +3693,10 @@ function mapSaleToDbRow(row) {
     gross: row.gross, fee: row.fee, net: row.net, status: row.status,
     type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null,
     // ที่มาของแถว: ทุกแถวต้องบอกได้ว่ามาจากไหน (POS / import แพลตฟอร์ม / ฟอร์มในแอป)
-    source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null
+    source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null,
+    // คอลัมน์วันที่จริงที่ทุกรายงานใช้จัดกลุ่มรายวัน — ก่อนหน้านี้ไม่ได้ส่งมาเลย
+    // แถวที่บันทึกผ่านฟอร์มจึงมี sale_date ว่าง แล้วหายไปจากรายงานรายวันทั้งหมด
+    sale_date: row.isoDate || safeBeShortToISO(row.date) || null
   };
 }
 function mapDbRowToExpense(dbRow) {
@@ -3707,9 +3710,29 @@ function mapExpenseToDbRow(row) {
   return {
     date: row.date, time: row.time, main_cat: row.mainCat, sub_cat: row.subCat,
     detail: row.detail, amount: row.amount, payment: row.payment, attachment_name: row.attachmentName || null,
-    source: row.source || 'MANUAL', source_ref: row.sourceRef || null, created_by: row.createdBy || null
+    source: row.source || 'MANUAL', source_ref: row.sourceRef || null, created_by: row.createdBy || null,
+    // เหตุผลเดียวกับ sale_date ด้านบน — รายจ่ายที่คีย์ผ่านฟอร์มเคยมี expense_date ว่างทุกแถว
+    expense_date: row.isoDate || safeBeShortToISO(row.date) || null
   };
 }
+
+/** หมวดหมู่รายจ่าย — หมวดย่อยผูกกับหมวดหลัก (แอนนี่กำหนดเอง 27 ส.ค. 2569)
+ *  ไม่มีหมวด "ค่าคอมมิชชันแพลตฟอร์ม" โดยตั้งใจ — ค่าคอมฯ บันทึกอยู่ในช่อง fee ของฝั่งรายรับแล้ว
+ *  ถ้าเพิ่มเป็นรายจ่ายอีกจะนับซ้ำ ทำให้กำไรต่ำกว่าความจริง */
+const EXPENSE_CATS = [
+  ['วัตถุดิบ (COGS)',        ['ต้นทุนเค้ก AnnieCake','ต้นทุนเค้ก หอมมนต์','วิปครีม','ผลไม้','สีผสมอาหาร','ขนมสำหรับตกแต่ง','ไอซ์ซิ่ง','อื่นๆ']],
+  ['บรรจุภัณฑ์',             ['กล่องเค้ก','ฐานรอง/จานรอง','ถุง/หูหิ้ว','ช้อนส้อม/มีดตัด','สติกเกอร์/ฉลาก','อื่นๆ']],
+  ['ของตกแต่งเค้ก',          ['เทียนวันเกิด','ป้าย/ท็อปเปอร์','ริบบิ้น/โบว์','ดอกไม้/ของประดับ','อื่นๆ']],
+  ['อุปกรณ์ & ซ่อมบำรุง',    ['อุปกรณ์เบเกอรี่ (พิมพ์/หัวบีบ)','ของใช้สิ้นเปลืองในร้าน','ค่าซ่อมบำรุง','ค่าทำความสะอาด','อื่นๆ']],
+  ['ค่าขนส่ง',               ['ค่าส่งของเข้าร้าน','ค่าส่งให้ลูกค้า','อื่นๆ']],
+  ['ค่าเช่า & สาธารณูปโภค',  ['ค่าเช่าร้าน','ค่าไฟ','ค่าน้ำ','อินเทอร์เน็ต/โทรศัพท์','ค่าส่วนกลาง','อื่นๆ']],
+  ['ค่าแรง',                 ['เงินเดือนประจำ','ค่าจ้างรายวัน','ค่าล่วงเวลา (OT)','ประกันสังคม (ส่วนนายจ้าง)','โบนัส/สวัสดิการ','อื่นๆ']],
+  ['ค่าธรรมเนียม & ภาษี',    ['ค่าธรรมเนียมธนาคาร/QR','ค่าเช่าเครื่องรูดบัตร','ภาษีป้าย','ภาษีอื่นๆ','ค่าใบอนุญาต','ดอกเบี้ย','อื่นๆ']],
+  ['การตลาด',               ['ยิงแอด Facebook/IG','ยิงแอด TikTok','อื่นๆ']],
+  ['อื่นๆ',                  ['อื่นๆ']]
+];
+const EXPENSE_MAIN_CATS = EXPENSE_CATS.map(function (c) { return c[0]; });
+const EXPENSE_SUB_BY_MAIN = EXPENSE_CATS.reduce(function (m, c) { m[c[0]] = c[1]; return m; }, {});
 
 class Component extends DCLogic {
   state = {
@@ -4195,7 +4218,8 @@ class Component extends DCLogic {
     return React.createElement('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',height:'auto',style:{display:'block'}},els);
   }
 
-  mkFormDD(field, options, sk) {
+  // onPick: ให้ช่องอื่นเปลี่ยนตามได้ตอนเลือก (ใช้กับหมวดหลัก → รีเซ็ตหมวดย่อย)
+  mkFormDD(field, options, sk, onPick) {
     sk = sk || 'form';
     const cur = this.state[sk][field];
     const open = this.state.formDD === field;
@@ -4205,7 +4229,7 @@ class Component extends DCLogic {
       toggle: () => this.setState(s => ({ formDD: s.formDD === field ? null : field, periodOpen:false, brandOpen:false, channelOpen:false })),
       options: options.map(o => ({
         label: o,
-        onClick: () => this.setState(s => ({ [sk]: { ...s[sk], [field]: o }, formDD: null })),
+        onClick: () => this.setState(s => ({ [sk]: { ...s[sk], [field]: o, ...(onPick ? onPick(o, s[sk]) : {}) }, formDD: null })),
         style: o === cur ? { ...optBase, background:'#F3F6FA', color:'#223C66', fontWeight:600 } : { ...optBase, color:'#3A4456' },
         check: o === cur ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
@@ -5111,9 +5135,12 @@ class Component extends DCLogic {
     const setExpDate = e => { const val = e.target.value; this.setState(s => ({ expForm: { ...s.expForm, date: val } })); };
     const expDateOpen = this.state.formDD === 'expDate';
     const toggleExpDate = () => this.setState(s => ({ formDD: s.formDD === 'expDate' ? null : 'expDate' }));
-    const expMainDD = this.mkFormDD('mainCat', ['วัตถุดิบ (COGS)','ค่าแรง','บรรจุภัณฑ์','ค่าน้ำค่าไฟ','ค่าขนส่ง','การตลาด','อุปกรณ์/ของใช้ร้าน','ค่าเช่า','อื่นๆ'], 'expForm');
-    const expSubDD = this.mkFormDD('subCat', ['ต้นทุนเค้ก AC','กล่องเค้ก','วิปครีม','เงินเดือนพนักงาน','ค่าไฟ','ยิงแอด Facebook','ค่าส่งของเข้าร้าน','ซ่อมอุปกรณ์','อื่นๆ'], 'expForm');
-    const expBrandDD = this.mkFormDD('expBrand', ['ไม่ระบุ','AnnieCake','หอมมนต์','สวิทซอฟ'], 'expForm');
+    // เลือกหมวดหลักแล้วหมวดย่อยเปลี่ยนตาม และรีเซ็ตค่าเดิมทิ้ง กันเลือกคู่ที่ไม่มีความหมาย
+    // (ของเดิมเป็นรายการลอย เลือก "ค่าเช่า" คู่กับ "วิปครีม" ได้)
+    const expMainDD = this.mkFormDD('mainCat', EXPENSE_MAIN_CATS, 'expForm', () => ({ subCat: 'เลือกหมวดหมู่ย่อย' }));
+    const expSubDD = this.mkFormDD('subCat', EXPENSE_SUB_BY_MAIN[ef.mainCat] || [], 'expForm');
+    // ทะเบียนร้านยืนยันว่ามี 2 แบรนด์ — สวีทซอฟต์อยู่ใต้ AnnieCake ไม่ใช่แบรนด์แยก
+    const expBrandDD = this.mkFormDD('expBrand', ['ไม่ระบุ','AnnieCake','หอมมนต์'], 'expForm');
     const expPayDD = this.mkFormDD('expPayment', ['โอนเงิน','เงินสด','บัตรเครดิต','อื่นๆ'], 'expForm');
     const toggleAsset = () => this.setState(s => ({ expForm: { ...s.expForm, asset: !s.expForm.asset } }));
     const expAsset = ef.asset;
