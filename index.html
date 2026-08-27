@@ -3979,23 +3979,19 @@ class Component extends DCLogic {
   salesOnly(rows) {
     return rows.filter(r => r.platform !== 'ส่วนลด');
   }
-  // Total discount for the current filter selection:
-  //  - หน้าร้าน: stored per-row as fee (ยอดก่อนลด − ยอดรวม)
-  //  - Delivery: 'ส่วนลด' rows from the POS report; only attributable when the channel/brand
-  //    filters aren't narrowed to a single delivery platform.
+  /** ส่วนลดที่ต้องหักออกจาก gross — ตอนนี้เป็น 0 เสมอ
+   *
+   *  เจ้าของกำหนดเมื่อ 27 ส.ค. 2569 ว่าทุกช่องทางเก็บ `gross` เป็น **ยอดหลังหักส่วนลด**
+   *  ให้เป็นฐานเดียวกัน (เดิมหน้าร้านเก็บยอดก่อนลดแล้วเก็บส่วนลดไว้ในช่อง fee
+   *  ส่วน Grab/LINE MAN เก็บหลังลดอยู่แล้ว — เทียบกันไม่ได้)
+   *
+   *  ข้อมูลถูกแปลงในฐานข้อมูลแล้ว: หน้าร้านทุกแถว gross = net และ fee = 0
+   *  ยอดก่อนลดกับส่วนลดของแต่ละแถวเก็บไว้ในช่อง note เพื่อให้ตรวจย้อนได้
+   *
+   *  ⚠️ ห้ามกลับไปหักส่วนลดอีก จะกลายเป็นหักซ้ำและยอดขายต่ำกว่าความจริง
+   *  ฟังก์ชันนี้คงไว้เพื่อไม่ต้องแก้จุดเรียกใช้ทั้ง 5 จุด */
   salesDiscountTotal(filteredSaleRows) {
-    const store = filteredSaleRows.filter(r => r.platform === 'หน้าร้าน').reduce((a, r) => a + r.fee, 0);
-    const { brand, channel, saleType } = this.state;
-    let delivery = 0;
-    const deliveryVisible = (!brand || brand === 'ทุกแบรนด์') && (!channel || channel === 'ทุกช่องทาง')
-      && (!saleType || saleType === 'ทุกประเภท' || saleType === 'Delivery Platform');
-    if (deliveryVisible) {
-      const rng = this.periodRange();
-      delivery = this.state.recentRows
-        .filter(r => r.platform === 'ส่วนลด' && (!rng || (r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to)))
-        .reduce((a, r) => a + r.gross, 0);
-    }
-    return { store, delivery, total: store + delivery };
+    return { store: 0, delivery: 0, total: 0 };
   }
   applySalesFilters(rows) {
     const { brand, channel, saleType } = this.state;
@@ -4490,7 +4486,7 @@ class Component extends DCLogic {
 
     const kpiOverview = [
       { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ก่อนลด ' + ovFmt(ovGross) + ' · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
       { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
       { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
       { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
@@ -5364,7 +5360,7 @@ class Component extends DCLogic {
     const dashDayBuckets12 = this.dayBuckets(salesRows, 12);
     const dashOrderBuckets12 = dashDayBuckets12.map(d => d.count);
     const salesDashKpis = [
-      { title:'ยอดขายรวม (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ก่อนลด ' + fmtB(salesTotalGross) + ' − ส่วนลด ' + fmtB(salesDisc.total), icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#4A6B9E') },
+      { title:'ยอดขายรวม (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ทุกช่องทางเก็บเป็นยอดหลังหักส่วนลดแล้ว', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#4A6B9E') },
       { title:'ยอดขายสุทธิ (Net Sales)', amount:fmtB(salesTotalNet), delta:noDelta, icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(dashDayBuckets12.map(d=>d.net),'#4E9E77') },
       { title:'ออเดอร์รวม', amount:String(salesOrderCount), delta:noDelta, icon:'shopping-cart', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(dashOrderBuckets12,'#8B6FB8') },
       { title:'ลูกค้าใหม่', amount:'0', delta:'ยังไม่มีระบบติดตามลูกค้า', icon:'user-plus', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(dashOrderBuckets12.map(()=>0),'#D98A4C') },
@@ -5510,9 +5506,8 @@ class Component extends DCLogic {
       const totalPromo = sumBy(p=>dashPromo(p));
       const totalNet = sumBy((p,g)=>g.net);
       dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), gp: fmtB(totalGp), vat: fmtB(totalVat), promo: fmtB(totalPromo), net: fmtB(totalNet), statusTag:'—', weight:'700' });
-      // Reconcile ก่อนลด → หลังหักส่วนลด (matches the POS report's ยอดรวม concept)
-      dashPayoutRows.push({ platform: React.createElement('span', { style:{ color:'#8089A0' } }, 'ส่วนลดรวม (หน้าร้าน ' + fmtB(salesDisc.store) + ' + Delivery ' + fmtB(salesDisc.delivery) + ')'), gross: React.createElement('span', { style:{ color:'#B14A4A' } }, '−' + fmtB(salesDisc.total)), gp:'', vat:'', promo:'', net:'', statusTag:'', weight:'500' });
-      dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'ยอดขายหลังหักส่วนลด'), gross: fmtB(salesAfterDiscount), gp:'', vat:'', promo:'', net:'', statusTag:'', weight:'700' });
+      // ไม่มีแถว "ส่วนลดรวม" แล้ว เพราะ gross เก็บเป็นยอดหลังหักส่วนลดตั้งแต่ต้น
+      // แถว "รวมทั้งหมด" ด้านบนจึงเป็นยอดหลังหักส่วนลดอยู่แล้ว ไม่ต้องกระทบยอดซ้ำ
     }
     const dashMatrixRows = dashBrandNames.map(name => {
       const rowsForBrand = salesRows.filter(r => r.brand === name);
