@@ -4677,10 +4677,14 @@ class Component extends DCLogic {
     const isPayrollTabEmps  = this.state.payrollTab === 'employees';
     const isPayrollTabCal   = this.state.payrollTab === 'calendar';
 
-    const pyShiftPeriod = d => () => {
-      const dt = new Date(pyPeriodDate + 'T00:00:00'); dt.setMonth(dt.getMonth() + d);
-      this.setState({ payrollPeriod: dt.toISOString().slice(0, 7) });
+    /** เลื่อนเดือนด้วยเลขล้วน ไม่ใช้ Date
+     *  ใช้ new Date(...).toISOString() ไม่ได้ เพราะเที่ยงคืนตามเวลาไทยแปลงเป็น UTC
+     *  แล้วถอยไปเป็นวันก่อนหน้า ทำให้กดย้อนเดือนทีเดียวข้ามไป 2 เดือน (เจอจริงตอนทดสอบ) */
+    const pyMonthShift = (ym, d) => {
+      const m = (+ym.slice(0, 4)) * 12 + (+ym.slice(5, 7) - 1) + d;
+      return Math.floor(m / 12) + '-' + String((m % 12) + 1).padStart(2, '0');
     };
+    const pyShiftPeriod = d => () => this.setState({ payrollPeriod: pyMonthShift(pyPeriod, d) });
     const payrollPeriodLabel = pyMonthLabel(pyPeriodDate);
 
     // วันหยุดของงวดนี้ พร้อมสถานะที่ติ๊กไว้ของพนักงานแต่ละคน
@@ -4898,10 +4902,7 @@ class Component extends DCLogic {
     // ---- แท็บปฏิทินวันหยุด ----
     const pyCalMonth = this.state.payrollCalMonth;
     const payrollCalLabel = pyMonthLabel(pyCalMonth + '-01');
-    const pyShiftCal = d => () => {
-      const dt = new Date(pyCalMonth + '-01T00:00:00'); dt.setMonth(dt.getMonth() + d);
-      this.setState({ payrollCalMonth: dt.toISOString().slice(0, 7), openHolidayId: null });
-    };
+    const pyShiftCal = d => () => this.setState({ payrollCalMonth: pyMonthShift(pyCalMonth, d), openHolidayId: null });
     const payrollCalCells = (() => {
       const y = +pyCalMonth.slice(0, 4), m = +pyCalMonth.slice(5, 7);
       const first = new Date(Date.UTC(y, m - 1, 1)), days = new Date(Date.UTC(y, m, 0)).getUTCDate();
