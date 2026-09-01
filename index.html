@@ -2891,7 +2891,8 @@
               <div style="display:flex;align-items:center;border:1px solid #DFE2E7;border-radius:10px;padding:0 13px"><input value="{{ tf.pnd1.wht }}" onChange="{{ setPnd1Wht }}" inputmode="decimal" style="flex:1;min-width:0;border:none;outline:none;padding:11px 0;font-size:13.5px;color:#2B3547;text-align:right;background:transparent;font-family:inherit"/></div>
             </div>
           </div>
-          <div style="background:#FBFBFC;border:1px solid #EFF0F3;border-radius:12px;padding:14px 18px;font-size:12.5px;color:#8089A0;line-height:1.6;margin-bottom:18px">คำนวณจากอัตราภาษีก้าวหน้าตามเงินเดือนพนักงานแต่ละคน (โดยประมาณ {{ pnd1Rate }}% ของเงินได้รวม) — แนบรายชื่อพนักงานพร้อมยอดหักรายบุคคลตอนยื่น</div>
+          <div onClick="{{ pullPnd1FromPayroll }}" style="display:inline-flex;align-items:center;gap:8px;border:1px solid #C3CBD9;background:#fff;color:#2C4A7C;border-radius:11px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px"><i data-lucide="wallet" style="width:16px;height:16px"></i>{{ pnd1PullLabel }}</div>
+          <div style="background:#FBFBFC;border:1px solid #EFF0F3;border-radius:12px;padding:14px 18px;font-size:12.5px;color:#8089A0;line-height:1.6;margin-bottom:18px">คำนวณจากอัตราภาษีก้าวหน้าตามเงินเดือนพนักงานแต่ละคน (โดยประมาณ {{ pnd1Rate }}% ของเงินได้รวม) — ดึงจากสลิปจะเติมให้เฉพาะจำนวนพนักงานกับเงินได้รวม ส่วนภาษีหัก ณ ที่จ่ายต้องกรอกเอง เพราะระบบยังไม่คำนวณภาษีรายบุคคล · แนบรายชื่อพนักงานพร้อมยอดหักรายบุคคลตอนยื่น</div>
           </sc-if>
 
           <sc-if value="{{ isPnd3 }}" hint-placeholder-val="{{ false }}">
@@ -6991,6 +6992,24 @@ class Component extends DCLogic {
     const setTaxField = (key, field) => e => { const val = e.target.value; this.setState(s => ({ taxForms: { ...s.taxForms, [key]: { ...s.taxForms[key], [field]: val } } }), persistTaxForms); };
     const setPp30Sales = setTaxField('pp30','sales'), setPp30Purchases = setTaxField('pp30','purchases');
     const setPnd1EmpCount = setTaxField('pnd1','empCount'), setPnd1Income = setTaxField('pnd1','income'), setPnd1Wht = setTaxField('pnd1','wht');
+    /** ดึงจำนวนพนักงานและเงินได้รวมจากสลิปที่ "จ่ายแล้ว" ของงวดที่เลือกในหน้าเงินเดือน
+     *  ใช้ total_earning (ค่าจ้างก่อนหัก) เพราะ ภ.ง.ด.1 รายงานเงินได้ที่จ่าย ไม่ใช่เงินสดสุทธิ
+     *  ช่องภาษีหัก ณ ที่จ่ายไม่เติมให้ เพราะระบบยังไม่คำนวณภาษีรายบุคคล ห้ามเดา */
+    const pnd1PeriodLabel = payrollPeriodLabel;
+    const pnd1PaidSlips = this.state.payslips.filter(sl =>
+      String(sl.period).slice(0, 10) === pyPeriodDate && sl.status === 'จ่ายแล้ว');
+    const pnd1HasSlips = pnd1PaidSlips.length > 0;
+    const pnd1PullLabel = pnd1HasSlips
+      ? 'ดึงจากสลิป ' + pnd1PeriodLabel + ' (' + pnd1PaidSlips.length + ' คน)'
+      : 'ยังไม่มีสลิปที่จ่ายแล้วในงวด ' + pnd1PeriodLabel;
+    const pullPnd1FromPayroll = () => {
+      if (!pnd1HasSlips) return;
+      const income = pyRound2(pnd1PaidSlips.reduce((a, sl) => a + Number(sl.total_earning || 0), 0));
+      this.setState(st => ({ taxForms: Object.assign({}, st.taxForms, {
+        pnd1: Object.assign({}, st.taxForms.pnd1, {
+          period: pnd1PeriodLabel, empCount: String(pnd1PaidSlips.length), income: String(income)
+        }) }) }));
+    };
     const setPnd3Payee = setTaxField('pnd3','payee'), setPnd3Amount = setTaxField('pnd3','amount'), setPnd3Rate = setTaxField('pnd3','rate');
     const setPnd50Revenue = setTaxField('pnd50','revenue'), setPnd50Expenses = setTaxField('pnd50','expenses'), setPnd50Rate = setTaxField('pnd50','rate');
     const setPnd51EstProfit = setTaxField('pnd51','estProfit'), setPnd51Rate = setTaxField('pnd51','rate');
@@ -7210,6 +7229,7 @@ class Component extends DCLogic {
       setPnd50Revenue, setPnd50Expenses, setPnd50Rate, setPnd51EstProfit, setPnd51Rate,
       pp30SalesVat: tfFmt(pp30SalesVat), pp30PurchaseVat: tfFmt(pp30PurchaseVat), pp30Net: tfFmt(Math.abs(pp30Net)), pp30NetLabel: pp30Net >= 0 ? 'ต้องชำระ' : 'ขอคืนภาษี',
       pnd1Rate: pnd1Rate.toFixed(2),
+      pnd1PullLabel, pullPnd1FromPayroll, pnd1HasSlips,
       pnd3Wht: tfFmt(pnd3Wht),
       pnd53Total: tfFmt(pnd53Total), taxWhtForForm: taxWht,
       pnd50Profit: tfFmt(pnd50Profit), pnd50Tax: tfFmt(pnd50Tax),
