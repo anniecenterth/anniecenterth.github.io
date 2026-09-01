@@ -1121,6 +1121,235 @@
     </div>
     </sc-if>
 
+    <!-- ===================== PAYROLL PAGE ===================== -->
+    <sc-if value="{{ isPayroll }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Payroll — เงินเดือนพนักงาน">
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+        <sc-for list="{{ payrollTabs }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
+        </sc-for>
+      </div>
+      <h1 style="margin:0 0 6px;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">เงินเดือนพนักงาน</h1>
+      <div style="font-size:14px;color:#8089A0;margin-bottom:18px">คิดค่าแรงวันหยุดจากปฏิทินให้อัตโนมัติ แล้วลงรายจ่ายตามเงินสดที่จ่ายออกจริง</div>
+
+      <sc-if value="{{ payrollError }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FDF1F1;border:1px solid #F0D2D2;color:#B14A4A;border-radius:12px;padding:12px 16px;font-size:13px;margin-bottom:16px">{{ payrollError }}</div>
+      </sc-if>
+
+      <!-- ---------- แท็บ 1: สลิป ---------- -->
+      <sc-if value="{{ isPayrollTabSlips }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+          <div onClick="{{ payrollPrevPeriod }}" style="border:1px solid #E7E9ED;background:#fff;border-radius:10px;padding:8px 13px;cursor:pointer;font-size:13px">‹ เดือนก่อน</div>
+          <div style="font-size:16px;font-weight:700;color:#1B2536">{{ payrollPeriodLabel }}</div>
+          <div onClick="{{ payrollNextPeriod }}" style="border:1px solid #E7E9ED;background:#fff;border-radius:10px;padding:8px 13px;cursor:pointer;font-size:13px">เดือนถัดไป ›</div>
+          <div style="flex:1"></div>
+          <div style="font-size:13px;color:#8089A0">จ่ายแล้ว <b style="color:#1B2536">{{ payrollPaidCount }}</b> · รวมสุทธิ <b style="color:#1B2536">{{ payrollTotalNet }}</b></div>
+        </div>
+        <sc-if value="{{ payrollHasEmployees }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:6px 18px 14px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:660px">
+            <thead><tr style="color:#8089A0;text-align:right;border-bottom:1px solid #EFF0F3">
+              <th style="padding:12px 5px;font-weight:500;text-align:left">พนักงาน</th>
+              <th style="padding:12px 5px;font-weight:500">เงินเดือน</th>
+              <th style="padding:12px 5px;font-weight:500">รวมได้รับ</th>
+              <th style="padding:12px 5px;font-weight:500">หัก</th>
+              <th style="padding:12px 5px;font-weight:500">รับสุทธิ</th>
+              <th style="padding:12px 5px;font-weight:500;text-align:center">สถานะ</th>
+              <th style="padding:12px 5px"></th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ payrollSlipRows }}" as="r" hint-placeholder-count="3">
+                <tr style="border-bottom:1px solid #F5F6F8;text-align:right">
+                  <td style="padding:11px 5px;text-align:left;font-weight:600;color:#1B2536">{{ r.name }}</td>
+                  <td style="padding:11px 5px;color:#5A6478">{{ r.salary }}</td>
+                  <td style="padding:11px 5px;color:#5A6478">{{ r.earning }}</td>
+                  <td style="padding:11px 5px;color:#B14A4A">{{ r.deduction }}</td>
+                  <td style="padding:11px 5px;font-weight:700;color:#1B2536">{{ r.net }}</td>
+                  <td style="padding:11px 5px;text-align:center"><span style="{{ r.statusStyle }}">{{ r.statusLabel }}</span></td>
+                  <td style="padding:11px 5px"><span onClick="{{ r.onAction }}" style="color:#2C4A7C;font-weight:600;cursor:pointer">{{ r.actionLabel }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        </sc-if>
+        <sc-if value="{{ payrollNoEmployees }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:34px;text-align:center;color:#8089A0;font-size:13.5px">ยังไม่มีพนักงาน — ไปที่แท็บ "พนักงาน" เพื่อเพิ่มคนแรกก่อน</div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ---------- ตัวแก้สลิป ---------- -->
+      <sc-if value="{{ slipEditorOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px;margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="font-size:16px;font-weight:700;color:#1B2536">สลิป — {{ slipEditorTitle }}</div>
+          <div onClick="{{ closeSlipEditor }}" style="cursor:pointer;color:#8089A0;font-size:13px">ปิด</div>
+        </div>
+        <sc-if value="{{ slipEditorLocked }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#E6F3ED;border:1px solid #C4E0D2;color:#26654A;border-radius:11px;padding:11px 15px;font-size:13px;margin-bottom:14px">จ่ายแล้ว — แก้ไม่ได้ ถ้าต้องแก้ให้กดยกเลิกการจ่ายก่อน</div>
+        </sc-if>
+        <div style="display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 1fr 34px;gap:8px;font-size:11.5px;color:#8089A0;padding-bottom:6px;border-bottom:1px solid #EFF0F3">
+          <div>รายการ</div><div>จำนวน</div><div>ราคา/หน่วย</div><div style="text-align:right">ยอด</div><div></div>
+        </div>
+        <sc-for list="{{ slipEditorRows }}" as="l" hint-placeholder-count="5">
+          <div style="{{ l.rowStyle }}">
+            <input value="{{ l.labelValue }}" onChange="{{ l.onLabel }}" placeholder="ชื่อรายการ" style="border:1px solid #E7E9ED;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;min-width:0"/>
+            <input value="{{ l.qtyValue }}" onChange="{{ l.onQty }}" inputmode="decimal" placeholder="—" style="border:1px solid #E7E9ED;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;text-align:right;min-width:0"/>
+            <input value="{{ l.rateValue }}" onChange="{{ l.onRate }}" inputmode="decimal" placeholder="—" style="border:1px solid #E7E9ED;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;text-align:right;min-width:0"/>
+            <input value="{{ l.amountValue }}" onChange="{{ l.onAmount }}" inputmode="decimal" style="border:1px solid #E7E9ED;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:600;font-family:inherit;outline:none;text-align:right;min-width:0"/>
+            <div onClick="{{ l.onDelete }}" style="cursor:pointer;color:#C08A8A;text-align:center;font-size:16px">×</div>
+          </div>
+        </sc-for>
+        <div style="display:flex;gap:9px;margin-top:12px;flex-wrap:wrap">
+          <div onClick="{{ addEarningLine }}" style="border:1px dashed #C3CBD9;border-radius:10px;padding:8px 14px;font-size:12.5px;color:#2C4A7C;cursor:pointer">+ เพิ่มรายการได้รับ</div>
+          <div onClick="{{ addDeductionLine }}" style="border:1px dashed #E0C3C3;border-radius:10px;padding:8px 14px;font-size:12.5px;color:#B14A4A;cursor:pointer">+ เพิ่มรายการหัก</div>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #EFF0F3;display:flex;justify-content:flex-end;gap:28px;font-size:13px;flex-wrap:wrap">
+          <div>รวมได้รับ <b style="color:#1B2536">{{ slipEditorEarning }}</b></div>
+          <div>หัก <b style="color:#B14A4A">{{ slipEditorDeduction }}</b></div>
+          <div style="font-size:15px">รับสุทธิ <b style="color:#1B2536">{{ slipEditorNet }}</b></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap">
+          <div onClick="{{ saveSlipDraft }}" style="border:1px solid #DFE2E7;background:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;color:#5A6478;cursor:pointer">บันทึกร่าง</div>
+          <div onClick="{{ paySlip }}" style="background:#2E7D5B;color:#fff;border-radius:11px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">จ่ายเงิน & ลงรายจ่าย</div>
+          <div onClick="{{ unpaySlip }}" style="border:1px solid #F0D2D2;background:#fff;color:#B14A4A;border-radius:11px;padding:10px 18px;font-size:13.5px;cursor:pointer">ยกเลิกการจ่าย</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- แท็บ 2: พนักงาน ---------- -->
+      <sc-if value="{{ isPayrollTabEmps }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px;margin-bottom:18px">
+          <div style="font-size:15px;font-weight:600;margin-bottom:14px">{{ empSaveLabel }}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:14px">
+            <div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ชื่อพนักงาน</div>
+              <input value="{{ empForm.name }}" onChange="{{ setEmpName }}" placeholder="เช่น สมหญิง" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none"/>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">เงินเดือน (บาท)</div>
+              <input value="{{ empForm.base_salary }}" onChange="{{ setEmpSalary }}" inputmode="decimal" placeholder="8000" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;text-align:right"/>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ค่าแรงรายวัน (บาท)</div>
+              <input value="{{ empForm.daily_rate }}" onChange="{{ setEmpDaily }}" inputmode="decimal" placeholder="533.33" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;text-align:right"/>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันเริ่มงาน</div>
+              <input value="{{ empForm.start_date }}" onChange="{{ setEmpStart }}" type="date" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none"/>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div onClick="{{ toggleEmpSso }}" style="{{ empSsoStyle }}">{{ empSsoLabel }}</div>
+            <div style="flex:1;min-width:160px">
+              <input value="{{ empForm.note }}" onChange="{{ setEmpNote }}" placeholder="หมายเหตุ (ถ้ามี)" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none"/>
+            </div>
+            <div onClick="{{ saveEmployee }}" style="background:#2C4A7C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer">{{ empSaveLabel }}</div>
+            <sc-if value="{{ empEditing }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ cancelEmpEdit }}" style="cursor:pointer;color:#8089A0;font-size:13px">ยกเลิก</div>
+            </sc-if>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:#8089A0;line-height:1.6">ค่าแรงรายวันตั้งแยกจากเงินเดือน ระบบไม่คิดให้เอง · ประกันสังคมหัก 5% ของเงินเดือน เพดาน 750 บาท</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:6px 18px 14px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px">
+            <thead><tr style="color:#8089A0;text-align:right;border-bottom:1px solid #EFF0F3">
+              <th style="padding:12px 5px;font-weight:500;text-align:left">พนักงาน</th>
+              <th style="padding:12px 5px;font-weight:500">เงินเดือน</th>
+              <th style="padding:12px 5px;font-weight:500">ค่าแรง/วัน</th>
+              <th style="padding:12px 5px;font-weight:500;text-align:center">ประกันสังคม</th>
+              <th style="padding:12px 5px;font-weight:500;text-align:center">เริ่มงาน</th>
+              <th style="padding:12px 5px;font-weight:500;text-align:center">สถานะ</th>
+              <th style="padding:12px 5px"></th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ payrollEmpRows }}" as="r" hint-placeholder-count="3">
+                <tr style="border-bottom:1px solid #F5F6F8;text-align:right">
+                  <td style="padding:11px 5px;text-align:left;font-weight:600;color:#1B2536">{{ r.name }}</td>
+                  <td style="padding:11px 5px;color:#5A6478">{{ r.salary }}</td>
+                  <td style="padding:11px 5px;color:#5A6478">{{ r.daily }}</td>
+                  <td style="padding:11px 5px;text-align:center;color:#5A6478">{{ r.sso }}</td>
+                  <td style="padding:11px 5px;text-align:center;color:#5A6478">{{ r.start }}</td>
+                  <td style="padding:11px 5px;text-align:center"><span style="{{ r.statusStyle }}">{{ r.statusLabel }}</span></td>
+                  <td style="padding:11px 5px;white-space:nowrap"><span onClick="{{ r.onEdit }}" style="color:#2C4A7C;font-weight:600;cursor:pointer">แก้ไข</span> <span onClick="{{ r.onToggle }}" style="color:#8089A0;cursor:pointer;margin-left:10px">{{ r.toggleLabel }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- แท็บ 3: ปฏิทินวันหยุด ---------- -->
+      <sc-if value="{{ isPayrollTabCal }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;align-items:start">
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div onClick="{{ payrollPrevCal }}" style="cursor:pointer;color:#5A6478;font-size:13px">‹</div>
+            <div style="font-size:15px;font-weight:700;color:#1B2536">{{ payrollCalLabel }}</div>
+            <div onClick="{{ payrollNextCal }}" style="cursor:pointer;color:#5A6478;font-size:13px">›</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-size:11px;color:#9AA3B2;text-align:center;margin-bottom:6px">
+            <div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div><div>อา</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">
+            <sc-for list="{{ payrollCalCells }}" as="c" hint-placeholder-count="35">
+              <div onClick="{{ c.onClick }}" style="{{ c.style }}">
+                <div>{{ c.label }}</div>
+                <div style="font-size:10px;line-height:1.25;margin-top:2px">{{ c.holidayName }}</div>
+                <div style="font-size:9.5px;color:#A8894A">{{ c.workedCount }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:#8089A0">กดวันที่เพื่อเพิ่มวันหยุด หรือกดวันที่เป็นสีเหลืองเพื่อแก้และติ๊กพนักงาน</div>
+        </div>
+        <div>
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px;margin-bottom:18px">
+            <div style="font-size:15px;font-weight:600;margin-bottom:14px">{{ holSaveLabel }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div>
+                <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันที่</div>
+                <input value="{{ holForm.holiday_date }}" onChange="{{ setHolDate }}" type="date" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none"/>
+              </div>
+              <div>
+                <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ตัวคูณค่าแรง</div>
+                <input value="{{ holForm.pay_multiplier }}" onChange="{{ setHolMult }}" inputmode="decimal" placeholder="2" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;text-align:right"/>
+              </div>
+            </div>
+            <div style="margin-bottom:14px">
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ชื่อวันหยุด</div>
+              <input value="{{ holForm.name }}" onChange="{{ setHolName }}" placeholder="เช่น วันแม่" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none"/>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div onClick="{{ saveHoliday }}" style="background:#2C4A7C;color:#fff;border-radius:11px;padding:11px 22px;font-size:13.5px;font-weight:600;cursor:pointer">{{ holSaveLabel }}</div>
+              <sc-if value="{{ holEditing }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ deleteHoliday }}" style="border:1px solid #F0D2D2;color:#B14A4A;background:#fff;border-radius:11px;padding:11px 18px;font-size:13.5px;cursor:pointer">ลบวันหยุดนี้</div>
+              </sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ holidayOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px">
+            <div style="font-size:15px;font-weight:600;margin-bottom:4px">ใครมาทำงานวันนี้</div>
+            <div style="font-size:12px;color:#8089A0;margin-bottom:14px">มาทำงาน = ได้ค่าแรงคูณตัวคูณ · หยุดแต่ได้เงิน = ได้ค่าแรง 1 วัน</div>
+            <sc-for list="{{ holidayTickRows }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid #F5F6F8;flex-wrap:wrap">
+                <div style="flex:1;min-width:90px;font-size:13px;font-weight:600;color:#1B2536">{{ r.name }}</div>
+                <div onClick="{{ r.bWorked.onClick }}" style="{{ r.bWorked.style }}">{{ r.bWorked.label }}</div>
+                <div onClick="{{ r.bLeave.onClick }}" style="{{ r.bLeave.style }}">{{ r.bLeave.label }}</div>
+                <div onClick="{{ r.bNone.onClick }}" style="{{ r.bNone.style }}">{{ r.bNone.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
     <!-- ===================== รายรับ-รายจ่าย OVERVIEW PAGE ===================== -->
     <sc-if value="{{ isInex }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Income & Expense — รายรับ-รายจ่าย">
@@ -3734,6 +3963,112 @@ const EXPENSE_CATS = [
 const EXPENSE_MAIN_CATS = EXPENSE_CATS.map(function (c) { return c[0]; });
 const EXPENSE_SUB_BY_MAIN = EXPENSE_CATS.reduce(function (m, c) { m[c[0]] = c[1]; return m; }, {});
 
+// ---------- ระบบเงินเดือน — ตรรกะคำนวณ ----------
+// กติกาทั้งหมดยืนยันโดยเจ้าของร้าน 1 ก.ย. 2569
+// ดูสเปกที่ docs/superpowers/specs/2026-09-01-payroll-design.md
+
+var PAYROLL_SSO_RATE = 0.05;
+var PAYROLL_SSO_CAP  = 750;   // เพดานตามกฎหมาย (ฐานค่าจ้าง 15,000)
+
+function pyRound2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+
+/** ประกันสังคม = 5% ของ "เงินเดือนฐาน" ไม่ใช่ 5% ของยอดรวมที่ได้รับ
+ *  ยืนยันโดยเจ้าของร้าน: เงินเดือน 12,000 → หัก 600
+ *  คิดจากยอดรวมจะได้เลขต่างกันเกือบ 400 บาท/คน/เดือน */
+function pySso(baseSalary) {
+  return pyRound2(Math.min((Number(baseSalary) || 0) * PAYROLL_SSO_RATE, PAYROLL_SSO_CAP));
+}
+
+/** สร้างบรรทัดที่ระบบคำนวณให้ จากข้อมูลพนักงาน + วันหยุดที่ติ๊กไว้ในเดือนนั้น
+ *  works = [{ status:'worked'|'paid_leave', multiplier:2 }] หนึ่งแถวต่อวันหยุดหนึ่งวัน
+ *  บรรทัดที่ได้ทุกบรรทัด auto:true — ผู้ใช้แก้ทับได้ แก้แล้วเปลี่ยนเป็น false */
+function pyBuildLines(emp, works) {
+  var rate = Number(emp.daily_rate) || 0;
+  var lines = [{ kind: 'earning', label: 'เงินเดือน', qty: null, rate: null, mult: null,
+                 amount: pyRound2(emp.base_salary), auto: true }];
+
+  // คิดทีละวัน เพราะแต่ละวันหยุดตั้งตัวคูณต่างกันได้
+  // ห้ามเอาตัวคูณของวันแรกไปคูณทั้งหมด จะผิดทันทีที่มีวันหยุดคนละอัตราในเดือนเดียวกัน
+  var worked = (works || []).filter(function (w) { return w.status === 'worked'; });
+  if (worked.length) {
+    var amt = pyRound2(worked.reduce(function (a, w) { return a + rate * (Number(w.multiplier) || 0); }, 0));
+    var mults = worked.map(function (w) { return Number(w.multiplier) || 0; });
+    var uniform = mults.every(function (m) { return m === mults[0]; });
+    lines.push({ kind: 'earning', label: 'ทำวันหยุด', qty: worked.length, rate: rate,
+                 mult: uniform ? mults[0] : null, amount: amt, auto: true });
+  }
+
+  var leave = (works || []).filter(function (w) { return w.status === 'paid_leave'; });
+  if (leave.length) {
+    lines.push({ kind: 'earning', label: 'นขัต', qty: leave.length, rate: rate, mult: 1,
+                 amount: pyRound2(leave.length * rate), auto: true });
+  }
+
+  if (emp.sso_enabled) {
+    lines.push({ kind: 'deduction', label: 'ประกันสังคม 5%', qty: null, rate: null, mult: null,
+                 amount: pySso(emp.base_salary), auto: true });
+  }
+  return lines;
+}
+
+function pyTotals(lines) {
+  var e = 0, d = 0;
+  (lines || []).forEach(function (l) {
+    var v = Number(l.amount) || 0;
+    if (l.kind === 'deduction') d += v; else e += v;
+  });
+  return { earning: pyRound2(e), deduction: pyRound2(d), net: pyRound2(e - d) };
+}
+
+/** ข้อความแสดงวิธีคิดของแต่ละบรรทัด ให้เหมือนที่เจ้าของร้านพิมพ์เอง
+ *  "50 × 19" สำหรับค่าชิ้นงาน · "533.33 × 2" สำหรับวันหยุด */
+function pyLineDetail(l) {
+  var f = function (n) { return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); };
+  if (l.label === 'ทำวันหยุด' && l.mult) {
+    return f(l.rate) + ' × ' + f(l.mult) + (l.qty > 1 ? ' × ' + l.qty + ' วัน' : '');
+  }
+  if (l.label === 'นขัต') return l.qty + ' วัน × ' + f(l.rate);
+  if (l.qty != null && l.rate != null) return f(l.rate) + ' × ' + f(l.qty);
+  return '';
+}
+
+/** แบ่งยอดที่จ่ายจริงลงหมวดย่อยของหมวด "ค่าแรง" ในหน้ารายจ่าย
+ *  เจ้าของร้านกำหนดให้ลงรายจ่ายตาม "เงินสดที่จ่ายออกจริง" (ยอดรับสุทธิ)
+ *  ไม่ใช่ยอดค่าจ้างก่อนหัก เพราะประกันสังคมที่หักไว้ยังไม่ได้จ่ายออก
+ *  จึงกระจายรายการหักลดตามสัดส่วนของแต่ละหมวด */
+var PAYROLL_EXPENSE_MAP = [
+  { sub: 'เงินเดือนประจำ',  match: function (l) { return l.label === 'เงินเดือน'; } },
+  { sub: 'ค่าจ้างรายวัน',   match: function (l) { return l.label === 'ทำวันหยุด' || l.label === 'นขัต'; } },
+  { sub: 'โบนัส/สวัสดิการ', match: function (l) { return /^เพิ่มพิเศษ/.test(l.label || ''); } }
+];
+
+function pyExpenseSplit(lines) {
+  var t = pyTotals(lines);
+  if (!(t.net > 0)) return [];
+  var buckets = PAYROLL_EXPENSE_MAP.map(function (m) { return { sub: m.sub, gross: 0 }; });
+  buckets.push({ sub: 'อื่นๆ', gross: 0 });   // ค่าชิ้นงานทุกอย่างลงที่นี่
+
+  (lines || []).filter(function (l) { return l.kind !== 'deduction'; }).forEach(function (l) {
+    var i = -1;
+    PAYROLL_EXPENSE_MAP.forEach(function (m, k) { if (i < 0 && m.match(l)) i = k; });
+    buckets[i >= 0 ? i : buckets.length - 1].gross += Number(l.amount) || 0;
+  });
+
+  var rows = buckets.filter(function (b) { return b.gross > 0; }).map(function (b) {
+    return { sub: b.sub, amount: pyRound2(b.gross * t.net / t.earning) };
+  });
+
+  // ปัดเศษทีละก้อนอาจเพี้ยนไม่เกินสตางค์ — ยัดส่วนต่างใส่ก้อนใหญ่สุด
+  // เพื่อให้ผลรวมรายจ่าย = ยอดจ่ายจริง เป๊ะเสมอ ไม่ขาดไม่เกิน
+  var diff = pyRound2(t.net - rows.reduce(function (a, r) { return a + r.amount; }, 0));
+  if (diff !== 0 && rows.length) {
+    var big = 0;
+    rows.forEach(function (r, i) { if (r.amount > rows[big].amount) big = i; });
+    rows[big].amount = pyRound2(rows[big].amount + diff);
+  }
+  return rows;
+}
+
 class Component extends DCLogic {
   state = {
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
@@ -3746,6 +4081,14 @@ class Component extends DCLogic {
     importHistoryList: importHistoryStore.load(), lastImportSummary: null,
     expForm: { date: todayISO(), mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' },
     editingExpenseId: null,
+    // ---- ระบบเงินเดือน ----
+    employees: [], holidays: [], holidayWork: [], payslips: [], payrollError: null,
+    payrollTab: 'slips', payrollPeriod: todayISO().slice(0, 7), payrollCalMonth: todayISO().slice(0, 7),
+    empForm: { name: '', base_salary: '', daily_rate: '', sso_enabled: true, start_date: todayISO(), note: '' },
+    editingEmpId: null,
+    holForm: { holiday_date: todayISO(), name: '', pay_multiplier: '2' },
+    editingHolId: null, openHolidayId: null,
+    editingSlipId: null, slipDraft: null, payrollBusy: false,
     expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
     monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
     expSearch: '',
@@ -3791,6 +4134,7 @@ class Component extends DCLogic {
     this.loadSettings();
     this.loadCrm();
     this.loadPurchases();
+    this.loadPayroll();
   }
   // Supabase caps each request at 1000 rows — page through with .range() so no row is
   // ever silently dropped once the table grows past 1000 (it already has).
@@ -3818,6 +4162,24 @@ class Component extends DCLogic {
       this.setState({ recentRows: data.map(mapDbRowToSale), salesError: null });
     } catch (err) {
       this.setState({ salesError: 'โหลดข้อมูลยอดขายไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
+    }
+  };
+  /** โหลดข้อมูลเงินเดือนทั้ง 4 ตารางพร้อมกัน — แถวน้อยมากเมื่อเทียบกับ sales
+   *  จึงไม่ต้องแบ่งหน้าแบบ fetchAllRows */
+  loadPayroll = async () => {
+    try {
+      const [emp, hol, hw, ps] = await Promise.all([
+        supabaseClient.from('employees').select('*').order('active', { ascending: false }).order('name'),
+        supabaseClient.from('holidays').select('*').order('holiday_date'),
+        supabaseClient.from('holiday_work').select('*'),
+        supabaseClient.from('payslips').select('*').order('period', { ascending: false })
+      ]);
+      const err = emp.error || hol.error || hw.error || ps.error;
+      if (err) throw err;
+      this.setState({ employees: emp.data || [], holidays: hol.data || [],
+                      holidayWork: hw.data || [], payslips: ps.data || [], payrollError: null });
+    } catch (e) {
+      this.setState({ payrollError: 'โหลดข้อมูลเงินเดือนไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
     }
   };
   loadExpenses = async () => {
@@ -4296,6 +4658,333 @@ class Component extends DCLogic {
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
     const saleTypeOptions = ['ทุกประเภท','Retail Sales (หน้าร้าน)','Delivery Platform','Custom Cake','Wholesale (บางโพ)'].map(t => mkOpt(t, saleType, { saleType: t, saleTypeOpen: false }));
+    // ============ ระบบเงินเดือน ============
+    const pyBaht = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pyNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+    const pyPeriod = this.state.payrollPeriod;                 // 'YYYY-MM'
+    const pyPeriodDate = pyPeriod + '-01';
+    const pyMonthLabel = iso => THAI_MONTHS[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(0, 4) + 543);
+
+    const pyActiveEmps = this.state.employees.filter(e => e.active);
+    const pySetTab = t => () => this.setState({ payrollTab: t });
+    const payrollTabs = [['slips', 'สลิปเดือนนี้'], ['employees', 'พนักงาน'], ['calendar', 'ปฏิทินวันหยุด']].map(([k, label]) => ({
+      label, onClick: pySetTab(k),
+      style: this.state.payrollTab === k
+        ? 'padding:9px 16px;border-radius:11px;font-size:13.5px;font-weight:600;cursor:pointer;background:#2C4A7C;color:#fff'
+        : 'padding:9px 16px;border-radius:11px;font-size:13.5px;font-weight:500;cursor:pointer;background:#fff;border:1px solid #E7E9ED;color:#5A6478'
+    }));
+    const isPayrollTabSlips = this.state.payrollTab === 'slips';
+    const isPayrollTabEmps  = this.state.payrollTab === 'employees';
+    const isPayrollTabCal   = this.state.payrollTab === 'calendar';
+
+    const pyShiftPeriod = d => () => {
+      const dt = new Date(pyPeriodDate + 'T00:00:00'); dt.setMonth(dt.getMonth() + d);
+      this.setState({ payrollPeriod: dt.toISOString().slice(0, 7) });
+    };
+    const payrollPeriodLabel = pyMonthLabel(pyPeriodDate);
+
+    // วันหยุดของงวดนี้ พร้อมสถานะที่ติ๊กไว้ของพนักงานแต่ละคน
+    const pyWorksFor = empId => this.state.holidays
+      .filter(h => h.holiday_date.slice(0, 7) === pyPeriod)
+      .map(h => {
+        const w = this.state.holidayWork.find(x => x.holiday_id === h.id && x.employee_id === empId);
+        return w ? { status: w.status, multiplier: Number(h.pay_multiplier) || 0 } : null;
+      }).filter(Boolean);
+
+    const pySlipOf = empId => this.state.payslips.find(s2 => s2.employee_id === empId && String(s2.period).slice(0, 10) === pyPeriodDate);
+
+    const pySaveSlip = async (empId, lines, status, existing) => {
+      const t = pyTotals(lines);
+      const row = { employee_id: empId, period: pyPeriodDate, lines,
+                    total_earning: t.earning, total_deduction: t.deduction, net_pay: t.net, status };
+      const res = existing
+        ? await supabaseClient.from('payslips').update(row).eq('id', existing.id).select().single()
+        : await supabaseClient.from('payslips').insert(row).select().single();
+      if (res.error) throw res.error;
+      return res.data;
+    };
+
+    const pyCreateSlip = emp => async () => {
+      if (this.state.payrollBusy) return;
+      this.setState({ payrollBusy: true });
+      try {
+        const created = await pySaveSlip(emp.id, pyBuildLines(emp, pyWorksFor(emp.id)), 'ร่าง', null);
+        await this.loadPayroll();
+        this.setState({ editingSlipId: created.id, slipDraft: created.lines });
+      } catch (e) { this.setState({ payrollError: 'สร้างสลิปไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+
+    const pyOpenSlip = slip => () => this.setState({ editingSlipId: slip.id, slipDraft: (slip.lines || []).slice() });
+    const pyCloseSlip = () => this.setState({ editingSlipId: null, slipDraft: null });
+
+    const pySetLine = (i, field) => e => {
+      const val = e.target.value;
+      this.setState(st => {
+        const d = (st.slipDraft || []).slice();
+        const l = Object.assign({}, d[i]);
+        l[field] = field === 'label' ? val : pyNum(val);
+        // แก้จำนวนหรือราคาต่อหน่วย ให้คิดยอดใหม่ให้เอง แบบที่พิมพ์ "50 × 19" แล้วได้ 950
+        if ((field === 'qty' || field === 'rate') && l.qty != null && l.rate != null) {
+          l.amount = pyRound2(pyNum(l.qty) * pyNum(l.rate));
+        }
+        l.auto = false;                       // แก้เองแล้ว ระบบจะไม่เขียนทับอีก
+        d[i] = l; return { slipDraft: d };
+      });
+    };
+    const pyAddLine = kind => () => this.setState(st => ({
+      slipDraft: (st.slipDraft || []).concat([{ kind, label: '', qty: null, rate: null, mult: null, amount: 0, auto: false }])
+    }));
+    const pyDelLine = i => () => this.setState(st => ({ slipDraft: (st.slipDraft || []).filter((_, k) => k !== i) }));
+
+    const pySlipEditing = this.state.editingSlipId
+      ? this.state.payslips.find(s2 => s2.id === this.state.editingSlipId) : null;
+    const pySlipLocked = !!(pySlipEditing && pySlipEditing.status === 'จ่ายแล้ว');
+    const pyDraftTotals = pyTotals(this.state.slipDraft || []);
+    const slipEditorOpen = !!pySlipEditing;
+    const slipEditorTitle = pySlipEditing
+      ? ((this.state.employees.find(e => e.id === pySlipEditing.employee_id) || {}).name || '') + ' · ' + payrollPeriodLabel : '';
+    const slipEditorLocked = pySlipLocked;
+    const slipEditorRows = (this.state.slipDraft || []).map((l, i) => ({
+      label: l.label, detail: pyLineDetail(l),
+      isDeduction: l.kind === 'deduction',
+      amountText: (l.kind === 'deduction' ? '−' : '') + pyBaht(l.amount),
+      labelValue: l.label, qtyValue: l.qty == null ? '' : String(l.qty), rateValue: l.rate == null ? '' : String(l.rate),
+      amountValue: String(l.amount),
+      onLabel: pySetLine(i, 'label'), onQty: pySetLine(i, 'qty'), onRate: pySetLine(i, 'rate'), onAmount: pySetLine(i, 'amount'),
+      onDelete: pyDelLine(i),
+      rowStyle: 'display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 1fr 34px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F1F2F5'
+    }));
+    const slipEditorEarning = pyBaht(pyDraftTotals.earning);
+    const slipEditorDeduction = pyBaht(pyDraftTotals.deduction);
+    const slipEditorNet = pyBaht(pyDraftTotals.net);
+    const addEarningLine = pyAddLine('earning');
+    const addDeductionLine = pyAddLine('deduction');
+    const closeSlipEditor = pyCloseSlip;
+
+    const saveSlipDraft = async () => {
+      if (!pySlipEditing || pySlipLocked || this.state.payrollBusy) return;
+      this.setState({ payrollBusy: true });
+      try {
+        await pySaveSlip(pySlipEditing.employee_id, this.state.slipDraft || [], 'ร่าง', pySlipEditing);
+        await this.loadPayroll();
+        this.setState({ editingSlipId: null, slipDraft: null });
+      } catch (e) { this.setState({ payrollError: 'บันทึกสลิปไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+
+    /** กดจ่าย: ล็อกสลิป แล้วสร้างรายจ่ายตามเงินสดที่จ่ายออกจริง แยกตามหมวดย่อยของหมวดค่าแรง
+     *  เก็บ id รายจ่ายไว้ใน expense_ids เพื่อลบคืนได้ตอนยกเลิก */
+    const paySlip = async () => {
+      if (!pySlipEditing || pySlipLocked || this.state.payrollBusy) return;
+      this.setState({ payrollBusy: true });
+      try {
+        const lines = this.state.slipDraft || [];
+        const saved = await pySaveSlip(pySlipEditing.employee_id, lines, 'จ่ายแล้ว', pySlipEditing);
+        const emp = this.state.employees.find(e => e.id === saved.employee_id) || {};
+        const today = todayISO();
+        const rows = pyExpenseSplit(lines).map(r => ({
+          date: isoToBEShort(today), time: '00:00', expense_date: today,
+          main_cat: 'ค่าแรง', sub_cat: r.sub, amount: r.amount, payment: 'โอนเงิน',
+          detail: 'เงินเดือน ' + payrollPeriodLabel + ' · ' + (emp.name || ''),
+          source: 'PAYROLL', source_ref: saved.id, created_by: null, attachment_name: null
+        }));
+        let ids = [];
+        if (rows.length) {
+          const ins = await supabaseClient.from('expenses').insert(rows).select('id');
+          if (ins.error) throw ins.error;
+          ids = (ins.data || []).map(x => x.id);
+          await supabaseClient.from('payslips').update({ paid_date: today, expense_ids: ids }).eq('id', saved.id);
+        }
+        await this.loadPayroll(); await this.loadExpenses();
+        this.setState({ editingSlipId: null, slipDraft: null });
+      } catch (e) { this.setState({ payrollError: 'บันทึกการจ่ายไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+
+    const unpaySlip = async () => {
+      if (!pySlipEditing || this.state.payrollBusy) return;
+      if (!window.confirm('ยกเลิกการจ่าย และลบรายจ่ายที่สร้างไว้ใช่ไหม')) return;
+      this.setState({ payrollBusy: true });
+      try {
+        const ids = pySlipEditing.expense_ids || [];
+        if (ids.length) {
+          const del = await supabaseClient.from('expenses').delete().in('id', ids);
+          if (del.error) throw del.error;
+        }
+        const up = await supabaseClient.from('payslips')
+          .update({ status: 'ร่าง', paid_date: null, expense_ids: [] }).eq('id', pySlipEditing.id);
+        if (up.error) throw up.error;
+        await this.loadPayroll(); await this.loadExpenses();
+        this.setState({ editingSlipId: null, slipDraft: null });
+      } catch (e) { this.setState({ payrollError: 'ยกเลิกการจ่ายไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+
+    const payrollSlipRows = pyActiveEmps.map(emp => {
+      const slip = pySlipOf(emp.id);
+      const paid = slip && slip.status === 'จ่ายแล้ว';
+      return {
+        name: emp.name, salary: pyBaht(emp.base_salary),
+        earning: slip ? pyBaht(slip.total_earning) : '—',
+        deduction: slip ? pyBaht(slip.total_deduction) : '—',
+        net: slip ? pyBaht(slip.net_pay) : '—',
+        statusLabel: slip ? slip.status : 'ยังไม่มีสลิป',
+        statusStyle: 'font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;'
+          + (paid ? 'background:#E6F3ED;color:#2E7D5B' : slip ? 'background:#F8F0DC;color:#B98317' : 'background:#F1F2F5;color:#8089A0'),
+        actionLabel: slip ? (paid ? 'ดูสลิป' : 'แก้ไข') : 'สร้างสลิป',
+        onAction: slip ? pyOpenSlip(slip) : pyCreateSlip(emp)
+      };
+    });
+    const payrollTotalNet = pyBaht(pyActiveEmps.reduce((a, e) => { const s2 = pySlipOf(e.id); return a + (s2 ? Number(s2.net_pay) : 0); }, 0));
+    const payrollPaidCount = String(pyActiveEmps.filter(e => { const s2 = pySlipOf(e.id); return s2 && s2.status === 'จ่ายแล้ว'; }).length) + '/' + pyActiveEmps.length;
+    const payrollHasEmployees = pyActiveEmps.length > 0;
+    const payrollNoEmployees = pyActiveEmps.length === 0;
+
+    // ---- แท็บพนักงาน ----
+    const setEmpF = k => e => { const v = e.target.value; this.setState(st => ({ empForm: Object.assign({}, st.empForm, { [k]: v }) })); };
+    const setEmpName = setEmpF('name'), setEmpSalary = setEmpF('base_salary'), setEmpDaily = setEmpF('daily_rate'),
+          setEmpStart = setEmpF('start_date'), setEmpNote = setEmpF('note');
+    const toggleEmpSso = () => this.setState(st => ({ empForm: Object.assign({}, st.empForm, { sso_enabled: !st.empForm.sso_enabled }) }));
+    const empForm = this.state.empForm;
+    const empSsoOn = empForm.sso_enabled;
+    const empSsoStyle = empSsoOn
+      ? 'display:inline-flex;align-items:center;gap:8px;border:1.5px solid #2C4A7C;background:#ECF1F7;color:#2C4A7C;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer'
+      : 'display:inline-flex;align-items:center;gap:8px;border:1px solid #DFE2E7;background:#fff;color:#8089A0;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer';
+    const empSsoLabel = empSsoOn ? 'หักประกันสังคม 5%' : 'ไม่หักประกันสังคม';
+    const empSaveLabel = this.state.editingEmpId ? 'บันทึกการแก้ไข' : 'เพิ่มพนักงาน';
+    const empEditing = !!this.state.editingEmpId;
+    const cancelEmpEdit = () => this.setState({ editingEmpId: null, empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'' } });
+
+    const saveEmployee = async () => {
+      const f = this.state.empForm;
+      if (!f.name.trim()) { this.setState({ payrollError: 'ใส่ชื่อพนักงานก่อน' }); return; }
+      this.setState({ payrollBusy: true });
+      try {
+        const row = { name: f.name.trim(), base_salary: pyNum(f.base_salary), daily_rate: pyNum(f.daily_rate),
+                      sso_enabled: !!f.sso_enabled, start_date: f.start_date || null, note: f.note || null };
+        const res = this.state.editingEmpId
+          ? await supabaseClient.from('employees').update(row).eq('id', this.state.editingEmpId)
+          : await supabaseClient.from('employees').insert(row);
+        if (res.error) throw res.error;
+        await this.loadPayroll();
+        this.setState({ editingEmpId: null, payrollError: null,
+          empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'' } });
+      } catch (e) { this.setState({ payrollError: 'บันทึกพนักงานไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+
+    const payrollEmpRows = this.state.employees.map(emp => ({
+      name: emp.name, salary: pyBaht(emp.base_salary), daily: pyBaht(emp.daily_rate),
+      sso: emp.sso_enabled ? 'หัก 5%' : 'ไม่หัก',
+      start: emp.start_date ? isoToBEShort(emp.start_date) : '—',
+      statusLabel: emp.active ? 'ทำงานอยู่' : 'ไม่ได้ทำแล้ว',
+      statusStyle: 'font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;'
+        + (emp.active ? 'background:#E6F3ED;color:#2E7D5B' : 'background:#F1F2F5;color:#8089A0'),
+      toggleLabel: emp.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน',
+      onEdit: () => this.setState({ editingEmpId: emp.id, payrollTab: 'employees',
+        empForm: { name: emp.name, base_salary: String(emp.base_salary), daily_rate: String(emp.daily_rate),
+                   sso_enabled: !!emp.sso_enabled, start_date: emp.start_date || todayISO(), note: emp.note || '' } }),
+      // ไม่มีปุ่มลบพนักงานโดยตั้งใจ — ลบแล้วสลิปเก่าจะอ้างอิงไม่ได้ ใช้ปิดใช้งานแทน
+      onToggle: async () => {
+        try {
+          const r = await supabaseClient.from('employees').update({ active: !emp.active }).eq('id', emp.id);
+          if (r.error) throw r.error;
+          await this.loadPayroll();
+        } catch (e) { this.setState({ payrollError: 'เปลี่ยนสถานะไม่สำเร็จ' }); }
+      }
+    }));
+
+    // ---- แท็บปฏิทินวันหยุด ----
+    const pyCalMonth = this.state.payrollCalMonth;
+    const payrollCalLabel = pyMonthLabel(pyCalMonth + '-01');
+    const pyShiftCal = d => () => {
+      const dt = new Date(pyCalMonth + '-01T00:00:00'); dt.setMonth(dt.getMonth() + d);
+      this.setState({ payrollCalMonth: dt.toISOString().slice(0, 7), openHolidayId: null });
+    };
+    const payrollCalCells = (() => {
+      const y = +pyCalMonth.slice(0, 4), m = +pyCalMonth.slice(5, 7);
+      const first = new Date(Date.UTC(y, m - 1, 1)), days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      const lead = (first.getUTCDay() + 6) % 7;                 // ให้สัปดาห์เริ่มวันจันทร์
+      const cells = [];
+      for (let i = 0; i < lead; i++) cells.push({ label: '', style: 'padding:12px 0', onClick: () => {} });
+      for (let d = 1; d <= days; d++) {
+        const iso = pyCalMonth + '-' + String(d).padStart(2, '0');
+        const hol = this.state.holidays.find(h => h.holiday_date === iso);
+        const nWork = hol ? this.state.holidayWork.filter(w => w.holiday_id === hol.id).length : 0;
+        cells.push({
+          label: String(d), holidayName: hol ? hol.name : '', workedCount: nWork ? nWork + ' คน' : '',
+          style: 'border-radius:11px;padding:9px 6px;text-align:center;cursor:pointer;font-size:13px;min-height:62px;'
+            + (hol ? 'background:#F8F0DC;border:1.5px solid #E5C98A;color:#8A6216;font-weight:600'
+                   : 'background:#fff;border:1px solid #EFF0F3;color:#5A6478'),
+          onClick: hol
+            ? () => this.setState({ openHolidayId: hol.id, editingHolId: hol.id,
+                holForm: { holiday_date: hol.holiday_date, name: hol.name, pay_multiplier: String(hol.pay_multiplier) } })
+            : () => this.setState({ openHolidayId: null, editingHolId: null,
+                holForm: { holiday_date: iso, name: '', pay_multiplier: '2' } })
+        });
+      }
+      return cells;
+    })();
+
+    const setHolF = k => e => { const v = e.target.value; this.setState(st => ({ holForm: Object.assign({}, st.holForm, { [k]: v }) })); };
+    const setHolDate = setHolF('holiday_date'), setHolName = setHolF('name'), setHolMult = setHolF('pay_multiplier');
+    const holForm = this.state.holForm;
+    const holSaveLabel = this.state.editingHolId ? 'บันทึกวันหยุด' : 'เพิ่มวันหยุด';
+    const holEditing = !!this.state.editingHolId;
+
+    const saveHoliday = async () => {
+      const f = this.state.holForm;
+      if (!f.name.trim()) { this.setState({ payrollError: 'ใส่ชื่อวันหยุดก่อน' }); return; }
+      this.setState({ payrollBusy: true });
+      try {
+        const row = { holiday_date: f.holiday_date, name: f.name.trim(), pay_multiplier: pyNum(f.pay_multiplier) };
+        const res = this.state.editingHolId
+          ? await supabaseClient.from('holidays').update(row).eq('id', this.state.editingHolId)
+          : await supabaseClient.from('holidays').insert(row);
+        if (res.error) throw res.error;
+        await this.loadPayroll();
+        this.setState({ payrollError: null });
+      } catch (e) { this.setState({ payrollError: 'บันทึกวันหยุดไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+    const deleteHoliday = async () => {
+      if (!this.state.editingHolId) return;
+      if (!window.confirm('ลบวันหยุดนี้ และการติ๊กพนักงานทั้งหมดของวันนี้ใช่ไหม')) return;
+      try {
+        const r = await supabaseClient.from('holidays').delete().eq('id', this.state.editingHolId);
+        if (r.error) throw r.error;
+        await this.loadPayroll();
+        this.setState({ editingHolId: null, openHolidayId: null, holForm: { holiday_date: todayISO(), name:'', pay_multiplier:'2' } });
+      } catch (e) { this.setState({ payrollError: 'ลบวันหยุดไม่สำเร็จ' }); }
+    };
+
+    const holidayOpen = !!this.state.openHolidayId;
+    const holidayTickRows = holidayOpen ? pyActiveEmps.map(emp => {
+      const w = this.state.holidayWork.find(x => x.holiday_id === this.state.openHolidayId && x.employee_id === emp.id);
+      const cur = w ? w.status : 'none';
+      const btn = (key, label) => ({
+        label,
+        style: cur === key
+          ? 'padding:7px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:#2C4A7C;color:#fff'
+          : 'padding:7px 13px;border-radius:9px;font-size:12.5px;cursor:pointer;background:#fff;border:1px solid #DFE2E7;color:#5A6478',
+        onClick: async () => {
+          try {
+            if (key === 'none') {
+              if (w) { const r = await supabaseClient.from('holiday_work').delete().eq('id', w.id); if (r.error) throw r.error; }
+            } else if (w) {
+              const r = await supabaseClient.from('holiday_work').update({ status: key }).eq('id', w.id); if (r.error) throw r.error;
+            } else {
+              const r = await supabaseClient.from('holiday_work')
+                .insert({ holiday_id: this.state.openHolidayId, employee_id: emp.id, status: key }); if (r.error) throw r.error;
+            }
+            await this.loadPayroll();
+          } catch (e) { this.setState({ payrollError: 'บันทึกการติ๊กไม่สำเร็จ' }); }
+        }
+      });
+      return { name: emp.name, bWorked: btn('worked', 'มาทำงาน'), bLeave: btn('paid_leave', 'หยุดแต่ได้เงิน'), bNone: btn('none', 'ไม่เกี่ยว') };
+    }) : [];
+
     const nav = [
       { label:'ภาพรวม', icon:'house', key:'overview', page:'overview', group:['overview','finance','mobile'] },
       { label:'ยอดขาย', icon:'trending-up', key:'sales', page:'salesdash' },
@@ -4303,6 +4992,7 @@ class Component extends DCLogic {
       { label:'รายรับ-รายจ่าย', icon:'arrow-left-right', key:'inex', page:'inex' },
       { label:'รายรับ', icon:'circle-arrow-down', key:'income', sub:true, page:'sales' },
       { label:'รายจ่าย', icon:'circle-arrow-up', key:'expense', sub:true, page:'expenserec' },
+      { label:'เงินเดือน', icon:'wallet', key:'payroll', sub:true, page:'payroll' },
       { label:'เงินเข้า & กระทบยอด', icon:'badge-check', key:'reconcile', sub:true, page:'reconcile', group:['reconcile','payout'] },
       { label:'เงินรัฐรอรับ', icon:'landmark', key:'subsidy', sub:true, page:'subsidy' },
       { label:'นำเข้ารายงานออนไลน์', icon:'file-down', key:'import', sub:true, page:'import' },
@@ -6449,7 +7139,7 @@ class Component extends DCLogic {
     const mobileAlertsEmpty = alertItems.length === 0;
 
     return {
-      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
+      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
@@ -6526,6 +7216,19 @@ class Component extends DCLogic {
       users, roleDefs, permMatrix, userCountLabel: users.length + ' ผู้ใช้',
       mobileSales, mobileChannels, mobileAlerts, mobileProfit, mobileOrders, mobileAlertCount, mobileAlertsEmpty,
       navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs,
+      // ---- ระบบเงินเดือน ----
+      payrollTabs, isPayrollTabSlips, isPayrollTabEmps, isPayrollTabCal,
+      payrollPeriodLabel, payrollPrevPeriod: pyShiftPeriod(-1), payrollNextPeriod: pyShiftPeriod(1),
+      payrollSlipRows, payrollTotalNet, payrollPaidCount, payrollHasEmployees, payrollNoEmployees,
+      payrollError: this.state.payrollError,
+      slipEditorOpen, slipEditorTitle, slipEditorLocked, slipEditorRows,
+      slipEditorEarning, slipEditorDeduction, slipEditorNet,
+      addEarningLine, addDeductionLine, closeSlipEditor, saveSlipDraft, paySlip, unpaySlip,
+      payrollEmpRows, empForm, empSsoStyle, empSsoLabel, empSaveLabel, empEditing,
+      setEmpName, setEmpSalary, setEmpDaily, setEmpStart, setEmpNote, toggleEmpSso, saveEmployee, cancelEmpEdit,
+      payrollCalCells, payrollCalLabel, payrollPrevCal: pyShiftCal(-1), payrollNextCal: pyShiftCal(1),
+      holForm, holSaveLabel, holEditing, setHolDate, setHolName, setHolMult, saveHoliday, deleteHoliday,
+      holidayOpen, holidayTickRows,
       calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
       expCalCells, importCalCells, salesHeaderCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
       expPickToday, importPickToday, salesHeaderPickToday, storePickToday, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
