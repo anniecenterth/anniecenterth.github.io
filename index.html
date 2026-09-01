@@ -4698,7 +4698,8 @@ class Component extends DCLogic {
 
     const pySlipOf = empId => this.state.payslips.find(s2 => s2.employee_id === empId && String(s2.period).slice(0, 10) === pyPeriodDate);
 
-    const pySaveSlip = async (empId, lines, status, existing) => {
+    const pySaveSlip = async (empId, rawLines, status, existing) => {
+      const lines = pyNormalizeLines(rawLines);
       const t = pyTotals(lines);
       const row = { employee_id: empId, period: pyPeriodDate, lines,
                     total_earning: t.earning, total_deduction: t.deduction, net_pay: t.net, status };
@@ -4723,20 +4724,37 @@ class Component extends DCLogic {
     const pyOpenSlip = slip => () => this.setState({ editingSlipId: slip.id, slipDraft: (slip.lines || []).slice() });
     const pyCloseSlip = () => this.setState({ editingSlipId: null, slipDraft: null });
 
+    /** เก็บ "ตามที่พิมพ์" เป็นข้อความ ไม่แปลงเป็นตัวเลขทันที
+     *  เดิมแปลงเป็นตัวเลขทุกครั้งที่กดแป้น ทำให้พิมพ์จุดทศนิยมไม่ได้เลย —
+     *  พิมพ์ "533." แล้ว parseFloat ได้ 533 จุดหายไป พอพิมพ์ต่อจึงกลายเป็น 53333
+     *  (ทดสอบแล้วเกิดจริง) ค่อยแปลงเป็นตัวเลขตอนคิดยอดรวมและตอนบันทึก */
+    const pyHasVal = v => v !== '' && v != null;
     const pySetLine = (i, field) => e => {
       const val = e.target.value;
       this.setState(st => {
         const d = (st.slipDraft || []).slice();
         const l = Object.assign({}, d[i]);
-        l[field] = field === 'label' ? val : pyNum(val);
-        // แก้จำนวนหรือราคาต่อหน่วย ให้คิดยอดใหม่ให้เอง แบบที่พิมพ์ "50 × 19" แล้วได้ 950
-        if ((field === 'qty' || field === 'rate') && l.qty != null && l.rate != null) {
+        l[field] = val;
+        // พิมพ์จำนวนกับราคาต่อหน่วยครบ ให้คิดยอดให้เอง แบบที่พิมพ์ "50 × 19" แล้วได้ 950
+        if ((field === 'qty' || field === 'rate') && pyHasVal(l.qty) && pyHasVal(l.rate)) {
           l.amount = pyRound2(pyNum(l.qty) * pyNum(l.rate));
         }
         l.auto = false;                       // แก้เองแล้ว ระบบจะไม่เขียนทับอีก
         d[i] = l; return { slipDraft: d };
       });
     };
+
+    /** แปลงข้อความที่พิมพ์กลับเป็นตัวเลขทศนิยม 2 ตำแหน่งก่อนบันทึกลงฐานข้อมูล
+     *  ช่องว่างเก็บเป็น null ไม่ใช่ 0 เพื่อให้ "ไม่ได้ใส่" ต่างจาก "ใส่ศูนย์" */
+    const pyNormalizeLines = lines => (lines || []).map(l => ({
+      kind: l.kind === 'deduction' ? 'deduction' : 'earning',
+      label: String(l.label || '').trim(),
+      qty:    pyHasVal(l.qty)    ? pyRound2(pyNum(l.qty))    : null,
+      rate:   pyHasVal(l.rate)   ? pyRound2(pyNum(l.rate))   : null,
+      mult:   pyHasVal(l.mult)   ? pyNum(l.mult)             : null,
+      amount: pyRound2(pyNum(l.amount)),
+      auto: !!l.auto
+    }));
     const pyAddLine = kind => () => this.setState(st => ({
       slipDraft: (st.slipDraft || []).concat([{ kind, label: '', qty: null, rate: null, mult: null, amount: 0, auto: false }])
     }));
@@ -4754,8 +4772,10 @@ class Component extends DCLogic {
       label: l.label, detail: pyLineDetail(l),
       isDeduction: l.kind === 'deduction',
       amountText: (l.kind === 'deduction' ? '−' : '') + pyBaht(l.amount),
-      labelValue: l.label, qtyValue: l.qty == null ? '' : String(l.qty), rateValue: l.rate == null ? '' : String(l.rate),
-      amountValue: String(l.amount),
+      labelValue: l.label == null ? '' : String(l.label),
+      qtyValue:  pyHasVal(l.qty)  ? String(l.qty)  : '',
+      rateValue: pyHasVal(l.rate) ? String(l.rate) : '',
+      amountValue: pyHasVal(l.amount) ? String(l.amount) : '',
       onLabel: pySetLine(i, 'label'), onQty: pySetLine(i, 'qty'), onRate: pySetLine(i, 'rate'), onAmount: pySetLine(i, 'amount'),
       onDelete: pyDelLine(i),
       rowStyle: 'display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 1fr 34px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #F1F2F5'
@@ -4784,8 +4804,8 @@ class Component extends DCLogic {
       if (!pySlipEditing || pySlipLocked || this.state.payrollBusy) return;
       this.setState({ payrollBusy: true });
       try {
-        const lines = this.state.slipDraft || [];
-        const saved = await pySaveSlip(pySlipEditing.employee_id, lines, 'จ่ายแล้ว', pySlipEditing);
+        const saved = await pySaveSlip(pySlipEditing.employee_id, this.state.slipDraft || [], 'จ่ายแล้ว', pySlipEditing);
+        const lines = saved.lines || [];
         const emp = this.state.employees.find(e => e.id === saved.employee_id) || {};
         const today = todayISO();
         const rows = pyExpenseSplit(lines).map(r => ({
@@ -4888,7 +4908,7 @@ class Component extends DCLogic {
         + (emp.active ? 'background:#E6F3ED;color:#2E7D5B' : 'background:#F1F2F5;color:#8089A0'),
       toggleLabel: emp.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน',
       onEdit: () => this.setState({ editingEmpId: emp.id, payrollTab: 'employees',
-        empForm: { name: emp.name, base_salary: String(emp.base_salary), daily_rate: String(emp.daily_rate),
+        empForm: { name: emp.name, base_salary: Number(emp.base_salary).toFixed(2), daily_rate: Number(emp.daily_rate).toFixed(2),
                    sso_enabled: !!emp.sso_enabled, start_date: emp.start_date || todayISO(), note: emp.note || '' } }),
       // ไม่มีปุ่มลบพนักงานโดยตั้งใจ — ลบแล้วสลิปเก่าจะอ้างอิงไม่ได้ ใช้ปิดใช้งานแทน
       onToggle: async () => {
