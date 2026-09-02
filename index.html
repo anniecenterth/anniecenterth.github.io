@@ -1847,6 +1847,14 @@
                   </div>
                 </sc-if>
               </div>
+              <sc-if value="{{ expRangeOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                  <input value="{{ expRangeFrom }}" onChange="{{ setExpRangeFrom }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
+                  <span style="font-size:12.5px;color:#9AA3B2">ถึง</span>
+                  <input value="{{ expRangeTo }}" onChange="{{ setExpRangeTo }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
+                  <div onClick="{{ clearExpRange }}" style="font-size:12.5px;color:#8089A0;cursor:pointer;padding:0 4px">ล้าง</div>
+                </div>
+              </sc-if>
               <div onClick="{{ resetExpFilters }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none" title="ล้างตัวกรองทั้งหมด"><i data-lucide="sliders-horizontal" style="width:15px;height:15px"></i></div>
             </div>
           </div>
@@ -3466,6 +3474,14 @@
                   </div>
                 </sc-if>
               </div>
+              <sc-if value="{{ salesRangeOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                  <input value="{{ salesRangeFrom }}" onChange="{{ setSalesRangeFrom }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
+                  <span style="font-size:12.5px;color:#9AA3B2">ถึง</span>
+                  <input value="{{ salesRangeTo }}" onChange="{{ setSalesRangeTo }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
+                  <div onClick="{{ clearSalesRange }}" style="font-size:12.5px;color:#8089A0;cursor:pointer;padding:0 4px">ล้าง</div>
+                </div>
+              </sc-if>
               <div onClick="{{ resetSalesFilters }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none" title="ล้างตัวกรองทั้งหมด"><i data-lucide="sliders-horizontal" style="width:15px;height:15px"></i></div>
             </div>
           </div>
@@ -4070,6 +4086,30 @@ function pyExpenseSplit(lines) {
   return rows;
 }
 
+/** กรองแถวตามช่วงวันที่ที่เลือกเอง — ใช้ทั้งหน้าบันทึกรายจ่ายและบันทึกยอดขาย
+ *  เทียบด้วย isoDate (YYYY-MM-DD) เป็นสตริง เรียงตามตัวอักษรตรงกับเรียงตามเวลาพอดี
+ *  ไม่ต้องแปลงเป็น Date จึงไม่มีปัญหาเขตเวลา
+ *  เว้นช่องใดช่องหนึ่งได้ = เอาตั้งแต่วันนั้นเป็นต้นไป หรือจนถึงวันนั้น */
+function filterByDateRange(rows, from, to) {
+  if (!from && !to) return rows;
+  return rows.filter(function (r) {
+    var d = r.isoDate || safeBeShortToISO(r.date);
+    if (!d) return false;                       // ไม่มีวันที่ = ตอบไม่ได้ว่าอยู่ในช่วงไหม จึงไม่นับ
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    return true;
+  });
+}
+
+/** ป้ายบนปุ่มตัวกรอง ให้เห็นช่วงที่เลือกโดยไม่ต้องเปิดดู */
+function dateRangeLabel(from, to) {
+  var f = function (iso) { return isoToBEShort(iso); };
+  if (from && to) return f(from) + ' – ' + f(to);
+  if (from) return 'ตั้งแต่ ' + f(from);
+  if (to) return 'ถึง ' + f(to);
+  return 'เลือกช่วงวันที่';
+}
+
 class Component extends DCLogic {
   state = {
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
@@ -4091,6 +4131,7 @@ class Component extends DCLogic {
     editingHolId: null, openHolidayId: null,
     editingSlipId: null, slipDraft: null, payrollBusy: false,
     expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
+    expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
     monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
     expSearch: '',
     taxFormActive: 'pp30',
@@ -5913,7 +5954,9 @@ class Component extends DCLogic {
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, m);
     };
     let efiltered = this.state.expRows;
-    if (this.state.expPeriodFilter !== 'ทั้งหมด') {
+    if (this.state.expPeriodFilter === 'เลือกช่วงวันที่') {
+      efiltered = filterByDateRange(efiltered, this.state.expRangeFrom, this.state.expRangeTo);
+    } else if (this.state.expPeriodFilter !== 'ทั้งหมด') {
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       efiltered = efiltered.filter(r => {
@@ -5928,9 +5971,10 @@ class Component extends DCLogic {
     if (eq) efiltered = efiltered.filter(r => (r.detail + ' ' + r.mainCat + ' ' + r.subCat).toLowerCase().includes(eq));
 
     const expPeriodDDOpen = this.state.expListDD === 'period';
-    const expPeriodOptions = ['ทั้งหมด', 'วันนี้', '7 วันล่าสุด', 'เดือนนี้'];
+    const expPeriodOptions = ['ทั้งหมด', 'วันนี้', '7 วันล่าสุด', 'เดือนนี้', 'เลือกช่วงวันที่'];
     const expPeriodDD = {
-      value: this.state.expPeriodFilter, open: expPeriodDDOpen,
+      value: this.state.expPeriodFilter === 'เลือกช่วงวันที่' ? dateRangeLabel(this.state.expRangeFrom, this.state.expRangeTo) : this.state.expPeriodFilter,
+      open: expPeriodDDOpen,
       toggle: () => this.setState(s => ({ expListDD: s.expListDD === 'period' ? null : 'period' })),
       options: expPeriodOptions.map(o => ({
         label: o,
@@ -5939,6 +5983,13 @@ class Component extends DCLogic {
         check: o === this.state.expPeriodFilter ? React.createElement('span', { style:{ color:'#2C4A7C', fontWeight:700 } }, '✓') : null
       }))
     };
+    // ช่องเลือกช่วงวันที่ โผล่เฉพาะตอนเลือกโหมด "เลือกช่วงวันที่"
+    const expRangeOpen = this.state.expPeriodFilter === 'เลือกช่วงวันที่';
+    const expRangeFrom = this.state.expRangeFrom, expRangeTo = this.state.expRangeTo;
+    const setExpRangeFrom = e => { const v = e.target.value; this.setState({ expRangeFrom: v, expPage: 1 }); };
+    const setExpRangeTo   = e => { const v = e.target.value; this.setState({ expRangeTo: v, expPage: 1 }); };
+    const clearExpRange   = () => this.setState({ expRangeFrom: '', expRangeTo: '', expPeriodFilter: 'ทั้งหมด', expPage: 1 });
+
     const expPageSizeDDOpen = this.state.expListDD === 'pageSize';
     const expPageSizeOptions = [10, 25, 50, 100];
     const expPageSizeDD = {
@@ -6430,7 +6481,9 @@ class Component extends DCLogic {
     let filtered = this.state.recentRows;
     if (this.state.salesPlatform !== 'ทุกแพลตฟอร์ม') filtered = filtered.filter(r => r.platform === this.state.salesPlatform);
     if (this.state.salesStatusFilter !== 'ทุกสถานะเงินเข้า') filtered = filtered.filter(r => r.status === this.state.salesStatusFilter);
-    if (this.state.salesPeriodFilter !== 'ทั้งหมด') {
+    if (this.state.salesPeriodFilter === 'เลือกช่วงวันที่') {
+      filtered = filterByDateRange(filtered, this.state.salesRangeFrom, this.state.salesRangeTo);
+    } else if (this.state.salesPeriodFilter !== 'ทั้งหมด') {
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       filtered = filtered.filter(r => {
@@ -6457,9 +6510,10 @@ class Component extends DCLogic {
       }))
     };
     const salesPeriodDDOpen = this.state.salesListDD === 'period';
-    const salesPeriodOptions = ['ทั้งหมด', 'วันนี้', '7 วันล่าสุด', 'เดือนนี้'];
+    const salesPeriodOptions = ['ทั้งหมด', 'วันนี้', '7 วันล่าสุด', 'เดือนนี้', 'เลือกช่วงวันที่'];
     const salesPeriodDD = {
-      value: this.state.salesPeriodFilter, open: salesPeriodDDOpen,
+      value: this.state.salesPeriodFilter === 'เลือกช่วงวันที่' ? dateRangeLabel(this.state.salesRangeFrom, this.state.salesRangeTo) : this.state.salesPeriodFilter,
+      open: salesPeriodDDOpen,
       toggle: () => this.setState(s => ({ salesListDD: s.salesListDD === 'period' ? null : 'period' })),
       options: salesPeriodOptions.map(o => ({
         label: o,
@@ -6468,6 +6522,12 @@ class Component extends DCLogic {
         check: o === this.state.salesPeriodFilter ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
       }))
     };
+    const salesRangeOpen = this.state.salesPeriodFilter === 'เลือกช่วงวันที่';
+    const salesRangeFrom = this.state.salesRangeFrom, salesRangeTo = this.state.salesRangeTo;
+    const setSalesRangeFrom = e => { const v = e.target.value; this.setState({ salesRangeFrom: v, salesPage: 1 }); };
+    const setSalesRangeTo   = e => { const v = e.target.value; this.setState({ salesRangeTo: v, salesPage: 1 }); };
+    const clearSalesRange   = () => this.setState({ salesRangeFrom: '', salesRangeTo: '', salesPeriodFilter: 'ทั้งหมด', salesPage: 1 });
+
     const salesPageSizeDDOpen = this.state.salesListDD === 'pageSize';
     const salesPageSizeOptions = [10, 25, 50, 100];
     const salesPageSizeDD = {
@@ -7219,6 +7279,8 @@ class Component extends DCLogic {
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
       isEditingSales, salesFormTitle, clearButtonLabel, saveButtonLabel: isEditingSales ? 'บันทึกการแก้ไข' : 'บันทึกรายการ',
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
+      expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
+      salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
       scrollToSalesForm, exportSalesCsv,
       storeBatch, storeBatchRows, storeBatchTotals, storeFormError: this.state.storeFormError,
