@@ -3489,15 +3489,15 @@
           <table style="width:100%;border-collapse:collapse;font-size:12.5px">
             <thead>
               <tr style="color:#8089A0;font-size:11.5px">
-                <th style="padding:0 6px 11px;font-weight:500;text-align:left">วันที่</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:left">แบรนด์</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:left">Order ID</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:right">ยอดขายรวม</th>
+                <th onClick="{{ salesHeadDate.onClick }}" style="{{ salesHeadDate.style }}">วันที่{{ salesHeadDate.arrow }}</th>
+                <th onClick="{{ salesHeadPlatform.onClick }}" style="{{ salesHeadPlatform.style }}">แพลตฟอร์ม{{ salesHeadPlatform.arrow }}</th>
+                <th onClick="{{ salesHeadBrand.onClick }}" style="{{ salesHeadBrand.style }}">แบรนด์{{ salesHeadBrand.arrow }}</th>
+                <th onClick="{{ salesHeadOrderId.onClick }}" style="{{ salesHeadOrderId.style }}">Order ID{{ salesHeadOrderId.arrow }}</th>
+                <th onClick="{{ salesHeadGross.onClick }}" style="{{ salesHeadGross.style }}">ยอดขายรวม{{ salesHeadGross.arrow }}</th>
                 <th style="padding:0 6px 11px;font-weight:500;text-align:right">GP</th>
                 <th style="padding:0 6px 11px;font-weight:500;text-align:right">VAT</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:right">ยอดสุทธิ</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:center">สถานะ</th>
+                <th onClick="{{ salesHeadNet.onClick }}" style="{{ salesHeadNet.style }}">ยอดสุทธิ{{ salesHeadNet.arrow }}</th>
+                <th onClick="{{ salesHeadStatus.onClick }}" style="{{ salesHeadStatus.style }}">สถานะ{{ salesHeadStatus.arrow }}</th>
                 <th style="padding:0 6px 11px;font-weight:500;text-align:center">จัดการ</th>
               </tr>
             </thead>
@@ -4117,6 +4117,7 @@ class Component extends DCLogic {
     form: { date: todayISO(), platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
     formDD: null, salesListDD: null, salesPlatform: 'ทุกแพลตฟอร์ม', salesSearch: '', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด',
+    salesSortKey: 'date', salesSortDir: 'desc',
     salesPage: 1, salesPageSize: 10, salesHeaderDate: todayISO(),
     importFilesRaw: [], importReportDate: todayISO(), importParsing: false, importError: null,
     importHistoryList: importHistoryStore.load(), lastImportSummary: null,
@@ -6542,6 +6543,51 @@ class Component extends DCLogic {
     };
     const resetSalesFilters = () => this.setState({ salesSearch: '', salesPlatform: 'ทุกแพลตฟอร์ม', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด', salesPage: 1 });
 
+    /** เรียงตารางตามหัวคอลัมน์ที่กด
+     *  ตัวเลขเทียบเป็นตัวเลข ข้อความเทียบด้วย localeCompare ภาษาไทย
+     *  (เรียงสตริงไทยแบบ < > ได้ลำดับตามรหัสยูนิโคด ไม่ใช่ลำดับพจนานุกรมไทย)
+     *  วันที่เทียบด้วย isoDate ไม่ใช่ข้อความ พ.ศ. ที่ขึ้นต้นด้วยวัน */
+    const SALES_SORT = {
+      date:     r => r.isoDate || safeBeShortToISO(r.date) || '',
+      platform: r => r.platform || '',
+      brand:    r => r.brand || '',
+      orderId:  r => r.orderId || '',
+      gross:    r => Number(r.gross) || 0,
+      net:      r => Number(r.net) || 0,
+      status:   r => r.status || ''
+    };
+    const salesSortKey = this.state.salesSortKey, salesSortDir = this.state.salesSortDir;
+    const salesSortGet = SALES_SORT[salesSortKey] || SALES_SORT.date;
+    filtered = filtered.slice().sort((a, b) => {
+      const x = salesSortGet(a), y = salesSortGet(b);
+      let c;
+      if (typeof x === 'number' && typeof y === 'number') c = x - y;
+      else c = String(x).localeCompare(String(y), 'th');
+      if (c === 0) c = String(a.orderId || '').localeCompare(String(b.orderId || ''));  // ให้ลำดับคงที่
+      return salesSortDir === 'asc' ? c : -c;
+    });
+
+    const sortSales = key => () => this.setState(st => ({
+      salesSortKey: key,
+      // กดคอลัมน์เดิมซ้ำ = สลับทิศ · กดคอลัมน์ใหม่ = เริ่มที่มาก→น้อย เพราะคนดูมักอยากเห็นตัวใหญ่ก่อน
+      salesSortDir: st.salesSortKey === key ? (st.salesSortDir === 'asc' ? 'desc' : 'asc') : 'desc',
+      salesPage: 1
+    }));
+    const salesSortHead = (key, align) => ({
+      onClick: sortSales(key),
+      arrow: salesSortKey === key ? (salesSortDir === 'asc' ? ' ▲' : ' ▼') : '',
+      style: 'padding:0 6px 11px;font-weight:' + (salesSortKey === key ? '700' : '500')
+        + ';text-align:' + align + ';cursor:pointer;white-space:nowrap;'
+        + (salesSortKey === key ? 'color:#2C4A7C' : '')
+    });
+    const salesHeadDate = salesSortHead('date', 'left');
+    const salesHeadPlatform = salesSortHead('platform', 'left');
+    const salesHeadBrand = salesSortHead('brand', 'left');
+    const salesHeadOrderId = salesSortHead('orderId', 'left');
+    const salesHeadGross = salesSortHead('gross', 'right');
+    const salesHeadNet = salesSortHead('net', 'right');
+    const salesHeadStatus = salesSortHead('status', 'center');
+
     const salesTotalPages = Math.max(1, Math.ceil(filtered.length / this.state.salesPageSize));
     const salesPage = Math.min(this.state.salesPage, salesTotalPages);
     const salesPrevPage = () => this.setState(s => ({ salesPage: Math.max(1, s.salesPage - 1) }));
@@ -7279,6 +7325,7 @@ class Component extends DCLogic {
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
       isEditingSales, salesFormTitle, clearButtonLabel, saveButtonLabel: isEditingSales ? 'บันทึกการแก้ไข' : 'บันทึกรายการ',
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
+      salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
       expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
       salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
