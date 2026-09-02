@@ -4866,6 +4866,11 @@ class Component extends DCLogic {
       return Math.floor(m / 12) + '-' + String((m % 12) + 1).padStart(2, '0');
     };
     const pyShiftPeriod = d => () => this.setState({ payrollPeriod: pyMonthShift(pyPeriod, d) });
+    /** วันสุดท้ายของเดือนงวด — ใช้เป็นวันที่ของรายจ่ายเงินเดือน
+     *  เจ้าของร้านกำหนดให้ลงวันสิ้นเดือนที่เลือก ไม่ใช่วันที่กดปุ่ม
+     *  เพราะกดจ่ายวันไหนก็ได้ แต่ค่าใช้จ่ายเป็นของเดือนนั้น
+     *  Date.UTC(y, m, 0) = วันที่ 0 ของเดือนถัดไป คือวันสุดท้ายของเดือนนี้ (รองรับปีอธิกสุรทิน) */
+    const pyMonthEnd = ym => ym + '-' + String(new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7), 0)).getUTCDate()).padStart(2, '0');
     const payrollPeriodLabel = pyMonthLabel(pyPeriodDate);
 
     // วันหยุดของงวดนี้ พร้อมสถานะที่ติ๊กไว้ของพนักงานแต่ละคน
@@ -4989,8 +4994,10 @@ class Component extends DCLogic {
         const lines = saved.lines || [];
         const emp = this.state.employees.find(e => e.id === saved.employee_id) || {};
         const today = todayISO();
+        // วันที่ของรายจ่าย = วันสิ้นเดือนงวด ไม่ใช่วันที่กดปุ่ม
+        const expDate = pyMonthEnd(pyPeriod);
         const rows = pyExpenseSplit(lines).map(r => ({
-          date: isoToBEShort(today), time: '00:00', expense_date: today,
+          date: isoToBEShort(expDate), time: '00:00', expense_date: expDate,
           main_cat: 'ค่าแรง', sub_cat: r.sub, amount: r.amount, payment: 'โอนเงิน',
           detail: 'เงินเดือน ' + payrollPeriodLabel + ' · ' + (emp.name || ''),
           source: 'PAYROLL', source_ref: saved.id, created_by: null, attachment_name: null
