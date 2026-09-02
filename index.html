@@ -1212,10 +1212,28 @@
           <div style="font-size:15px">รับสุทธิ <b style="color:#1B2536">{{ slipEditorNet }}</b></div>
         </div>
         <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap">
+          <div onClick="{{ viewSlipImage }}" style="border:1px solid #DFE2E7;background:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;color:#5A6478;cursor:pointer">ดูเป็นภาพ</div>
           <div onClick="{{ saveSlipDraft }}" style="border:1px solid #DFE2E7;background:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;color:#5A6478;cursor:pointer">บันทึกร่าง</div>
           <div onClick="{{ paySlip }}" style="background:#2E7D5B;color:#fff;border-radius:11px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">จ่ายเงิน & ลงรายจ่าย</div>
           <div onClick="{{ unpaySlip }}" style="border:1px solid #F0D2D2;background:#fff;color:#B14A4A;border-radius:11px;padding:10px 18px;font-size:13.5px;cursor:pointer">ยกเลิกการจ่าย</div>
         </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- ดูสลิปเป็นภาพ ---------- -->
+      <sc-if value="{{ slipImageOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:20px;margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="font-size:16px;font-weight:700;color:#1B2536">สลิปเงินเดือน</div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <div onClick="{{ saveSlipImage }}" style="display:inline-flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer"><i data-lucide="download" style="width:16px;height:16px"></i>บันทึกภาพ</div>
+            <div onClick="{{ closeSlipImage }}" style="cursor:pointer;color:#8089A0;font-size:13px">ปิด</div>
+          </div>
+        </div>
+        <div style="background:#F7F7F8;border-radius:14px;padding:18px;display:flex;justify-content:center;overflow-x:auto">
+          <img src="{{ slipImageSrc }}" alt="สลิปเงินเดือน" style="max-width:100%;height:auto;border-radius:10px;box-shadow:0 6px 20px rgba(30,34,41,0.08)"/>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:#8089A0">กดบันทึกภาพจะได้ไฟล์ PNG ความละเอียด 2 เท่า ส่งต่อในแชทหรือพิมพ์ออกมาได้</div>
       </div>
       </sc-if>
 
@@ -4110,6 +4128,125 @@ function dateRangeLabel(from, to) {
   return 'เลือกช่วงวันที่';
 }
 
+/** วาดสลิปเงินเดือนเป็น SVG เพื่อให้ดูง่ายและบันทึกเป็นรูปได้
+ *  เลือก SVG แทนการใช้ไลบรารีจับภาพหน้าจอ เพราะ
+ *   1. ไม่ต้องเพิ่ม dependency จาก CDN (โปรเจกต์นี้กำหนดให้ปักเวอร์ชันทุกตัว)
+ *   2. คุมการจัดวางได้เต็มที่ ไม่ขึ้นกับขนาดหน้าจอตอนกด
+ *   3. แปลงเป็น PNG ได้ด้วย canvas ที่เบราว์เซอร์มีอยู่แล้ว
+ *  ใช้ <text> ล้วน ไม่ใช้ foreignObject เพราะ foreignObject วาดลง canvas ไม่ได้ในหลายเบราว์เซอร์ */
+
+function pyEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+function pyMoney(n) {
+  return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/** คืน { svg, w, h } — ความสูงยืดตามจำนวนบรรทัด ไม่ตัดข้อมูลทิ้ง */
+function pySlipSvg(opts) {
+  var empName = opts.employeeName || '';
+  var periodLabel = opts.periodLabel || '';
+  var lines = opts.lines || [];
+  var paidDate = opts.paidDate || '';
+  var status = opts.status || '';
+  var detailOf = opts.detailOf || function () { return ''; };
+
+  var earn = lines.filter(function (l) { return l.kind !== 'deduction'; });
+  var ded  = lines.filter(function (l) { return l.kind === 'deduction'; });
+  var sumE = earn.reduce(function (a, l) { return a + (Number(l.amount) || 0); }, 0);
+  var sumD = ded.reduce(function (a, l) { return a + (Number(l.amount) || 0); }, 0);
+  var net  = Math.round((sumE - sumD) * 100) / 100;
+
+  var W = 560;
+  var PAD = 34;
+  var ROW = 30;
+  var y = 0;
+  var out = [];
+
+  var push = function (s) { out.push(s); };
+  var text = function (x, yy, s, opt) {
+    opt = opt || {};
+    push('<text x="' + x + '" y="' + yy + '"'
+      + ' font-size="' + (opt.size || 14) + '"'
+      + ' font-weight="' + (opt.weight || 400) + '"'
+      + ' fill="' + (opt.fill || '#1B2536') + '"'
+      + (opt.anchor ? ' text-anchor="' + opt.anchor + '"' : '')
+      + '>' + pyEsc(s) + '</text>');
+  };
+  var rule = function (yy) {
+    push('<line x1="' + PAD + '" y1="' + yy + '" x2="' + (W - PAD) + '" y2="' + yy + '" stroke="#E7E9ED" stroke-width="1"/>');
+  };
+
+  // ---- หัวสลิป ----
+  y = 48;
+  text(PAD, y, 'Annie Group · สาขาบางโพ', { size: 12.5, fill: '#8089A0', weight: 500 });
+  y += 30;
+  text(PAD, y, 'สลิปเงินเดือน', { size: 23, weight: 700 });
+  if (status) {
+    var badge = status === 'จ่ายแล้ว' ? '#2E7D5B' : '#B98317';
+    text(W - PAD, y, status, { size: 13, weight: 700, fill: badge, anchor: 'end' });
+  }
+  y += 27;
+  text(PAD, y, empName, { size: 16, weight: 600, fill: '#2C4A7C' });
+  y += 21;
+  text(PAD, y, 'งวด ' + periodLabel, { size: 13, fill: '#8089A0' });
+
+  y += 20; rule(y);
+
+  // ---- รายการได้รับ ----
+  y += 26;
+  text(PAD, y, 'รายการได้รับ', { size: 12.5, weight: 600, fill: '#8089A0' });
+  earn.forEach(function (l) {
+    y += ROW;
+    text(PAD, y, l.label || '', { size: 14 });
+    var d = detailOf(l);
+    if (d) text(PAD + 210, y, d, { size: 12.5, fill: '#9AA3B2' });
+    text(W - PAD, y, pyMoney(l.amount), { size: 14, anchor: 'end' });
+  });
+  y += 18; rule(y);
+  y += 26;
+  text(PAD, y, 'รวมได้รับ', { size: 14, weight: 600 });
+  text(W - PAD, y, pyMoney(sumE), { size: 14, weight: 700, anchor: 'end' });
+
+  // ---- รายการหัก ----
+  if (ded.length) {
+    y += 20; rule(y);
+    y += 26;
+    text(PAD, y, 'รายการหัก', { size: 12.5, weight: 600, fill: '#8089A0' });
+    ded.forEach(function (l) {
+      y += ROW;
+      text(PAD, y, l.label || '', { size: 14 });
+      text(W - PAD, y, '−' + pyMoney(l.amount), { size: 14, fill: '#B14A4A', anchor: 'end' });
+    });
+    y += 18; rule(y);
+    y += 26;
+    text(PAD, y, 'รวมหัก', { size: 14, weight: 600 });
+    text(W - PAD, y, '−' + pyMoney(sumD), { size: 14, weight: 700, fill: '#B14A4A', anchor: 'end' });
+  }
+
+  // ---- รับสุทธิ ----
+  y += 22;
+  var boxTop = y;
+  y += 46;
+  push('<rect x="' + PAD + '" y="' + boxTop + '" width="' + (W - PAD * 2) + '" height="62" rx="12" fill="#ECF1F7"/>');
+  text(PAD + 18, y, 'รับสุทธิ', { size: 15, weight: 600, fill: '#2C4A7C' });
+  text(W - PAD - 18, y, '฿' + pyMoney(net), { size: 22, weight: 700, fill: '#1B2536', anchor: 'end' });
+  y += 16;
+
+  if (paidDate) { y += 28; text(PAD, y, 'จ่ายเมื่อ ' + paidDate, { size: 12, fill: '#9AA3B2' }); }
+  y += 30;
+
+  var H = y;
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">'
+    + '<rect width="' + W + '" height="' + H + '" fill="#FFFFFF"/>'
+    + '<rect x="0.5" y="0.5" width="' + (W - 1) + '" height="' + (H - 1) + '" fill="none" stroke="#E7E9ED"/>'
+    + '<g font-family="IBM Plex Sans Thai, Noto Sans Thai, Sarabun, Tahoma, sans-serif">'
+    + out.join('') + '</g></svg>';
+  return { svg: svg, w: W, h: H, net: net, earning: Math.round(sumE * 100) / 100, deduction: Math.round(sumD * 100) / 100 };
+}
+
 class Component extends DCLogic {
   state = {
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
@@ -4131,6 +4268,7 @@ class Component extends DCLogic {
     holForm: { holiday_date: todayISO(), name: '', pay_multiplier: '2' },
     editingHolId: null, openHolidayId: null,
     editingSlipId: null, slipDraft: null, payrollBusy: false,
+    slipImageId: null,
     expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
     expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
     monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
@@ -4828,6 +4966,7 @@ class Component extends DCLogic {
     const addEarningLine = pyAddLine('earning');
     const addDeductionLine = pyAddLine('deduction');
     const closeSlipEditor = pyCloseSlip;
+    const viewSlipImage = () => { if (pySlipEditing) this.setState({ slipImageId: pySlipEditing.id, editingSlipId: null, slipDraft: null }); };
 
     const saveSlipDraft = async () => {
       if (!pySlipEditing || pySlipLocked || this.state.payrollBusy) return;
@@ -4888,6 +5027,56 @@ class Component extends DCLogic {
       this.setState({ payrollBusy: false });
     };
 
+    // ---- ดูสลิปเป็นภาพ + บันทึกเป็น PNG ----
+    const pyImageSlip = this.state.slipImageId
+      ? this.state.payslips.find(x => x.id === this.state.slipImageId) : null;
+    const pyImageEmp = pyImageSlip
+      ? (this.state.employees.find(e => e.id === pyImageSlip.employee_id) || {}) : null;
+    const pySvgOut = pyImageSlip ? pySlipSvg({
+      employeeName: pyImageEmp.name || '',
+      periodLabel: pyMonthLabel(String(pyImageSlip.period).slice(0, 10)),
+      lines: pyImageSlip.lines || [],
+      status: pyImageSlip.status,
+      paidDate: pyImageSlip.paid_date ? isoToBEShort(pyImageSlip.paid_date) : '',
+      detailOf: pyLineDetail
+    }) : null;
+    const slipImageOpen = !!pySvgOut;
+    // ฝัง SVG เป็น data URI ด้วย encodeURIComponent — btoa รับภาษาไทยไม่ได้ จะโยน error ทันที
+    const slipImageSrc = pySvgOut
+      ? 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pySvgOut.svg) : '';
+    const slipImageName = pyImageSlip
+      ? 'สลิปเงินเดือน-' + (pyImageEmp.name || '').replace(/[\\/:*?"<>|]/g, '') + '-'
+        + String(pyImageSlip.period).slice(0, 7) + '.png' : '';
+    const closeSlipImage = () => this.setState({ slipImageId: null });
+    const openSlipImage = slip => () => this.setState({ slipImageId: slip.id });
+
+    /** บันทึกเป็น PNG: วาด SVG ลง canvas แล้วดาวน์โหลด
+     *  คูณ 2 เท่าเพื่อให้ภาพคมบนจอความละเอียดสูงและตอนพิมพ์ */
+    const saveSlipImage = () => {
+      if (!pySvgOut) return;
+      const scale = 2;
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = pySvgOut.w * scale; c.height = pySvgOut.h * scale;
+          const ctx = c.getContext('2d');
+          ctx.setTransform(scale, 0, 0, scale, 0, 0);
+          ctx.drawImage(img, 0, 0);
+          c.toBlob(b => {
+            if (!b) { this.setState({ payrollError: 'สร้างไฟล์ภาพไม่สำเร็จ' }); return; }
+            const url = URL.createObjectURL(b);
+            const a = document.createElement('a');
+            a.href = url; a.download = slipImageName;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }, 'image/png');
+        } catch (e) { this.setState({ payrollError: 'บันทึกภาพไม่สำเร็จ — ' + (e.message || '') }); }
+      };
+      img.onerror = () => this.setState({ payrollError: 'สร้างภาพสลิปไม่สำเร็จ' });
+      img.src = slipImageSrc;
+    };
+
     const payrollSlipRows = pyActiveEmps.map(emp => {
       const slip = pySlipOf(emp.id);
       const paid = slip && slip.status === 'จ่ายแล้ว';
@@ -4900,7 +5089,7 @@ class Component extends DCLogic {
         statusStyle: 'font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;'
           + (paid ? 'background:#E6F3ED;color:#2E7D5B' : slip ? 'background:#F8F0DC;color:#B98317' : 'background:#F1F2F5;color:#8089A0'),
         actionLabel: slip ? (paid ? 'ดูสลิป' : 'แก้ไข') : 'สร้างสลิป',
-        onAction: slip ? pyOpenSlip(slip) : pyCreateSlip(emp)
+        onAction: slip ? (paid ? openSlipImage(slip) : pyOpenSlip(slip)) : pyCreateSlip(emp)
       };
     });
     const payrollTotalNet = pyBaht(pyActiveEmps.reduce((a, e) => { const s2 = pySlipOf(e.id); return a + (s2 ? Number(s2.net_pay) : 0); }, 0));
@@ -7374,6 +7563,7 @@ class Component extends DCLogic {
       slipEditorOpen, slipEditorTitle, slipEditorLocked, slipEditorRows,
       slipEditorEarning, slipEditorDeduction, slipEditorNet,
       addEarningLine, addDeductionLine, closeSlipEditor, saveSlipDraft, paySlip, unpaySlip,
+      slipImageOpen, slipImageSrc, closeSlipImage, saveSlipImage, viewSlipImage,
       payrollEmpRows, empForm, empSsoStyle, empSsoLabel, empSaveLabel, empEditing,
       setEmpName, setEmpSalary, setEmpDaily, setEmpStart, setEmpNote, toggleEmpSso, saveEmployee, cancelEmpEdit,
       payrollCalCells, payrollCalLabel, payrollPrevCal: pyShiftCal(-1), payrollNextCal: pyShiftCal(1),
