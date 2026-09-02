@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://unpkg.com/lucide@1.39.0/dist/umd/lucide.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -4419,8 +4419,39 @@ class Component extends DCLogic {
   };
   componentWillUnmount() { document.removeEventListener('click', this.onDocClick); }
   componentDidUpdate() { this.icons(); }
+  /** วาดไอคอน "ข้างใน" แท็ก <i> แทนการให้ lucide แทนที่ทั้งแท็ก
+   *
+   *  lucide.createIcons() ลบ <i data-lucide> ทิ้งแล้วใส่ <svg> แทนที่ตำแหน่งเดิม
+   *  แต่ React ยังจำว่า <i> ตัวนั้นอยู่ในต้นไม้ของมัน พอถึงเวลาถอดหน้าจอออก
+   *  React เรียก removeChild กับ node ที่ไม่มีอยู่แล้ว หน้าจอจึงพังทั้งหน้าด้วย
+   *  "Failed to execute 'removeChild' on 'Node'" — เกิดจริงตอนกด "นำเข้าไฟล์ถัดไป"
+   *  หลังนำเข้าไฟล์เสร็จ เพราะขั้นตอนนั้นถอดบล็อกที่มีไอคอนออกทั้งก้อน
+   *
+   *  วิธีนี้ <i> ยังอยู่ครบ React จัดการต่อได้ปกติ เราแค่ใส่ innerHTML ให้
+   *  (React ไม่ได้จัดการลูกของ <i> เพราะในเทมเพลตมันว่างเปล่า) */
   icons() {
-    try { if (window.lucide) window.lucide.createIcons({ attrs: { width: 20, height: 20, 'stroke-width': 2 } }); } catch (e) {}
+    try {
+      if (!window.lucide) return;
+      document.querySelectorAll('i[data-lucide]').forEach(el => {
+        const name = el.getAttribute('data-lucide');
+        if (!name || el.getAttribute('data-icon-drawn') === name) return;   // วาดแล้วไม่วาดซ้ำ
+        const pascal = name.replace(/(^|-)([a-z0-9])/g, (m, dash, c) => c.toUpperCase());
+        const parts = window.lucide[pascal];
+        if (!parts || !parts.length) return;
+        const inner = parts.map(pair => {
+          const tag = pair[0], attrs = pair[1] || {};
+          return '<' + tag + ' ' + Object.keys(attrs)
+            .map(k => k + '="' + String(attrs[k]).replace(/"/g, '&quot;') + '"').join(' ') + '/>';
+        }).join('');
+        if (!el.style.width) { el.style.width = '20px'; el.style.height = '20px'; }
+        el.style.display = 'inline-flex';
+        el.style.flex = el.style.flex || 'none';
+        el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24"'
+          + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+          + ' style="display:block">' + inner + '</svg>';
+        el.setAttribute('data-icon-drawn', name);
+      });
+    } catch (e) { /* ไอคอนไม่ขึ้นดีกว่าหน้าพัง */ }
   }
 
   // ---------- chart engine ----------
