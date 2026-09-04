@@ -45,6 +45,7 @@
 <div style="display:flex;min-height:100vh;width:100%;background:#F7F7F8;font-family:'IBM Plex Sans Thai','IBM Plex Sans',system-ui,sans-serif;color:#1E2A3D;-webkit-font-smoothing:antialiased">
 
   <!-- ============ SIDEBAR ============ -->
+  <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ true }}">
   <aside style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E7E9ED;display:flex;flex-direction:column;padding:22px 16px 18px;position:sticky;top:0;height:100vh">
     <div class="sb-brand" style="display:flex;align-items:center;gap:12px;padding:0 6px 22px">
       <div style="width:42px;height:42px;border-radius:13px;background:#9C82C4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow:0 6px 14px rgba(124,138,224,0.35)">A</div>
@@ -83,11 +84,13 @@
         <div style="font-weight:600;font-size:13.5px">Annie Admin</div>
         <div style="font-size:11px;color:#9AA3B2">ผู้ดูแลระบบ</div>
       </div>
-      <i class="sb-collapse" data-lucide="chevron-down" style="color:#9AA3B2;width:18px;height:18px"></i>
+      <i onClick="{{ doLogout }}" title="ออกจากระบบ" class="sb-collapse" data-lucide="log-out" style="color:#9AA3B2;width:18px;height:18px;cursor:pointer"></i>
     </div>
   </aside>
+  </sc-if>
 
   <!-- ============ MAIN ============ -->
+  <sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ true }}">
   <main style="flex:1;min-width:0;padding:24px 30px 40px;overflow-x:auto">
 
     <!-- ===================== OVERVIEW PAGE ===================== -->
@@ -3702,6 +3705,38 @@
     </sc-if>
 
   </main>
+  </sc-if>
+
+  <!-- ============ หน้าเข้าสู่ระบบ ============ -->
+  <sc-if value="{{ authLoading }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:100vh;color:#8089A0;font-size:14px">กำลังตรวจสอบสิทธิ์…</div>
+  </sc-if>
+  <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px">
+      <div style="width:100%;max-width:390px;background:#fff;border:1px solid #E7E9ED;border-radius:20px;padding:34px 30px;box-shadow:0 18px 44px rgba(30,34,41,0.08)">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:26px">
+          <div style="width:46px;height:46px;border-radius:14px;background:#9C82C4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(124,138,224,0.35)">A</div>
+          <div style="line-height:1.2">
+            <div style="font-weight:700;font-size:17px;color:#202A3C">Annie Group</div>
+            <div style="font-size:12px;color:#9AA3B2">Command Center · สาขาบางโพ</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#6B7486;margin-bottom:20px;line-height:1.6">ระบบนี้เก็บยอดขาย รายจ่าย และเงินเดือนพนักงาน — ต้องเข้าสู่ระบบก่อนใช้งาน</div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ชื่อผู้ใช้</div>
+          <input value="{{ authUserValue }}" onChange="{{ setAuthUser }}" onKeyDown="{{ onLoginKeyDown }}" autocomplete="username" placeholder="admin" style="width:100%;border:1px solid #DFE2E7;border-radius:11px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">รหัสผ่าน</div>
+          <input value="{{ authPasswordValue }}" onChange="{{ setAuthPassword }}" onKeyDown="{{ onLoginKeyDown }}" type="password" autocomplete="current-password" style="width:100%;border:1px solid #DFE2E7;border-radius:11px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box"/>
+        </div>
+        <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDF1F1;border:1px solid #F0D2D2;color:#B14A4A;border-radius:11px;padding:11px 14px;font-size:13px;margin-bottom:16px">{{ authError }}</div>
+        </sc-if>
+        <div onClick="{{ doLogin }}" style="background:#2C4A7C;color:#fff;border-radius:12px;padding:13px;font-size:14px;font-weight:600;text-align:center;cursor:pointer">{{ authButtonLabel }}</div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:940}}">
@@ -4249,6 +4284,9 @@ function pySlipSvg(opts) {
 
 class Component extends DCLogic {
   state = {
+    // ---- ระบบเข้าสู่ระบบ ----
+    authChecked: false, authSession: null,
+    authUser: '', authPassword: '', authError: null, authBusy: false,
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
     saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
     form: { date: todayISO(), platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
@@ -4310,13 +4348,36 @@ class Component extends DCLogic {
   componentDidMount() {
     this.icons();
     document.addEventListener('click', this.onDocClick);
+    this.initAuth();
+  }
+
+  /** โหลดข้อมูลทุกชุด — เรียกหลังยืนยันว่ามี session แล้วเท่านั้น
+   *  ถ้าเรียกตอนยังไม่ล็อกอิน หลังล็อก RLS จะได้ผลลัพธ์ว่างเปล่าและดูเหมือนข้อมูลหาย */
+  loadAll = () => {
     this.loadSales();
     this.loadExpenses();
     this.loadSettings();
     this.loadCrm();
     this.loadPurchases();
     this.loadPayroll();
-  }
+  };
+
+  initAuth = async () => {
+    try {
+      const { data } = await supabaseClient.auth.getSession();
+      const session = data ? data.session : null;
+      this.setState({ authSession: session, authChecked: true });
+      if (session) this.loadAll();
+      // ต่ออายุ token เองอัตโนมัติ และรับรู้ตอนล็อกอิน/ออกจากระบบจากแท็บอื่น
+      supabaseClient.auth.onAuthStateChange((event, next) => {
+        const hadSession = !!this.state.authSession;
+        this.setState({ authSession: next || null, authChecked: true });
+        if (next && !hadSession) this.loadAll();
+      });
+    } catch (e) {
+      this.setState({ authChecked: true, authError: 'ตรวจสอบสถานะการเข้าสู่ระบบไม่สำเร็จ' });
+    }
+  };
   // Supabase caps each request at 1000 rows — page through with .range() so no row is
   // ever silently dropped once the table grows past 1000 (it already has).
   // PostgREST จำกัด 1000 แถว/ครั้ง จึงต้องแบ่งหน้า
@@ -5275,6 +5336,51 @@ class Component extends DCLogic {
       });
       return { name: emp.name, bWorked: btn('worked', 'มาทำงาน'), bLeave: btn('paid_leave', 'หยุดแต่ได้เงิน'), bNone: btn('none', 'ไม่เกี่ยว') };
     }) : [];
+
+    // ============ เข้าสู่ระบบ ============
+    const authChecked = this.state.authChecked;
+    const isLoggedIn = authChecked && !!this.state.authSession;
+    const showLogin = authChecked && !this.state.authSession;
+    const authLoading = !authChecked;
+    const authUserValue = this.state.authUser;
+    const authPasswordValue = this.state.authPassword;
+    const authError = this.state.authError;
+    const authBusy = this.state.authBusy;
+    const authButtonLabel = authBusy ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ';
+    const setAuthUser = e => { const v = e.target.value; this.setState({ authUser: v, authError: null }); };
+    const setAuthPassword = e => { const v = e.target.value; this.setState({ authPassword: v, authError: null }); };
+    const authEmail = () => {
+      const raw = (this.state.authUser || '').trim();
+      // พิมพ์แค่ "admin" ก็พอ ระบบเติมโดเมนให้ ให้ตรงกับที่ใช้ในระบบอื่นของร้าน
+      return raw.indexOf('@') >= 0 ? raw : (raw ? raw + '@annie.local' : '');
+    };
+    const doLogin = async () => {
+      if (this.state.authBusy) return;
+      const email = authEmail();
+      if (!email || !this.state.authPassword) {
+        this.setState({ authError: 'ใส่ชื่อผู้ใช้และรหัสผ่านให้ครบก่อน' }); return;
+      }
+      this.setState({ authBusy: true, authError: null });
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password: this.state.authPassword });
+        if (error) throw error;
+        // ไม่เก็บรหัสผ่านไว้ในหน่วยความจำหลังใช้เสร็จ
+        this.setState({ authBusy: false, authPassword: '', authError: null });
+      } catch (err) {
+        this.setState({ authBusy: false, authError: 'เข้าสู่ระบบไม่สำเร็จ — ตรวจชื่อผู้ใช้และรหัสผ่านอีกครั้ง' });
+      }
+    };
+    const onLoginKeyDown = e => { if (e.key === 'Enter') doLogin(); };
+    const doLogout = async () => {
+      try { await supabaseClient.auth.signOut(); } catch (e) { /* ออกจากระบบฝั่งเว็บให้ได้เสมอ */ }
+      // ล้างข้อมูลที่โหลดไว้ ไม่ให้คนถัดไปเห็นตัวเลขค้างบนจอ
+      this.setState({
+        authSession: null, authUser: '', authPassword: '', authError: null,
+        recentRows: [], expRows: [], purchases: [], crmMembers: [],
+        employees: [], holidays: [], holidayWork: [], payslips: [],
+        page: 'salesdash'
+      });
+    };
 
     const nav = [
       { label:'ภาพรวม', icon:'house', key:'overview', page:'overview', group:['overview','finance','mobile'] },
@@ -7592,6 +7698,8 @@ class Component extends DCLogic {
       pnd51EstTax: tfFmt(pnd51EstTax), pnd51Installment: tfFmt(pnd51Installment),
       users, roleDefs, permMatrix, userCountLabel: users.length + ' ผู้ใช้',
       mobileSales, mobileChannels, mobileAlerts, mobileProfit, mobileOrders, mobileAlertCount, mobileAlertsEmpty,
+      isLoggedIn, showLogin, authLoading, authUserValue, authPasswordValue, authError, authButtonLabel, authBusy,
+      setAuthUser, setAuthPassword, doLogin, onLoginKeyDown, doLogout,
       navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs,
       // ---- ระบบเงินเดือน ----
       payrollTabs, isPayrollTabSlips, isPayrollTabEmps, isPayrollTabCal,
