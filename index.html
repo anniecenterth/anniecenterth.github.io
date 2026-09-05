@@ -1894,12 +1894,12 @@
           <table style="width:100%;border-collapse:collapse;font-size:12px">
             <thead>
               <tr style="color:#8089A0;font-size:11px">
-                <th style="padding:0 5px 11px;font-weight:500;text-align:left">วันที่</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:left">หมวดหมู่หลัก</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:left">หมวดหมู่ย่อย</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:left">รายละเอียด</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:right">จำนวนเงิน</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:left">วิธีชำระเงิน</th>
+                <th onClick="{{ expHeadDate.onClick }}" style="{{ expHeadDate.style }}">วันที่{{ expHeadDate.arrow }}</th>
+                <th onClick="{{ expHeadMainCat.onClick }}" style="{{ expHeadMainCat.style }}">หมวดหมู่หลัก{{ expHeadMainCat.arrow }}</th>
+                <th onClick="{{ expHeadSubCat.onClick }}" style="{{ expHeadSubCat.style }}">หมวดหมู่ย่อย{{ expHeadSubCat.arrow }}</th>
+                <th onClick="{{ expHeadDetail.onClick }}" style="{{ expHeadDetail.style }}">รายละเอียด{{ expHeadDetail.arrow }}</th>
+                <th onClick="{{ expHeadAmount.onClick }}" style="{{ expHeadAmount.style }}">จำนวนเงิน{{ expHeadAmount.arrow }}</th>
+                <th onClick="{{ expHeadPayment.onClick }}" style="{{ expHeadPayment.style }}">วิธีชำระเงิน{{ expHeadPayment.arrow }}</th>
                 <th style="padding:0 5px 11px;font-weight:500;text-align:center">เอกสาร</th>
                 <th style="padding:0 5px 11px;font-weight:500;text-align:center">จัดการ</th>
               </tr>
@@ -4441,6 +4441,7 @@ class Component extends DCLogic {
     editingSlipId: null, slipDraft: null, payrollBusy: false,
     slipImageId: null,
     expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
+    expSortKey: 'date', expSortDir: 'desc',
     expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
     monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
     expSearch: '',
@@ -6479,6 +6480,47 @@ class Component extends DCLogic {
     };
     const resetExpFilters = () => this.setState({ expSearch: '', expPeriodFilter: 'ทั้งหมด', expPage: 1 });
 
+    // เรียงลำดับตามคอลัมน์ที่กด — ใช้กติกาเดียวกับตารางยอดขาย
+    const EXPENSE_SORT = {
+      date:    r => r.isoDate || safeBeShortToISO(r.date) || '',
+      mainCat: r => r.mainCat || '',
+      subCat:  r => r.subCat || '',
+      detail:  r => r.detail || '',
+      amount:  r => Number(r.amount) || 0,
+      payment: r => r.payment || ''
+    };
+    const expSortKey = this.state.expSortKey, expSortDir = this.state.expSortDir;
+    const expSortGet = EXPENSE_SORT[expSortKey] || EXPENSE_SORT.date;
+    efiltered = efiltered.slice().sort((a, b) => {
+      const x = expSortGet(a), y = expSortGet(b);
+      let c;
+      if (typeof x === 'number' && typeof y === 'number') c = x - y;
+      else c = String(x).localeCompare(String(y), 'th');
+      // ตัดสินเสมอด้วยเวลา แล้วต่อด้วย id เพื่อให้ลำดับคงที่ ไม่สลับไปมาตอน re-render
+      if (c === 0) c = String(a.time || '').localeCompare(String(b.time || ''));
+      if (c === 0) c = String(a.id || '').localeCompare(String(b.id || ''));
+      return expSortDir === 'asc' ? c : -c;
+    });
+    const sortExpenses = key => () => this.setState(st => ({
+      expSortKey: key,
+      // กดคอลัมน์เดิมซ้ำ = สลับทิศ · กดคอลัมน์ใหม่ = เริ่มที่มาก→น้อย
+      expSortDir: st.expSortKey === key ? (st.expSortDir === 'asc' ? 'desc' : 'asc') : 'desc',
+      expPage: 1
+    }));
+    const expSortHead = (key, align) => ({
+      onClick: sortExpenses(key),
+      arrow: expSortKey === key ? (expSortDir === 'asc' ? ' ▲' : ' ▼') : '',
+      style: 'padding:0 5px 11px;font-weight:' + (expSortKey === key ? '700' : '500')
+        + ';text-align:' + align + ';cursor:pointer;white-space:nowrap;'
+        + (expSortKey === key ? 'color:#2C4A7C' : '')
+    });
+    const expHeadDate    = expSortHead('date', 'left');
+    const expHeadMainCat = expSortHead('mainCat', 'left');
+    const expHeadSubCat  = expSortHead('subCat', 'left');
+    const expHeadDetail  = expSortHead('detail', 'left');
+    const expHeadAmount  = expSortHead('amount', 'right');
+    const expHeadPayment = expSortHead('payment', 'left');
+
     const expTotalPages = Math.max(1, Math.ceil(efiltered.length / this.state.expPageSize));
     const expPage = Math.min(this.state.expPage, expTotalPages);
     const expPrevPage = () => this.setState(s => ({ expPage: Math.max(1, s.expPage - 1) }));
@@ -7894,6 +7936,7 @@ class Component extends DCLogic {
       openExpAttachPicker, handleExpAttachChange, removeExpAttachment, hasExpAttachment: !!ef.attachmentName,
       expPeriodDD, expPageSizeDD, resetExpFilters, scrollToExpenseForm, exportExpenseCsv,
       expPage, expTotalPages, expPrevPage, expNextPage,
+      expHeadDate, expHeadMainCat, expHeadSubCat, expHeadDetail, expHeadAmount, expHeadPayment,
       todaySpentDisplay: '฿' + expFmt(todaySpent), todayCountDisplay: todayRows.length + ' รายการ',
       mtdSpentDisplay: '฿' + expFmt(mtdSpent), mtdCountDisplay: mtdRows.length + ' รายการเดือนนี้',
       daysInMonthDisplay: 'จาก ' + nowForBudget.getDate() + ' วัน',
