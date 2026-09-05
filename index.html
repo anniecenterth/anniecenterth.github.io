@@ -2295,6 +2295,67 @@
         </div>
       </div>
 
+      <!-- สมุดรายวัน — 1 แถว 1 วัน ตามช่วงเวลาที่เลือกด้านบน -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">สมุดรายวัน</h3>
+          <span style="font-size:12.5px;color:#9AA3B2">{{ dailyReportNote }}</span>
+        </div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">ตัวเลขรายรับเป็นเงินที่เข้าจริง (หลังหักค่าคอมและ VAT แล้ว) · คงเหลือ = รับ − จ่าย</div>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px">
+          <thead>
+            <tr style="color:#8089A0;font-size:11.5px">
+              <th style="padding:0 8px 10px;font-weight:500;text-align:left;white-space:nowrap">วันที่</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">เงินสด</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">เงินโอน</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">LINE MAN</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">Grab</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">Shopee</th>
+              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap;color:#2C4A7C">รวมรับ</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">วัตถุดิบ</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">ค่าแรง</th>
+              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">จ่ายอื่นๆ</th>
+              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap;color:#B14A4A">รวมจ่าย</th>
+              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap">คงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ dailyReportRows }}" as="d" hint-placeholder-count="14">
+              <tr style="{{ d.rowStyle }}">
+                <td style="padding:9px 8px;white-space:nowrap"><span style="font-weight:600">{{ d.day }}</span> <span style="color:#9AA3B2;font-size:11px">{{ d.month }}</span></td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.cash }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.transfer }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.lineman }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.grab }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.shopee }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap;font-weight:600;color:#2C4A7C">{{ d.income }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.cogs }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.wage }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.otherExp }}</td>
+                <td style="padding:9px 8px;text-align:right;white-space:nowrap;font-weight:600;color:#B14A4A">{{ d.expense }}</td>
+                <td style="{{ d.leftStyle }}">{{ d.left }}</td>
+              </tr>
+            </sc-for>
+            <tr style="border-top:2px solid #E7E9ED;background:#FAFBFC;color:#1B2536">
+              <td style="padding:11px 8px;font-weight:700;white-space:nowrap">รวม</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.cash }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.transfer }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.lineman }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.grab }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.shopee }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap;color:#2C4A7C">{{ dailyReportTotal.income }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.cogs }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.wage }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.otherExp }}</td>
+              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap;color:#B14A4A">{{ dailyReportTotal.expense }}</td>
+              <td style="{{ dailyReportTotal.leftStyle }}">{{ dailyReportTotal.left }}</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
     </div>
     </sc-if>
 
@@ -6797,6 +6858,79 @@ class Component extends DCLogic {
       // ไม่มีแถว "ส่วนลดรวม" แล้ว เพราะ gross เก็บเป็นยอดหลังหักส่วนลดตั้งแต่ต้น
       // แถว "รวมทั้งหมด" ด้านบนจึงเป็นยอดหลังหักส่วนลดอยู่แล้ว ไม่ต้องกระทบยอดซ้ำ
     }
+    // ---- ตารางรายวัน (Daily Report) — เลียนสมุดรายวันที่เจ้าของร้านทำในชีต ----
+    // 1 แถว = 1 วัน · รายรับแยกตามช่องทางที่เงินเข้าจริง · รายจ่ายแยกตามหมวดหลัก
+    // ใช้ "เงินเข้าจริง" (net) ไม่ใช่ยอดเต็ม เพราะสมุดเล่มนี้ตอบคำถามว่าวันนั้นเงินเหลือเท่าไร
+    const drFmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const drISO = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const drRange = this.periodRange();
+    const DR_MAX_DAYS = 92;   // ช่วงยาวกว่านี้ตารางจะยาวจนหาอะไรไม่เจอ
+    let drDates = [];
+    if (drRange) {
+      const d0 = new Date(drRange.from + 'T00:00:00'), d1 = new Date(drRange.to + 'T00:00:00');
+      for (let d = new Date(d0); d <= d1 && drDates.length < DR_MAX_DAYS; d.setDate(d.getDate() + 1)) drDates.push(drISO(d));
+    } else {
+      const seen = {};
+      salesRows.forEach(r => { if (r.isoDate) seen[r.isoDate] = 1; });
+      ovExpRows.forEach(r => { if (r.isoDate) seen[r.isoDate] = 1; });
+      drDates = Object.keys(seen).sort().slice(-DR_MAX_DAYS);
+    }
+    const drTrimmed = !!drRange && (() => {
+      const d0 = new Date(drRange.from + 'T00:00:00'), d1 = new Date(drRange.to + 'T00:00:00');
+      return Math.round((d1 - d0) / 86400000) + 1 > DR_MAX_DAYS;
+    })();
+    // เงินสดหน้าร้านแยกจากเงินโอน เพราะเจ้าของร้านนับเงินสดในลิ้นชักทุกคืน
+    const drIsCash = r => /cash|เงินสด/i.test(r.payment || '');
+    const drSalesByDate = {}, drExpByDate = {};
+    salesRows.forEach(r => {
+      if (!r.isoDate) return;
+      const b = drSalesByDate[r.isoDate] || (drSalesByDate[r.isoDate] = { cash:0, transfer:0, lineman:0, grab:0, shopee:0 });
+      const v = Number(r.net) || 0;
+      if (r.platform === 'หน้าร้าน')      { if (drIsCash(r)) b.cash += v; else b.transfer += v; }
+      else if (r.platform === 'LINE MAN')  b.lineman += v;
+      else if (r.platform === 'Grab')      b.grab += v;
+      else if (r.platform === 'ShopeeFood') b.shopee += v;
+    });
+    ovExpRows.forEach(r => {
+      if (!r.isoDate) return;
+      const b = drExpByDate[r.isoDate] || (drExpByDate[r.isoDate] = { cogs:0, wage:0, other:0 });
+      const v = Number(r.amount) || 0;
+      if (r.mainCat === 'วัตถุดิบ (COGS)') b.cogs += v;
+      else if (r.mainCat === 'ค่าแรง')      b.wage += v;
+      else                                  b.other += v;
+    });
+    const drTotals = { cash:0, transfer:0, lineman:0, grab:0, shopee:0, income:0, cogs:0, wage:0, other:0, expense:0, left:0 };
+    const dailyReportRows = drDates.map(iso => {
+      const s0 = drSalesByDate[iso] || { cash:0, transfer:0, lineman:0, grab:0, shopee:0 };
+      const e0 = drExpByDate[iso] || { cogs:0, wage:0, other:0 };
+      const income = s0.cash + s0.transfer + s0.lineman + s0.grab + s0.shopee;
+      const expense = e0.cogs + e0.wage + e0.other;
+      const left = income - expense;
+      ['cash','transfer','lineman','grab','shopee'].forEach(k => drTotals[k] += s0[k]);
+      ['cogs','wage','other'].forEach(k => drTotals[k] += e0[k]);
+      drTotals.income += income; drTotals.expense += expense; drTotals.left += left;
+      const d = new Date(iso + 'T00:00:00');
+      return {
+        day: String(d.getDate()), month: THAI_MONTHS_ABBR[d.getMonth()],
+        cash: drFmt(s0.cash), transfer: drFmt(s0.transfer), lineman: drFmt(s0.lineman),
+        grab: drFmt(s0.grab), shopee: drFmt(s0.shopee), income: drFmt(income),
+        cogs: drFmt(e0.cogs), wage: drFmt(e0.wage), otherExp: drFmt(e0.other), expense: drFmt(expense),
+        left: drFmt(left),
+        leftStyle: { padding:'9px 8px', textAlign:'right', fontWeight:700, whiteSpace:'nowrap', color: left < 0 ? '#B14A4A' : '#2E7D5B' },
+        rowStyle: { borderTop:'1px solid #F1F2F4', color:'#2B3547', background: (income || expense) ? 'transparent' : '#FCFCFD' }
+      };
+    });
+    const dailyReportTotal = {
+      cash: drFmt(drTotals.cash), transfer: drFmt(drTotals.transfer), lineman: drFmt(drTotals.lineman),
+      grab: drFmt(drTotals.grab), shopee: drFmt(drTotals.shopee), income: drFmt(drTotals.income),
+      cogs: drFmt(drTotals.cogs), wage: drFmt(drTotals.wage), otherExp: drFmt(drTotals.other),
+      expense: drFmt(drTotals.expense), left: drFmt(drTotals.left),
+      leftStyle: { padding:'11px 8px', textAlign:'right', fontWeight:700, whiteSpace:'nowrap', color: drTotals.left < 0 ? '#B14A4A' : '#2E7D5B' }
+    };
+    const dailyReportNote = drTrimmed
+      ? 'ช่วงที่เลือกยาวเกิน ' + DR_MAX_DAYS + ' วัน — แสดง ' + DR_MAX_DAYS + ' วันแรก'
+      : (dailyReportRows.length + ' วัน');
+
     const dashMatrixRows = dashBrandNames.map(name => {
       const rowsForBrand = salesRows.filter(r => r.brand === name);
       const gFor = k => rowsForBrand.filter(r => r.platform === k).reduce((a,r)=>a+r.gross,0);
@@ -7974,6 +8108,7 @@ class Component extends DCLogic {
       salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
       expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
       salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
+      dailyReportRows, dailyReportTotal, dailyReportNote,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
       scrollToSalesForm, exportSalesCsv,
       storeBatch, storeBatchRows, storeBatchTotals, storeFormError: this.state.storeFormError,
