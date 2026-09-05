@@ -4010,6 +4010,8 @@ function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: dbRow.brand,
     orderId: dbRow.order_id, gross: dbRow.gross, fee: dbRow.fee, net: dbRow.net, status: dbRow.status,
+    // ว่าง = ค่าคอม/ยอดสุทธิเป็นตัวเลขจริงจากรายงานแพลตฟอร์ม · มีค่า = ระบบประมาณให้
+    feeBasis: dbRow.fee_basis || null,
     // Real VAT withheld by the platform: prefer a stored sales.vat column, else the per-order
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
@@ -4021,7 +4023,7 @@ function mapDbRowToSale(dbRow) {
 function mapSaleToDbRow(row) {
   return {
     date: row.date, time: row.time, platform: row.platform, brand: row.brand, order_id: row.orderId,
-    gross: row.gross, fee: row.fee, net: row.net, status: row.status,
+    gross: row.gross, fee: row.fee, net: row.net, status: row.status, fee_basis: row.feeBasis || null,
     type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null,
     // ที่มาของแถว: ทุกแถวต้องบอกได้ว่ามาจากไหน (POS / import แพลตฟอร์ม / ฟอร์มในแอป)
     source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null,
@@ -5757,6 +5759,13 @@ class Component extends DCLogic {
       const avgDay = Object.keys(byDay).length ? ovGross / Object.keys(byDay).length : 0;
       if (bestDay) ovInsights.push({ icon:'calendar-check', text:'วันที่ขายดีที่สุดคือ ' + isoToBEShort(bestDay.d) + ' ' + ovFmt(bestDay.v) + ' (สูงกว่าค่าเฉลี่ยรายวัน ' + ovFmt(avgDay) + ')' });
 
+      // เตือนว่ากำไรในช่วงนี้อิงค่าคอมที่ประมาณไว้เท่าไร — ตัวเลขกำไรจะขยับถ้าได้ใบสรุปจริง
+      const ovApproxRows = ovRows.filter(r => r.feeBasis);
+      if (ovApproxRows.length) {
+        const ovApproxGross = ovApproxRows.reduce((a, r) => a + r.gross, 0);
+        ovInsights.push({ icon:'triangle-alert', text:'ยอด ' + ovFmt(ovApproxGross) + ' (' + ovApproxRows.length + ' รายการ) ใช้ค่าคอมประมาณ 21% เพราะรายงานรายวันของ LINE MAN ไม่บอกค่าคอม — กำไรจริงจะรู้ชัดเมื่อได้ใบสรุปการโอนเงิน' });
+      }
+
       // สุขภาพกำไร
       if (ovExpenseTotal > 0) {
         ovInsights.push({ icon:'wallet', text:'ทุกยอดขาย 100 บาท เหลือเป็นกำไรสุทธิ ' + ovNetMargin.toFixed(1) + ' บาท หลังหักรายจ่ายที่บันทึกไว้' });
@@ -6966,10 +6975,10 @@ class Component extends DCLogic {
     const pagedFiltered = filtered.slice(pageStart, pageStart + this.state.salesPageSize);
 
     const exportSalesCsv = () => {
-      const header = ['วันที่','เวลา','แพลตฟอร์ม','แบรนด์','Order ID','ยอดขายรวม','ค่าธรรมเนียม','ยอดสุทธิ','สถานะ'];
+      const header = ['วันที่','เวลา','แพลตฟอร์ม','แบรนด์','Order ID','ยอดขายรวม','ค่าธรรมเนียม','ยอดสุทธิ','สถานะ','ที่มาค่าธรรมเนียม'];
       const lines = [header.join(',')];
       filtered.forEach(r => {
-        lines.push([r.date, r.time, r.platform, r.brand, r.orderId, r.gross, r.fee, r.net, r.status].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
+        lines.push([r.date, r.time, r.platform, r.brand, r.orderId, r.gross, r.fee, r.net, r.status, r.feeBasis ? 'ประมาณ (' + r.feeBasis + ')' : 'รายงานจริง'].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
       });
       const csv = '﻿' + lines.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -6993,10 +7002,13 @@ class Component extends DCLogic {
           this.setState({ salesError: 'ลบไม่สำเร็จ ลองใหม่อีกครั้ง' });
         }
       };
+      // แถวที่ระบบประมาณค่าคอมให้ (LINE MAN รายงานรายวันไม่บอกค่าคอม) ติด ≈ ไว้ทุกช่อง
+      // ที่คำนวณต่อจากค่าคอม เพื่อไม่ให้อ่านปนกับตัวเลขจริงจากรายงานแพลตฟอร์ม
+      const approx = r.feeBasis ? (t => t === '—' ? t : '≈ ' + t) : (t => t);
       return {
         date: r.date, time: r.time, platform: platformBadge(r.platform), brand: r.brand, orderId: r.orderId, note: r.note || '',
-        gross: money2(r.gross), fee: money2(r.fee), gp: money2(r.fee == null ? null : r.fee - r.fee*7/107),
-        vat: money2(r.fee == null ? null : r.fee*7/107), net: money2(r.net), status: statusBadge(r.status),
+        gross: money2(r.gross), fee: approx(money2(r.fee)), gp: approx(money2(r.fee == null ? null : r.fee - r.fee*7/107)),
+        vat: approx(money2(r.fee == null ? null : r.fee*7/107)), net: approx(money2(r.net)), status: statusBadge(r.status),
         onEdit: startEditSalesRow(r),
         onDelete
       };
