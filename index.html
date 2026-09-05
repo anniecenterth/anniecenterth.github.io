@@ -3934,6 +3934,10 @@ function parseGenericDateTime(str) {
 }
 function normalizeImportRow(platform, row, fallbackDateISO) {
   const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+  // แต่ละแพลตฟอร์มเขียนเครื่องหมายไม่เหมือนกัน — Grab กับ LINE MAN ใส่ค่าคอมเป็นเลขติดลบ
+  // ส่วน Shopee ใส่เป็นเลขบวก ถ้าเก็บตามไฟล์ตรงๆ ยอดรวมจะหักกันเองจนอ่านไม่ได้
+  // ทั้งสามช่องนี้เป็น "เงินที่ถูกหัก" อยู่แล้ว จึงเก็บเป็นจำนวนบวกเสมอ
+  const mag = v => Math.abs(num(v));
   if (platform === 'grab') {
     const rawStatus = String(row['Status'] || row['สถานะ'] || '').trim();
     if (/cancel/i.test(rawStatus) || rawStatus === 'ยกเลิกแล้ว') return null;   // สเปก: กรองออก Status = Cancelled
@@ -3946,10 +3950,10 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     if (!orderId) return null;
     const gross = num(row['Amount'] || row['ยอด']);
     const net = num(row['Total'] || row['ทั้งหมด']);
-    const discount = num(row['Discount (Merchant-Funded)']);
-    const vat = num(row['Tax on GrabFood / GrabMart Commission, Adjustments, Ads']);
+    const discount = mag(row['Discount (Merchant-Funded)']);
+    const vat = mag(row['Tax on GrabFood / GrabMart Commission, Adjustments, Ads']);
     // ค่าคอมในไฟล์รวม VAT ไว้แล้ว จึงถอด VAT ออกให้ gp เป็นค่าคอมล้วน
-    const gp = num(row['Channel Commission']) + num(row['GrabFood / GrabMart Other Commission']) - vat;
+    const gp = mag(row['Channel Commission']) + mag(row['GrabFood / GrabMart Other Commission']) - vat;
     const dt = parseGrabDateTime(row['Date'], row['Created On'] || row['วันที่สร้าง']);
     const status = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว' ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
@@ -3976,8 +3980,8 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     const dt = parseGenericDateTime(row['capture_time']);
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
-      gross, net, discount: num(row['other_cost']), gp: num(row['fee']), vat: num(row['vat']),
-      fee: num(row['fee']) + num(row['vat']),
+      gross, net, discount: mag(row['other_cost']), gp: mag(row['fee']), vat: mag(row['vat']),
+      fee: mag(row['fee']) + mag(row['vat']),
       status: 'เงินเข้าจริง', payment: paymentMethod,
       brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN', raw: { ...row }
     };
@@ -3989,9 +3993,9 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     if (/cancel/i.test(orderStatus)) return null;                       // สเปก: กรองออก Order Status = cancelled
     const gross = num(row['Order Amount']);
     const net = num(row['Net Income']);
-    const discount = num(row['Merchant Food Voucher Subsidy']) + num(row['Merchant Shipping Fee Voucher Subsidy']);
-    const gp = num(row['Commission (GP + Package fee or additional fees if any)']);
-    const vat = num(row['VAT on Commission']);
+    const discount = mag(row['Merchant Food Voucher Subsidy']) + mag(row['Merchant Shipping Fee Voucher Subsidy']);
+    const gp = mag(row['Commission (GP + Package fee or additional fees if any)']);
+    const vat = mag(row['VAT on Commission']);
     const dt = parseGenericDateTime(row['Order Create Time']);
     const status = orderStatus.toLowerCase() === 'settled' ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
@@ -6705,17 +6709,19 @@ class Component extends DCLogic {
       const c = map[type] || map.wait;
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11px', fontWeight:600, padding:'4px 10px', borderRadius:'7px', whiteSpace:'nowrap' } }, txt);
     };
-    // Per-platform VAT (real, withheld by the platform) once migration 0006 + backfill land.
-    // GP = combined fee − VAT (so GP + VAT always reconciles to gross − net); falls back to
-    // GP = full fee, VAT = 0 until the real VAT is stored.
+    // GP / VAT / โปรโมชัน อ่านจากคอลัมน์จริงที่นำเข้ามาจากไฟล์รายงาน
+    // แถวเก่าที่นำเข้าก่อนมีคอลัมน์เหล่านี้จะเป็นค่าว่าง — กรณีนั้นถอย VAT กลับไปใช้ 0
+    // และให้ GP เท่ากับค่าธรรมเนียมรวม เพื่อให้ GP + VAT ยังกระทบกับ gross − net ได้เหมือนเดิม
     const taxByChannel = {};
     salesRows.forEach(r => {
-      const t = taxByChannel[r.platform] || (taxByChannel[r.platform] = { vat:0, hasVat:false });
-      if (r.vat != null) { t.hasVat = true; t.vat += r.vat; }
+      const t = taxByChannel[r.platform] || (taxByChannel[r.platform] = { vat:0, gp:0, promo:0, hasVat:false, hasGp:false, hasPromo:false });
+      if (r.vat != null)      { t.hasVat = true;   t.vat += r.vat; }
+      if (r.gp != null)       { t.hasGp = true;    t.gp += r.gp; }
+      if (r.discount != null) { t.hasPromo = true; t.promo += r.discount; }
     });
     const dashVat = (p) => { const t = taxByChannel[p]; return t && t.hasVat ? t.vat : 0; };
-    const dashGp = (p, g) => g.fee - dashVat(p);
-    const dashPromo = () => 0;
+    const dashGp = (p, g) => { const t = taxByChannel[p]; return t && t.hasGp ? t.gp : g.fee - dashVat(p); };
+    const dashPromo = (p) => { const t = taxByChannel[p]; return t && t.hasPromo ? t.promo : 0; };
     const dashDeliveryPlatforms = ['Grab','LINE MAN','ShopeeFood'];
     // Storefront (cash) row first: no commission/VAT/promo, money received immediately.
     // Clicking it expands a breakdown by POS payment type (Cash / K+ Shop / QR PromptPay
@@ -6768,12 +6774,14 @@ class Component extends DCLogic {
         const byBrandPlat = {};
         salesRows.filter(r => r.platform === p).forEach(r => {
           const b = r.brand || 'อื่นๆ';
-          const o = byBrandPlat[b] || (byBrandPlat[b] = { gross:0, fee:0, vat:0, net:0 });
+          const o = byBrandPlat[b] || (byBrandPlat[b] = { gross:0, fee:0, vat:0, gp:0, promo:0, hasGp:false, net:0 });
           o.gross += r.gross; o.fee += r.fee; o.vat += (r.vat || 0); o.net += r.net;
+          o.promo += (r.discount || 0);
+          if (r.gp != null) { o.hasGp = true; o.gp += r.gp; }
         });
         Object.keys(byBrandPlat).sort((a, b) => byBrandPlat[b].gross - byBrandPlat[a].gross).forEach(b => {
           const s = byBrandPlat[b];
-          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), gp: fmtB(s.fee - s.vat), vat: fmtB(s.vat), promo: fmtB(0), net: fmtB(s.net), statusTag: '', weight:'400' });
+          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), gp: fmtB(s.hasGp ? s.gp : s.fee - s.vat), vat: fmtB(s.vat), promo: fmtB(s.promo), net: fmtB(s.net), statusTag: '', weight:'400' });
         });
       }
     });
@@ -7496,10 +7504,13 @@ class Component extends DCLogic {
       const included = importIncluded;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+      // ต้องพาทุกช่องที่ normalizeImportRow คำนวณไว้ไปด้วย — เดิมสร้างออบเจกต์ใหม่แล้วลืม
+      // ส่วนลด/GP/VAT/แถวดิบ/ช่องทางชำระ ค่าจึงหล่นหายก่อนถึงฐานข้อมูลทุกครั้ง
       const rowsToInsert = included.map(r => ({
         date: r.date || isoToBEShort(this.state.importReportDate), time: r.time,
         platform: r.meta.label, brand: r.brand,
         orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status,
+        discount: r.discount, gp: r.gp, vat: r.vat, raw: r.raw, payment: r.payment,
         source: r.meta.label === 'หน้าร้าน' || r.meta.label === 'ส่วนลด' ? 'POS' : 'PLATFORM_IMPORT'
       }));
       try {
