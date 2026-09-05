@@ -4006,9 +4006,18 @@ const DEFAULT_BRANCH = 'main';
 const branchLabel = code => (BRANCH_OPTIONS.find(b => b.code === code) || {}).label || code || '—';
 const branchCodeOf = label => (BRANCH_OPTIONS.find(b => b.label === label) || {}).code || DEFAULT_BRANCH;
 
+/** แบรนด์กับช่องทางขายเป็นคนละเรื่อง แต่ข้อมูลเก่าเก็บปนกันไว้ในคอลัมน์ brand
+ *  ("หน้าร้าน" กับ "Delivery" คือช่องทาง ไม่ใช่แบรนด์ — แบรนด์จริงมีแค่ AnnieCake กับ หอมมนต์)
+ *  แปลงตอนอ่านเข้ามาให้เป็น "ไม่ระบุแบรนด์" ทุกที่ในแอปจะได้จัดกลุ่ม/กรองด้วยค่าเดียวกัน
+ *  และเขียนกลับฐานเป็น NULL เพื่อไม่ให้ค่าปนกลับเข้าไปอีก */
+const BRAND_UNSPEC = 'ไม่ระบุแบรนด์';
+const NON_BRAND_VALUES = ['หน้าร้าน', 'Delivery', ''];
+const brandName = b => (b == null || NON_BRAND_VALUES.indexOf(b) >= 0) ? BRAND_UNSPEC : b;
+const brandToDb = b => (b == null || b === BRAND_UNSPEC || NON_BRAND_VALUES.indexOf(b) >= 0) ? null : b;
+
 function mapDbRowToSale(dbRow) {
   return {
-    id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: dbRow.brand,
+    id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: brandName(dbRow.brand),
     orderId: dbRow.order_id, gross: dbRow.gross, fee: dbRow.fee, net: dbRow.net, status: dbRow.status,
     // ว่าง = ค่าคอม/ยอดสุทธิเป็นตัวเลขจริงจากรายงานแพลตฟอร์ม · มีค่า = ระบบประมาณให้
     feeBasis: dbRow.fee_basis || null,
@@ -4022,7 +4031,7 @@ function mapDbRowToSale(dbRow) {
 }
 function mapSaleToDbRow(row) {
   return {
-    date: row.date, time: row.time, platform: row.platform, brand: row.brand, order_id: row.orderId,
+    date: row.date, time: row.time, platform: row.platform, brand: brandToDb(row.brand), order_id: row.orderId,
     gross: row.gross, fee: row.fee, net: row.net, status: row.status, fee_basis: row.feeBasis || null,
     type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null,
     // ที่มาของแถว: ทุกแถวต้องบอกได้ว่ามาจากไหน (POS / import แพลตฟอร์ม / ฟอร์มในแอป)
@@ -4963,7 +4972,7 @@ class Component extends DCLogic {
     const periodDisplay = (period === 'เลือกเอง' && (customFrom || customTo))
       ? ((customFrom ? isoToBEShort(customFrom) : '…') + ' – ' + (customTo ? isoToBEShort(customTo) : '…'))
       : period;
-    const brandOptions = ['ทุกแบรนด์','AnnieCake','หอมมนต์'].map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
+    const brandOptions = ['ทุกแบรนด์','AnnieCake','หอมมนต์',BRAND_UNSPEC].map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
     const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood','ขายส่ง'].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
@@ -6812,7 +6821,7 @@ class Component extends DCLogic {
         }
         const note = (f.note || '').trim();
         const dbRows = entries.map(x => mapSaleToDbRow({
-          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: 'หน้าร้าน',
+          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: BRAND_UNSPEC,
           orderId: x.p + ' (หน้าร้าน ' + beDate + ')',
           gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
           status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: '', source: 'MANUAL_FORM'
