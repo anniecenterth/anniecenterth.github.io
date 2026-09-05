@@ -2365,8 +2365,22 @@
                 <span style="{{ c.noteStyle }}">{{ c.note }}</span>
                 <span style="font-size:11.5px;color:#9AA3B2">{{ c.recent }}</span>
               </div>
+              <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:9px">
+                <sc-for list="{{ c.strip }}" as="d" hint-placeholder-count="30">
+                  <span title="{{ d.title }}" style="{{ d.style }}"></span>
+                </sc-for>
+              </div>
+              <sc-if value="{{ c.missingLabel }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11px;color:#B14A4A;margin-top:6px;line-height:1.45">{{ c.missingLabel }}</div>
+              </sc-if>
             </div>
           </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#9AA3B2">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4A6B9E"></span>มีข้อมูล</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#E7C9C9"></span>ไม่มีข้อมูล</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#EEF0F5"></span>วันนี้ / ก่อนเริ่มเก็บ</span>
+          <span>· 30 วันล่าสุด เรียงซ้ายไปขวา</span>
         </div>
         <sc-if value="{{ importDateWarn }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:flex-start;gap:9px;background:#F8F0DC;border:1px solid #E4CFA0;color:#8A6414;border-radius:11px;padding:11px 14px;font-size:12.5px;font-weight:500;margin-top:13px;line-height:1.5">
@@ -7129,9 +7143,14 @@ class Component extends DCLogic {
       const k = r.platform + '|' + r.isoDate;
       covCountByDate[k] = (covCountByDate[k] || 0) + 1;
     });
-    const covWindowStart = covISO(new Date(Date.now() - 30 * covDayMs));
+    const COV_WINDOW = 30;
+    const covToday = covISO(new Date());
+    const covWindowDates = [];
+    for (let i = COV_WINDOW - 1; i >= 0; i--) covWindowDates.push(covISO(new Date(Date.now() - i * covDayMs)));
+    const covWindowStart = covWindowDates[0];
     const coverageRows = SALES_PLATFORMS.map(p => {
-      const days = Object.keys(covDaysByPlatform[p] || {}).sort();
+      const has = covDaysByPlatform[p] || {};
+      const days = Object.keys(has).sort();
       const last = days.length ? days[days.length - 1] : null;
       // นับถึง "เมื่อวาน" ไม่ใช่วันนี้ เพราะรายงานของวันนี้ยังออกไม่ครบ ไม่ควรนับว่าขาด
       const gap = last ? Math.max(0, covDaysBetween(last, covYesterday)) : null;
@@ -7141,10 +7160,30 @@ class Component extends DCLogic {
       else if (gap === 0) { tone = '#2E7D5B'; note = 'ครบถึงเมื่อวาน'; }
       else if (gap <= 2)  { tone = '#B98317'; note = 'ขาด ' + gap + ' วัน'; }
       else                { tone = '#B14A4A'; note = 'ขาด ' + gap + ' วัน'; }
+
+      // ปฏิทิน 30 วันย้อนหลัง — ตัวเลข "ขาดกี่วัน" ด้านบนมองเห็นแค่ช่วงท้าย
+      // ถ้าเว้นวันกลางเดือนไว้จะไม่มีอะไรฟ้อง แถบนี้ทำให้เห็นรูโหว่ทั้งเดือนในภาพเดียว
+      // วันก่อนที่ช่องทางนั้นจะมีข้อมูลวันแรก ไม่ถือว่าขาด (เพิ่งเริ่มเก็บ)
+      const firstEver = days.length ? days[0] : null;
+      const covCell = { width:'11px', height:'11px', borderRadius:'3px', flex:'none' };
+      const strip = covWindowDates.map(d => {
+        let bg, label;
+        if (has[d])                        { bg = '#4A6B9E'; label = 'มีข้อมูล'; }
+        else if (d === covToday)           { bg = '#EEF0F5'; label = 'วันนี้ ยังไม่ถึงเวลาลง'; }
+        else if (!firstEver || d < firstEver) { bg = '#F3F4F7'; label = 'ก่อนเริ่มเก็บข้อมูล'; }
+        else                               { bg = '#E7C9C9'; label = 'ไม่มีข้อมูล'; }
+        return { style: { ...covCell, background: bg }, title: isoToBEShort(d) + ' · ' + label };
+      });
+      const missing = covWindowDates.filter(d =>
+        !has[d] && d !== covToday && firstEver && d >= firstEver);
+      const missingLabel = missing.length
+        ? 'ขาด: ' + missing.slice(0, 5).map(d => isoToBEShort(d).slice(0, 5)).join(', ')
+            + (missing.length > 5 ? ' และอีก ' + (missing.length - 5) + ' วัน' : '')
+        : '';
       return {
         platform: p,
         last: last ? isoToBEShort(last) : '—',
-        note, recent: recent + '/30 วัน',
+        note, recent: recent + '/30 วัน', strip, missingLabel,
         dotStyle: { width:'9px', height:'9px', borderRadius:'50%', background:tone, flex:'none' },
         noteStyle: { fontSize:'12.5px', fontWeight:600, color:tone }
       };
