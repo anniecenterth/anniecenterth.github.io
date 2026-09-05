@@ -2525,6 +2525,7 @@
                 <th style="padding:0 8px 12px;font-weight:500;text-align:left">Order ID</th>
                 <th style="padding:0 8px 12px;font-weight:500;text-align:left">ช่องทางชำระ</th>
                 <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดขาย</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ส่วนลดร้าน</th>
                 <th style="padding:0 8px 12px;font-weight:500;text-align:right">GP</th>
                 <th style="padding:0 8px 12px;font-weight:500;text-align:right">VAT</th>
                 <th style="padding:0 8px 12px;font-weight:500;text-align:right">เงินเข้าจริง</th>
@@ -2539,6 +2540,7 @@
                   <td style="padding:11px 8px;color:#3A4456;font-weight:500;white-space:nowrap">{{ r.oid }}</td>
                   <td style="padding:11px 8px;color:#5A6478;white-space:nowrap">{{ r.pay }}</td>
                   <td style="padding:11px 8px;text-align:right;color:#1B2536;font-weight:600">{{ r.gross }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#B14A4A">{{ r.disc }}</td>
                   <td style="padding:11px 8px;text-align:right;color:#2C4A7C">{{ r.gp }}</td>
                   <td style="padding:11px 8px;text-align:right;color:#2C4A7C">{{ r.vat }}</td>
                   <td style="{{ r.netStyle }}">{{ r.net }}</td>
@@ -3882,6 +3884,24 @@ function detectPlatform(fields) {
   if (fields.some(f => f.indexOf('ประเภทการชำระเงิน') === 0)) return 'pos';
   return 'unknown';
 }
+/** Grab เก็บเฉพาะคอลัมน์ที่เจ้าของร้านระบุ (5 ก.ย. 2569) ส่วน LINE MAN กับ Shopee เก็บทุกคอลัมน์
+ *  ไฟล์ Grab ที่ส่งออกเป็นภาษาไทยไม่มีหัวคอลัมน์เหล่านี้ — กรณีนั้นเก็บทั้งแถวไว้แทน
+ *  ดีกว่าเก็บค่าว่างแล้วตามย้อนกลับไม่ได้ */
+const GRAB_KEEP_COLUMNS = [
+  'Merchant ID', 'Store Name', 'Store ID', 'Created On', 'Type', 'Category', 'Subcategory',
+  'Status', 'Transaction ID', 'Linked Transaction ID', 'Long Order ID', 'Short Order ID',
+  'Booking ID', 'Settlement ID', 'Transfer Date', 'Amount', 'Discount (Merchant-Funded)',
+  'Delivery Fee Discount (Merchant-Funded)', 'Delivery Charge (Merchant Delivery)',
+  'GrabExpress Delivery Service Fee', 'Net Sales', 'Marketing success fee', 'Channel Commission',
+  'GrabFood / GrabMart Other Commission', 'Total',
+  'Tax on GrabFood / GrabMart Commission, Adjustments, Ads'
+];
+function pickColumns(row, keep) {
+  const out = {};
+  let hit = 0;
+  keep.forEach(k => { if (row[k] !== undefined) { out[k] = row[k]; hit++; } });
+  return hit ? out : { ...row };
+}
 const GRAB_MONTH_ABBR = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
 function parseGrabDateTime(dateField, createdOnField) {
   const timeMatch = /(\d{1,2}):(\d{2})\s*(AM|PM)/i.exec(createdOnField || '');
@@ -3918,18 +3938,29 @@ function parseGenericDateTime(str) {
 function normalizeImportRow(platform, row, fallbackDateISO) {
   const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
   if (platform === 'grab') {
+    const rawStatus = String(row['Status'] || row['สถานะ'] || '').trim();
+    if (/cancel/i.test(rawStatus) || rawStatus === 'ยกเลิกแล้ว') return null;   // สเปก: กรองออก Status = Cancelled
+    // นอกจาก Cancelled ยังกรอง Category ไว้ด้วย — ไฟล์ Grab มีบรรทัดค่าโฆษณา/การปรับรายได้
+    // ปนมาในไฟล์เดียวกัน ถ้าไม่กรองจะถูกนับเป็นยอดขายทันที
     const category = String(row['Category'] || row['หมวดหมู่'] || '').trim();
     if (category && category !== 'Payment' && category !== 'ชำระเงิน') return null;
-    const orderId = row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '';
+    // Transaction ID ไม่ซ้ำ ต่างจาก Short Order ID ที่ Grab วนใช้เลขเดิม (เจอซ้ำ 32 เลขในฐาน)
+    const orderId = row['Transaction ID'] || row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '';
     if (!orderId) return null;
     const gross = num(row['Amount'] || row['ยอด']);
     const net = num(row['Total'] || row['ทั้งหมด']);
+    const discount = num(row['Discount (Merchant-Funded)']);
+    const vat = num(row['Tax on GrabFood / GrabMart Commission, Adjustments, Ads']);
+    // ค่าคอมในไฟล์รวม VAT ไว้แล้ว จึงถอด VAT ออกให้ gp เป็นค่าคอมล้วน
+    const gp = num(row['Channel Commission']) + num(row['GrabFood / GrabMart Other Commission']) - vat;
     const dt = parseGrabDateTime(row['Date'], row['Created On'] || row['วันที่สร้าง']);
-    const status = (row['Status'] || row['สถานะ'] || '').toLowerCase().includes('transfer') || (row['สถานะ'] === 'โอนแล้ว') ? 'เงินเข้าจริง' : 'รอรับเงิน';
+    const status = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว' ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
-      gross, net, fee: gross - net, status, payment: row['Payment Method'] || row['วิธีการชำระเงิน'] || 'เงินสด',
-      brand: detectBrandFromName(row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน']), platformLabel: 'Grab'
+      gross, net, discount, gp, vat, fee: gp + vat, status,
+      payment: row['Payment Method'] || row['วิธีการชำระเงิน'] || 'เงินสด',
+      brand: detectBrandFromName(row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน']),
+      platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
     };
   }
   if (platform === 'lineman') {
@@ -3948,21 +3979,28 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     const dt = parseGenericDateTime(row['capture_time']);
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
-      gross, net, fee: gross - net, status: 'เงินเข้าจริง', payment: paymentMethod,
-      brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN'
+      gross, net, discount: num(row['other_cost']), gp: num(row['fee']), vat: num(row['vat']),
+      fee: num(row['fee']) + num(row['vat']),
+      status: 'เงินเข้าจริง', payment: paymentMethod,
+      brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN', raw: { ...row }
     };
   }
   if (platform === 'shopee') {
     const orderId = row['Order ID'] || '';
     if (!orderId) return null;
+    const orderStatus = String(row['Order Status'] || '').trim();
+    if (/cancel/i.test(orderStatus)) return null;                       // สเปก: กรองออก Order Status = cancelled
     const gross = num(row['Order Amount']);
     const net = num(row['Net Income']);
+    const discount = num(row['Merchant Food Voucher Subsidy']) + num(row['Merchant Shipping Fee Voucher Subsidy']);
+    const gp = num(row['Commission (GP + Package fee or additional fees if any)']);
+    const vat = num(row['VAT on Commission']);
     const dt = parseGenericDateTime(row['Order Create Time']);
-    const status = (row['Order Status'] || '').toLowerCase() === 'settled' ? 'เงินเข้าจริง' : 'รอรับเงิน';
+    const status = orderStatus.toLowerCase() === 'settled' ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
-      gross, net, fee: gross - net, status, payment: 'ชำระผ่านแอป/บัตร',
-      brand: detectBrandFromName(row['Store Name']), platformLabel: 'ShopeeFood'
+      gross, net, discount, gp, vat, fee: gp + vat, status, payment: 'ชำระผ่านแอป/บัตร',
+      brand: detectBrandFromName(row['Store Name']), platformLabel: 'ShopeeFood', raw: { ...row }
     };
   }
   if (platform === 'pos') {
@@ -4068,6 +4106,8 @@ function mapDbRowToSale(dbRow) {
     // Real VAT withheld by the platform: prefer a stored sales.vat column, else the per-order
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
+    discount: dbRow.discount != null ? Number(dbRow.discount) : null,
+    gp: dbRow.gp != null ? Number(dbRow.gp) : null,
     type: dbRow.type, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
     note: dbRow.note || '', source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null,
     branch: dbRow.branch || DEFAULT_BRANCH
@@ -4077,6 +4117,12 @@ function mapSaleToDbRow(row) {
   return {
     date: row.date, time: row.time, platform: row.platform, brand: brandToDb(row.brand), order_id: row.orderId,
     gross: row.gross, fee: row.fee, net: row.net, status: row.status, fee_basis: row.feeBasis || null,
+    // ตัวเลขที่แพลตฟอร์มหัก แยกเป็นก้อนตามสเปกเจ้าของร้าน — fee ยังเก็บไว้เป็น gp + vat
+    // เพื่อให้รายงานเดิมทุกหน้าอ่านได้เหมือนเดิม ไม่ต้องแก้ตามทีละจุด
+    discount: row.discount != null ? row.discount : null,
+    gp: row.gp != null ? row.gp : null,
+    vat: row.vat != null ? row.vat : null,
+    raw: row.raw || null,
     type: row.type || null, payment: row.payment || null, attachment_name: row.attachmentName || null,
     // ที่มาของแถว: ทุกแถวต้องบอกได้ว่ามาจากไหน (POS / import แพลตฟอร์ม / ฟอร์มในแอป)
     source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null,
@@ -7278,25 +7324,31 @@ class Component extends DCLogic {
 
     const importMaps = [
       { platform:'Grab', initial:'G', fileType:'ไฟล์ .csv', pfg:'#2E7D5B', pbg:'#E6F3ED', rows:[
-        { f:'ยอดขาย', c:'ยอด' },
-        { f:'ค่าธรรมเนียม', c:'ค่าธรรมเนียม Grab + ภาษี MDR' },
-        { f:'เงินเข้าจริง', c:'ทั้งหมด' },
-        { f:'Order ID', c:'รหัสคำสั่งซื้อสั้น' },
-        { f:'กรองออก', c:'ประเภท = การปรับรายได้' }
+        { f:'Order ID', c:'Transaction ID' },
+        { f:'ยอดขาย', c:'Amount' },
+        { f:'ส่วนลดร้านค้า', c:'Discount (Merchant-Funded)' },
+        { f:'GP', c:'Channel Commission + Other Commission − Tax' },
+        { f:'VAT', c:'Tax on Commission, Adjustments, Ads' },
+        { f:'เงินเข้าจริง', c:'Total' },
+        { f:'กรองออก', c:'Status = Cancelled · Category ≠ Payment' }
       ]},
       { platform:'LINE MAN', initial:'L', fileType:'ไฟล์ .csv', pfg:'#7A5BA8', pbg:'#F1ECF6', rows:[
-        { f:'ยอดขาย', c:'cash_amount + e_payment_amount' },
-        { f:'ค่าธรรมเนียม', c:'fee + other_cost + vat' },
-        { f:'เงินเข้าจริง', c:'net_amount' },
         { f:'Order ID', c:'order_id' },
-        { f:'กรองออก', c:'detail = Payout / Installment' }
+        { f:'ยอดขาย', c:'cash_amount + e_payment_amount' },
+        { f:'ส่วนลดร้านค้า', c:'other_cost' },
+        { f:'GP', c:'fee' },
+        { f:'VAT', c:'vat' },
+        { f:'เงินเข้าจริง', c:'net_amount' },
+        { f:'กรองออก', c:'detail ≠ Delivery Order (รวม Payout)' }
       ]},
       { platform:'ShopeeFood', initial:'S', fileType:'ไฟล์ .csv / .xlsx', pfg:'#D98A4C', pbg:'#F8F0DC', rows:[
+        { f:'Order ID', c:'Order ID' },
         { f:'ยอดขาย', c:'Order Amount' },
-        { f:'ค่าธรรมเนียม', c:'Commission + VAT on Commission' },
+        { f:'ส่วนลดร้านค้า', c:'Food Voucher + Shipping Fee Voucher Subsidy' },
+        { f:'GP', c:'Commission (GP + Package fee…)' },
+        { f:'VAT', c:'VAT on Commission' },
         { f:'เงินเข้าจริง', c:'Net Income' },
-        { f:'Order ID', c:'Order ID (+ Pick up ID)' },
-        { f:'หัก ณ ที่จ่าย', c:'WHT' }
+        { f:'กรองออก', c:'Order Status = cancelled' }
       ]},
       { platform:'หน้าร้าน (POS)', initial:'ร', fileType:'ไฟล์ .csv', pfg:'#2C4A7C', pbg:'#ECF1F7', rows:[
         { f:'ยอดขาย', c:'ยอดรวม (หลังหักส่วนลด)' },
@@ -7359,11 +7411,14 @@ class Component extends DCLogic {
         status = 'พร้อมนำเข้า';
         statusStyle = { background:'#E6F3ED', color:'#2E7D5B', fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' };
       }
-      const vatN = r.fee * 7 / 107;
+      // GP กับ VAT อ่านจากคอลัมน์จริงในไฟล์ ถ้าไฟล์ไม่มี (เช่นรายงาน POS) ค่อยถอด 7/107 จาก fee
+      const vatN = r.vat != null ? r.vat : r.fee * 7 / 107;
+      const gpN = r.gp != null ? r.gp : r.fee - vatN;
       return {
         date: (r.date || '—') + ' ' + r.time, plat: r.meta.label, pfg: r.meta.pfg, pbg: r.meta.pbg,
         oid: r.orderId, pay: r.payment, gross: '฿' + fmt2(r.gross), fee: '฿' + fmt2(r.fee),
-        gp: '฿' + fmt2(r.fee - vatN), vat: '฿' + fmt2(vatN), net: '฿' + fmt2(r.net), status, statusStyle,
+        disc: '฿' + fmt2(r.discount || 0),
+        gp: '฿' + fmt2(gpN), vat: '฿' + fmt2(vatN), net: '฿' + fmt2(r.net), status, statusStyle,
         rowStyle: { borderTop:'1px solid #F1F2F4', opacity: greyed ? 0.42 : 1 },
         netStyle: { padding:'11px 8px', textAlign:'right', fontWeight:600, color: neg ? '#2C4A7C' : '#1B2536', textDecoration: greyed ? 'line-through' : 'none' }
       };
