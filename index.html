@@ -2346,6 +2346,35 @@
         </sc-for>
       </div>
 
+      <!-- ความครบถ้วนข้อมูล — เห็นตั้งแต่เปิดหน้าว่าช่องทางไหนค้างถึงวันไหน -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:18px 20px;margin-bottom:18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+          <i data-lucide="calendar-check" style="width:17px;height:17px;color:#8089A0"></i>
+          <h3 style="margin:0;font-size:15px;font-weight:600">ความครบถ้วนข้อมูล</h3>
+          <span style="{{ coverageHeadStyle }}">{{ coverageHeadline }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">
+          <sc-for list="{{ coverageRows }}" as="c" hint-placeholder-count="4">
+            <div style="border:1px solid #EEF0F5;border-radius:12px;padding:12px 14px;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="{{ c.dotStyle }}"></span>
+                <span style="font-size:13px;font-weight:600;color:#2B3547;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.platform }}</span>
+              </div>
+              <div style="font-size:12.5px;color:#8089A0;margin-bottom:3px">ข้อมูลถึง {{ c.last }}</div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                <span style="{{ c.noteStyle }}">{{ c.note }}</span>
+                <span style="font-size:11.5px;color:#9AA3B2">{{ c.recent }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ importDateWarn }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:flex-start;gap:9px;background:#F8F0DC;border:1px solid #E4CFA0;color:#8A6414;border-radius:11px;padding:11px 14px;font-size:12.5px;font-weight:500;margin-top:13px;line-height:1.5">
+            <i data-lucide="triangle-alert" style="width:16px;height:16px;flex:none;margin-top:1px"></i><span>{{ importDateWarn }}</span>
+          </div>
+        </sc-if>
+      </div>
+
       <!-- ===== TAB: นำเข้าไฟล์ (wizard) ===== -->
       <sc-if value="{{ impTabUpload }}" hint-placeholder-val="{{ true }}">
       <!-- stepper -->
@@ -4010,6 +4039,7 @@ const branchCodeOf = label => (BRANCH_OPTIONS.find(b => b.label === label) || {}
  *  ("หน้าร้าน" กับ "Delivery" คือช่องทาง ไม่ใช่แบรนด์ — แบรนด์จริงมีแค่ AnnieCake กับ หอมมนต์)
  *  แปลงตอนอ่านเข้ามาให้เป็น "ไม่ระบุแบรนด์" ทุกที่ในแอปจะได้จัดกลุ่ม/กรองด้วยค่าเดียวกัน
  *  และเขียนกลับฐานเป็น NULL เพื่อไม่ให้ค่าปนกลับเข้าไปอีก */
+const SALES_PLATFORMS = ['หน้าร้าน', 'LINE MAN', 'Grab', 'ShopeeFood'];
 const BRAND_UNSPEC = 'ไม่ระบุแบรนด์';
 const NON_BRAND_VALUES = ['หน้าร้าน', 'Delivery', ''];
 const brandName = b => (b == null || NON_BRAND_VALUES.indexOf(b) >= 0) ? BRAND_UNSPEC : b;
@@ -7082,6 +7112,59 @@ class Component extends DCLogic {
 
     // ---- นำเข้ารายงานออนไลน์ (Import) ----
     const importStep = this.state.importStep || 'upload';
+
+    // ---- ความครบถ้วนข้อมูลรายช่องทาง ----
+    // Grab / ShopeeFood / หน้าร้าน ลงเองทุกวัน (ปิดระบบอัตโนมัติแล้ว 5 ก.ย. 2569)
+    // ถ้าไม่มีตัวบอกว่าช่องทางไหนค้างถึงวันไหน จะรู้ตัวอีกทีตอนสิ้นเดือนแล้วยอดขาดไปเป็นสัปดาห์
+    // (เกิดจริงกับ Grab ที่ค้างตั้งแต่ 27 ส.ค. โดยไม่มีอะไรเตือน)
+    const covDayMs = 86400000;
+    const covISO = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const covYesterday = covISO(new Date(Date.now() - covDayMs));
+    const covDaysBetween = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / covDayMs);
+    const covDaysByPlatform = {};
+    const covCountByDate = {};
+    (this.state.recentRows || []).forEach(r => {
+      if (!r.isoDate) return;
+      (covDaysByPlatform[r.platform] = covDaysByPlatform[r.platform] || {})[r.isoDate] = true;
+      const k = r.platform + '|' + r.isoDate;
+      covCountByDate[k] = (covCountByDate[k] || 0) + 1;
+    });
+    const covWindowStart = covISO(new Date(Date.now() - 30 * covDayMs));
+    const coverageRows = SALES_PLATFORMS.map(p => {
+      const days = Object.keys(covDaysByPlatform[p] || {}).sort();
+      const last = days.length ? days[days.length - 1] : null;
+      // นับถึง "เมื่อวาน" ไม่ใช่วันนี้ เพราะรายงานของวันนี้ยังออกไม่ครบ ไม่ควรนับว่าขาด
+      const gap = last ? Math.max(0, covDaysBetween(last, covYesterday)) : null;
+      const recent = days.filter(d => d >= covWindowStart).length;
+      let tone, note;
+      if (!last)          { tone = '#9AA3B2'; note = 'ยังไม่มีข้อมูลเลย'; }
+      else if (gap === 0) { tone = '#2E7D5B'; note = 'ครบถึงเมื่อวาน'; }
+      else if (gap <= 2)  { tone = '#B98317'; note = 'ขาด ' + gap + ' วัน'; }
+      else                { tone = '#B14A4A'; note = 'ขาด ' + gap + ' วัน'; }
+      return {
+        platform: p,
+        last: last ? isoToBEShort(last) : '—',
+        note, recent: recent + '/30 วัน',
+        dotStyle: { width:'9px', height:'9px', borderRadius:'50%', background:tone, flex:'none' },
+        noteStyle: { fontSize:'12.5px', fontWeight:600, color:tone }
+      };
+    });
+    const covBehind = coverageRows.filter(r => /^ขาด/.test(r.note));
+    const coverageHeadline = covBehind.length
+      ? covBehind.length + ' ช่องทางยังลงไม่ครบ: ' + covBehind.map(r => r.platform + ' (' + r.note + ')').join(' · ')
+      : 'ทุกช่องทางมีข้อมูลถึงเมื่อวานครบแล้ว';
+    const coverageHeadStyle = covBehind.length
+      ? { fontSize:'13px', fontWeight:600, color:'#B14A4A' }
+      : { fontSize:'13px', fontWeight:600, color:'#2E7D5B' };
+
+    // เตือนก่อนนำเข้าทับวันที่ที่มีข้อมูลอยู่แล้ว — กันยอดเกินจริงแบบที่ Shopee เคยทำไว้ ฿31,683
+    const covPickedDate = this.state.importReportDate;
+    const covDupes = covPickedDate
+      ? SALES_PLATFORMS.map(p => ({ p, n: covCountByDate[p + '|' + covPickedDate] || 0 })).filter(x => x.n > 0)
+      : [];
+    const importDateWarn = covDupes.length
+      ? 'วันที่ ' + isoToBEShort(covPickedDate) + ' มีข้อมูลอยู่แล้ว — ' + covDupes.map(x => x.p + ' ' + x.n + ' รายการ') .join(' · ') + ' · นำเข้าซ้ำจะทำให้ยอดเกินจริง'
+      : '';
     const importLoaded = this.state.importFilesRaw.length > 0;
     const dedupeSkip = this.state.dedupeSkip !== false;
     const setImportStep = p => () => this.setState({ importStep: p });
@@ -7736,6 +7819,7 @@ class Component extends DCLogic {
       openImportFilePicker, handleImportFilesChange, handleImportDrop, preventDefault, removeImportFiles, gotoPreview, backToUpload, goSales, toggleDedupe,
       confirmImport, resetImport, confirmImportLabel, doneHeadline, doneGrossTotal, doneFeeTotal, doneNetTotal,
       importDateOpen, toggleImportDate, setImportReportDate, importReportDateDisplay, importReportDate: this.state.importReportDate,
+      coverageRows, coverageHeadline, coverageHeadStyle, importDateWarn,
       importFileSummary, importParsing: this.state.importParsing, importError: this.state.importError,
       importTabs, impTabUpload, impTabAuto, impTabHistory, autoConnections, autoSteps, importHistory, hasImportHistory, importToast, closeToast,
       payoutKpis, payoutPlatforms, payoutRecRows,
