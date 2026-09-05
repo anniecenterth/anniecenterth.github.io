@@ -1759,6 +1759,17 @@
               </div>
             </div>
             <div>
+              <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">สาขา</div>
+              <div data-form-dd="expBranch" style="position:relative">
+                <div onClick="{{ expBranchDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ expBranchDD.value }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
+                <sc-if value="{{ expBranchDD.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px">
+                    <sc-for list="{{ expBranchDD.options }}" as="opt" hint-placeholder-count="2"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <div>
               <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่หลัก <span style="color:#2C4A7C">*</span></div>
               <div data-form-dd="mainCat" style="position:relative">
                 <div onClick="{{ expMainDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ expMainDD.value }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
@@ -3632,8 +3643,17 @@
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
           <h3 style="margin:0;font-size:16px;font-weight:600">บันทึกยอดขายหน้าร้าน — ทั้งวัน</h3>
-          <div style="display:flex;align-items:center;gap:9px">
-            <span style="font-size:12.5px;color:#6B7486;font-weight:500">วันที่ <span style="color:#2C4A7C">*</span></span>
+          <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+            <span style="font-size:12.5px;color:#6B7486;font-weight:500">สาขา</span>
+            <div data-form-dd="storeBranch" style="position:relative;min-width:132px">
+              <div onClick="{{ salesBranchDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="font-weight:600">{{ salesBranchDD.value }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2;flex:none"></i></div>
+              <sc-if value="{{ salesBranchDD.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:46px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:132px">
+                  <sc-for list="{{ salesBranchDD.options }}" as="opt" hint-placeholder-count="2"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <span style="font-size:12.5px;color:#6B7486;font-weight:500;margin-left:5px">วันที่ <span style="color:#2C4A7C">*</span></span>
             <div data-form-dd="storeDate" style="position:relative">
               <div onClick="{{ toggleStoreDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><i data-lucide="calendar" style="width:16px;height:16px;color:#8089A0"></i><span style="font-weight:600">{{ storeDateDisplay }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
               <sc-if value="{{ storeDateOpen }}" hint-placeholder-val="{{ false }}">
@@ -3975,6 +3995,17 @@ const SALES_VAT_BY_ORDER = {"LMF-260709-704801585":3.94,"LMF-260709-787669571":5
 // Product sales snapshot pulled from the POS "ยอดขายตามสินค้า" report (top 60 by
 // gross per month). Real data; refresh by asking Claude to "อัปเดตข้อมูลสินค้า".
 const PRODUCT_SALES = {"asOf":"10/08/2569","jul":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",1041,100551],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",125,35723],["เค้ก 90 Buttercream เค้กโบราณ","เมนูใหม่ประจำวัน",79,20731],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",47,13061],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",39,12597],["H มะพร้าว","ครึ่งปอนด์",52,12338],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",34,11012],["เค้กมะพร้าว","2 ปอนด์",217,8778],["H Bear Brown Cake","ครึ่งปอนด์",39,8541],["เครปเค้กเรนโบว์","2 ปอนด์",173,8329],["Flowers","เมนูแนะนำ (เมนูใหม่)",25,8153],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",55,7559],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",183,7336],["H ช็อคบราวนี่","ครึ่งปอนด์",33,7317],["เค้กแบล็คฟอเรสต์","2 ปอนด์",168,6769],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",19,6682],["เค้กส้ม","2 ปอนด์",164,6545],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",20,6521],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",163,6510],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",161,6433],["Be Smiles","เค้กมินิมอล",27,6063],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",149,5992],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",150,5915],["เค้กมะพร้าวใบเตย","2 ปอนด์",145,5852],["เค้กบลูเบอร์รี่","2 ปอนด์",148,5775],["เค้กช็อคหน้านิ่ม","2 ปอนด์",147,5768],["Blessing","เค้กมินิมอล",17,5673],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",143,5586],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",133,5257],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",16,5229],["เค้กช็อคโอริโอ้","2 ปอนด์",131,5222],["White Ruby","เมนูแนะนำ (เมนูใหม่)",12,5159],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",16,5073],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",18,4872],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",15,4851],["เค้กเชอร์รี่ช็อกโกแลต","2 ปอนด์",120,4795],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",14,4740],["เค้กมิกซ์เบอร์รี่","2 ปอนด์",118,4599],["เค้กช็อกโกแลต ครัช","2 ปอนด์",115,4585],["เค้กโอริโอ้","2 ปอนด์",118,4571],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",14,4473],["1P เค้กช็อคโก้โอริโอ้","เค้ก 1 ปอนด์",14,4395],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",18,4332],["เค้กเชดด้าชีส","2 ปอนด์",110,4284],["Boy Choco","เค้กช็อกโกแลตหน้านิ่ม",11,4275],["เค้กบลูเลิฟเวอร์","2 ปอนด์",105,4116],["เค้กลูกตาล","2 ปอนด์",100,3913],["H เรนโบว์ช็อค","ครึ่งปอนด์",18,3862],["เค้กชาเขียวมัจฉะ","2 ปอนด์",94,3794],["เค้กช็อคโกแลตพีนัทบัตเตอร์","2 ปอนด์",94,3724],["1P ช็อกโกแลตนูเทลล่า","เค้ก 1 ปอนด์",11,3495],["เค้กฝอยทอง","2 ปอนด์",87,3465],["1P ไวท์ช็อกโกแลต","เค้ก 1 ปอนด์",11,3378],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",80,3160],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",11,3135],["เค้กช็อคโอช็อค","2 ปอนด์",79,3101],["คนพิเศษเกิดวันนี้","เมนูแนะนำ (เมนูใหม่)",9,3037],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",8,2970],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",9,2904],["เค้กไวท์กรีนทีเชอรี่","2 ปอนด์",73,2884]],"aug":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",117,11106],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",18,5924],["H มะพร้าว","ครึ่งปอนด์",21,4819],["Little Boy","เมนูใหม่ประจำวัน",16,3662],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",7,3055],["Flowers","เมนูแนะนำ (เมนูใหม่)",8,2543],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",8,2299],["เค้ก 90 Buttercream Mini × 6","เมนูใหม่ประจำวัน",4,2160],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",6,2086],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",7,2066],["H Bear Brown Cake","ครึ่งปอนด์",9,2031],["เครปเค้กเรนโบว์","2 ปอนด์",41,1917],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",6,1917],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",6,1917],["เค้กมะพร้าวใบเตย","2 ปอนด์",47,1911],["เค้กมะพร้าว","2 ปอนด์",44,1764],["พวงมาลัย (กลาง)","เค้กวันแม่",5,1745],["Red Ruby","เมนูแนะนำ (เมนูใหม่)",4,1705],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",6,1669],["เค้กบลูเลิฟเวอร์","2 ปอนด์",42,1638],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",40,1582],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",5,1578],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",40,1575],["H ช็อคนูเทล่า","ครึ่งปอนด์",7,1573],["เค้กแบล็คฟอเรสต์","2 ปอนด์",38,1449],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",5,1425],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",5,1413],["พวงมาลัย (ใหญ่)","เค้กวันแม่",4,1396],["Blessing","เค้กมินิมอล",4,1377],["H ช็อคโอริโอ้","ครึ่งปอนด์",6,1354],["H ช็อคเลิฟเวอร์","ครึ่งปอนด์",6,1284],["Cherry","เค้กมินิมอล",4,1276],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",33,1260],["เค้กช็อคหน้านิ่ม","2 ปอนด์",32,1239],["เค้กบลูเบอร์รี่","2 ปอนด์",31,1225],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",3,1221],["H มิกซ์เบอร์รี่","ครึ่งปอนด์",5,1145],["Cinderella Princess","เมนูดังคนสั่งเยอะ",3,1142],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",29,1120],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1116],["H Bear Pink Cake","ครึ่งปอนด์",5,1115],["Pink Heart Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1112],["เค้กช็อกโกแลต ครัช","2 ปอนด์",29,1106],["เค้กช็อคโอช็อค","2 ปอนด์",29,1099],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",3,1045],["เค้กเชดด้าชีส","2 ปอนด์",26,1001],["Be Smiles","เค้กมินิมอล",3,957],["Blue Ocean","เค้กมินิมอล",3,956],["เค้กช็อคโอริโอ้","2 ปอนด์",25,952],["เค้กโอริโอ้","2 ปอนด์",24,952],["H เรนโบว์ช็อค","ครึ่งปอนด์",5,945],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",3,939],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",3,939],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",25,938],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",24,931],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",4,926],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",24,924],["เค้กฝอยทอง","2 ปอนด์",23,903],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",23,888],["Girl Choco","เค้กช็อกโกแลตหน้านิ่ม",3,887]]};
+/** รหัสสาขา — ต้องตรงกับฐาน annie-cake เป๊ะ (ดู Annie AI System/นิยามกลาง.md)
+ *  ห้ามคิดรหัสใหม่เอง ไม่งั้นวันรวมฐานจะแมปกันไม่ได้
+ *  Command Center ทำสาขาบางโพเป็นหลัก จึงตั้ง main เป็นค่าเริ่มต้น */
+const BRANCH_OPTIONS = [
+  { code: 'main',     label: 'บางโพ' },
+  { code: 'chanroad', label: 'ถนนจันทร์' }
+];
+const DEFAULT_BRANCH = 'main';
+const branchLabel = code => (BRANCH_OPTIONS.find(b => b.code === code) || {}).label || code || '—';
+const branchCodeOf = label => (BRANCH_OPTIONS.find(b => b.label === label) || {}).code || DEFAULT_BRANCH;
+
 function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: dbRow.brand,
@@ -3983,7 +4014,8 @@ function mapDbRowToSale(dbRow) {
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
     type: dbRow.type, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
-    note: dbRow.note || '', source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null
+    note: dbRow.note || '', source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null,
+    branch: dbRow.branch || DEFAULT_BRANCH
   };
 }
 function mapSaleToDbRow(row) {
@@ -3995,14 +4027,16 @@ function mapSaleToDbRow(row) {
     source: row.source || null, source_ref: row.sourceRef || row.orderId || null, created_by: row.createdBy || null,
     // คอลัมน์วันที่จริงที่ทุกรายงานใช้จัดกลุ่มรายวัน — ก่อนหน้านี้ไม่ได้ส่งมาเลย
     // แถวที่บันทึกผ่านฟอร์มจึงมี sale_date ว่าง แล้วหายไปจากรายงานรายวันทั้งหมด
-    sale_date: row.isoDate || safeBeShortToISO(row.date) || null
+    sale_date: row.isoDate || safeBeShortToISO(row.date) || null,
+    branch: row.branch || DEFAULT_BRANCH
   };
 }
 function mapDbRowToExpense(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.expense_date || safeBeShortToISO(dbRow.date), time: dbRow.time, mainCat: dbRow.main_cat, subCat: dbRow.sub_cat,
     detail: dbRow.detail, amount: dbRow.amount, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
-    source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null
+    source: dbRow.source || null, sourceRef: dbRow.source_ref || null, createdBy: dbRow.created_by || null,
+    branch: dbRow.branch || DEFAULT_BRANCH
   };
 }
 function mapExpenseToDbRow(row) {
@@ -4011,7 +4045,8 @@ function mapExpenseToDbRow(row) {
     detail: row.detail, amount: row.amount, payment: row.payment, attachment_name: row.attachmentName || null,
     source: row.source || 'MANUAL', source_ref: row.sourceRef || null, created_by: row.createdBy || null,
     // เหตุผลเดียวกับ sale_date ด้านบน — รายจ่ายที่คีย์ผ่านฟอร์มเคยมี expense_date ว่างทุกแถว
-    expense_date: row.isoDate || safeBeShortToISO(row.date) || null
+    expense_date: row.isoDate || safeBeShortToISO(row.date) || null,
+    branch: row.branch || DEFAULT_BRANCH
   };
 }
 
@@ -4289,14 +4324,14 @@ class Component extends DCLogic {
     authUser: '', authPassword: '', authError: null, authBusy: false,
     page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
     saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
-    form: { date: todayISO(), platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
+    form: { date: todayISO(), branch: 'บางโพ', platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
     formDD: null, salesListDD: null, salesPlatform: 'ทุกแพลตฟอร์ม', salesSearch: '', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด',
     salesSortKey: 'date', salesSortDir: 'desc',
     salesPage: 1, salesPageSize: 10, salesHeaderDate: todayISO(),
     importFilesRaw: [], importReportDate: todayISO(), importParsing: false, importError: null,
     importHistoryList: importHistoryStore.load(), lastImportSummary: null,
-    expForm: { date: todayISO(), mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' },
+    expForm: { date: todayISO(), branch: 'บางโพ', mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' },
     editingExpenseId: null,
     // ---- ระบบเงินเดือน ----
     employees: [], holidays: [], holidayWork: [], payslips: [], payrollError: null,
@@ -4328,7 +4363,7 @@ class Component extends DCLogic {
     crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
-    storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' },
+    storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' },
     storeFormError: null, storeSaving: false
   };
 
@@ -6223,11 +6258,12 @@ class Component extends DCLogic {
     const expMainDD = this.mkFormDD('mainCat', EXPENSE_MAIN_CATS, 'expForm', () => ({ subCat: 'เลือกหมวดหมู่ย่อย' }));
     const expSubDD = this.mkFormDD('subCat', EXPENSE_SUB_BY_MAIN[ef.mainCat] || [], 'expForm');
     // ทะเบียนร้านยืนยันว่ามี 2 แบรนด์ — สวีทซอฟต์อยู่ใต้ AnnieCake ไม่ใช่แบรนด์แยก
+    const expBranchDD = this.mkFormDD('branch', BRANCH_OPTIONS.map(b => b.label), 'expForm');
     const expBrandDD = this.mkFormDD('expBrand', ['ไม่ระบุ','AnnieCake','หอมมนต์'], 'expForm');
     const expPayDD = this.mkFormDD('expPayment', ['โอนเงิน','เงินสด','บัตรเครดิต','อื่นๆ'], 'expForm');
     const toggleAsset = () => this.setState(s => ({ expForm: { ...s.expForm, asset: !s.expForm.asset } }));
     const expAsset = ef.asset;
-    const defaultExpenseForm = () => ({ date: todayISO(), mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' });
+    const defaultExpenseForm = () => ({ date: todayISO(), branch:'บางโพ', mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' });
     const clearExp = () => this.setState({ expForm: defaultExpenseForm(), editingExpenseId: null });
     const openExpAttachPicker = () => { const el = document.getElementById('exp-attach-input'); if (el) el.click(); };
     const handleExpAttachChange = e => { const file = e.target.files && e.target.files[0]; if (file) this.setState(s => ({ expForm: { ...s.expForm, attachmentName: file.name } })); e.target.value = ''; };
@@ -6236,7 +6272,7 @@ class Component extends DCLogic {
       const e2 = this.state.expForm;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time, mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time, branch: branchCodeOf(e2.branch), mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
     };
     const saveExp = (keepGoing) => async () => {
       const editingId = this.state.editingExpenseId;
@@ -6644,6 +6680,7 @@ class Component extends DCLogic {
     const dateOpen = this.state.formDD === 'date';
     const toggleDate = () => this.setState(s => ({ formDD: s.formDD === 'date' ? null : 'date' }));
     const platformDD = this.mkFormDD('platform', ['LINE MAN','Grab','ShopeeFood','หน้าร้าน']);
+    const salesBranchDD = this.mkFormDD('branch', BRANCH_OPTIONS.map(b => b.label), 'storeBatch');
     const brandDD = this.mkFormDD('brand', ['AnnieCake','หอมมนต์']);
     const typeDD = this.mkFormDD('type', ['อาหาร / เครื่องดื่ม','เบเกอรี่','เค้กสั่งทำ','อื่น ๆ']);
     const paymentDD = this.mkFormDD('payment', ['ลูกค้าชำระเงินปลายทาง (COD)','ชำระผ่านแอป/บัตร','โอนเงิน']);
@@ -6661,7 +6698,7 @@ class Component extends DCLogic {
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       const pre = { 'LINE MAN':'LM', 'Grab':'GRAB', 'ShopeeFood':'SPF', 'หน้าร้าน':'POS' }[ff.platform] || 'LM';
       const orderId = ff.orderId || (pre + '-' + isoToBEShort(ff.date).split('/').reverse().join('') + '-' + String(Math.floor(Math.random()*900)+100));
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time, platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time, branch: branchCodeOf(ff.branch), platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
     };
     const saveRow = (keepGoing) => async () => {
       const editingId = this.state.editingSalesId;
@@ -6692,7 +6729,7 @@ class Component extends DCLogic {
       this.setState({
         editingSalesId: row.id,
         form: {
-          date: beShortToISO(row.date), platform: row.platform, brand: row.brand,
+          date: beShortToISO(row.date), branch: branchLabel(row.branch), platform: row.platform, brand: row.brand,
           type: row.type || 'อาหาร / เครื่องดื่ม', orderId: row.orderId,
           payment: row.payment || 'ลูกค้าชำระเงินปลายทาง (COD)', status: row.status,
           gross: row.gross.toFixed(2), discount: '0.00', fee: row.fee.toFixed(2),
@@ -6743,7 +6780,7 @@ class Component extends DCLogic {
       disc: '−฿' + Math.round(sbDisc).toLocaleString('en-US'),
       net: '฿' + Math.round(sbBefore - sbDisc).toLocaleString('en-US')
     };
-    const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' }, storeFormError: null });
+    const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' }, storeFormError: null });
     const saveStoreBatch = async () => {
       if (this.state.storeSaving) return;
       const f = this.state.storeBatch;
@@ -6766,7 +6803,7 @@ class Component extends DCLogic {
         }
         const note = (f.note || '').trim();
         const dbRows = entries.map(x => mapSaleToDbRow({
-          date: beDate, time: '23:59', platform: 'หน้าร้าน', brand: 'หน้าร้าน',
+          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: 'หน้าร้าน',
           orderId: x.p + ' (หน้าร้าน ' + beDate + ')',
           gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
           status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: '', source: 'MANUAL_FORM'
@@ -6784,7 +6821,7 @@ class Component extends DCLogic {
         this.setState(s => ({
           storeSaving: false,
           recentRows: [...res.data.map(mapDbRowToSale), ...s.recentRows.filter(r => !dupeIds.includes(r.id))],
-          storeBatch: { date: todayISO(), amounts: {}, discounts: {}, note: '' },
+          storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' },
           storeFormError: noteDropped ? 'บันทึก ' + entries.length + ' รายการสำเร็จ แต่หมายเหตุยังไม่ถูกเก็บ (ต้องรัน migration 0007_sales_note.sql ก่อน)' : null
         }));
       } catch (err) {
@@ -7657,6 +7694,7 @@ class Component extends DCLogic {
       headerDateDisplay, headerDateLabel, salesHeaderDateOpen, toggleSalesHeaderDate, setSalesHeaderDate, salesHeaderDate: this.state.salesHeaderDate,
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
       isEditingSales, salesFormTitle, clearButtonLabel, saveButtonLabel: isEditingSales ? 'บันทึกการแก้ไข' : 'บันทึกรายการ',
+      salesBranchDD, expBranchDD,
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
       salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
       expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
