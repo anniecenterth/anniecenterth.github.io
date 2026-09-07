@@ -566,9 +566,7 @@
               <tr style="color:#8089A0;font-size:11.5px;text-align:right">
                 <th style="padding:0 6px 11px;font-weight:500;text-align:left">ช่องทาง</th>
                 <th style="padding:0 6px 11px;font-weight:500">ยอดขาย</th>
-                <th style="padding:0 6px 11px;font-weight:500">GP</th>
-                <th style="padding:0 6px 11px;font-weight:500">VAT</th>
-                <th style="padding:0 6px 11px;font-weight:500">โปรโมชัน</th>
+                <th style="padding:0 6px 11px;font-weight:500">ค่าบริการ</th>
                 <th style="padding:0 6px 11px;font-weight:500">เงินเข้าจริง</th>
                 <th style="padding:0 6px 11px;font-weight:500;text-align:center">สถานะเงินเข้า</th>
               </tr>
@@ -578,9 +576,7 @@
                 <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ p.weight }}">
                   <td style="padding:12px 6px"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.dot }}"></span>{{ p.name }}</span></td>
                   <td style="padding:12px 6px;text-align:right">{{ p.gross }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.gp }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.vat }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.promo }}</td>
+                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.service }}</td>
                   <td style="padding:12px 6px;text-align:right;font-weight:600">{{ p.net }}</td>
                   <td style="padding:12px 6px;text-align:center">{{ p.statusTag }}</td>
                 </tr>
@@ -2271,9 +2267,7 @@
             <tr style="color:#8089A0;font-size:11.5px;text-align:right">
               <th style="padding:0 8px 12px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
               <th style="padding:0 8px 12px;font-weight:500">ยอดขายรวม</th>
-              <th style="padding:0 8px 12px;font-weight:500">GP</th>
-              <th style="padding:0 8px 12px;font-weight:500">VAT</th>
-              <th style="padding:0 8px 12px;font-weight:500">โปรโมชัน</th>
+              <th style="padding:0 8px 12px;font-weight:500">ค่าบริการ</th>
               <th style="padding:0 8px 12px;font-weight:500">ยอดเงินเข้าจริง</th>
               <th style="padding:0 8px 12px;font-weight:500;text-align:center">สถานะเงินเข้า</th>
             </tr>
@@ -2283,9 +2277,7 @@
               <tr style="border-top:1px solid #F1F2F4;color:#2B3547;font-weight:{{ p.weight }}">
                 <td style="padding:12px 8px">{{ p.platform }}</td>
                 <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ p.gross }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.gp }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.vat }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.promo }}</td>
+                <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.service }}</td>
                 <td style="padding:12px 8px;text-align:right;font-weight:600;white-space:nowrap">{{ p.net }}</td>
                 <td style="padding:12px 8px;text-align:center">{{ p.statusTag }}</td>
               </tr>
@@ -5965,17 +5957,21 @@ class Component extends DCLogic {
     const finPlatformDots = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245' };
     const byPlatformFin = this.groupBy(finRows, r => r.platform);
     const finDeliveryPlatforms = ['Grab','LINE MAN','ShopeeFood'];
+    // ค่าบริการ = ค่าคอม + VAT ของค่าคอม + ส่วนลดที่ร้านออกเอง (fee เก็บ gp + vat ไว้แล้ว)
+    // แถวเก่าที่ไม่มีคอลัมน์ส่วนลดจะคิดเป็น 0 เอง ไม่ต้องแยกกรณี
+    const finPromoOf = p => finRows.filter(r => r.platform === p).reduce((a, r) => a + (Number(r.discount) || 0), 0);
     const payoutRows = finDeliveryPlatforms.filter(p => byPlatformFin[p]).map(p => {
       const g = byPlatformFin[p];
       const hasWaiting = finRows.some(r => r.platform === p && r.status === 'รอรับเงิน');
-      const feePct = g.gross ? (g.fee / g.gross * 100).toFixed(1) + '%' : '0%';
-      return { name:p, dot: finPlatformDots[p], gross: fmtFin(g.gross), gp: '-' + fmtFin(g.fee) + ' (' + feePct + ')', vat: fmtFin(0), promo: fmtFin(0), net: fmtFin(g.net), statusTag: hasWaiting ? statusTag('รอเข้าวันนี้','wait') : statusTag('เข้าบัญชีแล้ว','ok'), weight:'500' };
+      const service = g.fee + finPromoOf(p);
+      const svcPct = g.gross ? (service / g.gross * 100).toFixed(1) + '%' : '0%';
+      return { name:p, dot: finPlatformDots[p], gross: fmtFin(g.gross), service: fmtFin(service) + ' (' + svcPct + ')', net: fmtFin(g.net), statusTag: hasWaiting ? statusTag('รอเข้าวันนี้','wait') : statusTag('เข้าบัญชีแล้ว','ok'), weight:'500' };
     });
     if (payoutRows.length) {
       const totalGross = finDeliveryPlatforms.reduce((a,p)=>a+(byPlatformFin[p]?byPlatformFin[p].gross:0),0);
-      const totalFee = finDeliveryPlatforms.reduce((a,p)=>a+(byPlatformFin[p]?byPlatformFin[p].fee:0),0);
+      const totalService = finDeliveryPlatforms.reduce((a,p)=>a+(byPlatformFin[p]?byPlatformFin[p].fee + finPromoOf(p):0),0);
       const totalNet = finDeliveryPlatforms.reduce((a,p)=>a+(byPlatformFin[p]?byPlatformFin[p].net:0),0);
-      payoutRows.push({ name:'รวมทั้งสิ้น', dot:'#C7CDD8', gross: fmtFin(totalGross), gp: '-' + fmtFin(totalFee), vat: fmtFin(0), promo: fmtFin(0), net: fmtFin(totalNet), statusTag:'—', weight:'700' });
+      payoutRows.push({ name:'รวมทั้งสิ้น', dot:'#C7CDD8', gross: fmtFin(totalGross), service: fmtFin(totalService), net: fmtFin(totalNet), statusTag:'—', weight:'700' });
     }
 
     const finTodayISO = todayISO();
@@ -6814,7 +6810,7 @@ class Component extends DCLogic {
     const dashPayoutRows = [];
     if (byChannel['หน้าร้าน']) {
       const g = byChannel['หน้าร้าน'];
-      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(g.gross), gp: fmtB(0), vat: fmtB(0), promo: fmtB(0), net: fmtB(g.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(g.gross), service: fmtB(0), net: fmtB(g.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (storefrontExpanded) {
         const storeRows = salesRows.filter(r => r.platform === 'หน้าร้าน');
         const payOrder = ['Cash','K+ Shop','QR PromptPay (POS Pay)','ไทยช่วยไทย พลัส (หน้าร้าน)','Split Amount','ขายส่ง'];
@@ -6823,7 +6819,7 @@ class Component extends DCLogic {
         const orderedKeys = payOrder.filter(k => byPay[k]).concat(Object.keys(byPay).filter(k => !payOrder.includes(k)));
         orderedKeys.forEach(k => {
           const s = byPay[k];
-          dashPayoutRows.push({ platform: storefrontSubCell(k), gross: fmtB(s.gross), gp: fmtB(0), vat: fmtB(0), promo: fmtB(0), net: fmtB(s.net), statusTag: '', weight:'400' });
+          dashPayoutRows.push({ platform: storefrontSubCell(k), gross: fmtB(s.gross), service: fmtB(0), net: fmtB(s.net), statusTag: '', weight:'400' });
         });
       }
     }
@@ -6840,7 +6836,7 @@ class Component extends DCLogic {
     dashDeliveryPlatforms.filter(p => byChannel[p]).forEach(p => {
       const g = byChannel[p];
       const hasWaiting = salesRows.some(r => r.platform === p && r.status === 'รอรับเงิน');
-      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), gp: fmtB(dashGp(p,g)), vat: fmtB(dashVat(p)), promo: fmtB(dashPromo(p)), net: fmtB(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), service: fmtB(dashGp(p,g) + dashVat(p) + dashPromo(p)), net: fmtB(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (expandedPlatforms[p]) {
         // แยกเป็น "ร้าน" ตามชื่อที่แพลตฟอร์มเรียก ไม่ยุบเป็นแบรนด์ เพราะแบรนด์เดียวมีหลายร้าน
         // และเจ้าของร้านต้องดูออกว่าร้านไหนทำยอดได้เท่าไร (แถวเก่าที่ไม่มีชื่อร้านถอยไปใช้แบรนด์)
@@ -6854,7 +6850,7 @@ class Component extends DCLogic {
         });
         Object.keys(byBrandPlat).sort((a, b) => byBrandPlat[b].gross - byBrandPlat[a].gross).forEach(b => {
           const s = byBrandPlat[b];
-          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), gp: fmtB(s.hasGp ? s.gp : s.fee - s.vat), vat: fmtB(s.vat), promo: fmtB(s.promo), net: fmtB(s.net), statusTag: '', weight:'400' });
+          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), service: fmtB((s.hasGp ? s.gp : s.fee - s.vat) + s.vat + s.promo), net: fmtB(s.net), statusTag: '', weight:'400' });
         });
       }
     });
@@ -6866,7 +6862,7 @@ class Component extends DCLogic {
       const totalVat = sumBy(p=>dashVat(p));
       const totalPromo = sumBy(p=>dashPromo(p));
       const totalNet = sumBy((p,g)=>g.net);
-      dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), gp: fmtB(totalGp), vat: fmtB(totalVat), promo: fmtB(totalPromo), net: fmtB(totalNet), statusTag:'—', weight:'700' });
+      dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), service: fmtB(totalGp + totalVat + totalPromo), net: fmtB(totalNet), statusTag:'—', weight:'700' });
       // ไม่มีแถว "ส่วนลดรวม" แล้ว เพราะ gross เก็บเป็นยอดหลังหักส่วนลดตั้งแต่ต้น
       // แถว "รวมทั้งหมด" ด้านบนจึงเป็นยอดหลังหักส่วนลดอยู่แล้ว ไม่ต้องกระทบยอดซ้ำ
     }
