@@ -4134,6 +4134,18 @@ const NON_BRAND_VALUES = ['หน้าร้าน', 'Delivery', ''];
 const brandName = b => (b == null || NON_BRAND_VALUES.indexOf(b) >= 0) ? BRAND_UNSPEC : b;
 const brandToDb = b => (b == null || b === BRAND_UNSPEC || NON_BRAND_VALUES.indexOf(b) >= 0) ? null : b;
 
+/** ชื่อร้านตามที่แพลตฟอร์มเรียก — 1 แบรนด์มีหลายร้าน (บางโพ บางบัวทอง ราชพฤกษ์ ฯลฯ)
+ *  เก็บอยู่ในแถวดิบ คนละชื่อคอลัมน์ในแต่ละแพลตฟอร์ม จึงรวบเป็นช่องเดียวตั้งแต่ตอนอ่านเข้ามา */
+const STORE_NAME_KEYS = ['Store Name', 'restaurant_name', 'ชื่อร้าน', 'ชื่อร้าน_1'];
+function storeNameOf(raw) {
+  if (!raw) return null;
+  for (const k of STORE_NAME_KEYS) {
+    const v = raw[k];
+    if (v != null && String(v).trim()) return String(v).trim();
+  }
+  return null;
+}
+
 function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: brandName(dbRow.brand),
@@ -4143,6 +4155,7 @@ function mapDbRowToSale(dbRow) {
     // Real VAT withheld by the platform: prefer a stored sales.vat column, else the per-order
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
+    store: storeNameOf(dbRow.raw),
     discount: dbRow.discount != null ? Number(dbRow.discount) : null,
     gp: dbRow.gp != null ? Number(dbRow.gp) : null,
     type: dbRow.type, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
@@ -6772,10 +6785,12 @@ class Component extends DCLogic {
       // Plain-text chevron: lucide's <i>→<svg> replacement fights React reconciliation
       // when this cell re-renders on toggle (removeChild NotFoundError).
       React.createElement('span', { style:{ fontSize:'11px', color:'#9AA3B2', display:'inline-block', transform: expanded ? 'rotate(180deg)' : 'none', transition:'transform .15s' } }, '▼'));
+    // ชื่อร้านของแพลตฟอร์มยาวกว่าชื่อช่องทางชำระมาก ตัดด้วย ellipsis ไม่ให้ดันคอลัมน์อื่นหาย
+    // และใส่ title ไว้ให้ชี้เมาส์อ่านชื่อเต็มได้
     const storefrontSubCell = (name) => React.createElement('span',
-      { style:{ display:'inline-flex', alignItems:'center', gap:'8px', paddingLeft:'31px', color:'#7A8398' } },
+      { title: name, style:{ display:'inline-flex', alignItems:'center', gap:'8px', paddingLeft:'31px', color:'#7A8398', maxWidth:'290px' } },
       React.createElement('span', { style:{ width:'5px', height:'5px', borderRadius:'50%', background:'#C3CAD6', flex:'none' } }),
-      name);
+      React.createElement('span', { style:{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } }, name));
     const dashPayoutRows = [];
     if (byChannel['หน้าร้าน']) {
       const g = byChannel['หน้าร้าน'];
@@ -6807,9 +6822,11 @@ class Component extends DCLogic {
       const hasWaiting = salesRows.some(r => r.platform === p && r.status === 'รอรับเงิน');
       dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), gp: fmtB(dashGp(p,g)), vat: fmtB(dashVat(p)), promo: fmtB(dashPromo(p)), net: fmtB(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (expandedPlatforms[p]) {
+        // แยกเป็น "ร้าน" ตามชื่อที่แพลตฟอร์มเรียก ไม่ยุบเป็นแบรนด์ เพราะแบรนด์เดียวมีหลายร้าน
+        // และเจ้าของร้านต้องดูออกว่าร้านไหนทำยอดได้เท่าไร (แถวเก่าที่ไม่มีชื่อร้านถอยไปใช้แบรนด์)
         const byBrandPlat = {};
         salesRows.filter(r => r.platform === p).forEach(r => {
-          const b = r.brand || 'อื่นๆ';
+          const b = r.store || r.brand || 'ไม่ระบุร้าน';
           const o = byBrandPlat[b] || (byBrandPlat[b] = { gross:0, fee:0, vat:0, gp:0, promo:0, hasGp:false, net:0 });
           o.gross += r.gross; o.fee += r.fee; o.vat += (r.vat || 0); o.net += r.net;
           o.promo += (r.discount || 0);
