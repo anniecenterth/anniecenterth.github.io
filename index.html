@@ -4002,35 +4002,39 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
   if (platform === 'grab') {
     const rawStatus = String(row['Status'] || row['สถานะ'] || '').trim();
     if (/cancel/i.test(rawStatus) || rawStatus === 'ยกเลิกแล้ว') return null;   // สเปก: กรองออก Status = Cancelled
-    // นอกจาก Cancelled ยังกรอง Category ไว้ด้วย — ไฟล์ Grab มีบรรทัดค่าโฆษณา/การปรับรายได้
-    // ปนมาในไฟล์เดียวกัน ถ้าไม่กรองจะถูกนับเป็นยอดขายทันที
+    // ไฟล์ Grab มี 2 ชนิดบรรทัดที่ต้องนับ แต่คิดคนละแบบ
+    //   Payment    = ออเดอร์ลูกค้า → ยอดขายคือ Amount
+    //   Adjustment = การปรับรายได้ (Grab หักคืน) → ไม่ใช่ยอดขาย แต่เป็นค่าบริการ
+    // เดิมกรอง Adjustment ทิ้งทั้งหมด ค่าบริการจึงขาดไป (ร้านหอมมนต์บางโพ ส.ค. ขาด ฿790.67)
     const category = String(row['Category'] || row['หมวดหมู่'] || '').trim();
-    if (category && category !== 'Payment' && category !== 'ชำระเงิน') return null;
+    const isAdjustment = /adjust/i.test(category) || category === 'การปรับรายได้';
+    if (category && !isAdjustment && category !== 'Payment' && category !== 'ชำระเงิน') return null;
     // Transaction ID ไม่ซ้ำ ต่างจาก Short Order ID ที่ Grab วนใช้เลขเดิม (เจอซ้ำ 32 เลขในฐาน)
     const orderId = row['Transaction ID'] || row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '';
     if (!orderId) return null;
     if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return null;
-    const gross = num(row['Amount'] || row['ยอด']);
+    const amount = num(row['Amount'] || row['ยอด']);
     const total = num(row['Total'] || row['ทั้งหมด']);
-    const payMethod = String(row['Payment Method'] || row['วิธีการชำระเงิน'] || '').trim();
-    const isCash = /^cash$|เงินสด/i.test(payMethod);
+    const settled = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว';
     // ค่าบริการ = Amount − Total ใช้เลขคณิตของ Grab เอง
     // Grab หักหลายคอลัมน์และไม่เท่ากันทุกออเดอร์ (Channel Commission, Marketing success fee,
     // Step-up commission ฯลฯ) ถ้าไล่บวกทีละคอลัมน์จะตกหล่นทันทีที่ Grab เพิ่มคอลัมน์ใหม่
-    // — เคยตกไป 2 คอลัมน์จนค่าบริการต่ำกว่าจริง
-    const service = Math.abs(gross - total);
+    const gross = isAdjustment ? 0 : amount;
+    const service = isAdjustment ? -amount : amount - total;
+    // แถวที่ยังไม่โอน (Status = Completed) Grab ยังไม่หักค่าคอม Amount จึงเท่ากับ Total
+    // เงินยังไม่เข้าบัญชี ยอดโอนของแถวนี้จึงเป็น 0 แต่ยอดขายนับแล้ว และสถานะขึ้นว่ารอรับเงิน
+    const net = (!isAdjustment && !settled) ? 0 : total;
     const vat = mag(loosePick(row, 'Tax on GrabFood / GrabMart Commission, Adjustments, Ads'));
     const discount = mag(loosePick(row, 'Discount (Merchant-Funded)'));
     // VAT กับส่วนลดร้านรวมอยู่ในผลต่างข้างบนแล้ว จึงถอดออกให้ gp เป็นค่าคอมล้วน
-    const gp = Math.max(0, service - vat - discount);
-    // ออเดอร์เงินสด ร้านรับเงินจากลูกค้าเองหน้าร้าน Grab ไม่ได้โอนยอดนี้ให้
-    // แต่หักค่าคอมคืนจากยอดโอนก้อนอื่น — ยอดโอนของแถวนี้จึงติดลบ
-    const net = isCash ? total - gross : total;
+    const gp = service - vat - discount;
+    const payMethod = String(row['Payment Method'] || row['วิธีการชำระเงิน'] || '').trim();
     const dt = parseGrabDateTime(row['Date'], row['Created On'] || row['วันที่สร้าง']);
-    const status = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว' ? 'เงินเข้าจริง' : 'รอรับเงิน';
+    const status = settled ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount, gp, vat, fee: gp + vat, status,
+      type: isAdjustment ? 'Adjustment' : null,
       payment: payMethod || 'เงินสด',
       brand: detectBrandFromName(row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน']),
       platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
