@@ -567,7 +567,7 @@
                 <th style="padding:0 6px 11px;font-weight:500;text-align:left">ช่องทาง</th>
                 <th style="padding:0 6px 11px;font-weight:500">ยอดขาย</th>
                 <th style="padding:0 6px 11px;font-weight:500">ค่าบริการ</th>
-                <th style="padding:0 6px 11px;font-weight:500">เงินเข้าจริง</th>
+                <th style="padding:0 6px 11px;font-weight:500">ยอดโอนออกให้ร้าน</th>
                 <th style="padding:0 6px 11px;font-weight:500;text-align:center">สถานะเงินเข้า</th>
               </tr>
             </thead>
@@ -2268,7 +2268,7 @@
               <th style="padding:0 8px 12px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
               <th style="padding:0 8px 12px;font-weight:500">ยอดขายรวม</th>
               <th style="padding:0 8px 12px;font-weight:500">ค่าบริการ</th>
-              <th style="padding:0 8px 12px;font-weight:500">ยอดเงินเข้าจริง</th>
+              <th style="padding:0 8px 12px;font-weight:500">ยอดโอนออกให้ร้าน</th>
               <th style="padding:0 8px 12px;font-weight:500;text-align:center">สถานะเงินเข้า</th>
             </tr>
           </thead>
@@ -4013,22 +4013,27 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
   if (platform === 'lineman') {
     const orderId = row['order_id'] || '';
     if (!orderId) return null;
-    // Non-order settlement lines (Payout batches, POS Subscription fees, Listing Ads
-    // spend) also carry an order_id but are not customer sales — exclude them.
-    if (row['detail'] !== 'Delivery Order') return null;
+    // กรองออกเฉพาะ Payout ตามสเปกเจ้าของร้าน — Payout คือรายการโอนเงินก้อน ไม่ใช่ค่าใช้จ่าย
+    // ถ้ากรองแรงกว่านี้ (เก็บเฉพาะ Delivery Order) ค่าโฆษณา Listing Ads กับค่าระบบ POS Subscription
+    // จะหายไปจากค่าบริการ ทำให้ต้นทุนต่ำกว่าจริง — เทียบกับไฟล์จริงแล้วขาดไป ฿7,761 ใน 1 ร้าน 1 เดือน
+    const detail = String(row['detail'] || '').trim();
+    if (detail === 'Payout') return null;
     if (isExcludedStore('lineman', row['restaurant_name'])) return null;
     const gross = num(row['cash_amount']) + num(row['e_payment_amount']);
-    const netAmount = num(row['net_amount']);
+    // net_amount = เงินที่ LINE MAN โอนออกให้ร้านจริง ใช้ตามไฟล์ตรงๆ
+    // ออเดอร์ไทยช่วยไทย (GOVERNMENT_WALLET) ร้านเก็บเงินสดเองหน้าร้าน ค่านี้จึงติดลบ
+    // (เป็นค่าคอมที่ยังค้างคืน LINE MAN) — ถูกต้องแล้วสำหรับ "ยอดโอนออกให้ร้าน"
+    // เงินสดที่ร้านรับเองอยู่ในช่อง gross ไม่ได้หายไปไหน
+    const net = num(row['net_amount']);
     const paymentMethod = row['payment_method'] || 'เงินสด';
-    // GOVERNMENT_WALLET (คนละครึ่ง) orders: the store collects the full cash-equivalent
-    // amount itself, and net_amount is just the commission still owed back to LINE MAN
-    // (a negative figure) — not a receivable amount like on every other payment method.
-    const net = paymentMethod === 'GOVERNMENT_WALLET' ? gross + netAmount : netAmount;
     const dt = parseGenericDateTime(row['capture_time']);
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount: mag(row['other_cost']), gp: mag(row['fee']), vat: mag(row['vat']),
       fee: mag(row['fee']) + mag(row['vat']),
+      // เก็บชนิดรายการไว้ด้วย — Listing Ads / POS Subscription ไม่ใช่ออเดอร์ลูกค้า
+      // รายงานที่นับจำนวนออเดอร์จะได้แยกออกจากยอดขายจริงได้
+      type: detail || null,
       status: 'เงินเข้าจริง', payment: paymentMethod,
       brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN', raw: { ...row }
     };
@@ -7689,7 +7694,7 @@ class Component extends DCLogic {
         date: r.date || isoToBEShort(this.state.importReportDate), time: r.time,
         platform: r.meta.label, brand: r.brand,
         orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status,
-        discount: r.discount, gp: r.gp, vat: r.vat, raw: r.raw, payment: r.payment,
+        discount: r.discount, gp: r.gp, vat: r.vat, raw: r.raw, payment: r.payment, type: r.type,
         source: r.meta.label === 'หน้าร้าน' || r.meta.label === 'ส่วนลด' ? 'POS' : 'PLATFORM_IMPORT'
       }));
       try {
