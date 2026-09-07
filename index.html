@@ -3918,7 +3918,8 @@ function detectBrandFromName(name) {
  *
  *  เพิ่มร้านที่ต้องกรองได้ที่นี่ที่เดียว เช่น { platform:'grab', kw:'ราชพฤกษ์' } */
 const EXCLUDED_STORES = [
-  { platform: 'grab', kw: 'บางบัวทอง' }
+  { platform: 'grab', kw: 'บางบัวทอง' },
+  { platform: 'grab', kw: 'ราชพฤกษ์' }
 ];
 function isExcludedStore(platform, name) {
   const n = String(name || '');
@@ -7584,7 +7585,7 @@ class Component extends DCLogic {
         { f:'GP', c:'Channel Commission + Other Commission − Tax' },
         { f:'VAT', c:'Tax on Commission, Adjustments, Ads' },
         { f:'เงินเข้าจริง', c:'Total' },
-        { f:'กรองออก', c:'Status = Cancelled · Category ≠ Payment · ร้านบางบัวทอง' }
+        { f:'กรองออก', c:'Status = Cancelled · Category ≠ Payment · ร้านบางบัวทอง/ราชพฤกษ์' }
       ]},
       { platform:'LINE MAN', initial:'L', fileType:'ไฟล์ .csv', pfg:'#7A5BA8', pbg:'#F1ECF6', rows:[
         { f:'Order ID', c:'order_id' },
