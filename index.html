@@ -3936,8 +3936,24 @@ const GRAB_KEEP_COLUMNS = [
   'Delivery Fee Discount (Merchant-Funded)', 'Delivery Charge (Merchant Delivery)',
   'GrabExpress Delivery Service Fee', 'Net Sales', 'Marketing success fee', 'Channel Commission',
   'GrabFood / GrabMart Other Commission', 'Total',
-  'Tax on GrabFood / GrabMart Commission, Adjustments, Ads'
+  'Tax on GrabFood / GrabMart Commission, Adjustments, Ads',
+  // คอลัมน์ที่ Grab หักจริงแต่ไม่ได้อยู่ในสเปกตั้งต้น — เก็บไว้ตรวจย้อนกลับว่าค่าบริการมาจากไหน
+  'Payment Method', 'Marketing success fee', 'Step-up commission', 'Delivery Commission',
+  'Order commission', 'Withholding Tax', 'Tax on GrabFood/GrabMart commission, adjustments, ads'
 ];
+/** หาค่าจากคอลัมน์โดยไม่สนรูปแบบการเขียนหัวคอลัมน์
+ *  ไฟล์ Grab เขียนหัวคอลัมน์ภาษีไม่เหมือนกันในแต่ละครั้งที่ส่งออก — บางไฟล์เป็น
+ *  "Tax on GrabFood/GrabMart commission, adjustments, ads" บางไฟล์ขึ้นบรรทัดใหม่กลางชื่อ
+ *  เทียบตรงตัวจึงพลาดตลอด ทำให้ VAT ขึ้น ฿0 ทั้งที่ในไฟล์มีตัวเลข */
+function normKey(k) {
+  return String(k || '').toLowerCase().replace(/\s+/g, ' ').replace(/\s*\/\s*/g, '/').replace(/[,]/g, '').trim();
+}
+function loosePick(row, name) {
+  if (row[name] !== undefined) return row[name];
+  const want = normKey(name);
+  for (const k in row) if (normKey(k) === want) return row[k];
+  return undefined;
+}
 function pickColumns(row, keep) {
   const out = {};
   let hit = 0;
@@ -3995,17 +4011,27 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     if (!orderId) return null;
     if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return null;
     const gross = num(row['Amount'] || row['ยอด']);
-    const net = num(row['Total'] || row['ทั้งหมด']);
-    const discount = mag(row['Discount (Merchant-Funded)']);
-    const vat = mag(row['Tax on GrabFood / GrabMart Commission, Adjustments, Ads']);
-    // ค่าคอมในไฟล์รวม VAT ไว้แล้ว จึงถอด VAT ออกให้ gp เป็นค่าคอมล้วน
-    const gp = mag(row['Channel Commission']) + mag(row['GrabFood / GrabMart Other Commission']) - vat;
+    const total = num(row['Total'] || row['ทั้งหมด']);
+    const payMethod = String(row['Payment Method'] || row['วิธีการชำระเงิน'] || '').trim();
+    const isCash = /^cash$|เงินสด/i.test(payMethod);
+    // ค่าบริการ = Amount − Total ใช้เลขคณิตของ Grab เอง
+    // Grab หักหลายคอลัมน์และไม่เท่ากันทุกออเดอร์ (Channel Commission, Marketing success fee,
+    // Step-up commission ฯลฯ) ถ้าไล่บวกทีละคอลัมน์จะตกหล่นทันทีที่ Grab เพิ่มคอลัมน์ใหม่
+    // — เคยตกไป 2 คอลัมน์จนค่าบริการต่ำกว่าจริง
+    const service = Math.abs(gross - total);
+    const vat = mag(loosePick(row, 'Tax on GrabFood / GrabMart Commission, Adjustments, Ads'));
+    const discount = mag(loosePick(row, 'Discount (Merchant-Funded)'));
+    // VAT กับส่วนลดร้านรวมอยู่ในผลต่างข้างบนแล้ว จึงถอดออกให้ gp เป็นค่าคอมล้วน
+    const gp = Math.max(0, service - vat - discount);
+    // ออเดอร์เงินสด ร้านรับเงินจากลูกค้าเองหน้าร้าน Grab ไม่ได้โอนยอดนี้ให้
+    // แต่หักค่าคอมคืนจากยอดโอนก้อนอื่น — ยอดโอนของแถวนี้จึงติดลบ
+    const net = isCash ? total - gross : total;
     const dt = parseGrabDateTime(row['Date'], row['Created On'] || row['วันที่สร้าง']);
     const status = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว' ? 'เงินเข้าจริง' : 'รอรับเงิน';
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount, gp, vat, fee: gp + vat, status,
-      payment: row['Payment Method'] || row['วิธีการชำระเงิน'] || 'เงินสด',
+      payment: payMethod || 'เงินสด',
       brand: detectBrandFromName(row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน']),
       platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
     };
