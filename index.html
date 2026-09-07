@@ -3909,6 +3909,22 @@ function detectBrandFromName(name) {
   }
   return 'AnnieCake';
 }
+/** ร้านที่ไม่ใช่สาขาบางโพ — กรองทิ้งตั้งแต่ตอนอ่านไฟล์ ไม่ให้ปนเข้าฐาน
+ *  (Grab บางบัวทอง เคยปนมา 180 รายการ ฿42,572 ทำให้ยอดทุกหน้าเกินจริง)
+ *
+ *  ผูกกับแพลตฟอร์มเสมอ ห้ามกรองด้วยคำเปล่าๆ ข้ามทุกแพลตฟอร์ม — Shopee เคยตั้งชื่อ
+ *  ร้านบางโพ (Store ID 10042597) ว่า "บางบัวทอง (บางรักพัฒนา)" ผิด ถ้ากรองแบบเหมารวม
+ *  ยอดบางโพจริงจะหายไปเงียบๆ
+ *
+ *  เพิ่มร้านที่ต้องกรองได้ที่นี่ที่เดียว เช่น { platform:'grab', kw:'ราชพฤกษ์' } */
+const EXCLUDED_STORES = [
+  { platform: 'grab', kw: 'บางบัวทอง' }
+];
+function isExcludedStore(platform, name) {
+  const n = String(name || '');
+  if (!n) return false;
+  return EXCLUDED_STORES.some(x => x.platform === platform && n.indexOf(x.kw) >= 0);
+}
 function detectPlatform(fields) {
   const has = (name) => fields.includes(name);
   if (has('Short Order ID') || has('รหัสคำสั่งซื้อสั้น')) return 'grab';
@@ -3984,6 +4000,7 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     // Transaction ID ไม่ซ้ำ ต่างจาก Short Order ID ที่ Grab วนใช้เลขเดิม (เจอซ้ำ 32 เลขในฐาน)
     const orderId = row['Transaction ID'] || row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '';
     if (!orderId) return null;
+    if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return null;
     const gross = num(row['Amount'] || row['ยอด']);
     const net = num(row['Total'] || row['ทั้งหมด']);
     const discount = mag(row['Discount (Merchant-Funded)']);
@@ -4006,6 +4023,7 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     // Non-order settlement lines (Payout batches, POS Subscription fees, Listing Ads
     // spend) also carry an order_id but are not customer sales — exclude them.
     if (row['detail'] !== 'Delivery Order') return null;
+    if (isExcludedStore('lineman', row['restaurant_name'])) return null;
     const gross = num(row['cash_amount']) + num(row['e_payment_amount']);
     const netAmount = num(row['net_amount']);
     const paymentMethod = row['payment_method'] || 'เงินสด';
@@ -4027,6 +4045,7 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     if (!orderId) return null;
     const orderStatus = String(row['Order Status'] || '').trim();
     if (/cancel/i.test(orderStatus)) return null;                       // สเปก: กรองออก Order Status = cancelled
+    if (isExcludedStore('shopee', row['Store Name'])) return null;
     const gross = num(row['Order Amount']);
     const net = num(row['Net Income']);
     const discount = mag(row['Merchant Food Voucher Subsidy']) + mag(row['Merchant Shipping Fee Voucher Subsidy']);
@@ -7565,7 +7584,7 @@ class Component extends DCLogic {
         { f:'GP', c:'Channel Commission + Other Commission − Tax' },
         { f:'VAT', c:'Tax on Commission, Adjustments, Ads' },
         { f:'เงินเข้าจริง', c:'Total' },
-        { f:'กรองออก', c:'Status = Cancelled · Category ≠ Payment' }
+        { f:'กรองออก', c:'Status = Cancelled · Category ≠ Payment · ร้านบางบัวทอง' }
       ]},
       { platform:'LINE MAN', initial:'L', fileType:'ไฟล์ .csv', pfg:'#7A5BA8', pbg:'#F1ECF6', rows:[
         { f:'Order ID', c:'order_id' },
