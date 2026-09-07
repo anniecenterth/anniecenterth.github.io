@@ -2303,53 +2303,28 @@
         </div>
         <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">ตัวเลขรายรับเป็นเงินที่เข้าจริง (หลังหักค่าคอมและ VAT แล้ว) · คงเหลือ = รับ − จ่าย</div>
         <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:940px">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:1560px">
           <thead>
             <tr style="color:#8089A0;font-size:11.5px">
-              <th style="padding:0 8px 10px;font-weight:500;text-align:left;white-space:nowrap">วันที่</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">เงินสด</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">เงินโอน</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">LINE MAN</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">Grab</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">Shopee</th>
-              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap;color:#2C4A7C">รวมรับ</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">วัตถุดิบ</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">ค่าแรง</th>
-              <th style="padding:0 8px 10px;font-weight:500;text-align:right;white-space:nowrap">จ่ายอื่นๆ</th>
-              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap;color:#B14A4A">รวมจ่าย</th>
-              <th style="padding:0 8px 10px;font-weight:600;text-align:right;white-space:nowrap">คงเหลือ</th>
+              <sc-for list="{{ dailyReportHeads }}" as="h" hint-placeholder-count="22">
+                <th style="{{ h.style }}">{{ h.label }}</th>
+              </sc-for>
             </tr>
           </thead>
           <tbody>
             <sc-for list="{{ dailyReportRows }}" as="d" hint-placeholder-count="14">
               <tr style="{{ d.rowStyle }}">
                 <td style="padding:9px 8px;white-space:nowrap"><span style="font-weight:600">{{ d.day }}</span> <span style="color:#9AA3B2;font-size:11px">{{ d.month }}</span></td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.cash }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.transfer }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.lineman }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.grab }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap">{{ d.shopee }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap;font-weight:600;color:#2C4A7C">{{ d.income }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.cogs }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.wage }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap;color:#8089A0">{{ d.otherExp }}</td>
-                <td style="padding:9px 8px;text-align:right;white-space:nowrap;font-weight:600;color:#B14A4A">{{ d.expense }}</td>
-                <td style="{{ d.leftStyle }}">{{ d.left }}</td>
+                <sc-for list="{{ d.cells }}" as="c" hint-placeholder-count="21">
+                  <td style="{{ c.style }}">{{ c.v }}</td>
+                </sc-for>
               </tr>
             </sc-for>
             <tr style="border-top:2px solid #E7E9ED;background:#FAFBFC;color:#1B2536">
               <td style="padding:11px 8px;font-weight:700;white-space:nowrap">รวม</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.cash }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.transfer }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.lineman }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.grab }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.shopee }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap;color:#2C4A7C">{{ dailyReportTotal.income }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.cogs }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.wage }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap">{{ dailyReportTotal.otherExp }}</td>
-              <td style="padding:11px 8px;text-align:right;font-weight:700;white-space:nowrap;color:#B14A4A">{{ dailyReportTotal.expense }}</td>
-              <td style="{{ dailyReportTotal.leftStyle }}">{{ dailyReportTotal.left }}</td>
+              <sc-for list="{{ dailyReportTotalCells }}" as="c" hint-placeholder-count="21">
+                <td style="{{ c.style }}">{{ c.v }}</td>
+              </sc-for>
             </tr>
           </tbody>
         </table>
@@ -6859,10 +6834,33 @@ class Component extends DCLogic {
       // แถว "รวมทั้งหมด" ด้านบนจึงเป็นยอดหลังหักส่วนลดอยู่แล้ว ไม่ต้องกระทบยอดซ้ำ
     }
     // ---- ตารางรายวัน (Daily Report) — เลียนสมุดรายวันที่เจ้าของร้านทำในชีต ----
-    // 1 แถว = 1 วัน · รายรับแยกตามช่องทางที่เงินเข้าจริง · รายจ่ายแยกตามหมวดหลัก
+    // 1 แถว = 1 วัน · รายรับแยกตามช่องทางรับเงินจริง · รายจ่ายแยกครบทุกหมวดหลัก
     // ใช้ "เงินเข้าจริง" (net) ไม่ใช่ยอดเต็ม เพราะสมุดเล่มนี้ตอบคำถามว่าวันนั้นเงินเหลือเท่าไร
     const drFmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const drISO = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+    // ช่องทางรับเงินหน้าร้าน ตามที่เจ้าของร้านกำหนด — ชื่อใน POS เขียนไม่เหมือนกันทุกไฟล์
+    // จึงจับด้วยคำสำคัญ ไม่ใช่เทียบตรงตัว · ที่ไม่เข้ากฎไหนเลยตกลงช่อง "อื่นๆ" ไม่ให้เงินหาย
+    const DR_POS_COLS = [
+      { key:'cash',    label:'Cash',        match: p => /^cash$|เงินสด/i.test(p) },
+      { key:'kshop',   label:'K+ Shop',     match: p => /k\+\s*shop/i.test(p) },
+      { key:'pospay',  label:'POS Pay',     match: p => /pos\s*pay|promptpay/i.test(p) },
+      { key:'thaipl',  label:'ไทยช่วยไทย',  match: p => /ไทยช่วยไทย/.test(p) },
+      { key:'whole',   label:'ขายส่ง',      match: p => /ขายส่ง/.test(p) },
+      { key:'posetc',  label:'อื่นๆ (หน้าร้าน)', match: () => true }
+    ];
+    const DR_PLATFORM_COLS = [
+      { key:'lineman', label:'LINE MAN',   platform:'LINE MAN' },
+      { key:'grab',    label:'Grab',       platform:'Grab' },
+      { key:'shopee',  label:'ShopeeFood', platform:'ShopeeFood' }
+    ];
+    // หมวดรายจ่ายใช้รายการกลางชุดเดียวกับฟอร์มรายจ่าย เพิ่มหมวดใหม่ที่นั่นแล้วโผล่ที่นี่เอง
+    const DR_EXP_SHORT = {
+      'วัตถุดิบ (COGS)':'วัตถุดิบ', 'ของตกแต่งเค้ก':'ของตกแต่ง', 'อุปกรณ์ & ซ่อมบำรุง':'อุปกรณ์/ซ่อม',
+      'ค่าขนส่ง':'ขนส่ง', 'ค่าเช่า & สาธารณูปโภค':'เช่า/สาธารณูปโภค', 'ค่าธรรมเนียม & ภาษี':'ค่าธรรมเนียม/ภาษี'
+    };
+    const drPosKeyOf = pay => (DR_POS_COLS.find(c => c.match(String(pay || ''))) || DR_POS_COLS[DR_POS_COLS.length - 1]).key;
+
     const drRange = this.periodRange();
     const DR_MAX_DAYS = 92;   // ช่วงยาวกว่านี้ตารางจะยาวจนหาอะไรไม่เจอ
     let drDates = [];
@@ -6879,54 +6877,68 @@ class Component extends DCLogic {
       const d0 = new Date(drRange.from + 'T00:00:00'), d1 = new Date(drRange.to + 'T00:00:00');
       return Math.round((d1 - d0) / 86400000) + 1 > DR_MAX_DAYS;
     })();
-    // เงินสดหน้าร้านแยกจากเงินโอน เพราะเจ้าของร้านนับเงินสดในลิ้นชักทุกคืน
-    const drIsCash = r => /cash|เงินสด/i.test(r.payment || '');
-    const drSalesByDate = {}, drExpByDate = {};
+
+    const drByDate = {};
+    const drBucket = iso => drByDate[iso] || (drByDate[iso] = { in:{}, exp:{} });
     salesRows.forEach(r => {
       if (!r.isoDate) return;
-      const b = drSalesByDate[r.isoDate] || (drSalesByDate[r.isoDate] = { cash:0, transfer:0, lineman:0, grab:0, shopee:0 });
+      const b = drBucket(r.isoDate).in;
       const v = Number(r.net) || 0;
-      if (r.platform === 'หน้าร้าน')      { if (drIsCash(r)) b.cash += v; else b.transfer += v; }
-      else if (r.platform === 'LINE MAN')  b.lineman += v;
-      else if (r.platform === 'Grab')      b.grab += v;
-      else if (r.platform === 'ShopeeFood') b.shopee += v;
+      if (r.platform === 'หน้าร้าน') { const k = drPosKeyOf(r.payment); b[k] = (b[k] || 0) + v; }
+      else { const c = DR_PLATFORM_COLS.find(x => x.platform === r.platform); if (c) b[c.key] = (b[c.key] || 0) + v; }
     });
     ovExpRows.forEach(r => {
       if (!r.isoDate) return;
-      const b = drExpByDate[r.isoDate] || (drExpByDate[r.isoDate] = { cogs:0, wage:0, other:0 });
-      const v = Number(r.amount) || 0;
-      if (r.mainCat === 'วัตถุดิบ (COGS)') b.cogs += v;
-      else if (r.mainCat === 'ค่าแรง')      b.wage += v;
-      else                                  b.other += v;
+      const b = drBucket(r.isoDate).exp;
+      const k = EXPENSE_MAIN_CATS.indexOf(r.mainCat) >= 0 ? r.mainCat : 'อื่นๆ';
+      b[k] = (b[k] || 0) + (Number(r.amount) || 0);
     });
-    const drTotals = { cash:0, transfer:0, lineman:0, grab:0, shopee:0, income:0, cogs:0, wage:0, other:0, expense:0, left:0 };
+
+    const drNumHead = (label, tone) => ({ label, style: 'padding:0 8px 10px;font-weight:' + (tone ? '600' : '500')
+      + ';text-align:right;white-space:nowrap;' + (tone ? 'color:' + tone : '') });
+    const dailyReportHeads = [{ label:'วันที่', style:'padding:0 8px 10px;font-weight:500;text-align:left;white-space:nowrap' }]
+      .concat(DR_POS_COLS.map(c => drNumHead(c.label)))
+      .concat(DR_PLATFORM_COLS.map(c => drNumHead(c.label)))
+      .concat([drNumHead('รวมรับ', '#2C4A7C')])
+      .concat(EXPENSE_MAIN_CATS.map(c => drNumHead(DR_EXP_SHORT[c] || c)))
+      .concat([drNumHead('รวมจ่าย', '#B14A4A'), drNumHead('คงเหลือ', '#1B2536')]);
+
+    const drCell = (v, opt) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
+      + (v ? '' : 'color:#C2C9D6;') + (opt || '') });
+    const drTotals = { in:{}, exp:{}, income:0, expense:0, left:0 };
     const dailyReportRows = drDates.map(iso => {
-      const s0 = drSalesByDate[iso] || { cash:0, transfer:0, lineman:0, grab:0, shopee:0 };
-      const e0 = drExpByDate[iso] || { cogs:0, wage:0, other:0 };
-      const income = s0.cash + s0.transfer + s0.lineman + s0.grab + s0.shopee;
-      const expense = e0.cogs + e0.wage + e0.other;
+      const b = drByDate[iso] || { in:{}, exp:{} };
+      let income = 0, expense = 0;
+      const cells = [];
+      DR_POS_COLS.concat(DR_PLATFORM_COLS).forEach(c => {
+        const v = b.in[c.key] || 0; income += v;
+        drTotals.in[c.key] = (drTotals.in[c.key] || 0) + v;
+        cells.push(drCell(v));
+      });
+      cells.push(drCell(income, 'font-weight:600;color:#2C4A7C;'));
+      EXPENSE_MAIN_CATS.forEach(c => {
+        const v = b.exp[c] || 0; expense += v;
+        drTotals.exp[c] = (drTotals.exp[c] || 0) + v;
+        cells.push(drCell(v));
+      });
+      cells.push(drCell(expense, 'font-weight:600;color:#B14A4A;'));
       const left = income - expense;
-      ['cash','transfer','lineman','grab','shopee'].forEach(k => drTotals[k] += s0[k]);
-      ['cogs','wage','other'].forEach(k => drTotals[k] += e0[k]);
+      cells.push({ v: drFmt(left), style: 'padding:9px 8px;text-align:right;white-space:nowrap;font-weight:700;color:'
+        + (left < 0 ? '#B14A4A' : (left > 0 ? '#2E7D5B' : '#C2C9D6')) });
       drTotals.income += income; drTotals.expense += expense; drTotals.left += left;
       const d = new Date(iso + 'T00:00:00');
       return {
-        day: String(d.getDate()), month: THAI_MONTHS_ABBR[d.getMonth()],
-        cash: drFmt(s0.cash), transfer: drFmt(s0.transfer), lineman: drFmt(s0.lineman),
-        grab: drFmt(s0.grab), shopee: drFmt(s0.shopee), income: drFmt(income),
-        cogs: drFmt(e0.cogs), wage: drFmt(e0.wage), otherExp: drFmt(e0.other), expense: drFmt(expense),
-        left: drFmt(left),
-        leftStyle: { padding:'9px 8px', textAlign:'right', fontWeight:700, whiteSpace:'nowrap', color: left < 0 ? '#B14A4A' : '#2E7D5B' },
+        day: String(d.getDate()), month: THAI_MONTHS_ABBR[d.getMonth()], cells,
         rowStyle: { borderTop:'1px solid #F1F2F4', color:'#2B3547', background: (income || expense) ? 'transparent' : '#FCFCFD' }
       };
     });
-    const dailyReportTotal = {
-      cash: drFmt(drTotals.cash), transfer: drFmt(drTotals.transfer), lineman: drFmt(drTotals.lineman),
-      grab: drFmt(drTotals.grab), shopee: drFmt(drTotals.shopee), income: drFmt(drTotals.income),
-      cogs: drFmt(drTotals.cogs), wage: drFmt(drTotals.wage), otherExp: drFmt(drTotals.other),
-      expense: drFmt(drTotals.expense), left: drFmt(drTotals.left),
-      leftStyle: { padding:'11px 8px', textAlign:'right', fontWeight:700, whiteSpace:'nowrap', color: drTotals.left < 0 ? '#B14A4A' : '#2E7D5B' }
-    };
+
+    const drTotCell = (v, opt) => ({ v: drFmt(v), style: 'padding:11px 8px;text-align:right;white-space:nowrap;font-weight:700;' + (opt || '') });
+    const dailyReportTotalCells = DR_POS_COLS.concat(DR_PLATFORM_COLS).map(c => drTotCell(drTotals.in[c.key] || 0))
+      .concat([drTotCell(drTotals.income, 'color:#2C4A7C;')])
+      .concat(EXPENSE_MAIN_CATS.map(c => drTotCell(drTotals.exp[c] || 0)))
+      .concat([drTotCell(drTotals.expense, 'color:#B14A4A;'),
+               drTotCell(drTotals.left, 'color:' + (drTotals.left < 0 ? '#B14A4A' : '#2E7D5B') + ';')]);
     const dailyReportNote = drTrimmed
       ? 'ช่วงที่เลือกยาวเกิน ' + DR_MAX_DAYS + ' วัน — แสดง ' + DR_MAX_DAYS + ' วันแรก'
       : (dailyReportRows.length + ' วัน');
@@ -8108,7 +8120,7 @@ class Component extends DCLogic {
       salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
       expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
       salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
-      dailyReportRows, dailyReportTotal, dailyReportNote,
+      dailyReportRows, dailyReportHeads, dailyReportTotalCells, dailyReportNote,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
       scrollToSalesForm, exportSalesCsv,
       storeBatch, storeBatchRows, storeBatchTotals, storeFormError: this.state.storeFormError,
