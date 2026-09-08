@@ -350,41 +350,6 @@
         </div>
       </div>
 
-      <!-- summary table -->
-      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-        <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">สรุปรายรับ–รายจ่าย บางโพ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(เดือนนี้)</span></h3>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead>
-            <tr style="color:#8089A0;font-size:12px;text-align:left">
-              <th style="padding:0 8px 12px;font-weight:500">แบรนด์</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดขาย (฿)</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">หน้าร้าน (฿)</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">% ยอดขาย</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">รายจ่าย (฿)</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">% รายจ่าย</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">กำไรสุทธิ (฿)</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">Margin (%)</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:right">ช่องทางเด่น</th>
-            </tr>
-          </thead>
-          <tbody>
-            <sc-for list="{{ summaryRows }}" as="r" hint-placeholder-count="4">
-              <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ r.weight }}">
-                <td style="padding:13px 8px"><span style="display:inline-flex;align-items:center;gap:10px"><span style="width:9px;height:9px;border-radius:3px;background:{{ r.dot }}"></span>{{ r.brand }}</span></td>
-                <td style="padding:13px 8px;text-align:right">{{ r.sales }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.storefront }}</td>
-                <td style="padding:13px 8px;text-align:right;color:#7A8497">{{ r.salesPct }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.exp }}</td>
-                <td style="padding:13px 8px;text-align:right;color:#7A8497">{{ r.expPct }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.profit }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.margin }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.channelTag }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
-      </div>
-
       <!-- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน -->
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px">
@@ -6023,22 +5988,6 @@ class Component extends DCLogic {
       { label:'อื่น ๆ', value: ovOtherPct }
     ];
 
-    const summaryRows = ovBrandNames.map((name, i) => {
-      const brandRowsFor = ovRows.filter(r => r.brand === name);
-      const sales = brandRowsFor.reduce((a,r)=>a+r.gross,0);
-      const storefront = brandRowsFor.filter(r=>r.platform==='หน้าร้าน').reduce((a,r)=>a+r.gross,0);
-      const byPlatformForBrand = ovSumByKey(brandRowsFor, r=>r.platform, r=>r.gross);
-      const topPlatform = Object.keys(byPlatformForBrand).sort((a,b)=>byPlatformForBrand[b]-byPlatformForBrand[a])[0];
-      const tagColors = { 'หน้าร้าน':['#EAF0F8','#3A5A8C'], 'Grab':['#E7F1EA','#26663F'], 'LINE MAN':['#EFEBF6','#5F4A87'], 'ShopeeFood':['#F9ECE7','#A64A31'] };
-      const tc = tagColors[topPlatform] || ['#EEF0F5','#5A6478'];
-      const channelTag = topPlatform ? React.createElement('span', { style:{ background:tc[0], color:tc[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, topPlatform) : '—';
-      return { brand:name, dot: ovBrandColors[i % ovBrandColors.length], sales: ovFmt(sales), storefront: ovFmt(storefront), salesPct: ovGross ? (sales/ovGross*100).toFixed(1)+'%' : '0%', exp:'—', expPct:'—', profit:'—', margin:'—', channelTag, weight:'500' };
-    });
-    if (summaryRows.length) {
-      summaryRows.push({ brand:'รวมทั้งสิ้น', dot:'#C7CDD8', sales: ovFmt(ovGross), storefront: ovFmt(byChannelOv['หน้าร้าน']||0), salesPct:'100%', exp: ovFmt(ovExpenseTotal), expPct:'100%', profit: ovFmt(ovNetProfit), margin: ovNetMargin.toFixed(1)+'%', channelTag:'—', weight:'700' });
-    }
-
-    // ---- Annie Brain: บทวิเคราะห์จากข้อมูลจริง (คำนวณในเครื่อง ไม่เรียก AI ภายนอก) ----
     // ---- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน ----
     // จัดหน้าตามงบรายรับของราชการที่เจ้าของร้านคุ้นเคย: มีรหัสบัญชี · ยอดเดือนนี้ · เดือนก่อน ·
     // เครื่องหมาย (+)/(-) · ผลต่าง · ยอดสะสมทั้งช่วงที่เลือก
@@ -8485,7 +8434,7 @@ class Component extends DCLogic {
       calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
       expCalCells, importCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
       expPickToday, importPickToday, storePickToday, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
-      ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini, summaryRows,
+      ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini,
       procKpis, procTableRows, procSearch: this.state.procSearch || '', setProcSearch,
       exportProcurementCsv, procEmpty: procTableRows.length === 0,
       procError: this.state.purchaseError || '', procHasSpike: procSpikes.length > 0, procSpikeText,
