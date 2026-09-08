@@ -385,6 +385,43 @@
         </table>
       </div>
 
+      <!-- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">รายงานสรุปรายรับ-รายจ่าย</h3>
+          <span style="font-size:12.5px;color:#9AA3B2">{{ reportCumLabel }}</span>
+        </div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">ยอดขายเป็นยอดเต็มก่อนหักค่าบริการ · ค่าบริการแพลตฟอร์มแยกเป็นหมวดรายจ่าย · คอลัมน์ (+)/(−) เทียบเดือนก่อน</div>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:880px">
+          <thead>
+            <tr style="color:#5A6478;font-size:11.5px;background:#F1F4F8">
+              <th style="padding:10px;font-weight:600;text-align:left;white-space:nowrap;border-bottom:1px solid #DFE4EC">รายการ</th>
+              <th style="padding:10px;font-weight:600;text-align:center;white-space:nowrap;border-bottom:1px solid #DFE4EC">รหัสบัญชี</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">{{ reportCurLabel }}</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">{{ reportPrevLabel }}</th>
+              <th style="padding:10px 6px;font-weight:600;text-align:center;white-space:nowrap;border-bottom:1px solid #DFE4EC">(+)<br/>(−)</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">สูงหรือต่ำกว่า<br/>เดือนก่อน</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">{{ reportCumLabel }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ reportRows }}" as="r" hint-placeholder-count="24">
+              <tr style="{{ r.rowStyle }}">
+                <td style="{{ r.nameStyle }}">{{ r.name }}</td>
+                <td style="{{ r.signStyle }}">{{ r.code }}</td>
+                <td style="{{ r.numStyle }}">{{ r.cur }}</td>
+                <td style="{{ r.numStyle }}">{{ r.prev }}</td>
+                <td style="{{ r.signStyle }}">{{ r.sign }}</td>
+                <td style="{{ r.numStyle }}">{{ r.diff }}</td>
+                <td style="{{ r.numStyle }}">{{ r.cum }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
     </div>
     </sc-if>
 
@@ -6002,6 +6039,105 @@ class Component extends DCLogic {
     }
 
     // ---- Annie Brain: บทวิเคราะห์จากข้อมูลจริง (คำนวณในเครื่อง ไม่เรียก AI ภายนอก) ----
+    // ---- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน ----
+    // จัดหน้าตามงบรายรับของราชการที่เจ้าของร้านคุ้นเคย: มีรหัสบัญชี · ยอดเดือนนี้ · เดือนก่อน ·
+    // เครื่องหมาย (+)/(-) · ผลต่าง · ยอดสะสมทั้งช่วงที่เลือก
+    // ตัวเลขเดือนไม่ผูกกับตัวกรองช่วงเวลา (ใช้ ovNonPeriodFilters) เพราะต้องเทียบเดือนต่อเดือนเสมอ
+    // ส่วนคอลัมน์สะสมใช้ช่วงที่เลือกด้านบน
+    const rpFmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const rpMonthOf = iso => String(iso || '').slice(0, 7);
+    const rpCurMonth = rpMonthOf((ovCurRng && ovCurRng.to) || todayISO());
+    const rpPrevMonth = (() => {
+      const y = +rpCurMonth.slice(0, 4), m = +rpCurMonth.slice(5, 7) - 1;
+      const t = y * 12 + m - 1;
+      return Math.floor(t / 12) + '-' + String((t % 12) + 1).padStart(2, '0');
+    })();
+    const rpMonthLabel = ym => THAI_MONTHS_ABBR[+ym.slice(5, 7) - 1] + ' ' + (+ym.slice(0, 4) + 543).toString().slice(2);
+    const rpSalesAll = ovNonPeriodFilters(this.state.recentRows);
+    const rpExpAll = this.state.expRows;
+    const rpPick = (rows, ym) => rows.filter(r => rpMonthOf(r.isoDate) === ym);
+    const rpSalesCur = rpPick(rpSalesAll, rpCurMonth), rpSalesPrev = rpPick(rpSalesAll, rpPrevMonth);
+    const rpExpCur = rpPick(rpExpAll, rpCurMonth), rpExpPrev = rpPick(rpExpAll, rpPrevMonth);
+    const rpServiceOf = r => (Number(r.gp) || 0) + (Number(r.vat) || 0) + (Number(r.discount) || 0);
+
+    const rpRows = [];
+    const rpLine = (code, name, cur, prev, cum, kind) => {
+      const diff = cur - prev;
+      rpRows.push({
+        code, name, cur: rpFmt(cur), prev: rpFmt(prev), cum: rpFmt(cum),
+        sign: diff === 0 ? '' : (diff > 0 ? '(+)' : '(-)'),
+        diff: rpFmt(Math.abs(diff)),
+        nameStyle: 'padding:9px 10px;white-space:nowrap;'
+          + (kind === 'head' ? 'font-weight:700;color:#1B2536;background:#F6F8FB;'
+            : kind === 'sum' ? 'font-weight:700;color:#1B2536;'
+            : 'padding-left:26px;color:#3A4456;'),
+        numStyle: 'padding:9px 10px;text-align:right;white-space:nowrap;'
+          + (kind === 'head' ? 'background:#F6F8FB;' : kind === 'sum' ? 'font-weight:700;' : ''),
+        signStyle: 'padding:9px 6px;text-align:center;white-space:nowrap;font-size:11px;color:'
+          + (diff > 0 ? '#2E7D5B' : diff < 0 ? '#B14A4A' : '#C2C9D6')
+          + (kind === 'head' ? ';background:#F6F8FB' : ''),
+        rowStyle: { borderTop: '1px solid #F1F2F4' }
+      });
+    };
+    const rpGroup = (code, title, items, kind) => {
+      rpLine(code, title, 0, 0, 0, 'head');
+      let c = 0, p = 0, u = 0;
+      items.forEach((it, i) => {
+        rpLine(code.slice(0, 2) + String(i + 1).padStart(2, '0') + code.slice(4),
+               '(' + (i + 1) + ') ' + it.name, it.cur, it.prev, it.cum);
+        c += it.cur; p += it.prev; u += it.cum;
+      });
+      rpLine('', 'รวม' + title, c, p, u, 'sum');
+      return { cur: c, prev: p, cum: u };
+    };
+
+    // รายรับหน้าร้าน แยกตามช่องทางรับเงิน
+    const rpStoreKeys = {};
+    [rpSalesCur, rpSalesPrev, ovRows].forEach(set => set.forEach(r => {
+      if (r.platform === 'หน้าร้าน') rpStoreKeys[r.payment || 'อื่นๆ'] = 1;
+    }));
+    const rpSumBy = (rows, pick, val) => rows.reduce((a, r) => a + (pick(r) ? (val(r) || 0) : 0), 0);
+    const rpStoreItems = Object.keys(rpStoreKeys).sort().map(k => ({
+      name: k,
+      cur: rpSumBy(rpSalesCur,  r => r.platform === 'หน้าร้าน' && (r.payment || 'อื่นๆ') === k, r => r.gross),
+      prev: rpSumBy(rpSalesPrev, r => r.platform === 'หน้าร้าน' && (r.payment || 'อื่นๆ') === k, r => r.gross),
+      cum: rpSumBy(ovRows,       r => r.platform === 'หน้าร้าน' && (r.payment || 'อื่นๆ') === k, r => r.gross)
+    })).filter(x => x.cur || x.prev || x.cum);
+    const RP_PLATFORMS = ['LINE MAN', 'Grab', 'ShopeeFood'];
+    const rpPlatItems = RP_PLATFORMS.map(p => ({
+      name: p,
+      cur: rpSumBy(rpSalesCur,  r => r.platform === p, r => r.gross),
+      prev: rpSumBy(rpSalesPrev, r => r.platform === p, r => r.gross),
+      cum: rpSumBy(ovRows,       r => r.platform === p, r => r.gross)
+    })).filter(x => x.cur || x.prev || x.cum);
+    const rpSvcItems = RP_PLATFORMS.map(p => ({
+      name: 'ค่าบริการ ' + p,
+      cur: rpSumBy(rpSalesCur,  r => r.platform === p, rpServiceOf),
+      prev: rpSumBy(rpSalesPrev, r => r.platform === p, rpServiceOf),
+      cum: rpSumBy(ovRows,       r => r.platform === p, rpServiceOf)
+    })).filter(x => x.cur || x.prev || x.cum);
+    const rpExpItems = EXPENSE_MAIN_CATS.map(c => ({
+      name: c,
+      cur: rpSumBy(rpExpCur,  r => r.mainCat === c, r => r.amount),
+      prev: rpSumBy(rpExpPrev, r => r.mainCat === c, r => r.amount),
+      cum: rpSumBy(ovExpRows,  r => r.mainCat === c, r => r.amount)
+    })).filter(x => x.cur || x.prev || x.cum);
+
+    const rpStore = rpGroup('4100', 'หมวดขายหน้าร้าน', rpStoreItems);
+    const rpPlat  = rpGroup('4200', 'หมวดขายผ่านแพลตฟอร์ม', rpPlatItems);
+    rpLine('', 'รวมรายรับทั้งสิ้น', rpStore.cur + rpPlat.cur, rpStore.prev + rpPlat.prev, rpStore.cum + rpPlat.cum, 'sum');
+    const rpSvc = rpGroup('5100', 'หมวดค่าบริการแพลตฟอร์ม', rpSvcItems);
+    const rpExp = rpGroup('5200', 'หมวดรายจ่ายดำเนินงาน', rpExpItems);
+    rpLine('', 'รวมรายจ่ายทั้งสิ้น', rpSvc.cur + rpExp.cur, rpSvc.prev + rpExp.prev, rpSvc.cum + rpExp.cum, 'sum');
+    rpLine('', 'คงเหลือ (รับ − จ่าย)',
+      rpStore.cur + rpPlat.cur - rpSvc.cur - rpExp.cur,
+      rpStore.prev + rpPlat.prev - rpSvc.prev - rpExp.prev,
+      rpStore.cum + rpPlat.cum - rpSvc.cum - rpExp.cum, 'sum');
+    const reportRows = rpRows;
+    const reportCurLabel = rpMonthLabel(rpCurMonth);
+    const reportPrevLabel = rpMonthLabel(rpPrevMonth);
+    const reportCumLabel = ovCurRng ? ('สะสม ' + dateRangeLabel(ovCurRng.from, ovCurRng.to)) : 'สะสมทั้งหมด';
+
     const ovInsights = [];
     if (!ovRows.length) {
       ovInsights.push({ icon:'database', text:'ยังไม่มีข้อมูลยอดขายในช่วงที่เลือก — ลองขยายช่วงเวลาหรือนำเข้าข้อมูลก่อน' });
@@ -8358,6 +8494,7 @@ class Component extends DCLogic {
         ? 'ข้อมูล ' + ovStale.map(x => x.platform).join('/') + ' ค้าง ' + ovStale[0].gap + ' วัน — ยอดรวมยังไม่ครบ'
         : (ovInsights[0] ? ovInsights[0].text : 'ยังไม่มีข้อมูลในช่วงที่เลือก')),
       goDataSources: () => this.setState({ page: 'datasources' }),
+      reportRows, reportCurLabel, reportPrevLabel, reportCumLabel,
       expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, byExpCat['วัตถุดิบ (COGS)'] || 0, finExpenseTotal - (byExpCat['วัตถุดิบ (COGS)'] || 0)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
     };
   }
