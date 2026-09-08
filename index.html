@@ -4322,6 +4322,18 @@ const brandToDb = b => (b == null || b === BRAND_UNSPEC || NON_BRAND_VALUES.inde
 /** ชื่อร้านตามที่แพลตฟอร์มเรียก — 1 แบรนด์มีหลายร้าน (บางโพ บางบัวทอง ราชพฤกษ์ ฯลฯ)
  *  เก็บอยู่ในแถวดิบ คนละชื่อคอลัมน์ในแต่ละแพลตฟอร์ม จึงรวบเป็นช่องเดียวตั้งแต่ตอนอ่านเข้ามา */
 const STORE_NAME_KEYS = ['Store Name', 'restaurant_name', 'ชื่อร้าน', 'ชื่อร้าน_1'];
+/** รหัสร้านของแพลตฟอร์ม — LINE MAN ใช้ business_id · Grab ใช้ Store ID
+ *  ดึงออกมาเก็บเป็นช่องเดียวตั้งแต่ตอนอ่านเข้าแอป จะได้ไม่ต้องพา raw ทั้งก้อน
+ *  (raw ของ 5,000 แถวหนักเกินกว่าจะถือไว้ในหน่วยความจำทั้งหมด) */
+const STORE_ID_KEYS = ['business_id', 'Store ID', 'store_id'];
+function storeIdOf(raw) {
+  if (!raw) return null;
+  for (const k of STORE_ID_KEYS) {
+    const v = raw[k];
+    if (v != null && String(v).trim()) return String(v).trim();
+  }
+  return null;
+}
 function storeNameOf(raw) {
   if (!raw) return null;
   for (const k of STORE_NAME_KEYS) {
@@ -4358,6 +4370,7 @@ function mapDbRowToSale(dbRow) {
     // lookup derived from the source reports; null only if the order carried no VAT.
     vat: dbRow.vat != null ? Number(dbRow.vat) : (SALES_VAT_BY_ORDER[dbRow.order_id] != null ? SALES_VAT_BY_ORDER[dbRow.order_id] : null),
     store: storeNameOf(dbRow.raw),
+    storeId: storeIdOf(dbRow.raw),
     discount: dbRow.discount != null ? Number(dbRow.discount) : null,
     gp: dbRow.gp != null ? Number(dbRow.gp) : null,
     type: dbRow.type, payment: dbRow.payment, attachmentName: dbRow.attachment_name || '',
@@ -8207,16 +8220,15 @@ class Component extends DCLogic {
       { owner: 'อิทธิศักดิ์ รัตนวิชัย', ids: ['1292668qr', '006f5483-04dd-4c67-b4fb-6b0c35cba90a'] }
     ];
     const OWNER_DEFAULT = 'วราภรณ์ รัตนวิชัย';
-    const ownerStoreIdOf = raw => raw ? (raw['business_id'] || raw['Store ID'] || '') : '';
-    const ownerOf = raw => {
-      const id = String(ownerStoreIdOf(raw) || '').trim();
+    const ownerOf = storeId => {
+      const id = String(storeId || '').trim();
       const hit = id && OWNER_STORE_IDS.find(o => o.ids.indexOf(id) >= 0);
       return hit ? hit.owner : OWNER_DEFAULT;
     };
     // นับเฉพาะรายการที่มาจากไฟล์ของแอป — ยอดหน้าร้าน (POS) และรายการที่กรอกเองไม่นับ
     // แถวไทยช่วยไทยที่ย้ายไปแสดงใต้หน้าร้านยังนับอยู่ เพราะเป็นยอดขายของร้านในแอปจริง
     // ตารางนี้คิดทั้งปี ไม่ผูกกับตัวกรองช่วงเวลาด้านบน เพราะใช้ยื่นภาษีซึ่งคิดเป็นรายปีเสมอ
-    const ownerAppRows = this.salesOnly(this.state.recentRows).filter(r => r.raw && r.source === 'PLATFORM_IMPORT');
+    const ownerAppRows = this.salesOnly(this.state.recentRows).filter(r => r.storeId && r.source === 'PLATFORM_IMPORT');
     const ownerYearsFound = {};
     ownerAppRows.forEach(r => { if (r.isoDate) ownerYearsFound[r.isoDate.slice(0, 4)] = 1; });
     const ownerThisYear = String(new Date().getFullYear());
@@ -8233,14 +8245,17 @@ class Component extends DCLogic {
     const ownerRows = ownerAppRows.filter(r => r.isoDate && r.isoDate.slice(0, 4) === ownerYear);
     const ownerAgg = {};
     ownerRows.forEach(r => {
-      const owner = ownerOf(r.raw);
-      const store = storeNameOf(r.raw) || 'ไม่ระบุร้าน';
+      const owner = ownerOf(r.storeId);
+      const store = r.store || 'ไม่ระบุร้าน';
       const o = ownerAgg[owner] || (ownerAgg[owner] = { gross:0, service:0, vat:0, orders:0, stores:{} });
       const svc = (Number(r.gp) || 0) + (Number(r.vat) || 0) + (Number(r.discount) || 0);
       const isOrder = (Number(r.gross) || 0) > 0;
       o.gross += Number(r.gross) || 0; o.service += svc; o.vat += Number(r.vat) || 0;
       if (isOrder) o.orders++;
       const st = o.stores[store] || (o.stores[store] = { gross:0, service:0, vat:0, orders:0, platform:r.platform });
+      // ร้านเดียวมีทั้งแถวของแอปและแถวไทยช่วยไทยที่ย้ายไปแสดงใต้หน้าร้าน
+      // ป้ายช่องทางให้ใช้ชื่อแอป ไม่ใช่ "หน้าร้าน" เพราะยอดก้อนนี้มาจากแอปทั้งหมด
+      if (st.platform === 'หน้าร้าน' && r.platform !== 'หน้าร้าน') st.platform = r.platform;
       st.gross += Number(r.gross) || 0; st.service += svc; st.vat += Number(r.vat) || 0;
       if (isOrder) st.orders++;
     });
