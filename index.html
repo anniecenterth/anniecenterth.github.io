@@ -4062,7 +4062,13 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     const isAdjustment = /adjust/i.test(category) || category === 'การปรับรายได้';
     if (category && !isAdjustment && category !== 'Payment' && category !== 'ชำระเงิน') return null;
     // Transaction ID ไม่ซ้ำ ต่างจาก Short Order ID ที่ Grab วนใช้เลขเดิม (เจอซ้ำ 32 เลขในฐาน)
-    const orderId = row['Transaction ID'] || row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '';
+    // แต่ออเดอร์โครงการไทยช่วยไทย Grab เว้นช่อง Transaction ID ว่างไว้ทั้งหมด (270 แถวในไฟล์เดียว)
+    // ถ้าถอยไปใช้ Short Order ID เปล่าๆ แถวพวกนี้จะชนกันเองแล้วถูกทิ้งเพราะนึกว่าซ้ำ
+    // (หายไป 43 แถว · ร้านหอมมนต์บางโพ เดือน ส.ค. หายไป ฿730) จึงต่อวันเวลาเข้าไปให้ไม่ชนกัน
+    const grabTxId = String(row['Transaction ID'] || '').trim();
+    const grabShortId = String(row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '').trim();
+    const grabCreatedOn = String(row['Created On'] || row['วันที่สร้าง'] || '').trim();
+    const orderId = grabTxId || (grabShortId ? (grabShortId + (grabCreatedOn ? ' · ' + grabCreatedOn : '')) : '');
     if (!orderId) return null;
     if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return null;
     const amount = num(row['Amount'] || row['ยอด']);
