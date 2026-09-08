@@ -2295,7 +2295,7 @@
         </div>
         <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">ตัวเลขรายรับเป็นเงินที่เข้าจริง (หลังหักค่าคอมและ VAT แล้ว) · คงเหลือ = รับ − จ่าย</div>
         <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:1560px">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:2100px">
           <thead>
             <tr style="color:#8089A0;font-size:11.5px">
               <sc-for list="{{ dailyReportHeads }}" as="h" hint-placeholder-count="22">
@@ -6990,11 +6990,16 @@ class Component extends DCLogic {
 
     // ช่องทางรับเงินหน้าร้าน ตามที่เจ้าของร้านกำหนด — ชื่อใน POS เขียนไม่เหมือนกันทุกไฟล์
     // จึงจับด้วยคำสำคัญ ไม่ใช่เทียบตรงตัว · ที่ไม่เข้ากฎไหนเลยตกลงช่อง "อื่นๆ" ไม่ให้เงินหาย
+    // เรียงจากเจาะจงไปกว้าง — ตัวจับเอาอันแรกที่ตรง ถ้าเอา "ไทยช่วยไทย" กว้างๆ ไว้ก่อน
+    // ยอดของ 3 ร้านจะไหลเข้าช่องเดียวกันหมด แยกไม่ออกว่ามาจากช่องทางไหน
     const DR_POS_COLS = [
       { key:'cash',    label:'Cash',        match: p => /^cash$|เงินสด/i.test(p) },
       { key:'kshop',   label:'K+ Shop',     match: p => /k\+\s*shop/i.test(p) },
       { key:'pospay',  label:'POS Pay',     match: p => /pos\s*pay|promptpay/i.test(p) },
-      { key:'thaipl',  label:'ไทยช่วยไทย',  match: p => /ไทยช่วยไทย/.test(p) },
+      { key:'tcLmAc',  label:'ไทยช่วยไทย พลัส (Lineman Anniecake)', match: p => /Lineman Anniecake/i.test(p) },
+      { key:'tcLmHm',  label:'ไทยช่วยไทย พลัส (Lineman หอมมนต์)',   match: p => /Lineman หอมมนต์/.test(p) },
+      { key:'tcGbHm',  label:'ไทยช่วยไทย พลัส (Grab หอมมนต์)',      match: p => /Grab หอมมนต์/.test(p) },
+      { key:'thaipl',  label:'ไทยช่วยไทย (หน้าร้าน)', match: p => /ไทยช่วยไทย/.test(p) },
       { key:'whole',   label:'ขายส่ง',      match: p => /ขายส่ง/.test(p) },
       { key:'posetc',  label:'อื่นๆ (หน้าร้าน)', match: () => true }
     ];
