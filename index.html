@@ -3993,7 +3993,58 @@ function parseGenericDateTime(str) {
   if (!m) return { date: null, time: '00:00' };
   return { date: isoToBEShort(m[1] + '-' + m[2] + '-' + m[3]), time: m[4] + ':' + m[5] };
 }
-function normalizeImportRow(platform, row, fallbackDateISO) {
+/** ยอดขายจากโครงการไทยช่วยไทย ลูกค้าจ่ายที่ร้านผ่านกระเป๋ารัฐ ไม่ใช่ยอดที่แพลตฟอร์มเก็บเงินแทน
+ *  เจ้าของร้านจึงให้ย้าย "เฉพาะยอดขาย" ไปนับรวมกับหน้าร้าน ส่วนค่าบริการยังอยู่กับแพลตฟอร์มเดิม
+ *  (ยืนยัน 8 ก.ย. 2569) */
+const SUBSIDY_SPLITS = [
+  { platform: 'grab',    storeKw: 'เค้กหอมมนต์ บางโพ',                    label: 'ไทยช่วยไทย พลัส (Grab หอมมนต์)' },
+  { platform: 'lineman', storeKw: 'เค้กหอมมนต์ เค้กวันเกิด เบเกอรี่ บางโพ', label: 'ไทยช่วยไทย พลัส (Lineman หอมมนต์)' }
+];
+/** Grab คิดค่าคอมโครงการนี้ 5.35% ของยอดออเดอร์เป๊ะทุกแถว (ตรวจจากออเดอร์ที่ไม่กำกวม 130 รายการ
+ *  ค่าเบี่ยงเบนเป็น 0) จึงย้อนกลับหายอดขายจากค่าคอมได้ — ไฟล์ Grab ไม่มีคอลัมน์บอกว่าออเดอร์ไหน
+ *  อยู่ในโครงการ มีแต่บรรทัดค่าคอมที่อ้าง Short Order ID ไว้ในช่อง Description */
+const GRAB_SUBSIDY_RATE = 0.0535;
+function subsidyLabelOf(platform, storeName) {
+  const n = String(storeName || '');
+  const hit = SUBSIDY_SPLITS.find(x => x.platform === platform && n.indexOf(x.storeKw) >= 0);
+  return hit ? hit.label : null;
+}
+/** อ่านทั้งไฟล์ก่อน 1 รอบ เพื่อรู้ว่าออเดอร์ไหนของ Grab อยู่ในโครงการไทยช่วยไทย
+ *  แล้วค่อยแปลงทีละแถว — 1 แถวอาจแตกเป็น 2 แถว (ยอดขายไปหน้าร้าน ค่าบริการอยู่กับแพลตฟอร์ม) */
+function normalizeImportRows(platform, rows, fallbackDateISO) {
+  const ctx = {};
+  if (platform === 'grab') {
+    const pending = {};
+    rows.forEach(r => {
+      if (!/govt campaign/i.test(String(r['Subcategory'] || ''))) return;
+      const m = /GF-\d+/.exec(String(r['Description'] || ''));
+      if (!m) return;
+      const fee = Math.abs(parseFloat(String(r['Amount'] || '0').replace(/,/g, '')) || 0);
+      if (!fee) return;
+      // เก็บค่าคอมตามไฟล์ แล้วค่อยเทียบไปข้างหน้า (ยอดขาย × 5.35%) ตอนจับคู่
+      // ถ้าย้อนกลับ (ค่าคอม ÷ 5.35%) จะคลาดจากการปัดเศษ 2 ตำแหน่งจนจับไม่ติด
+      (pending[m[0]] = pending[m[0]] || []).push(fee);
+    });
+    ctx.grabSubsidy = pending;
+  }
+  const out = [];
+  rows.forEach(row => {
+    const r = normalizeImportRow(platform, row, fallbackDateISO, ctx);
+    if (!r) return;
+    if (Array.isArray(r)) out.push.apply(out, r); else out.push(r);
+  });
+  return out;
+}
+/** แตกแถวเป็น 2: ยอดขายไปหน้าร้าน · ค่าบริการคงอยู่กับแพลตฟอร์มเดิม (ยอดขายเป็น 0) */
+function splitSubsidyRow(r, label) {
+  return [
+    { ...r, platformLabel: 'หน้าร้าน', payment: label, type: 'ไทยช่วยไทย',
+      orderId: r.orderId + ' · ไทยช่วยไทย', gross: r.gross, net: r.gross,
+      discount: 0, gp: 0, vat: 0, fee: 0, status: 'เงินเข้าจริง' },
+    { ...r, gross: 0 }
+  ];
+}
+function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
   const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
   // แต่ละแพลตฟอร์มเขียนเครื่องหมายไม่เหมือนกัน — Grab กับ LINE MAN ใส่ค่าคอมเป็นเลขติดลบ
   // ส่วน Shopee ใส่เป็นเลขบวก ถ้าเก็บตามไฟล์ตรงๆ ยอดรวมจะหักกันเองจนอ่านไม่ได้
@@ -4031,14 +4082,28 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     const payMethod = String(row['Payment Method'] || row['วิธีการชำระเงิน'] || '').trim();
     const dt = parseGrabDateTime(row['Date'], row['Created On'] || row['วันที่สร้าง']);
     const status = settled ? 'เงินเข้าจริง' : 'รอรับเงิน';
-    return {
+    const storeName = row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'];
+    const built = {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount, gp, vat, fee: gp + vat, status,
       type: isAdjustment ? 'Adjustment' : null,
       payment: payMethod || 'เงินสด',
-      brand: detectBrandFromName(row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน']),
+      brand: detectBrandFromName(storeName),
       platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
     };
+    // ออเดอร์โครงการไทยช่วยไทย — จับคู่ด้วย Short Order ID คู่กับยอดที่ตรงกับค่าคอม 5.35%
+    // (Short Order ID ของ Grab วนใช้ซ้ำ ใช้รหัสอย่างเดียวจะจับผิดออเดอร์)
+    const subsidyLabel = !isAdjustment && subsidyLabelOf('grab', storeName);
+    if (subsidyLabel && ctx && ctx.grabSubsidy) {
+      const shortId = String(row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '').trim();
+      const list = ctx.grabSubsidy[shortId];
+      if (list && list.length) {
+        const expect = Math.round(gross * GRAB_SUBSIDY_RATE * 100) / 100;
+        const i = list.findIndex(v => Math.abs(v - expect) < 0.011);
+        if (i >= 0) { list.splice(i, 1); return splitSubsidyRow(built, subsidyLabel); }
+      }
+    }
+    return built;
   }
   if (platform === 'lineman') {
     const orderId = row['order_id'] || '';
@@ -4057,7 +4122,7 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
     const net = num(row['net_amount']);
     const paymentMethod = row['payment_method'] || 'เงินสด';
     const dt = parseGenericDateTime(row['capture_time']);
-    return {
+    const built = {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount: mag(row['other_cost']), gp: mag(row['fee']), vat: mag(row['vat']),
       fee: mag(row['fee']) + mag(row['vat']),
@@ -4067,6 +4132,10 @@ function normalizeImportRow(platform, row, fallbackDateISO) {
       status: 'เงินเข้าจริง', payment: paymentMethod,
       brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN', raw: { ...row }
     };
+    // ออเดอร์โครงการไทยช่วยไทยของ LINE MAN ระบุตรงๆ ที่ payment_method ไม่ต้องเดา
+    const lmSubsidy = paymentMethod === 'GOVERNMENT_WALLET' && subsidyLabelOf('lineman', row['restaurant_name']);
+    if (lmSubsidy) return splitSubsidyRow(built, lmSubsidy);
+    return built;
   }
   if (platform === 'shopee') {
     const orderId = row['Order ID'] || '';
@@ -7552,7 +7621,7 @@ class Component extends DCLogic {
       const cleaned = firstLine.trim().startsWith('*') ? text.slice(firstNewline + 1) : text;
       Papa.parse(cleaned, { header: true, skipEmptyLines: true, complete: (results) => {
         const platform = detectPlatform(results.meta.fields || []);
-        const normalized = platform === 'unknown' ? [] : results.data.map(row => normalizeImportRow(platform, row, fallbackDateISO)).filter(Boolean);
+        const normalized = platform === 'unknown' ? [] : normalizeImportRows(platform, results.data, fallbackDateISO);
         resolve({ name: file.name, platform, rawCount: results.data.length, rows: normalized, skippedCount: results.data.length - normalized.length });
       }});
     }));
@@ -7563,7 +7632,7 @@ class Component extends DCLogic {
       const allRows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
       const rows = allRows.filter(row => Object.values(row).some(v => String(v).trim() !== ''));
       const platform = detectPlatform(headerRow);
-      const normalized = platform === 'unknown' ? [] : rows.map(row => normalizeImportRow(platform, row, fallbackDateISO)).filter(Boolean);
+      const normalized = platform === 'unknown' ? [] : normalizeImportRows(platform, rows, fallbackDateISO);
       return { name: file.name, platform, rawCount: rows.length, rows: normalized, skippedCount: rows.length - normalized.length };
     });
     const parseImportFiles = (fileList) => {
@@ -7722,7 +7791,7 @@ class Component extends DCLogic {
       // ส่วนลด/GP/VAT/แถวดิบ/ช่องทางชำระ ค่าจึงหล่นหายก่อนถึงฐานข้อมูลทุกครั้ง
       const rowsToInsert = included.map(r => ({
         date: r.date || isoToBEShort(this.state.importReportDate), time: r.time,
-        platform: r.meta.label, brand: r.brand,
+        platform: r.platformLabel || r.meta.label, brand: r.brand,
         orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status,
         discount: r.discount, gp: r.gp, vat: r.vat, raw: r.raw, payment: r.payment, type: r.type,
         source: r.meta.label === 'หน้าร้าน' || r.meta.label === 'ส่วนลด' ? 'POS' : 'PLATFORM_IMPORT'
