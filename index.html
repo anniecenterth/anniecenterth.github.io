@@ -4020,10 +4020,6 @@ const SUBSIDY_SPLITS = [
   { platform: 'lineman', storeKw: 'เค้กหอมมนต์ เค้กวันเกิด เบเกอรี่ บางโพ', label: 'ไทยช่วยไทย พลัส (Lineman หอมมนต์)' },
   { platform: 'lineman', storeKw: 'Annie cake เค้กวันเกิด เค้กมินิมอล',      label: 'ไทยช่วยไทย พลัส (Lineman Anniecake)' }
 ];
-/** Grab คิดค่าคอมโครงการนี้ 5.35% ของยอดออเดอร์เป๊ะทุกแถว (ตรวจจากออเดอร์ที่ไม่กำกวม 130 รายการ
- *  ค่าเบี่ยงเบนเป็น 0) จึงย้อนกลับหายอดขายจากค่าคอมได้ — ไฟล์ Grab ไม่มีคอลัมน์บอกว่าออเดอร์ไหน
- *  อยู่ในโครงการ มีแต่บรรทัดค่าคอมที่อ้าง Short Order ID ไว้ในช่อง Description */
-const GRAB_SUBSIDY_RATE = 0.0535;
 function subsidyLabelOf(platform, storeName) {
   const n = String(storeName || '');
   const hit = SUBSIDY_SPLITS.find(x => x.platform === platform && n.indexOf(x.storeKw) >= 0);
@@ -4036,20 +4032,6 @@ function normalizeImportRows(platform, rows, fallbackDateISO) {
   // กว่าจะรู้ว่าตกหล่นก็ตอนยอดไม่ตรงใบสรุปแล้ว (เคยหายไป 43 แถว ฿730 โดยไม่มีอะไรฟ้อง)
   const ctx = { skips: {} };
   ctx.skip = reason => { ctx.skips[reason] = (ctx.skips[reason] || 0) + 1; return null; };
-  if (platform === 'grab') {
-    const pending = {};
-    rows.forEach(r => {
-      if (!/govt campaign/i.test(String(r['Subcategory'] || ''))) return;
-      const m = /GF-\d+/.exec(String(r['Description'] || ''));
-      if (!m) return;
-      const fee = Math.abs(parseFloat(String(r['Amount'] || '0').replace(/,/g, '')) || 0);
-      if (!fee) return;
-      // เก็บค่าคอมตามไฟล์ แล้วค่อยเทียบไปข้างหน้า (ยอดขาย × 5.35%) ตอนจับคู่
-      // ถ้าย้อนกลับ (ค่าคอม ÷ 5.35%) จะคลาดจากการปัดเศษ 2 ตำแหน่งจนจับไม่ติด
-      (pending[m[0]] = pending[m[0]] || []).push(fee);
-    });
-    ctx.grabSubsidy = pending;
-  }
   const out = [];
   rows.forEach(row => {
     const r = normalizeImportRow(platform, row, fallbackDateISO, ctx);
@@ -4058,13 +4040,17 @@ function normalizeImportRows(platform, rows, fallbackDateISO) {
   });
   return { rows: out, skips: ctx.skips };
 }
-/** แตกแถวเป็น 2: ยอดขายไปหน้าร้าน · ค่าบริการคงอยู่กับแพลตฟอร์มเดิม (ยอดขายเป็น 0) */
-function splitSubsidyRow(r, label) {
+/** แตกแถวเป็น 2: ยอดที่รับผ่านกระเป๋ารัฐไปหน้าร้าน · ที่เหลือกับค่าบริการอยู่กับแพลตฟอร์มเดิม
+ *  subsidyGross = ยอดที่รัฐจ่ายจริง — LINE MAN ใช้ cash_amount เพราะบางออเดอร์ลูกค้าจ่ายเพิ่ม
+ *  ผ่านแอปเอง (e_payment) ส่วนนั้นยังเป็นยอดของแพลตฟอร์มตามเดิม · Grab ใช้ทั้งก้อน */
+function splitSubsidyRow(r, label, subsidyGross) {
+  const moved = subsidyGross == null ? r.gross : subsidyGross;
+  const left = Math.round((r.gross - moved) * 100) / 100;
   return [
     { ...r, platformLabel: 'หน้าร้าน', payment: label, type: 'ไทยช่วยไทย',
-      orderId: r.orderId + ' · ไทยช่วยไทย', gross: r.gross, net: r.gross,
+      orderId: r.orderId + ' · ไทยช่วยไทย', gross: moved, net: moved,
       discount: 0, gp: 0, vat: 0, fee: 0, status: 'เงินเข้าจริง' },
-    { ...r, gross: 0 }
+    { ...r, gross: left }
   ];
 }
 function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
@@ -4121,18 +4107,13 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
       brand: detectBrandFromName(storeName),
       platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
     };
-    // ออเดอร์โครงการไทยช่วยไทย — จับคู่ด้วย Short Order ID คู่กับยอดที่ตรงกับค่าคอม 5.35%
-    // (Short Order ID ของ Grab วนใช้ซ้ำ ใช้รหัสอย่างเดียวจะจับผิดออเดอร์)
-    const subsidyLabel = !isAdjustment && subsidyLabelOf('grab', storeName);
-    if (subsidyLabel && ctx && ctx.grabSubsidy) {
-      const shortId = String(row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '').trim();
-      const list = ctx.grabSubsidy[shortId];
-      if (list && list.length) {
-        const expect = Math.round(gross * GRAB_SUBSIDY_RATE * 100) / 100;
-        const i = list.findIndex(v => Math.abs(v - expect) < 0.011);
-        if (i >= 0) { list.splice(i, 1); return splitSubsidyRow(built, subsidyLabel); }
-      }
-    }
+    // ออเดอร์โครงการไทยช่วยไทยของ Grab = ออเดอร์ที่ยังไม่โอน (Status = Completed / Manually Paid)
+    // ลูกค้าจ่ายที่ร้านผ่านกระเป๋ารัฐ Grab จึงไม่ต้องโอนเงินให้ มีแต่หักค่าคอมโครงการทีหลัง
+    // ตรวจแล้วจำนวนออเดอร์ Completed เท่ากับจำนวนบรรทัดค่าคอมโครงการพอดี และยอด ÷ 5.35%
+    // ก็ตรงกัน (ส.ค. 2569: 78 ออเดอร์ ฿16,649 · ค่าคอม ฿890.67 ÷ 5.35% = ฿16,648)
+    // เดิมไล่จับคู่จากช่อง Description ซึ่งจับผิดออเดอร์ได้เพราะ Short Order ID วนใช้ซ้ำ
+    const subsidyLabel = !isAdjustment && !settled && subsidyLabelOf('grab', storeName);
+    if (subsidyLabel) return splitSubsidyRow(built, subsidyLabel);
     return built;
   }
   if (platform === 'lineman') {
@@ -4164,7 +4145,8 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     };
     // ออเดอร์โครงการไทยช่วยไทยของ LINE MAN ระบุตรงๆ ที่ payment_method ไม่ต้องเดา
     const lmSubsidy = paymentMethod === 'GOVERNMENT_WALLET' && subsidyLabelOf('lineman', row['restaurant_name']);
-    if (lmSubsidy) return splitSubsidyRow(built, lmSubsidy);
+    // ย้ายเฉพาะส่วนที่รัฐจ่าย (cash_amount) ส่วนที่ลูกค้าจ่ายผ่านแอปเองยังเป็นยอดของ LINE MAN
+    if (lmSubsidy) return splitSubsidyRow(built, lmSubsidy, num(row['cash_amount']));
     return built;
   }
   if (platform === 'shopee') {
