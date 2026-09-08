@@ -2941,6 +2941,54 @@
           <div style="background:#FBFBFC;border:1px solid #EFF0F3;border-radius:12px;padding:13px 15px;margin-top:14px"><div style="font-size:12px;color:#8089A0;line-height:1.6">WHT ที่แพลตฟอร์มหักไว้สามารถนำไปเครดิตภาษีได้ — แนบหนังสือรับรองหัก ณ ที่จ่ายตอนยื่น</div></div>
         </div>
       </div>
+
+      <!-- สรุปยอดแยกตามเจ้าของร้าน สำหรับยื่นภาษีรายบุคคล -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">สรุปยอดแยกตามเจ้าของร้าน</h3>
+          <span style="font-size:12.5px;color:#9AA3B2">{{ ownerTaxLabel }}</span>
+        </div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">นับเฉพาะยอดจากแอป Grab · LINE MAN · ShopeeFood — ไม่รวมยอดหน้าร้านและรายจ่ายที่ไม่ได้มาจากแอป · แถวย่อยคือร้านของแต่ละคน</div>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:900px">
+          <thead>
+            <tr style="color:#5A6478;font-size:11.5px;background:#F1F4F8">
+              <th style="padding:10px;font-weight:600;text-align:left;white-space:nowrap;border-bottom:1px solid #DFE4EC">ชื่อ / ร้าน</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ออเดอร์</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ยอดขายก่อนหัก<br/>ค่าใช้จ่ายของแอป</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ค่าใช้จ่ายของแอป</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">% ค่าใช้จ่าย</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">VAT ในค่าใช้จ่าย</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ยอดหลังหัก<br/>ค่าใช้จ่ายของแอป</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">สัดส่วน / ช่องทาง</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ ownerTaxRows }}" as="r" hint-placeholder-count="12">
+              <tr style="{{ r.rowStyle }}">
+                <td style="{{ r.nameStyle }}" title="{{ r.name }}">{{ r.name }}</td>
+                <td style="{{ r.numStyle }}">{{ r.orders }}</td>
+                <td style="{{ r.numStyle }}">{{ r.gross }}</td>
+                <td style="{{ r.numStyle }}">{{ r.service }}</td>
+                <td style="{{ r.numStyle }}">{{ r.pct }}</td>
+                <td style="{{ r.numStyle }}">{{ r.vat }}</td>
+                <td style="{{ r.numStyle }}">{{ r.after }}</td>
+                <td style="{{ r.numStyle }}">{{ r.share }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+        <div style="background:#FBFBFC;border:1px solid #EFF0F3;border-radius:12px;padding:13px 15px;margin-top:14px">
+          <div style="font-size:12px;color:#8089A0;line-height:1.7">
+            <b>จับร้านเข้าเจ้าของด้วยรหัสร้านของแอป ไม่ใช่ชื่อร้าน</b> เพราะชื่อร้านเปลี่ยนได้ ·
+            ธงไชย ธัญรัตนมงคล = LINE MAN 625974Dg, 1411527WE ·
+            อิทธิศักดิ์ รัตนวิชัย = LINE MAN 1292668qr, Grab 006f5483-04dd-4c67-b4fb-6b0c35cba90a ·
+            ร้านที่เหลือทั้งหมดเป็นของ วราภรณ์ รัตนวิชัย ·
+            <b>ยอดไทยช่วยไทยนับรวมอยู่ด้วย</b> เพราะเป็นยอดขายของร้านในแอปจริง แม้หน้าอื่นจะแสดงไว้ใต้หน้าร้าน
+          </div>
+        </div>
+      </div>
     </div>
     </sc-if>
 
@@ -8145,6 +8193,92 @@ class Component extends DCLogic {
       knobStyle: { position:'absolute', top:'2px', left: r.on ? '18px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' } }));
 
     // ---- ภาษี & ส่งออก — real revenue base from sales; VAT/WHT left empty pending confirmation ----
+    // ---- สรุปยอดแยกตามเจ้าของร้าน (ใช้ยื่นภาษีรายบุคคล) ----
+    // ผูกร้านกับเจ้าของด้วยรหัสร้านของแพลตฟอร์ม ไม่ใช่ชื่อร้าน เพราะชื่อร้านเปลี่ยนได้
+    // LINE MAN ใช้ business_id · Grab ใช้ Store ID · ร้านที่ไม่อยู่ในรายการนี้เป็นของวราภรณ์ทั้งหมด
+    const OWNER_STORE_IDS = [
+      { owner: 'ธงไชย ธัญรัตนมงคล',   ids: ['625974Dg', '1411527WE'] },
+      { owner: 'อิทธิศักดิ์ รัตนวิชัย', ids: ['1292668qr', '006f5483-04dd-4c67-b4fb-6b0c35cba90a'] }
+    ];
+    const OWNER_DEFAULT = 'วราภรณ์ รัตนวิชัย';
+    const ownerStoreIdOf = raw => raw ? (raw['business_id'] || raw['Store ID'] || '') : '';
+    const ownerOf = raw => {
+      const id = String(ownerStoreIdOf(raw) || '').trim();
+      const hit = id && OWNER_STORE_IDS.find(o => o.ids.indexOf(id) >= 0);
+      return hit ? hit.owner : OWNER_DEFAULT;
+    };
+    // นับเฉพาะรายการที่มาจากไฟล์ของแอป — ยอดหน้าร้าน (POS) และรายการที่กรอกเองไม่นับ
+    // แถวไทยช่วยไทยที่ย้ายไปแสดงใต้หน้าร้านยังนับอยู่ เพราะเป็นยอดขายของร้านในแอปจริง
+    const ownerRows = this.applySalesFilters(this.state.recentRows).filter(r => r.raw && r.source === 'PLATFORM_IMPORT');
+    const ownerAgg = {};
+    ownerRows.forEach(r => {
+      const owner = ownerOf(r.raw);
+      const store = storeNameOf(r.raw) || 'ไม่ระบุร้าน';
+      const o = ownerAgg[owner] || (ownerAgg[owner] = { gross:0, service:0, vat:0, orders:0, stores:{} });
+      const svc = (Number(r.gp) || 0) + (Number(r.vat) || 0) + (Number(r.discount) || 0);
+      const isOrder = (Number(r.gross) || 0) > 0;
+      o.gross += Number(r.gross) || 0; o.service += svc; o.vat += Number(r.vat) || 0;
+      if (isOrder) o.orders++;
+      const st = o.stores[store] || (o.stores[store] = { gross:0, service:0, vat:0, orders:0, platform:r.platform });
+      st.gross += Number(r.gross) || 0; st.service += svc; st.vat += Number(r.vat) || 0;
+      if (isOrder) st.orders++;
+    });
+    const ownerTotalGross = Object.keys(ownerAgg).reduce((a, k) => a + ownerAgg[k].gross, 0);
+    const ownerFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const ownerCell = (extra) => 'padding:11px 10px;text-align:right;white-space:nowrap;' + (extra || '');
+    const ownerTaxRows = [];
+    Object.keys(ownerAgg)
+      .sort((a, b) => ownerAgg[b].gross - ownerAgg[a].gross)
+      .forEach(name => {
+        const o = ownerAgg[name];
+        const after = o.gross - o.service;
+        ownerTaxRows.push({
+          name, isOwner: true, isStore: false,
+          orders: o.orders.toLocaleString('en-US'),
+          gross: ownerFmt(o.gross), service: ownerFmt(o.service), vat: ownerFmt(o.vat),
+          after: ownerFmt(after),
+          pct: o.gross ? (o.service / o.gross * 100).toFixed(1) + '%' : '—',
+          share: ownerTotalGross ? (o.gross / ownerTotalGross * 100).toFixed(1) + '%' : '—',
+          nameStyle: 'padding:11px 10px;font-weight:700;color:#1B2536;white-space:nowrap',
+          numStyle: ownerCell('font-weight:700;color:#1B2536'),
+          rowStyle: { borderTop:'2px solid #E7E9ED', background:'#FAFBFC' }
+        });
+        Object.keys(o.stores).sort((a, b) => o.stores[b].gross - o.stores[a].gross).forEach(sname => {
+          const st = o.stores[sname];
+          ownerTaxRows.push({
+            name: sname, isOwner: false, isStore: true,
+            orders: st.orders.toLocaleString('en-US'),
+            gross: ownerFmt(st.gross), service: ownerFmt(st.service), vat: ownerFmt(st.vat),
+            after: ownerFmt(st.gross - st.service),
+            pct: st.gross ? (st.service / st.gross * 100).toFixed(1) + '%' : '—',
+            share: st.platform,
+            nameStyle: 'padding:9px 10px 9px 30px;color:#7A8398;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap',
+            numStyle: ownerCell('color:#5A6478'),
+            rowStyle: { borderTop:'1px solid #F1F2F4' }
+          });
+        });
+      });
+    if (ownerTaxRows.length) {
+      const t = Object.keys(ownerAgg).reduce((a, k) => {
+        const o = ownerAgg[k];
+        return { gross:a.gross+o.gross, service:a.service+o.service, vat:a.vat+o.vat, orders:a.orders+o.orders };
+      }, { gross:0, service:0, vat:0, orders:0 });
+      ownerTaxRows.push({
+        name: 'รวมทั้งสิ้น', isOwner: true, isStore: false,
+        orders: t.orders.toLocaleString('en-US'),
+        gross: ownerFmt(t.gross), service: ownerFmt(t.service), vat: ownerFmt(t.vat),
+        after: ownerFmt(t.gross - t.service),
+        pct: t.gross ? (t.service / t.gross * 100).toFixed(1) + '%' : '—',
+        share: '100%',
+        nameStyle: 'padding:12px 10px;font-weight:700;color:#1B2536;white-space:nowrap',
+        numStyle: ownerCell('font-weight:700;color:#1B2536'),
+        rowStyle: { borderTop:'2px solid #C7CDD8', background:'#F1F4F8' }
+      });
+    }
+    const ownerTaxLabel = this.periodRange()
+      ? dateRangeLabel(this.periodRange().from, this.periodRange().to)
+      : 'ทั้งหมด';
+
     const txRows = this.applySalesFilters(this.state.recentRows);
     const txNet = txRows.reduce((a, r) => a + r.net, 0);
     const txGross = txRows.reduce((a, r) => a + r.gross, 0);
@@ -8427,7 +8561,7 @@ class Component extends DCLogic {
       payoutKpis, payoutPlatforms, payoutRecRows,
       subsidyKpis, subsidyRows, subsidyRounds,
       alertItems, alertCounts, alertRules, alertsEmpty, alertCountLabel,
-      taxKpis, taxDocs, taxWht, exportAllTaxDocs,
+      taxKpis, taxDocs, taxWht, exportAllTaxDocs, ownerTaxRows, ownerTaxLabel,
       taxFormsList, taxFormsReadyCount, taxFormsDraftCount, taxFormActive, tf,
       isPp30, isPnd1, isPnd3, isPnd53, isPnd50, isPnd51,
       activeStatusPill, activeStatusLabel, activeIsReady, toggleActiveReady, toggleReadyLabel, toggleReadyIcon,
