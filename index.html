@@ -2946,9 +2946,14 @@
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px">
           <h3 style="margin:0;font-size:16px;font-weight:600">สรุปยอดแยกตามเจ้าของร้าน</h3>
-          <span style="font-size:12.5px;color:#9AA3B2">{{ ownerTaxLabel }}</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:12.5px;color:#9AA3B2">{{ ownerTaxLabel }}</span>
+            <sc-for list="{{ ownerYearChips }}" as="y" hint-placeholder-count="2">
+              <div onClick="{{ y.onClick }}" style="{{ y.style }}">{{ y.label }}</div>
+            </sc-for>
+          </div>
         </div>
-        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">นับเฉพาะยอดจากแอป Grab · LINE MAN · ShopeeFood — ไม่รวมยอดหน้าร้านและรายจ่ายที่ไม่ได้มาจากแอป · แถวย่อยคือร้านของแต่ละคน</div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">นับเฉพาะยอดจากแอป Grab · LINE MAN · ShopeeFood — ไม่รวมยอดหน้าร้านและรายจ่ายที่ไม่ได้มาจากแอป · คิดทั้งปีตามที่เลือก ไม่ขึ้นกับตัวกรองช่วงเวลาด้านบน · แถวย่อยคือร้านของแต่ละคน</div>
         <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:900px">
           <thead>
@@ -4677,6 +4682,7 @@ class Component extends DCLogic {
     formDD: null, salesListDD: null, salesPlatform: 'ทุกแพลตฟอร์ม', salesSearch: '', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด',
     salesSortKey: 'date', salesSortDir: 'desc',
     salesPage: 1, salesPageSize: 10, salesHeadFrom: todayISO(), salesHeadTo: todayISO(),
+    taxOwnerYear: String(new Date().getFullYear()),
     importFilesRaw: [], importReportDate: todayISO(), importParsing: false, importError: null,
     importHistoryList: importHistoryStore.load(), lastImportSummary: null,
     expForm: { date: todayISO(), branch: 'บางโพ', mainCat:'เลือกหมวดหมู่', subCat:'เลือกหมวดหมู่ย่อย', expBrand:'ไม่ระบุ', channel:'', amount:'', expPayment:'เลือก', note:'', asset:false, attachmentName:'' },
@@ -8209,7 +8215,22 @@ class Component extends DCLogic {
     };
     // นับเฉพาะรายการที่มาจากไฟล์ของแอป — ยอดหน้าร้าน (POS) และรายการที่กรอกเองไม่นับ
     // แถวไทยช่วยไทยที่ย้ายไปแสดงใต้หน้าร้านยังนับอยู่ เพราะเป็นยอดขายของร้านในแอปจริง
-    const ownerRows = this.applySalesFilters(this.state.recentRows).filter(r => r.raw && r.source === 'PLATFORM_IMPORT');
+    // ตารางนี้คิดทั้งปี ไม่ผูกกับตัวกรองช่วงเวลาด้านบน เพราะใช้ยื่นภาษีซึ่งคิดเป็นรายปีเสมอ
+    const ownerAppRows = this.salesOnly(this.state.recentRows).filter(r => r.raw && r.source === 'PLATFORM_IMPORT');
+    const ownerYearsFound = {};
+    ownerAppRows.forEach(r => { if (r.isoDate) ownerYearsFound[r.isoDate.slice(0, 4)] = 1; });
+    const ownerThisYear = String(new Date().getFullYear());
+    ownerYearsFound[ownerThisYear] = 1;
+    const ownerYearList = Object.keys(ownerYearsFound).sort().reverse();
+    const ownerYear = ownerYearList.indexOf(this.state.taxOwnerYear) >= 0 ? this.state.taxOwnerYear : ownerYearList[0];
+    const ownerYearChips = ownerYearList.map(y => ({
+      label: 'ปี ' + (Number(y) + 543),
+      onClick: () => this.setState({ taxOwnerYear: y }),
+      style: y === ownerYear
+        ? { padding:'7px 15px', borderRadius:'10px', fontSize:'12.5px', fontWeight:700, cursor:'pointer', background:'#7A5BA8', color:'#fff' }
+        : { padding:'7px 15px', borderRadius:'10px', fontSize:'12.5px', fontWeight:600, cursor:'pointer', background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
+    }));
+    const ownerRows = ownerAppRows.filter(r => r.isoDate && r.isoDate.slice(0, 4) === ownerYear);
     const ownerAgg = {};
     ownerRows.forEach(r => {
       const owner = ownerOf(r.raw);
@@ -8275,9 +8296,8 @@ class Component extends DCLogic {
         rowStyle: { borderTop:'2px solid #C7CDD8', background:'#F1F4F8' }
       });
     }
-    const ownerTaxLabel = this.periodRange()
-      ? dateRangeLabel(this.periodRange().from, this.periodRange().to)
-      : 'ทั้งหมด';
+    const ownerTaxLabel = 'ทั้งปี ' + (Number(ownerYear) + 543)
+      + ' (01/01/' + String(Number(ownerYear) + 543).slice(2) + ' – 31/12/' + String(Number(ownerYear) + 543).slice(2) + ')';
 
     const txRows = this.applySalesFilters(this.state.recentRows);
     const txNet = txRows.reduce((a, r) => a + r.net, 0);
@@ -8561,7 +8581,7 @@ class Component extends DCLogic {
       payoutKpis, payoutPlatforms, payoutRecRows,
       subsidyKpis, subsidyRows, subsidyRounds,
       alertItems, alertCounts, alertRules, alertsEmpty, alertCountLabel,
-      taxKpis, taxDocs, taxWht, exportAllTaxDocs, ownerTaxRows, ownerTaxLabel,
+      taxKpis, taxDocs, taxWht, exportAllTaxDocs, ownerTaxRows, ownerTaxLabel, ownerYearChips,
       taxFormsList, taxFormsReadyCount, taxFormsDraftCount, taxFormActive, tf,
       isPp30, isPnd1, isPnd3, isPnd53, isPnd50, isPnd51,
       activeStatusPill, activeStatusLabel, activeIsReady, toggleActiveReady, toggleReadyLabel, toggleReadyIcon,
