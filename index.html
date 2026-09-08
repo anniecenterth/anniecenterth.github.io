@@ -2510,6 +2510,25 @@
           </sc-for>
         </div>
 
+        <!-- แถวที่ถูกข้าม พร้อมเหตุผล — เห็นก่อนกดยืนยันว่ามีอะไรไม่เข้าระบบบ้าง -->
+        <sc-if value="{{ hasImportSkips }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#FDFBF5;border:1px solid #E4CFA0;border-radius:16px;padding:16px 20px;margin-bottom:18px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px">
+              <i data-lucide="filter" style="width:16px;height:16px;color:#8A6414"></i>
+              <span style="font-size:13.5px;font-weight:600;color:#8A6414">{{ importSkipHeadline }}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ importSkipRows }}" as="sk" hint-placeholder-count="3">
+                <div style="display:flex;align-items:baseline;gap:7px;background:#fff;border:1px solid #EDE0C2;border-radius:10px;padding:7px 12px">
+                  <span style="font-size:12.5px;color:#5A6478">{{ sk.reason }}</span>
+                  <span style="font-size:12.5px;font-weight:700;color:#8A6414">{{ sk.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:11.5px;color:#9AA3B2;margin-top:10px;line-height:1.5">รายการเหล่านี้อยู่ในไฟล์แต่ไม่ถูกนำเข้า · ถ้าตัวเลขไม่ตรงกับใบสรุปของแพลตฟอร์ม ให้ดูที่นี่ก่อน</div>
+          </div>
+        </sc-if>
+
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:16px;font-weight:600">การจับคู่คอลัมน์อัตโนมัติ</h3>
@@ -4013,7 +4032,10 @@ function subsidyLabelOf(platform, storeName) {
 /** อ่านทั้งไฟล์ก่อน 1 รอบ เพื่อรู้ว่าออเดอร์ไหนของ Grab อยู่ในโครงการไทยช่วยไทย
  *  แล้วค่อยแปลงทีละแถว — 1 แถวอาจแตกเป็น 2 แถว (ยอดขายไปหน้าร้าน ค่าบริการอยู่กับแพลตฟอร์ม) */
 function normalizeImportRows(platform, rows, fallbackDateISO) {
-  const ctx = {};
+  // นับเหตุผลที่ข้ามแต่ละแถวไว้ด้วย — เดิมแถวที่ถูกข้ามหายไปเงียบๆ
+  // กว่าจะรู้ว่าตกหล่นก็ตอนยอดไม่ตรงใบสรุปแล้ว (เคยหายไป 43 แถว ฿730 โดยไม่มีอะไรฟ้อง)
+  const ctx = { skips: {} };
+  ctx.skip = reason => { ctx.skips[reason] = (ctx.skips[reason] || 0) + 1; return null; };
   if (platform === 'grab') {
     const pending = {};
     rows.forEach(r => {
@@ -4034,7 +4056,7 @@ function normalizeImportRows(platform, rows, fallbackDateISO) {
     if (!r) return;
     if (Array.isArray(r)) out.push.apply(out, r); else out.push(r);
   });
-  return out;
+  return { rows: out, skips: ctx.skips };
 }
 /** แตกแถวเป็น 2: ยอดขายไปหน้าร้าน · ค่าบริการคงอยู่กับแพลตฟอร์มเดิม (ยอดขายเป็น 0) */
 function splitSubsidyRow(r, label) {
@@ -4046,6 +4068,7 @@ function splitSubsidyRow(r, label) {
   ];
 }
 function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
+  const skip = reason => (ctx && ctx.skip) ? ctx.skip(reason) : null;
   const num = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
   // แต่ละแพลตฟอร์มเขียนเครื่องหมายไม่เหมือนกัน — Grab กับ LINE MAN ใส่ค่าคอมเป็นเลขติดลบ
   // ส่วน Shopee ใส่เป็นเลขบวก ถ้าเก็บตามไฟล์ตรงๆ ยอดรวมจะหักกันเองจนอ่านไม่ได้
@@ -4053,14 +4076,14 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
   const mag = v => Math.abs(num(v));
   if (platform === 'grab') {
     const rawStatus = String(row['Status'] || row['สถานะ'] || '').trim();
-    if (/cancel/i.test(rawStatus) || rawStatus === 'ยกเลิกแล้ว') return null;   // สเปก: กรองออก Status = Cancelled
+    if (/cancel/i.test(rawStatus) || rawStatus === 'ยกเลิกแล้ว') return skip('ออเดอร์ยกเลิก');   // สเปก: กรองออก Status = Cancelled
     // ไฟล์ Grab มี 2 ชนิดบรรทัดที่ต้องนับ แต่คิดคนละแบบ
     //   Payment    = ออเดอร์ลูกค้า → ยอดขายคือ Amount
     //   Adjustment = การปรับรายได้ (Grab หักคืน) → ไม่ใช่ยอดขาย แต่เป็นค่าบริการ
     // เดิมกรอง Adjustment ทิ้งทั้งหมด ค่าบริการจึงขาดไป (ร้านหอมมนต์บางโพ ส.ค. ขาด ฿790.67)
     const category = String(row['Category'] || row['หมวดหมู่'] || '').trim();
     const isAdjustment = /adjust/i.test(category) || category === 'การปรับรายได้';
-    if (category && !isAdjustment && category !== 'Payment' && category !== 'ชำระเงิน') return null;
+    if (category && !isAdjustment && category !== 'Payment' && category !== 'ชำระเงิน') return skip('ไม่ใช่รายการขาย (' + category + ')');
     // Transaction ID ไม่ซ้ำ ต่างจาก Short Order ID ที่ Grab วนใช้เลขเดิม (เจอซ้ำ 32 เลขในฐาน)
     // แต่ออเดอร์โครงการไทยช่วยไทย Grab เว้นช่อง Transaction ID ว่างไว้ทั้งหมด (270 แถวในไฟล์เดียว)
     // ถ้าถอยไปใช้ Short Order ID เปล่าๆ แถวพวกนี้จะชนกันเองแล้วถูกทิ้งเพราะนึกว่าซ้ำ
@@ -4069,8 +4092,8 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     const grabShortId = String(row['Short Order ID'] || row['รหัสคำสั่งซื้อสั้น'] || '').trim();
     const grabCreatedOn = String(row['Created On'] || row['วันที่สร้าง'] || '').trim();
     const orderId = grabTxId || (grabShortId ? (grabShortId + (grabCreatedOn ? ' · ' + grabCreatedOn : '')) : '');
-    if (!orderId) return null;
-    if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return null;
+    if (!orderId) return skip('ไม่มีรหัสออเดอร์');
+    if (isExcludedStore('grab', row['Store Name'] || row['ชื่อร้าน_1'] || row['ชื่อร้าน'])) return skip('ร้านนอกสาขาบางโพ');
     const amount = num(row['Amount'] || row['ยอด']);
     const total = num(row['Total'] || row['ทั้งหมด']);
     const settled = rawStatus.toLowerCase().includes('transfer') || rawStatus === 'โอนแล้ว';
@@ -4114,13 +4137,13 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
   }
   if (platform === 'lineman') {
     const orderId = row['order_id'] || '';
-    if (!orderId) return null;
+    if (!orderId) return skip('ไม่มีรหัสออเดอร์');
     // กรองออกเฉพาะ Payout ตามสเปกเจ้าของร้าน — Payout คือรายการโอนเงินก้อน ไม่ใช่ค่าใช้จ่าย
     // ถ้ากรองแรงกว่านี้ (เก็บเฉพาะ Delivery Order) ค่าโฆษณา Listing Ads กับค่าระบบ POS Subscription
     // จะหายไปจากค่าบริการ ทำให้ต้นทุนต่ำกว่าจริง — เทียบกับไฟล์จริงแล้วขาดไป ฿7,761 ใน 1 ร้าน 1 เดือน
     const detail = String(row['detail'] || '').trim();
-    if (detail === 'Payout') return null;
-    if (isExcludedStore('lineman', row['restaurant_name'])) return null;
+    if (detail === 'Payout') return skip('รายการโอนเงิน (Payout)');
+    if (isExcludedStore('lineman', row['restaurant_name'])) return skip('ร้านนอกสาขาบางโพ');
     const gross = num(row['cash_amount']) + num(row['e_payment_amount']);
     // net_amount = เงินที่ LINE MAN โอนออกให้ร้านจริง ใช้ตามไฟล์ตรงๆ
     // ออเดอร์ไทยช่วยไทย (GOVERNMENT_WALLET) ร้านเก็บเงินสดเองหน้าร้าน ค่านี้จึงติดลบ
@@ -4146,10 +4169,10 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
   }
   if (platform === 'shopee') {
     const orderId = row['Order ID'] || '';
-    if (!orderId) return null;
+    if (!orderId) return skip('ไม่มีรหัสออเดอร์');
     const orderStatus = String(row['Order Status'] || '').trim();
-    if (/cancel/i.test(orderStatus)) return null;                       // สเปก: กรองออก Order Status = cancelled
-    if (isExcludedStore('shopee', row['Store Name'])) return null;
+    if (/cancel/i.test(orderStatus)) return skip('ออเดอร์ยกเลิก');       // สเปก: กรองออก Order Status = cancelled
+    if (isExcludedStore('shopee', row['Store Name'])) return skip('ร้านนอกสาขาบางโพ');
     const gross = num(row['Order Amount']);
     const net = num(row['Net Income']);
     const discount = mag(row['Merchant Food Voucher Subsidy']) + mag(row['Merchant Shipping Fee Voucher Subsidy']);
@@ -7628,8 +7651,9 @@ class Component extends DCLogic {
       const cleaned = firstLine.trim().startsWith('*') ? text.slice(firstNewline + 1) : text;
       Papa.parse(cleaned, { header: true, skipEmptyLines: true, complete: (results) => {
         const platform = detectPlatform(results.meta.fields || []);
-        const normalized = platform === 'unknown' ? [] : normalizeImportRows(platform, results.data, fallbackDateISO);
-        resolve({ name: file.name, platform, rawCount: results.data.length, rows: normalized, skippedCount: results.data.length - normalized.length });
+        const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, results.data, fallbackDateISO);
+        resolve({ name: file.name, platform, rawCount: results.data.length, rows: parsed.rows, skips: parsed.skips,
+                  skippedCount: Object.keys(parsed.skips).reduce((a, k) => a + parsed.skips[k], 0) });
       }});
     }));
     const parseXlsxFile = (file, fallbackDateISO) => file.arrayBuffer().then(buf => {
@@ -7639,8 +7663,9 @@ class Component extends DCLogic {
       const allRows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
       const rows = allRows.filter(row => Object.values(row).some(v => String(v).trim() !== ''));
       const platform = detectPlatform(headerRow);
-      const normalized = platform === 'unknown' ? [] : normalizeImportRows(platform, rows, fallbackDateISO);
-      return { name: file.name, platform, rawCount: rows.length, rows: normalized, skippedCount: rows.length - normalized.length };
+      const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, rows, fallbackDateISO);
+      return { name: file.name, platform, rawCount: rows.length, rows: parsed.rows, skips: parsed.skips,
+               skippedCount: Object.keys(parsed.skips).reduce((a, k) => a + parsed.skips[k], 0) };
     });
     const parseImportFiles = (fileList) => {
       const files = Array.from(fileList).filter(f => { const n = f.name.toLowerCase(); return n.endsWith('.csv') || n.endsWith('.xlsx'); });
@@ -7751,6 +7776,19 @@ class Component extends DCLogic {
       });
     });
     const importIncluded = importRowsFlat.filter(r => !(r.isDup && dedupeSkip));
+    // สรุปแถวที่ถูกข้ามพร้อมเหตุผล — ให้เห็นตั้งแต่ก่อนกดยืนยันว่ามีอะไรไม่ได้เข้าระบบบ้าง
+    const importSkipTally = {};
+    this.state.importFilesRaw.forEach(f => {
+      Object.keys(f.skips || {}).forEach(k => { importSkipTally[k] = (importSkipTally[k] || 0) + f.skips[k]; });
+    });
+    const importSkipTotal = Object.keys(importSkipTally).reduce((a, k) => a + importSkipTally[k], 0);
+    const importSkipRows = Object.keys(importSkipTally)
+      .sort((a, b) => importSkipTally[b] - importSkipTally[a])
+      .map(k => ({ reason: k, count: String(importSkipTally[k]) + ' รายการ' }));
+    const importSkipHeadline = importSkipTotal
+      ? 'ข้ามไป ' + importSkipTotal + ' รายการจากไฟล์'
+      : 'ไม่มีรายการถูกข้าม';
+
     const importStats = [
       { label:'รายการยอดขาย', value: String(importRowsFlat.length), icon:'receipt', fg:'#2C4A7C', bg:'#ECF1F7' },
       { label:'ซ้ำกับระบบ', value: String(importRowsFlat.filter(r => r.isDup).length), icon:'copy', fg:'#2C4A7C', bg:'#ECF1F7' },
@@ -8277,7 +8315,8 @@ class Component extends DCLogic {
       brand, brandOpen, toggleBrand, brandOptions,
       channel, channelOpen, toggleChannel, channelOptions,
       importStep, importLoaded, importNotLoaded: !importLoaded, impUpload: importStep === 'upload', impPreview: importStep === 'preview', impDone: importStep === 'done',
-      importStepItems, importMaps, importFiles, importStats, importRowsPreview, importRowsCountLabel, importHasMoreRows, importMoreRowsCount, dedupeSkip, dedupeTrackStyle, dedupeKnobStyle,
+      importStepItems, importMaps, importFiles, importStats, importRowsPreview,
+      importSkipRows, importSkipHeadline, hasImportSkips: importSkipTotal > 0, importRowsCountLabel, importHasMoreRows, importMoreRowsCount, dedupeSkip, dedupeTrackStyle, dedupeKnobStyle,
       openImportFilePicker, handleImportFilesChange, handleImportDrop, preventDefault, removeImportFiles, gotoPreview, backToUpload, goSales, toggleDedupe,
       confirmImport, resetImport, confirmImportLabel, doneHeadline, doneGrossTotal, doneFeeTotal, doneNetTotal,
       importDateOpen, toggleImportDate, setImportReportDate, importReportDateDisplay, importReportDate: this.state.importReportDate,
