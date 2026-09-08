@@ -4278,6 +4278,23 @@ function storeNameOf(raw) {
   return null;
 }
 
+/** จำหน้าที่เปิดค้างไว้ เวลารีเฟรชจะได้อยู่หน้าเดิม ไม่เด้งกลับหน้าเริ่มต้น
+ *  เก็บใน localStorage ของเบราว์เซอร์เครื่องนั้น ไม่เกี่ยวกับฐานข้อมูล
+ *  ตรวจกับรายชื่อหน้าจริงก่อนใช้เสมอ — ถ้าเคยเก็บชื่อหน้าที่ถูกลบไปแล้ว จะได้ไม่ค้างหน้าว่าง
+ *  อ่าน/เขียนหุ้ม try ไว้ เพราะโหมดไม่ระบุตัวตนหรือเบราว์เซอร์ที่ปิด site data จะโยน error */
+const APP_PAGES = ['overview','finance','mobile','salesdash','sales','import','payout','reconcile',
+  'subsidy','inex','expenserec','payroll','tax','taxforms','products','members','marketing',
+  'campaign','content','alerts','datasources','settings','procurement'];
+const LAST_PAGE_KEY = 'bangpho_last_page';
+function loadLastPage(fallback) {
+  try {
+    const v = localStorage.getItem(LAST_PAGE_KEY);
+    return APP_PAGES.indexOf(v) >= 0 ? v : fallback;
+  } catch (e) { return fallback; }
+}
+function saveLastPage(page) {
+  try { if (APP_PAGES.indexOf(page) >= 0) localStorage.setItem(LAST_PAGE_KEY, page); } catch (e) { /* ไม่ใช่เรื่องคอขาดบาดตาย */ }
+}
 function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: brandName(dbRow.brand),
@@ -4605,7 +4622,7 @@ class Component extends DCLogic {
     // ---- ระบบเข้าสู่ระบบ ----
     authChecked: false, authSession: null,
     authUser: '', authPassword: '', authError: null, authBusy: false,
-    page: 'salesdash', period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
+    page: loadLastPage('salesdash'), period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
     saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
     form: { date: todayISO(), branch: 'บางโพ', platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
@@ -4798,7 +4815,11 @@ class Component extends DCLogic {
     catch (err) { /* non-fatal */ }
   };
   componentWillUnmount() { document.removeEventListener('click', this.onDocClick); }
-  componentDidUpdate() { this.icons(); }
+  componentDidUpdate(prevProps, prevState) {
+    this.icons();
+    // จำหน้าปัจจุบันไว้ทุกครั้งที่เปลี่ยนหน้า เพื่อให้รีเฟรชแล้วกลับมาที่เดิม
+    if (prevState && prevState.page !== this.state.page) saveLastPage(this.state.page);
+  }
   /** วาดไอคอน "ข้างใน" แท็ก <i> แทนการให้ lucide แทนที่ทั้งแท็ก
    *
    *  lucide.createIcons() ลบ <i data-lucide> ทิ้งแล้วใส่ <svg> แทนที่ตำแหน่งเดิม
