@@ -2888,57 +2888,8 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">ภาษี & ส่งออก</h1>
-            <span style="background:#F1ECF6;color:#7A5BA8;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">รอบ มิ.ย. 2569</span>
           </div>
-          <div style="font-size:14px;color:#8089A0">สรุป VAT และภาษีหัก ณ ที่จ่ายจากทุกช่องทาง พร้อมเอกสารส่งบัญชี/สรรพากร</div>
-        </div>
-        <div onClick="{{ exportAllTaxDocs }}" style="display:flex;align-items:center;gap:8px;background:#7A5BA8;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="download" style="width:16px;height:16px"></i>ดาวน์โหลดทั้งหมด</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
-        <sc-for list="{{ taxKpis }}" as="k" hint-placeholder-count="4">
-          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-            <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ k.bg }};color:{{ k.fg }}"><i data-lucide="{{ k.icon }}"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500;line-height:1.3">{{ k.title }}</span></div>
-            <div style="font-size:24px;font-weight:700;color:#1B2536;letter-spacing:-0.5px;margin-bottom:5px">{{ k.amount }}</div>
-            <div style="font-size:12px;color:#9AA3B2">{{ k.sub }}</div>
-          </div>
-        </sc-for>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">เอกสารพร้อมส่ง</h3>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <sc-for list="{{ taxDocs }}" as="d" hint-placeholder-count="4">
-              <div style="display:flex;align-items:center;gap:14px;border:1px solid #E7E9ED;border-radius:13px;padding:14px 16px">
-                <div style="width:42px;height:42px;border-radius:11px;background:#F1ECF6;color:#7A5BA8;display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
-                <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:#1B2536;margin-bottom:3px">{{ d.name }}</div><div style="font-size:12px;color:#8089A0">{{ d.period }} · {{ d.fmt }}</div></div>
-                <div style="text-align:right;flex:none"><div style="font-size:14px;font-weight:700;color:#1B2536;margin-bottom:6px">{{ d.amount }}</div><span onClick="{{ d.onDownload }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #C9B3DC;color:#7A5BA8;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer"><i data-lucide="download" style="width:13px;height:13px"></i>ดาวน์โหลด</span></div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">หัก ณ ที่จ่ายแยกแพลตฟอร์ม</h3>
-          <table style="width:100%;border-collapse:collapse;font-size:12.5px">
-            <thead>
-              <tr style="color:#8089A0;font-size:11.5px">
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดขาย</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">GP</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">WHT</th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ taxWht }}" as="r" hint-placeholder-count="3">
-                <tr style="border-top:1px solid #F1F2F4">
-                  <td style="padding:13px 8px"><span style="background:{{ r.pbg }};color:{{ r.pfg }};font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;white-space:nowrap">{{ r.plat }}</span></td>
-                  <td style="padding:13px 8px;text-align:right;color:#1B2536;font-weight:600">{{ r.sales }}</td>
-                  <td style="padding:13px 8px;text-align:right;color:#5A6478">{{ r.gp }}</td>
-                  <td style="padding:13px 8px;text-align:right;color:#D98A4C;font-weight:600">{{ r.wht }}</td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-          <div style="background:#FBFBFC;border:1px solid #EFF0F3;border-radius:12px;padding:13px 15px;margin-top:14px"><div style="font-size:12px;color:#8089A0;line-height:1.6">WHT ที่แพลตฟอร์มหักไว้สามารถนำไปเครดิตภาษีได้ — แนบหนังสือรับรองหัก ณ ที่จ่ายตอนยื่น</div></div>
+          <div style="font-size:14px;color:#8089A0">สรุปยอดขายและค่าใช้จ่ายของแอปแยกตามเจ้าของร้าน สำหรับใช้ยื่นภาษีรายบุคคล</div>
         </div>
       </div>
 
@@ -8318,35 +8269,6 @@ class Component extends DCLogic {
     const txNet = txRows.reduce((a, r) => a + r.net, 0);
     const txGross = txRows.reduce((a, r) => a + r.gross, 0);
     const txFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
-    const taxKpis = [
-      { title:'รายได้ (ฐาน Net Sales)', amount: txFmt(txNet), sub:'จากยอดขายสุทธิจริง', icon:'landmark', bg:'#E6F3ED', fg:'#2E7D5B' },
-      { title:'ยอดขายรวม (Gross)', amount: txFmt(txGross), sub:'ก่อนหักค่าธรรมเนียม', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C' },
-      { title:'VAT ขาย (7%)', amount:'—', sub:'ต้องยืนยันสถานะจด VAT', icon:'receipt', bg:'#EFF0F3', fg:'#9AA3B2' },
-      { title:'หัก ณ ที่จ่ายสะสม', amount:'—', sub:'ยังไม่เก็บภาษีต่อออเดอร์', icon:'scissors', bg:'#EFF0F3', fg:'#9AA3B2' }
-    ];
-    // เอกสารสรุปฐานรายได้รายเดือน — generated from real sales/expense data (monthAgg)
-    const taxDocs = Object.keys(monthAgg).sort().reverse().map(m => {
-      const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
-      const label = THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543);
-      const income = o.gross - o.storeDisc - o.deliveryDisc;
-      const fmt2n = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      const onDownload = () => {
-        const lines = [csvRow(['รายการ','ค่า (฿)'])];
-        [['เดือน', label], ['ยอดขายก่อนลด', o.gross.toFixed(2)], ['ส่วนลดหน้าร้าน', o.storeDisc.toFixed(2)], ['ส่วนลด Delivery', o.deliveryDisc.toFixed(2)],
-         ['รายรับหลังส่วนลด (ฐานรายได้)', income.toFixed(2)], ['ค่าธรรมเนียมแพลตฟอร์ม (GP)', o.gp.toFixed(2)], ['รายจ่ายที่บันทึก', o.exp.toFixed(2)]
-        ].forEach(r => lines.push(csvRow(r)));
-        downloadCsv('ฐานรายได้-' + label.replace(/\s/g, '') + '.csv', lines);
-      };
-      return { name: 'สรุปฐานรายได้ ' + label, period: label, fmt: 'CSV จากข้อมูลจริง', amount: fmt2n(income), onDownload };
-    });
-    const exportAllTaxDocs = () => {
-      const lines = [csvRow(['เดือน','ยอดขายก่อนลด (฿)','ส่วนลดรวม (฿)','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)'])];
-      Object.keys(monthAgg).sort().forEach(m => {
-        const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
-        lines.push(csvRow([THAI_MONTHS_ABBR[mo - 1] + ' ' + (y + 543), o.gross.toFixed(2), (o.storeDisc + o.deliveryDisc).toFixed(2), (o.gross - o.storeDisc - o.deliveryDisc).toFixed(2), o.gp.toFixed(2), o.exp.toFixed(2)]));
-      });
-      downloadCsv('ฐานรายได้ทุกเดือน-' + todayISO() + '.csv', lines);
-    };
     const taxWht = [];
 
     // ---- 7b. แบบฟอร์ม ภ.พ./ภ.ง.ด. ----
@@ -8596,7 +8518,7 @@ class Component extends DCLogic {
       payoutKpis, payoutPlatforms, payoutRecRows,
       subsidyKpis, subsidyRows, subsidyRounds,
       alertItems, alertCounts, alertRules, alertsEmpty, alertCountLabel,
-      taxKpis, taxDocs, taxWht, exportAllTaxDocs, ownerTaxRows, ownerTaxLabel, ownerYearChips,
+      ownerTaxRows, ownerTaxLabel, ownerYearChips,
       taxFormsList, taxFormsReadyCount, taxFormsDraftCount, taxFormActive, tf,
       isPp30, isPnd1, isPnd3, isPnd53, isPnd50, isPnd51,
       activeStatusPill, activeStatusLabel, activeIsReady, toggleActiveReady, toggleReadyLabel, toggleReadyIcon,
