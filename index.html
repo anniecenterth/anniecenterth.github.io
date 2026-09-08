@@ -338,7 +338,7 @@
                 <td style="{{ r.numStyle }}">{{ r.cur }}</td>
                 <td style="{{ r.numStyle }}">{{ r.prev }}</td>
                 <td style="{{ r.signStyle }}">{{ r.sign }}</td>
-                <td style="{{ r.numStyle }}">{{ r.diff }}</td>
+                <td style="{{ r.diffStyle }}">{{ r.diff }}</td>
                 <td style="{{ r.numStyle }}">{{ r.cum }}</td>
               </tr>
             </sc-for>
@@ -6025,6 +6025,12 @@ class Component extends DCLogic {
         numStyle: 'padding:9px 10px;text-align:right;white-space:nowrap;'
           + (kind === 'head' ? 'background:#F6F8FB;' : kind === 'sum' ? 'font-weight:700;' : ''),
         signStyle: 'padding:9px 6px;text-align:center;white-space:nowrap;font-size:11px;color:'
+          + (diff > 0 ? '#2E7D5B' : diff < 0 ? '#B14A4A' : '#C2C9D6')
+          + (kind === 'head' ? ';background:#F6F8FB' : ''),
+        // ตัวเลขผลต่างใช้สีเดียวกับเครื่องหมาย (+)/(−) — สีบอกทิศทางว่าสูงหรือต่ำกว่าเดือนก่อน
+        // ไม่ได้แปลว่าดีหรือไม่ดี เพราะรายจ่ายที่สูงขึ้นก็ขึ้นสีเขียวเหมือนกัน
+        diffStyle: 'padding:9px 10px;text-align:right;white-space:nowrap;font-weight:'
+          + (kind === 'sum' || kind === 'head' ? '700' : '600') + ';color:'
           + (diff > 0 ? '#2E7D5B' : diff < 0 ? '#B14A4A' : '#C2C9D6')
           + (kind === 'head' ? ';background:#F6F8FB' : ''),
         rowStyle: { borderTop: '1px solid #F1F2F4' }
