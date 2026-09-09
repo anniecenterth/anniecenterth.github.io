@@ -6002,9 +6002,10 @@ class Component extends DCLogic {
     const inexExpCat = this.state.inexExpCat || 'ทั้งหมด';
     const inexExpPeriod = this.applyExpenseFilters(this.state.expRows);
     const inexExpAll = inexExpCat === 'ทั้งหมด' ? inexExpPeriod : inexExpPeriod.filter(r => r.mainCat === inexExpCat);
-    // ตัวเลือกหมวดสร้างจากหมวดที่มีรายจ่ายจริงในช่วงที่เลือก ไม่ใช่รายชื่อหมวดทั้งหมด
-    // จะได้ไม่มีตัวเลือกที่กดแล้วได้ ฿0 เสมอ
-    const inexExpCatNames = Array.from(new Set(inexExpPeriod.map(r => r.mainCat).filter(Boolean))).sort();
+    // ตัวเลือกหมวดสร้างจากหมวดที่มีรายจ่ายจริงในฐานข้อมูล ไม่ใช่รายชื่อหมวดตั้งต้นทั้งหมด
+    // ใช้ทุกแถว ไม่ใช่เฉพาะช่วงที่เลือก ไม่งั้นเดือนที่ยังไม่มีรายจ่ายจะเหลือตัวเลือกเดียว
+    // แล้วเปลี่ยนช่วงเวลาทีหลังไม่ได้เพราะไม่มีอะไรให้เลือก
+    const inexExpCatNames = Array.from(new Set(this.state.expRows.map(r => r.mainCat).filter(Boolean))).sort();
     const toggleInexExpCat = () => this.setState(s => ({ inexExpCatOpen: !s.inexExpCatOpen, brandOpen: false, channelOpen: false, periodOpen: false }));
     const inexExpCatOptions = ['ทั้งหมด'].concat(inexExpCatNames).map(c => mkOpt(c, inexExpCat, { inexExpCat: c, inexExpCatOpen: false }));
     const inexIncomeTotal = inexRows.reduce((a, r) => a + r.gross, 0) - this.salesDiscountTotal(inexRows).total;
