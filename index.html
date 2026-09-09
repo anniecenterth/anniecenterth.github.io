@@ -189,12 +189,11 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <h3 style="margin:0;font-size:16px;font-weight:600">รายรับ vs รายจ่าย <span style="color:#9AA3B2;font-weight:500;font-size:14px">(14 วันล่าสุด)</span></h3>
-            <div style="display:flex;align-items:center;gap:6px;border:1px solid #E7E9ED;border-radius:9px;padding:6px 11px;font-size:12.5px;color:#5A6478;cursor:pointer">รายวัน <i data-lucide="chevron-down" style="width:14px;height:14px"></i></div>
+            <h3 style="margin:0;font-size:16px;font-weight:600">รายรับ vs รายจ่าย <span style="color:#9AA3B2;font-weight:500;font-size:14px">{{ ovChartLabel }}</span></h3>
           </div>
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;font-size:12px;color:#7A8497">
             <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>ยอดขาย</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#A9BBD6"></span>รายจ่าย</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#D98A4C"></span>รายจ่าย</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span><span style="width:6px;height:6px;border-radius:50%;background:#2E7D5B;margin-left:-9px"></span>กำไรสุทธิ</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>{{ dailyTargetLabel }}
               <sc-if value="{{ !targetEditing }}" hint-placeholder-val="{{ true }}">
@@ -218,7 +217,7 @@
         <!-- brand -->
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-            <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามแบรนด์ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
+            <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามแบรนด์ <span style="color:#9AA3B2;font-weight:500;font-size:13px">{{ ovRangeLabel }}</span></h3>
             <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:18px;flex:1">
@@ -244,7 +243,7 @@
         <!-- channel donut -->
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
+            <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">{{ ovRangeLabel }}</span></h3>
             <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
@@ -351,250 +350,6 @@
             <div onClick="{{ goDataSources }}" style="background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.16);border-radius:11px;padding:11px 16px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:8px;cursor:pointer">ดูแหล่งข้อมูลทั้งหมด <i data-lucide="arrow-right" style="width:16px;height:16px"></i></div>
             <i data-lucide="sparkles" style="position:absolute;right:-10px;bottom:-10px;width:120px;height:120px;color:rgba(201,182,255,0.13);stroke-width:1"></i>
           </div>
-      </div>
-
-    </div>
-    </sc-if>
-
-    <!-- ===================== FINANCE PAGE ===================== -->
-    <sc-if value="{{ isFinance }}" hint-placeholder-val="{{ true }}">
-    <div data-screen-label="Finance — สาขาบางโพ">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-        <sc-for list="{{ overviewTabs }}" as="t" hint-placeholder-count="2">
-          <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
-        </sc-for>
-      </div>
-
-      <!-- header -->
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px">
-        <div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">การเงิน — สาขาบางโพ</h1>
-            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Branch P&L</span>
-          </div>
-          <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย เงินเข้าจริง และต้นทุนของสาขาบางโพ</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;flex:none">
-          <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;width:280px;color:#9AA3B2">
-            <i data-lucide="search" style="width:18px;height:18px"></i>
-            <span style="font-size:13.5px">ค้นหาเมนู, รายงาน, ข้อมูล...</span>
-          </div>
-          <div style="position:relative;width:46px;height:46px;border-radius:12px;background:#fff;border:1px solid #E7E9ED;display:flex;align-items:center;justify-content:center;color:#5A6478">
-            <i data-lucide="bell" style="width:20px;height:20px"></i>
-            <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#4A6B9E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- filters -->
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-        <div data-period-dd="1" style="position:relative">
-          <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
-              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
-                </sc-for>
-              </div>
-              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
-                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
-                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
-                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
-                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
-                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
-                  <span style="color:#5A6478">{{ rangeLabel }}</span>
-                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
-                </div>
-              </div>
-            </div>
-          </sc-if>
-        </div>
-        <div data-brand-dd="1" style="position:relative">
-          <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
-              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
-        <div data-channel-dd="1" style="position:relative">
-          <div onClick="{{ toggleChannel }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่องทางขาย:</span><span style="font-weight:600">{{ channel }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ channelOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
-              <sc-for list="{{ channelOptions }}" as="opt" hint-placeholder-count="6">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;background:#ECF1F7;border:1px solid #DEE6F1;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="store" style="width:16px;height:16px;color:#2C4A7C"></i><span style="color:#5A6478">สาขา:</span><span style="font-weight:600;color:#223C66">บางโพ</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#4A6B9E"></i></div>
-        <div style="flex:1"></div>
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออกข้อมูล</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8089A0"><span>อัปเดตล่าสุด: วันนี้ 10:30</span><i data-lucide="refresh-cw" style="width:15px;height:15px"></i></div>
-      </div>
-
-      <!-- KPI grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:16px;margin-bottom:18px">
-        <sc-for list="{{ kpiFinance }}" as="k" hint-placeholder-count="6">
-          <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:16px 17px;box-shadow:0 4px 16px rgba(30,34,41,0.03);display:flex;flex-direction:column;gap:9px;min-width:0">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ k.bg }};color:{{ k.fg }}"><i data-lucide="{{ k.icon }}"></i></div>
-              <span style="font-size:13px;color:#7C8699;font-weight:500;line-height:1.25">{{ k.title }}</span>
-            </div>
-            <div style="font-size:25px;font-weight:700;color:#1B2536;letter-spacing:-0.5px">{{ k.amount }}</div>
-            <div style="font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:4px;line-height:1.35;color:{{ k.deltaColor }}"><span style="font-size:9px;flex:none;margin-top:2px">{{ k.arrow }}</span><span style="flex:1;min-width:0">{{ k.delta }}</span></div>
-            <div style="height:36px;margin-top:1px">{{ k.spark }}</div>
-          </div>
-        </sc-for>
-      </div>
-
-      <!-- waterfall + expense donut -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px">
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 6px;font-size:16px;font-weight:600">โครงสร้างกำไร <span style="color:#9AA3B2;font-weight:500;font-size:14px">(P&L Waterfall)</span></h3>
-          <div>{{ waterfall }}</div>
-        </div>
-
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">รายจ่ายตามหมวด <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
-            <div style="position:relative;width:158px;height:158px;flex:none">
-              {{ expenseDonut }}
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-                <span style="font-size:11px;color:#9AA3B2">รายจ่ายรวม</span>
-                <span style="font-size:18px;font-weight:700;color:#1B2536">{{ finExpenseTotalLabel }}</span>
-                <span style="font-size:11px;color:#9AA3B2">100%</span>
-              </div>
-            </div>
-            <div style="flex:1">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:#9AA3B2;margin-bottom:8px;padding:0 2px"><span></span><span style="display:flex;gap:14px"><span>บาท</span><span>% ต่อรายจ่าย</span></span></div>
-              <div style="display:flex;flex-direction:column;gap:9px">
-                <sc-for list="{{ expenseRows }}" as="e" hint-placeholder-count="7">
-                  <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-                    <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ e.color }}"></span>
-                    <span style="flex:1;color:#3A4456">{{ e.name }}</span>
-                    <span style="font-weight:600;color:#2B3547;width:62px;text-align:right">{{ e.amount }}</span>
-                    <span style="color:#9AA3B2;width:42px;flex:none;text-align:right">{{ e.pct }}</span>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #EFF0F3;margin-top:15px;padding-top:12px;font-size:13px">
-            <span style="font-weight:600;color:#3A4456">รวมทั้งสิ้น</span>
-            <span style="display:flex;gap:20px"><span style="font-weight:700;color:#1B2536">{{ finExpenseTotalLabel }}</span><span style="font-weight:700;color:#1B2536;width:42px;text-align:right">100%</span></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- platform payout + cashflow + alerts -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px;align-items:start">
-        <!-- platform payout -->
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">เงินจาก Platform <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <table style="width:100%;border-collapse:collapse;font-size:12.5px">
-            <thead>
-              <tr style="color:#8089A0;font-size:11.5px;text-align:right">
-                <th style="padding:0 6px 11px;font-weight:500;text-align:left">ช่องทาง</th>
-                <th style="padding:0 6px 11px;font-weight:500">ยอดขาย</th>
-                <th style="padding:0 6px 11px;font-weight:500">ค่าบริการ</th>
-                <th style="padding:0 6px 11px;font-weight:500">ยอดโอนออกให้ร้าน</th>
-                <th style="padding:0 6px 11px;font-weight:500;text-align:center">สถานะเงินเข้า</th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ payoutRows }}" as="p" hint-placeholder-count="4">
-                <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ p.weight }}">
-                  <td style="padding:12px 6px"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.dot }}"></span>{{ p.name }}</span></td>
-                  <td style="padding:12px 6px;text-align:right">{{ p.gross }}</td>
-                  <td style="padding:12px 6px;text-align:right;color:#B14A4A">{{ p.service }}</td>
-                  <td style="padding:12px 6px;text-align:right;font-weight:600">{{ p.net }}</td>
-                  <td style="padding:12px 6px;text-align:center">{{ p.statusTag }}</td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- cashflow today -->
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">Cashflow วันนี้ <span style="color:#9AA3B2;font-weight:500;font-size:13px">({{ finTodayLabel }})</span></h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:11px">
-            <sc-for list="{{ cashflowCards }}" as="cf" hint-placeholder-count="5">
-              <div style="background:{{ cf.bg }};border:1px solid {{ cf.border }};border-radius:13px;padding:13px 13px">
-                <div style="width:30px;height:30px;border-radius:9px;background:{{ cf.iconBg }};color:{{ cf.iconFg }};display:flex;align-items:center;justify-content:center;margin-bottom:9px"><i data-lucide="{{ cf.icon }}" style="width:16px;height:16px"></i></div>
-                <div style="font-size:12px;color:#7C8699;margin-bottom:3px">{{ cf.label }}</div>
-                <div style="font-size:17px;font-weight:700;color:#1B2536">{{ cf.value }}</div>
-                <div style="font-size:11px;color:#2E7D5B;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px"><span style="font-size:8px">▲</span>จากเมื่อวาน</div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-
-        <!-- finance CEO alerts dark -->
-        <div style="background:#23262D;border-radius:18px;padding:20px 22px;color:#fff">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px">
-            <h3 style="margin:0;font-size:16px;font-weight:600">ศูนย์แจ้งเตือน CEO</h3>
-            <span style="font-size:12px;color:#A9BBD6;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:11px">
-            <sc-for list="{{ financeAlerts }}" as="a" hint-placeholder-count="4">
-              <div style="display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,0.05);border:1px solid {{ a.border }};border-left:3px solid {{ a.accent }};border-radius:11px;padding:11px 13px">
-                <div style="width:28px;height:28px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;background:{{ a.iconBg }};color:{{ a.iconFg }}"><i data-lucide="{{ a.icon }}" style="width:15px;height:15px"></i></div>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:13px;font-weight:600;color:{{ a.titleColor }};margin-bottom:2px">{{ a.title }}</div>
-                  <div style="font-size:11.5px;color:#A6ADC2;line-height:1.4">{{ a.detail }}</div>
-                </div>
-                <span style="font-size:11px;color:#A9BBD6;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:12px;height:12px"></i></span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-      </div>
-
-      <!-- category table -->
-      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-        <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">ตารางรายรับ–รายจ่าย รายหมวด <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-        <table style="width:100%;border-collapse:collapse;font-size:12.5px">
-          <thead>
-            <tr style="color:#8089A0;font-size:11.5px;text-align:right">
-              <th style="padding:0 8px 12px;font-weight:500;text-align:left">หมวด</th>
-              <th style="padding:0 8px 12px;font-weight:500">ยอดขาย/รายรับ (บาท)</th>
-              <th style="padding:0 8px 12px;font-weight:500">% ต่อรายรับ</th>
-              <th style="padding:0 8px 12px;font-weight:500">รายจ่าย (บาท)</th>
-              <th style="padding:0 8px 12px;font-weight:500">% ต่อรายรับ</th>
-              <th style="padding:0 8px 12px;font-weight:500">% ต่อรายจ่าย</th>
-              <th style="padding:0 8px 12px;font-weight:500;text-align:left">หมายเหตุ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <sc-for list="{{ categoryRows }}" as="r" hint-placeholder-count="9">
-              <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ r.weight }}">
-                <td style="padding:12px 8px"><span style="display:inline-flex;align-items:center;gap:10px"><span style="width:9px;height:9px;border-radius:50%;background:{{ r.dot }}"></span>{{ r.cat }}</span></td>
-                <td style="padding:12px 8px;text-align:right">{{ r.income }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#7A8497">{{ r.incomePct }}</td>
-                <td style="padding:12px 8px;text-align:right">{{ r.expense }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#7A8497">{{ r.expPctRev }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#7A8497">{{ r.expPctExp }}</td>
-                <td style="padding:12px 8px;text-align:left;color:#8089A0">{{ r.note }}</td>
-              </tr>
-            </sc-for>
-          </tbody>
-        </table>
       </div>
 
     </div>
@@ -4040,7 +3795,7 @@ function storeNameOf(raw) {
  *  เก็บใน localStorage ของเบราว์เซอร์เครื่องนั้น ไม่เกี่ยวกับฐานข้อมูล
  *  ตรวจกับรายชื่อหน้าจริงก่อนใช้เสมอ — ถ้าเคยเก็บชื่อหน้าที่ถูกลบไปแล้ว จะได้ไม่ค้างหน้าว่าง
  *  อ่าน/เขียนหุ้ม try ไว้ เพราะโหมดไม่ระบุตัวตนหรือเบราว์เซอร์ที่ปิด site data จะโยน error */
-const APP_PAGES = ['overview','finance','mobile','salesdash','sales','import','payout','reconcile',
+const APP_PAGES = ['overview','mobile','salesdash','sales','import','payout','reconcile',
   'subsidy','inex','expenserec','payroll','tax','taxforms','products','members','marketing',
   'campaign','content','alerts','datasources','settings','procurement'];
 const LAST_PAGE_KEY = 'bangpho_last_page';
@@ -4640,34 +4395,47 @@ class Component extends DCLogic {
     );
   }
 
-  barLine(salesRows, expRows, n) {
-    const salesDays = this.dayBucketsGeneric(salesRows, n, r => r.gross);
-    const expDays = this.dayBucketsGeneric(expRows, n, r => r.amount);
-    const labels = this.dayBuckets(salesRows.length ? salesRows : expRows, n).map(d => d.label);
+  barLine(salesRows, expRows, axis) {
+    const salesDays = this.axisSeries(axis, salesRows, r => r.gross);
+    const expDays = this.axisSeries(axis, expRows, r => r.amount);
+    const labels = axis.labels;
     const net = salesDays.map((v, i) => v - expDays[i]);
-    const maxVal = Math.max(1, ...salesDays, ...expDays, ...net.map(Math.abs));
+    // กำไรสุทธิติดลบได้ (เดือนที่รายจ่ายมากกว่ารายรับ) แกนเดิมเริ่มที่ 0 เสมอ
+    // เส้นเลยหลุดออกนอกกรอบไปทับป้ายวันที่ — ต้องเผื่อฝั่งลบด้วย
+    const maxVal = Math.max(1, ...salesDays, ...expDays, ...net);
+    const minVal = Math.min(0, ...net);
     const maxY = Math.max(100, Math.ceil(maxVal / 4 / 50) * 50 * 4);
+    const minY = minVal < 0 ? -Math.max(100, Math.ceil(-minVal / 50) * 50) : 0;
     const W = 880, H = 290, ml = 46, mr = 12, mt = 12, mb = 28;
     const cw = W - ml - mr, ch = H - mt - mb;
     const xc = i => ml + (i + 0.5) / labels.length * cw;
-    const yy = v => mt + ch - (v / maxY) * ch;
+    const yy = v => mt + ch - ((v - minY) / (maxY - minY)) * ch;
+    const y0 = yy(0);
     const els = [];
-    const gridStep = maxY / 4;
-    for (let g = 0; g <= maxY + 0.01; g += gridStep) {
+    const gridStep = (maxY - minY) / 4;
+    for (let g = minY; g <= maxY + 0.01; g += gridStep) {
       els.push(React.createElement('line', { key:'g'+g, x1: ml, x2: W - mr, y1: yy(g), y2: yy(g), stroke:'#F1F2F4', strokeWidth:1 }));
       els.push(React.createElement('text', { key:'gl'+g, x: ml - 8, y: yy(g) + 3.5, textAnchor:'end', fontSize:10, fill:'#9AA3B2' }, g === 0 ? '฿0' : '฿' + Math.round(g/1000) + 'K'));
     }
-    const bw = 9, gap = 3.5;
+    // แท่งต้องแคบลงเมื่อช่วงยาว (สูงสุด 62 แท่งคู่) ไม่งั้นแท่งของสองชุดจะทับกัน
+    const slot = cw / labels.length;
+    const bw = Math.max(2, Math.min(9, slot / 2 - 2));
+    const gap = Math.min(3.5, bw * 0.4);
+    const labelStride = Math.ceil(labels.length / 16);
     labels.forEach((d, i) => {
       const c = xc(i);
-      els.push(React.createElement('rect', { key:'s'+i, x: c - bw - gap/2, y: yy(salesDays[i]), width: bw, height: Math.max(ch - (yy(salesDays[i]) - mt), 0), rx: 2.5, fill:'#A9BBD6' }));
-      els.push(React.createElement('rect', { key:'e'+i, x: c + gap/2, y: yy(expDays[i]), width: bw, height: Math.max(ch - (yy(expDays[i]) - mt), 0), rx: 2.5, fill:'#A9BBD6' }));
-      els.push(React.createElement('text', { key:'d'+i, x: c, y: H - 8, textAnchor:'middle', fontSize:10.5, fill:'#9AA3B2', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, d));
+      els.push(React.createElement('rect', { key:'s'+i, x: c - bw - gap/2, y: yy(salesDays[i]), width: bw, height: Math.max(y0 - yy(salesDays[i]), 0), rx: Math.min(2.5, bw/2), fill:'#A9BBD6' }));
+      els.push(React.createElement('rect', { key:'e'+i, x: c + gap/2, y: yy(expDays[i]), width: bw, height: Math.max(y0 - yy(expDays[i]), 0), rx: Math.min(2.5, bw/2), fill:'#D98A4C' }));
+      if (i % labelStride === 0 || i === labels.length - 1) {
+        els.push(React.createElement('text', { key:'d'+i, x: c, y: H - 8, textAnchor:'middle', fontSize:10.5, fill:'#9AA3B2', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, d));
+      }
     });
     const pts = net.map((v, i) => [xc(i), yy(v)]);
     const dp = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
     els.push(React.createElement('path', { key:'np', d: dp, fill:'none', stroke:'#2E7D5B', strokeWidth:2.6, strokeLinecap:'round', strokeLinejoin:'round' }));
-    pts.forEach((p, i) => els.push(React.createElement('circle', { key:'npc'+i, cx: p[0], cy: p[1], r: 3.2, fill:'#2E7D5B', stroke:'#fff', strokeWidth:1.6 })));
+    if (pts.length <= 20) {
+      pts.forEach((p, i) => els.push(React.createElement('circle', { key:'npc'+i, cx: p[0], cy: p[1], r: 3.2, fill:'#2E7D5B', stroke:'#fff', strokeWidth:1.6 })));
+    }
     return React.createElement('svg', { viewBox:`0 0 ${W} ${H}`, width:'100%', height:'auto', style:{ display:'block' } }, els);
   }
 
@@ -4794,43 +4562,67 @@ class Component extends DCLogic {
     return days.map(d => d.value);
   }
 
-  /** แบ่งข้อมูลเป็นแท่งตามช่วงวันที่ที่เลือกไว้บนหัวหน้า (ไม่ล็อก 14 วันล่าสุดอีกแล้ว)
-   *  ช่วงยาวเกิน 2 เดือน จะยุบเป็นรายเดือน ไม่งั้นแท่งจะถี่จนอ่านไม่ออก
-   *  (หน้ายอดขายไม่มีปุ่มเลือก รายวัน/รายเดือน แล้ว จึงต้องเลือกให้เองตรงนี้) */
-  periodBuckets(rows) {
+  /** แกนเวลาของกราฟ — ยึดช่วงวันที่ที่เลือกไว้บนหัวหน้า ไม่ล็อก 14 วันล่าสุดอีกแล้ว
+   *  ช่วงยาวเกิน 62 วันยุบเป็นรายเดือน ไม่งั้นแท่งจะถี่จนอ่านไม่ออก
+   *  (หน้ายอดขาย/ภาพรวมไม่มีปุ่มเลือก รายวัน/รายเดือน แล้ว จึงต้องเลือกให้เองตรงนี้)
+   *  กราฟทุกใบใช้แกนเดียวกัน ตัวเลขจะได้ไม่เพี้ยนกันเองเวลาเปลี่ยนช่วง */
+  periodAxis(fallbackDays) {
+    const n = fallbackDays || 14;
     const rng = this.periodRange();
-    if (!rng) return { buckets: this.dayBuckets(rows, 14), label: '(14 วันล่าสุด)' };
+    const dayKey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const dayLabel = d => d.getDate() + ' ' + THAI_MONTHS_ABBR[d.getMonth()];
+    if (!rng) {
+      const keys = [], labels = [], now = new Date();
+      for (let i = n - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        keys.push(dayKey(d)); labels.push(dayLabel(d));
+      }
+      return { keys, labels, monthly: false, label: '(' + n + ' วันล่าสุด)', short: '(ทุกช่วงเวลา)' };
+    }
     const d0 = new Date(rng.from + 'T00:00:00'), d1 = new Date(rng.to + 'T00:00:00');
     const nDays = Math.round((d1 - d0) / 86400000) + 1;
-    const isoOf = r => { try { return beShortToISO(r.date); } catch (e) { return null; } };
     const rngText = iso => { const [y, m, d] = iso.split('-').map(Number); return d + ' ' + THAI_MONTHS_ABBR[m - 1]; };
+    const span = rngText(rng.from) + ' – ' + rngText(rng.to);
     if (nDays <= 62) {
-      const buckets = [];
+      const keys = [], labels = [];
       for (let i = 0; i < nDays; i++) {
         const d = new Date(d0.getTime() + i * 86400000);
-        const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        buckets.push({ iso, label: d.getDate() + ' ' + THAI_MONTHS_ABBR[d.getMonth()], gross: 0, net: 0, count: 0 });
+        keys.push(dayKey(d)); labels.push(dayLabel(d));
       }
-      const byIso = {};
-      buckets.forEach(b => { byIso[b.iso] = b; });
-      rows.forEach(r => { const b = byIso[isoOf(r)]; if (b) { b.gross += r.gross; b.net += r.net; b.count++; } });
-      return { buckets, label: '(' + rngText(rng.from) + ' – ' + rngText(rng.to) + ' · รายวัน)' };
+      return { keys, labels, monthly: false, label: '(' + span + ' · รายวัน)', short: '(' + span + ')' };
     }
-    const buckets = [];
+    const keys = [], labels = [];
     let y = d0.getFullYear(), m = d0.getMonth();
     while (y * 12 + m <= d1.getFullYear() * 12 + d1.getMonth()) {
-      buckets.push({ iso: y + '-' + String(m + 1).padStart(2, '0'), label: THAI_MONTHS_ABBR[m] + ' ' + String((y + 543) % 100).padStart(2, '0'), gross: 0, net: 0, count: 0 });
+      keys.push(y + '-' + String(m + 1).padStart(2, '0'));
+      labels.push(THAI_MONTHS_ABBR[m] + ' ' + String((y + 543) % 100).padStart(2, '0'));
       m++; if (m > 11) { m = 0; y++; }
     }
-    const byYm = {};
-    buckets.forEach(b => { byYm[b.iso] = b; });
+    return { keys, labels, monthly: true, label: '(' + span + ' · รายเดือน)', short: '(' + span + ')' };
+  }
+  /** รวมค่าของแถวลงในแต่ละช่องของแกนเวลา — แถวที่อยู่นอกแกนถูกทิ้ง */
+  axisSeries(axis, rows, valFn) {
+    const idx = {};
+    axis.keys.forEach((k, i) => { idx[k] = i; });
+    const out = axis.keys.map(() => 0);
     rows.forEach(r => {
-      const iso = isoOf(r);
-      if (!iso || iso < rng.from || iso > rng.to) return;
-      const b = byYm[iso.slice(0, 7)];
-      if (b) { b.gross += r.gross; b.net += r.net; b.count++; }
+      let iso = null;
+      try { iso = beShortToISO(r.date); } catch (e) { iso = null; }
+      if (!iso) return;
+      const i = idx[axis.monthly ? iso.slice(0, 7) : iso];
+      if (i != null) out[i] += valFn(r);
     });
-    return { buckets, label: '(' + rngText(rng.from) + ' – ' + rngText(rng.to) + ' · รายเดือน)' };
+    return out;
+  }
+  periodBuckets(rows) {
+    const axis = this.periodAxis(14);
+    const gross = this.axisSeries(axis, rows, r => r.gross);
+    const net = this.axisSeries(axis, rows, r => r.net);
+    const count = this.axisSeries(axis, rows, () => 1);
+    return {
+      buckets: axis.keys.map((k, i) => ({ iso: k, label: axis.labels[i], gross: gross[i], net: net[i], count: count[i] })),
+      label: axis.label
+    };
   }
   realTrendChart(rows, n, preBuckets) {
     const days = preBuckets || this.dayBuckets(rows, n);
@@ -5545,7 +5337,7 @@ class Component extends DCLogic {
     };
 
     const nav = [
-      { label:'ภาพรวม', icon:'house', key:'overview', page:'overview', group:['overview','finance','mobile'] },
+      { label:'ภาพรวม', icon:'house', key:'overview', page:'overview', group:['overview','mobile'] },
       { label:'ยอดขาย', icon:'trending-up', key:'sales', page:'salesdash' },
       { label:'รายรับ-รายจ่าย', icon:'arrow-left-right', key:'inex', page:'inex' },
       { label:'รายรับ', icon:'circle-arrow-down', key:'income', sub:true, page:'sales' },
@@ -5648,7 +5440,7 @@ class Component extends DCLogic {
       onClick: () => this.setState({ page: t.page }),
       style: page === t.page ? { ...tabBase, background:'#2C4A7C', color:'#fff' } : { ...tabBase, background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
     }));
-    const overviewTabs = mkTabs([{ label:'ภาพรวม', page:'overview' }, { label:'การเงิน', page:'finance' }, { label:'มุมมองเจ้าของ', page:'mobile' }]);
+    const overviewTabs = mkTabs([{ label:'ภาพรวม', page:'overview' }, { label:'มุมมองเจ้าของ', page:'mobile' }]);
     const cashInTabs = mkTabs([{ label:'เงินเข้าจริง', page:'reconcile' }, { label:'กระทบยอดเงินโอน', page:'payout' }]);
     const taxPageTabs = mkTabs([{ label:'สรุปภาษี & ส่งออก', page:'tax' }, { label:'แบบฟอร์ม ภ.พ./ภ.ง.ด.', page:'taxforms' }]);
     const marketingTabs = mkTabs([{ label:'ภาพรวมการตลาด', page:'marketing' }, { label:'แคมเปญ', page:'campaign' }, { label:'คอนเทนต์', page:'content' }]);
@@ -5665,6 +5457,7 @@ class Component extends DCLogic {
       return rng ? out.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to) : out;
     };
     const ovRows = ovPeriodOnly(this.state.recentRows);
+    const ovAxis = this.periodAxis(14);
     const ovExpRows = this.applyExpenseFilters(this.state.expRows);
     const ovTodayISOStr = todayISO();
     const ovIsToday = r => { try { return beShortToISO(r.date) === ovTodayISOStr; } catch (e) { return false; } };
@@ -5831,15 +5624,17 @@ class Component extends DCLogic {
       : ovEmptyDonut(150, 22);
     const channelTotalLabel = ovFmt(ovGross);
     const ovFeeTotal = ovRows.reduce((a,r)=>a+r.fee,0);
-    const ovLaborPct = ovExpenseTotal ? ((ovByExpCat['ค่าแรง'] || 0) / ovExpenseTotal * 100).toFixed(1) + '%' : '0%';
-    const ovOtherPct = ovExpenseTotal ? ((ovByExpCat['อื่นๆ'] || 0) / ovExpenseTotal * 100).toFixed(1) + '%' : '0%';
+    // แถบนี้เคยแสดง ค่าแรง กับ อื่น ๆ เป็น % ส่วนอีกสามช่องเป็นบาท เทียบกันไม่ได้เลย
+    // ตอนนี้เป็นบาททั้งหมด และ "อื่น ๆ" คือรายจ่ายที่เหลือจริง ไม่ใช่เฉพาะหมวดชื่อ "อื่นๆ"
     const ovRentUtil = (ovByExpCat['ค่าเช่า'] || 0) + (ovByExpCat['ค่าน้ำค่าไฟ'] || 0);
+    const ovLabor = ovByExpCat['ค่าแรง'] || 0;
+    const ovMiniOther = Math.max(0, ovExpenseTotal - ovCogs - ovLabor - ovRentUtil);
     const channelExpenseMini = [
       { label:'ต้นทุนสินค้า', value: ovFmt(ovCogs) },
-      { label:'ค่าแรง', value: ovLaborPct },
-      { label:'Platform', value: ovFmt(ovFeeTotal) },
+      { label:'ค่าแรง', value: ovFmt(ovLabor) },
+      { label:'ค่าบริการแพลตฟอร์ม', value: ovFmt(ovFeeTotal) },
       { label:'ค่าเช่า/ค่าน้ำไฟ', value: ovFmt(ovRentUtil) },
-      { label:'อื่น ๆ', value: ovOtherPct }
+      { label:'รายจ่ายอื่น', value: ovFmt(ovMiniOther) }
     ];
 
     // ---- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน ----
@@ -8297,7 +8092,7 @@ class Component extends DCLogic {
     const mobileAlertsEmpty = alertItems.length === 0;
 
     return {
-      page, isOverview: page === 'overview', isFinance: page === 'finance', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
+      page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
@@ -8402,7 +8197,7 @@ class Component extends DCLogic {
       holidayOpen, holidayTickRows,
       calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
       expCalCells, importCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
-      expPickToday, importPickToday, storePickToday, kpiOverview, ovPeriodNote, ovShowWarn, ovWarnText, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
+      expPickToday, importPickToday, storePickToday, kpiOverview, ovPeriodNote, ovShowWarn, ovWarnText, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, ovAxis), ovChartLabel: ovAxis.label, ovRangeLabel: ovAxis.short, brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini,
       procKpis, procTableRows, procSearch: this.state.procSearch || '', setProcSearch,
       exportProcurementCsv, procEmpty: procTableRows.length === 0,
