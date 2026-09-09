@@ -69,6 +69,12 @@
       </sc-if>
     </div>
 
+    <sc-if value="{{ isReadOnly }}" hint-placeholder-val="{{ false }}">
+      <div class="sb-collapse" style="display:flex;align-items:flex-start;gap:8px;background:#FDF4E7;border:1px solid #F0DCBF;border-radius:11px;padding:9px 12px;margin-bottom:12px;font-size:11.5px;color:#8A5A22;line-height:1.5">
+        <i data-lucide="eye" style="width:15px;height:15px;flex:none;margin-top:1px"></i><span>โหมดดูอย่างเดียว — บันทึกหรือแก้ไขข้อมูลไม่ได้</span>
+      </div>
+    </sc-if>
+
     <nav style="display:flex;flex-direction:column;gap:3px;flex:1">
       <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
         <div onClick="{{ item.onClick }}" style="{{ item.style }}">
@@ -421,7 +427,7 @@
             </sc-if>
           </div>
           <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i><span>รีเฟรช</span></div>
-          <div onClick="{{ goSalesPage }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
+          <sc-if value="{{ canWriteHere }}" hint-placeholder-val="{{ true }}"><div onClick="{{ goSalesPage }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div></sc-if>
         </div>
       </div>
       <div style="text-align:right;font-size:12.5px;color:#2E7D5B;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:7px"><i data-lucide="circle-check-big" style="width:15px;height:15px"></i>{{ dataAsOfLabel }}</div>
@@ -1487,7 +1493,7 @@
             </sc-if>
           </div>
           <div onClick="{{ exportExpenseCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ดูรายงาน</span></div>
-          <div onClick="{{ scrollToExpenseForm }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายจ่าย</span></div>
+          <sc-if value="{{ canWriteHere }}" hint-placeholder-val="{{ true }}"><div onClick="{{ scrollToExpenseForm }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายจ่าย</span></div></sc-if>
         </div>
       </div>
 
@@ -4334,6 +4340,7 @@ class Component extends DCLogic {
     salesError: null,
     purchaseRows: [], purchaseError: '', procSearch: '', procExpanded: '',
     crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
+    accessRows: [], accessLoaded: false,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
     storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' },
@@ -4367,6 +4374,7 @@ class Component extends DCLogic {
     this.loadSales();
     this.loadExpenses();
     this.loadSettings();
+    this.loadAccess();
     this.loadCrm();
     this.loadPurchases();
     this.loadPayroll();
@@ -4462,6 +4470,22 @@ class Component extends DCLogic {
     }
   };
   // ดึงสรุประบบสมาชิกจากโปรเจค annie-crm (อ่านอย่างเดียว) — หน้าไม่พังถ้าเชื่อมไม่ได้
+  /** สิทธิ์รายสาขาของผู้ใช้ที่ล็อกอินอยู่ — ตัวจริงบังคับที่ RLS ในฐานข้อมูล
+   *  ตรงนี้อ่านมาเพื่อให้หน้าเว็บแสดงเฉพาะสาขาที่เขาเห็นได้ และซ่อนปุ่มบันทึกถ้าดูอย่างเดียว
+   *  ถ้าอ่านไม่ได้ให้ถือว่าไม่มีสิทธิ์ ปลอดภัยกว่าเดาว่ามีสิทธิ์ */
+  loadAccess = async () => {
+    try {
+      const { data, error } = await supabaseClient.from('user_access').select('branch,can_write');
+      if (error) throw error;
+      const rows = data || [];
+      const branches = rows.map(r => r.branch);
+      const patch = { accessRows: rows, accessLoaded: true };
+      if (branches.length && branches.indexOf(this.activeBranch()) < 0) patch.activeBranch = branches[0];
+      this.setState(patch);
+    } catch (e) {
+      this.setState({ accessRows: [], accessLoaded: true });
+    }
+  };
   loadCrm = async () => {
     try {
       // session ของ annie-crm ฟื้นจาก localStorage แบบ async — ถ้ายิง select ก่อนมันพร้อม
@@ -6179,11 +6203,20 @@ class Component extends DCLogic {
      *  ข้อมูลสองสาขาแยกกันเด็ดขาด ไม่มีหน้าไหนรวมยอดข้ามสาขา (เจ้าของร้านกำหนด 9 ก.ย. 2569) */
     const activeBranch = this.activeBranch();
     const activeBranchLabel = branchLabel(activeBranch);
+    // สาขาที่ผู้ใช้คนนี้เห็นได้ — ถ้ายังโหลดสิทธิ์ไม่เสร็จให้แสดงสาขาที่เปิดอยู่ไปก่อน
+    const accessRows = this.state.accessRows || [];
+    const allowedBranches = this.state.accessLoaded
+      ? accessRows.map(r => r.branch)
+      : BRANCH_OPTIONS.map(b => b.code);
+    const canWriteHere = accessRows.some(r => r.branch === activeBranch && r.can_write);
+    const isReadOnly = this.state.accessLoaded && !canWriteHere;
+    const branchOptionsAllowed = BRANCH_OPTIONS.filter(b => allowedBranches.indexOf(b.code) >= 0);
     const branchDD = {
-      value: activeBranchLabel,
+      value: activeBranchLabel + (isReadOnly ? ' · ดูอย่างเดียว' : ''),
+      single: branchOptionsAllowed.length <= 1,
       open: !!this.state.branchDDOpen,
-      toggle: () => this.setState(st => ({ branchDDOpen: !st.branchDDOpen })),
-      options: BRANCH_OPTIONS.map(b => ({
+      toggle: () => { if (branchOptionsAllowed.length > 1) this.setState(st => ({ branchDDOpen: !st.branchDDOpen })); },
+      options: branchOptionsAllowed.map(b => ({
         label: b.label,
         onClick: () => this.setState({ activeBranch: b.code, branchDDOpen: false }),
         style: b.code === activeBranch
@@ -8436,7 +8469,7 @@ class Component extends DCLogic {
     return {
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
-      activeBranchLabel, branchDD, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
+      activeBranchLabel, branchDD, isReadOnly, canWriteHere, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       goAlerts: goPage('alerts'), goPayout: goPage('payout'), goSalesDash: goPage('salesdash'),
       goSalesPage: goPage('sales'), goExpenseRec: goPage('expenserec'), goReconcile: goPage('reconcile'),
       // "เปรียบเทียบ" ยังไม่มีหน้ารายงานเปรียบเทียบของตัวเอง — ส่งไปหน้ารายรับ-รายจ่าย
