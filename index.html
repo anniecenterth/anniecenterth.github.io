@@ -6973,13 +6973,16 @@ class Component extends DCLogic {
     const dashDeliveryGross = salesTotalGross - dashStorefrontGross;
     const dashPct = v => salesTotalGross ? (v / salesTotalGross * 100).toFixed(1) + '%' : '0%';
     // ไม่มีหมวด Custom Cake แล้ว — ไม่มีแหล่งข้อมูลรองรับ โชว์ ฿0 ตลอดกาลจึงเป็นตัวเลขหลอก
-    const dashTypeRows = [
-      { name:'Retail Sales (หน้าร้าน)', amount:fmtB(dashRetailGross), pct: dashPct(dashRetailGross), color:'#4A6B9E' },
-      { name:'Delivery Platform Sales', amount:fmtB(dashDeliveryGross), pct: dashPct(dashDeliveryGross), color:'#4E9E77' },
-      { name:'ขายส่ง', amount:fmtB(wholesale.gross), pct: dashPct(wholesale.gross), color:'#D98A4C' }
+    const dashTypeParts = [
+      { name:'Retail Sales (หน้าร้าน)', value: dashRetailGross, color:'#4A6B9E' },
+      { name:'Delivery Platform Sales', value: dashDeliveryGross, color:'#4E9E77' },
+      { name:'ขายส่ง', value: wholesale.gross, color:'#D98A4C' }
     ];
+    const dashTypeRows = dashTypeParts.map(t => ({ name:t.name, amount:fmtB(t.value), pct:dashPct(t.value), color:t.color }));
+    // หมวดที่ยอดเป็น 0 ยังอยู่ในรายการข้าง ๆ แต่ต้องไม่วาดลงวงโดนัท
+    // ไม่งั้น donut() จะขีดส่วนโค้งบาง ๆ ให้ ทำให้เห็นสีทั้งที่ยอดเป็นศูนย์
     const dashTypeDonut = salesTotalGross > 0
-      ? this.donut(dashTypeRows.filter(r => r.pct !== '0%').map(r => ({ value: r.name === 'ขายส่ง' ? wholesale.gross : (r.name === 'Retail Sales (หน้าร้าน)' ? dashRetailGross : dashDeliveryGross), color: r.color })), 135, 20)
+      ? this.donut(dashTypeParts.filter(t => t.value > 0).map(t => ({ value:t.value, color:t.color })), 135, 20)
       : emptyDonut(135, 20);
     const pIconCell = (name) => {
       const m = { 'Grab':['#E7F1EA','#26663F','G'], 'LINE MAN':['#EFEBF6','#5F4A87','L'], 'ShopeeFood':['#F9ECE7','#A64A31','S'] };
