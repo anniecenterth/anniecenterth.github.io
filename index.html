@@ -1458,6 +1458,55 @@
         </div>
       </div>
 
+      <!-- โดนัทรายจ่าย 2 ใบ ย้ายมาจากหน้ารายจ่าย 9 ก.ย. 2569 -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px;margin-bottom:18px">
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 16px;font-size:15.5px;font-weight:600">สรุปรายจ่ายตามหมวดหมู่</h3>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="position:relative;width:140px;height:140px;flex:none">
+              {{ expCatDonut }}
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                <span style="font-size:16px;font-weight:700;color:#1B2536">{{ epTotalLabel }}</span>
+                <span style="font-size:11px;color:#9AA3B2">100%</span>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:9px">
+              <sc-for list="{{ expCatRows }}" as="c" hint-placeholder-count="7">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ c.color }}"></span>
+                  <span style="flex:1;min-width:0;color:#3A4456;line-height:1.35">{{ c.name }}</span>
+                  <span style="font-weight:600;color:#2B3547;white-space:nowrap">{{ c.amount }}</span>
+                  <span style="color:#9AA3B2;width:38px;text-align:right">{{ c.pct }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 16px;font-size:15.5px;font-weight:600">รายจ่ายแยกตามวิธีการชำระเงิน</h3>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="position:relative;width:140px;height:140px;flex:none">
+              {{ expPayDonut }}
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+                <span style="font-size:16px;font-weight:700;color:#1B2536">{{ epTotalLabel }}</span>
+                <span style="font-size:11px;color:#9AA3B2">100%</span>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ expPayRows }}" as="c" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px">
+                  <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ c.color }}"></span>
+                  <span style="flex:1;min-width:0;color:#3A4456;line-height:1.35">{{ c.name }}</span>
+                  <span style="font-weight:600;color:#2B3547;white-space:nowrap">{{ c.amount }}</span>
+                  <span style="color:#9AA3B2;width:38px;text-align:right">{{ c.pct }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- recent + channels -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px;align-items:start">
         <!-- recent transactions -->
@@ -1889,58 +1938,12 @@
       <!-- bottom charts -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 16px;font-size:15.5px;font-weight:600">สรุปรายจ่ายตามหมวดหมู่ <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <div style="display:flex;align-items:center;gap:16px">
-            <div style="position:relative;width:140px;height:140px;flex:none">
-              {{ expCatDonut }}
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-                <span style="font-size:16px;font-weight:700;color:#1B2536">{{ epTotalLabel }}</span>
-                <span style="font-size:11px;color:#9AA3B2">100%</span>
-              </div>
-            </div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:9px">
-              <sc-for list="{{ expCatRows }}" as="c" hint-placeholder-count="7">
-                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-                  <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ c.color }}"></span>
-                  <span style="flex:1;min-width:0;color:#3A4456;line-height:1.35">{{ c.name }}</span>
-                  <span style="font-weight:600;color:#2B3547;white-space:nowrap">{{ c.amount }}</span>
-                  <span style="color:#9AA3B2;width:38px;text-align:right">{{ c.pct }}</span>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <h3 style="margin:0 0 6px;font-size:15.5px;font-weight:600">แนวโน้มรายจ่าย <span style="color:#9AA3B2;font-weight:500;font-size:13px">(30 วันล่าสุด)</span></h3>
           <div style="display:flex;align-items:center;gap:18px;margin-bottom:6px;font-size:12px;color:#7A8497">
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#4A6B9E"></span><span style="width:6px;height:6px;border-radius:50%;background:#4A6B9E;margin-left:-9px"></span>รายจ่าย</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>งบประมาณ</span>
           </div>
           <div>{{ expenseTrend }}</div>
-        </div>
-
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 16px;font-size:15.5px;font-weight:600">รายจ่ายแยกตามวิธีการชำระเงิน <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <div style="display:flex;align-items:center;gap:16px">
-            <div style="position:relative;width:140px;height:140px;flex:none">
-              {{ expPayDonut }}
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-                <span style="font-size:16px;font-weight:700;color:#1B2536">{{ epTotalLabel }}</span>
-                <span style="font-size:11px;color:#9AA3B2">100%</span>
-              </div>
-            </div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:12px">
-              <sc-for list="{{ expPayRows }}" as="c" hint-placeholder-count="4">
-                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px">
-                  <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ c.color }}"></span>
-                  <span style="flex:1;min-width:0;color:#3A4456;line-height:1.35">{{ c.name }}</span>
-                  <span style="font-weight:600;color:#2B3547;white-space:nowrap">{{ c.amount }}</span>
-                  <span style="color:#9AA3B2;width:38px;text-align:right">{{ c.pct }}</span>
-                </div>
-              </sc-for>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -6889,18 +6892,22 @@ class Component extends DCLogic {
     const epFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const epEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const epRows = this.state.expRows;
-    const epTotal = epRows.reduce((a,r)=>a+r.amount,0);
+    // การ์ดโดนัท 2 ใบย้ายไปอยู่หน้ารายรับ-รายจ่ายแล้ว (9 ก.ย. 2569) จึงต้องกรองตามช่วงเวลา
+    // ของหน้านั้น ไม่ใช่รายจ่ายทั้งฐาน ไม่งั้นตัวเลขจะไม่ตรงกับการ์ดอื่นบนหน้าเดียวกัน
+    // ส่วนกราฟแนวโน้มรายจ่ายยังอยู่หน้ารายจ่ายและใช้ epRows เต็ม (มันตัด 30 วันเองอยู่แล้ว)
+    const epDonutRows = inexExpAll;
+    const epTotal = epDonutRows.reduce((a,r)=>a+r.amount,0);
     const epTotalLabel = epFmt(epTotal);
     const epCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#9C82C4', 'การตลาด':'#3E9E92', 'อุปกรณ์/ของใช้ร้าน':'#8B6FB8', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
     const epSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
-    const byCatEp = epSumByKey(epRows, r => r.mainCat, r => r.amount);
+    const byCatEp = epSumByKey(epDonutRows, r => r.mainCat, r => r.amount);
     const epCatNames = Object.keys(byCatEp);
     const expCatRows = epCatNames.map(name => ({ name, amount: epFmt(byCatEp[name]), pct: epTotal ? (byCatEp[name]/epTotal*100).toFixed(1)+'%' : '0%', color: epCatColors[name] || '#B6BECC' }));
     const expCatDonut = epTotal > 0
       ? this.donut(epCatNames.map(name => ({ value: byCatEp[name], color: epCatColors[name] || '#B6BECC' })), 150, 22)
       : epEmptyDonut(150, 22);
     const epPayColors = { 'โอนเงิน':'#4A6B9E', 'เงินสด':'#4E9E77', 'บัตรเครดิต':'#9C82C4', 'อื่นๆ':'#D98A4C' };
-    const byPayEp = epSumByKey(epRows, r => r.payment, r => r.amount);
+    const byPayEp = epSumByKey(epDonutRows, r => r.payment, r => r.amount);
     const epPayNames = Object.keys(byPayEp);
     const expPayRows = epPayNames.map(name => ({ name, amount: epFmt(byPayEp[name]), pct: epTotal ? (byPayEp[name]/epTotal*100).toFixed(1)+'%' : '0%', color: epPayColors[name] || '#B6BECC' }));
     const expPayDonut = epTotal > 0
