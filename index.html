@@ -194,7 +194,7 @@
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;font-size:12px;color:#7A8497">
             <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#2C4A7C"></span>ยอดขาย</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:2px;border-radius:2px;background:#B14A4A"></span>รายจ่าย</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#B14A4A"></span><span style="width:7px;height:7px;border-radius:50%;background:#B14A4A;border:1.5px solid #fff;margin-left:-10px"></span>กำไรสุทธิ</span>
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#2E7D5B"></span>กำไรสุทธิ</span>
             <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #5A6478"></span>{{ dailyTargetLabel }}
               <sc-if value="{{ !targetEditing }}" hint-placeholder-val="{{ true }}">
                 <i data-lucide="pencil" onClick="{{ startTargetEdit }}" style="width:12px;height:12px;color:#2C4A7C;cursor:pointer;margin-left:2px"></i>
@@ -3379,11 +3379,10 @@
 const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const THAI_MONTHS_ABBR = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 // สีของกราฟ "รายรับ vs รายจ่าย" — เจ้าของร้านกำหนดเมื่อ 9 ก.ย. 2569
-// ยอดขาย = แท่งน้ำเงินเข้ม · รายจ่าย = เส้นแดงเข้ม · กำไรสุทธิ = เส้นแดงเข้ม · เป้า = เส้นปะเทาเข้ม
-// รายจ่ายกับกำไรสุทธิสีเดียวกันตามที่สั่ง จึงต้องแยกด้วยความหนาเส้นและหมุด
+// ยอดขาย = แท่งน้ำเงินเข้ม · รายจ่าย = เส้นแดงเข้ม · กำไรสุทธิ = เส้นเขียวเข้ม · เป้า = เส้นปะเทาเข้ม
 const BL_SALES = '#2C4A7C';
 const BL_EXPENSE = '#B14A4A';
-const BL_PROFIT = '#B14A4A';
+const BL_PROFIT = '#2E7D5B';
 const BL_TARGET = '#5A6478';
 function dateToISO(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -4462,13 +4461,8 @@ class Component extends DCLogic {
       }
     });
     const lineOf = arr => arr.map((v, i) => (i ? 'L' : 'M') + xc(i).toFixed(1) + ' ' + yy(v).toFixed(1)).join(' ');
-    // รายจ่ายกับกำไรสุทธิใช้สีแดงเข้มเหมือนกันตามที่เจ้าของร้านกำหนด
-    // แยกกันด้วยรูปแบบ: รายจ่ายเป็นเส้นบาง ไม่มีหมุด · กำไรสุทธิเส้นหนากว่าและมีหมุดกลม
-    els.push(React.createElement('path', { key:'ep', d: lineOf(expDays), fill:'none', stroke: BL_EXPENSE, strokeWidth:1.8, strokeLinecap:'round', strokeLinejoin:'round' }));
-    els.push(React.createElement('path', { key:'np', d: lineOf(net), fill:'none', stroke: BL_PROFIT, strokeWidth:2.8, strokeLinecap:'round', strokeLinejoin:'round' }));
-    if (labels.length <= 20) {
-      net.forEach((v, i) => els.push(React.createElement('circle', { key:'npc'+i, cx: xc(i), cy: yy(v), r: 3.4, fill: BL_PROFIT, stroke:'#fff', strokeWidth:1.6 })));
-    }
+    els.push(React.createElement('path', { key:'ep', d: lineOf(expDays), fill:'none', stroke: BL_EXPENSE, strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' }));
+    els.push(React.createElement('path', { key:'np', d: lineOf(net), fill:'none', stroke: BL_PROFIT, strokeWidth:2.6, strokeLinecap:'round', strokeLinejoin:'round' }));
     // เส้นเป้า — เดิมมีแต่ในคำอธิบายสัญลักษณ์ ไม่เคยวาดจริงบนกราฟ
     // แกนรายเดือนใช้เป้ารายวัน x จำนวนวันของเดือนนั้นที่อยู่ในช่วงที่เลือก
     if (dailyTarget > 0) {
@@ -4485,7 +4479,39 @@ class Component extends DCLogic {
       });
       els.push(React.createElement('path', { key:'tg', d: lineOf(tgt), fill:'none', stroke: BL_TARGET, strokeWidth:1.6, strokeDasharray:'6 5', strokeLinecap:'round' }));
     }
-    return React.createElement('svg', { viewBox:`0 0 ${W} ${H}`, width:'100%', height:'auto', style:{ display:'block' } }, els);
+    // กล่องบอกตัวเลขตอนเอาเมาส์ชี้ — ทำด้วย CSS :hover ล้วน ไม่ผูกกับ state
+    // ถ้าใช้ onMouseEnter + setState หน้าจะ re-render ทั้งแอปทุกครั้งที่เลื่อนเมาส์
+    // (ข้อมูลยอดขายมี 5,000+ แถว) จะหน่วงจนใช้ไม่ได้
+    els.push(React.createElement('style', { key:'css' },
+      '.bl-col .bl-tip{opacity:0;transition:opacity .08s}' +
+      '.bl-col:hover .bl-tip{opacity:1}' +
+      '.bl-col .bl-hit{fill:transparent}' +
+      '.bl-col:hover .bl-hit{fill:rgba(44,74,124,0.05)}'));
+    const money = v => '฿' + Math.round(v || 0).toLocaleString('en-US');
+    const tipW = 160, tipH = 78, lineH = 15;
+    labels.forEach((d, i) => {
+      const c = xc(i);
+      let tx = c + 12;
+      if (tx + tipW > W - 4) tx = c - 12 - tipW;
+      if (tx < 4) tx = 4;
+      const top = Math.min(yy(salesDays[i]), yy(expDays[i]), yy(net[i]));
+      const ty = Math.max(4, Math.min(top - tipH - 8, H - tipH - 4));
+      const row = (k, label, value, color) => [
+        React.createElement('circle', { key:'dot'+k, cx: tx + 12, cy: ty + 26 + k * lineH - 3.5, r: 3.2, fill: color }),
+        React.createElement('text', { key:'lb'+k, x: tx + 21, y: ty + 26 + k * lineH, fontSize: 10.5, fill:'#6B7486', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, label),
+        React.createElement('text', { key:'vl'+k, x: tx + tipW - 10, y: ty + 26 + k * lineH, textAnchor:'end', fontSize: 10.5, fontWeight: 700, fill:'#1B2536', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, value)
+      ];
+      els.push(React.createElement('g', { key:'col'+i, className:'bl-col' },
+        React.createElement('rect', { className:'bl-hit', x: c - slot/2, y: mt, width: slot, height: ch, rx: 3 }),
+        React.createElement('g', { className:'bl-tip' },
+          React.createElement('rect', { x: tx, y: ty, width: tipW, height: tipH, rx: 9, fill:'#fff', stroke:'#DFE2E7', strokeWidth: 1 }),
+          React.createElement('text', { x: tx + 12, y: ty + 17, fontSize: 10.5, fontWeight: 700, fill:'#1B2536', fontFamily:"'IBM Plex Sans Thai',sans-serif" }, d),
+          row(0, 'ยอดขาย', money(salesDays[i]), BL_SALES),
+          row(1, 'รายจ่าย', money(expDays[i]), BL_EXPENSE),
+          row(2, 'กำไรสุทธิ', money(net[i]), BL_PROFIT)
+        )));
+    });
+    return React.createElement('svg', { viewBox:`0 0 ${W} ${H}`, width:'100%', height:'auto', style:{ display:'block', overflow:'visible' } }, els);
   }
 
   donut(segs, size, thick) {
