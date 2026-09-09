@@ -3541,15 +3541,29 @@ function saveObject(key, obj) {
  *  หอมมนต์ ต้องอยู่บนสุด เพราะชื่อร้านบางร้านมีคำอื่นปนแล้วไปชนกฎท้ายๆ ได้
  *  ไม่ใช้ "ถนนประชาราษฏร์สาย 2" เป็นคีย์เวิร์ด — ทั้งร้านสวีทซอฟ (Grab) และร้านหอมมนต์ (Shopee)
  *  ต่างมีคำนี้ในชื่อ จับแบรนด์จากคำนี้จะแยกไม่ออก */
+/** แบรนด์ของแต่ละสาขาไม่เหมือนกัน (ยืนยันโดยเจ้าของร้าน 9 ก.ย. 2569)
+ *    บางโพ      — AnnieCake · หอมมนต์ · หน้าร้าน
+ *    ถนนจันทร์  — AnnieCake · Midnight · Lottery · หน้าร้าน
+ *  "หน้าร้าน" ไม่ใช่แบรนด์จริง เป็นค่าที่ใช้แทนแถวที่ไม่มีแบรนด์ (ดู BRAND_UNSPEC) */
+const BRANCH_BRANDS = {
+  main:     ['AnnieCake', 'หอมมนต์'],
+  chanroad: ['AnnieCake', 'Midnight', 'Lottery']
+};
+/** คำสำคัญ→แบรนด์ ตอนอ่านชื่อร้านจากไฟล์ที่นำเข้า
+ *  ผูกสาขาไว้ด้วย เพื่อไม่ให้ชื่อร้านของอีกสาขามาจับแบรนด์ผิดข้ามสาขา
+ *  รายการที่ไม่ระบุ branch ใช้ได้ทุกสาขา · หอมมนต์ต้องอยู่บนสุดเพราะชื่อร้านบางร้านมีคำอื่นปน */
 const BRAND_KEYWORDS = [
-  { kw: 'หอมมนต์', brand: 'หอมมนต์' },
-  { kw: 'hommon', brand: 'หอมมนต์' },
-  { kw: 'midnight', brand: 'MidnightCookies' },
-  { kw: 'มิดไนท์', brand: 'MidnightCookies' },
-  { kw: 'สวีทซอฟ', brand: 'AnnieCake' },
+  { kw: 'หอมมนต์',   brand: 'หอมมนต์',    branch: 'main' },
+  { kw: 'hommon',    brand: 'หอมมนต์',    branch: 'main' },
+  { kw: 'midnight',  brand: 'Midnight',   branch: 'chanroad' },
+  { kw: 'มิดไนท์',    brand: 'Midnight',   branch: 'chanroad' },
+  { kw: 'lottery',   brand: 'Lottery',    branch: 'chanroad' },
+  { kw: 'ลอตเตอรี',  brand: 'Lottery',    branch: 'chanroad' },
+  { kw: 'สลาก',      brand: 'Lottery',    branch: 'chanroad' },
+  { kw: 'สวีทซอฟ',   brand: 'AnnieCake' },
   { kw: 'sweet soft', brand: 'AnnieCake' },
-  { kw: 'เทศกาล', brand: 'AnnieCake' },
-  { kw: 'annie', brand: 'AnnieCake' }
+  { kw: 'เทศกาล',    brand: 'AnnieCake' },
+  { kw: 'annie',     brand: 'AnnieCake' }
 ];
 /** ทะเบียนร้านแยกตามสาขา — ใช้เดาสาขาจาก Store ID ตอนนำเข้าไฟล์
  *  ยืนยันโดยเจ้าของร้าน 9 ก.ย. 2569
@@ -3572,10 +3586,12 @@ function branchFromStoreId(id, fallback) {
   return hit || fallback || DEFAULT_BRANCH;
 }
 const POS_ALLOWED_PAYMENT_TYPES = ['Cash', 'QR PromptPay (POS Pay)', 'K+shop', 'K+ Shop', 'K+Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount'];
-function detectBrandFromName(name) {
+function detectBrandFromName(name, branch) {
   const lower = String(name || '').toLowerCase();
-  for (const { kw, brand } of BRAND_KEYWORDS) {
-    if (lower.includes(kw.toLowerCase())) return brand;
+  const b = branch || DEFAULT_BRANCH;
+  for (const rule of BRAND_KEYWORDS) {
+    if (rule.branch && rule.branch !== b) continue;
+    if (lower.includes(rule.kw.toLowerCase())) return rule.brand;
   }
   return 'AnnieCake';
 }
@@ -3686,10 +3702,10 @@ function subsidyLabelOf(platform, storeName) {
 }
 /** อ่านทั้งไฟล์ก่อน 1 รอบ เพื่อรู้ว่าออเดอร์ไหนของ Grab อยู่ในโครงการไทยช่วยไทย
  *  แล้วค่อยแปลงทีละแถว — 1 แถวอาจแตกเป็น 2 แถว (ยอดขายไปหน้าร้าน ค่าบริการอยู่กับแพลตฟอร์ม) */
-function normalizeImportRows(platform, rows, fallbackDateISO) {
+function normalizeImportRows(platform, rows, fallbackDateISO, activeBranch) {
   // นับเหตุผลที่ข้ามแต่ละแถวไว้ด้วย — เดิมแถวที่ถูกข้ามหายไปเงียบๆ
   // กว่าจะรู้ว่าตกหล่นก็ตอนยอดไม่ตรงใบสรุปแล้ว (เคยหายไป 43 แถว ฿730 โดยไม่มีอะไรฟ้อง)
-  const ctx = { skips: {} };
+  const ctx = { skips: {}, branch: activeBranch || DEFAULT_BRANCH };
   ctx.skip = reason => { ctx.skips[reason] = (ctx.skips[reason] || 0) + 1; return null; };
   const out = [];
   rows.forEach(row => {
@@ -3763,7 +3779,7 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
       gross, net, discount, gp, vat, fee: gp + vat, status,
       type: isAdjustment ? 'Adjustment' : null,
       payment: payMethod || 'เงินสด',
-      brand: detectBrandFromName(storeName),
+      brand: detectBrandFromName(storeName, branchFromStoreId(storeIdOf(row), ctx && ctx.branch)),
       platformLabel: 'Grab', raw: pickColumns(row, GRAB_KEEP_COLUMNS)
     };
     // ออเดอร์โครงการไทยช่วยไทยของ Grab = ออเดอร์ที่ยังไม่โอน (Status = Completed / Manually Paid)
@@ -3800,7 +3816,7 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
       // รายงานที่นับจำนวนออเดอร์จะได้แยกออกจากยอดขายจริงได้
       type: detail || null,
       status: 'เงินเข้าจริง', payment: paymentMethod,
-      brand: detectBrandFromName(row['restaurant_name']), platformLabel: 'LINE MAN', raw: { ...row }
+      brand: detectBrandFromName(row['restaurant_name'], branchFromStoreId(storeIdOf(row), ctx && ctx.branch)), platformLabel: 'LINE MAN', raw: { ...row }
     };
     // ออเดอร์โครงการไทยช่วยไทยของ LINE MAN ระบุตรงๆ ที่ payment_method ไม่ต้องเดา
     const lmSubsidy = paymentMethod === 'GOVERNMENT_WALLET' && subsidyLabelOf('lineman', row['restaurant_name']);
@@ -3824,7 +3840,7 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     return {
       orderId, date: dt.date || (fallbackDateISO && isoToBEShort(fallbackDateISO)), time: dt.time,
       gross, net, discount, gp, vat, fee: gp + vat, status, payment: 'ชำระผ่านแอป/บัตร',
-      brand: detectBrandFromName(row['Store Name']), platformLabel: 'ShopeeFood', raw: { ...row }
+      brand: detectBrandFromName(row['Store Name'], branchFromStoreId(storeIdOf(row), ctx && ctx.branch)), platformLabel: 'ShopeeFood', raw: { ...row }
     };
   }
   if (platform === 'pos') {
@@ -5120,7 +5136,15 @@ class Component extends DCLogic {
     const periodDisplay = (period === 'เลือกเอง' && (customFrom || customTo))
       ? ((customFrom ? isoToBEShort(customFrom) : '…') + ' – ' + (customTo ? isoToBEShort(customTo) : '…'))
       : period;
-    const brandOptions = ['ทุกแบรนด์','AnnieCake','หอมมนต์',BRAND_UNSPEC].map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
+    /** รายชื่อแบรนด์ในดรอปดาวน์ = แบรนด์ประจำสาขา + แบรนด์ที่มีอยู่จริงในข้อมูลของสาขานั้น
+     *  เอาจากข้อมูลจริงด้วย เพราะถ้าอนาคตมีแบรนด์ใหม่เข้ามาจะได้ขึ้นเองโดยไม่ต้องมาแก้โค้ด
+     *  และไม่โชว์แบรนด์ของอีกสาขา (บางโพไม่ควรเห็น Midnight / Lottery) */
+    const brandsInData = Array.from(new Set(
+      this.ofBranch(this.state.recentRows).map(r => r.brand).filter(b => b && b !== BRAND_UNSPEC)
+    ));
+    const brandNames = Array.from(new Set((BRANCH_BRANDS[this.activeBranch()] || []).concat(brandsInData)));
+    const brandOptions = ['ทุกแบรนด์'].concat(brandNames).concat([BRAND_UNSPEC])
+      .map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
     const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood','ขายส่ง'].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
@@ -7722,7 +7746,7 @@ class Component extends DCLogic {
       const cleaned = firstLine.trim().startsWith('*') ? text.slice(firstNewline + 1) : text;
       Papa.parse(cleaned, { header: true, skipEmptyLines: true, complete: (results) => {
         const platform = detectPlatform(results.meta.fields || []);
-        const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, results.data, fallbackDateISO);
+        const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, results.data, fallbackDateISO, this.activeBranch());
         resolve({ name: file.name, platform, rawCount: results.data.length, rows: parsed.rows, skips: parsed.skips,
                   skippedCount: Object.keys(parsed.skips).reduce((a, k) => a + parsed.skips[k], 0) });
       }});
@@ -7734,7 +7758,7 @@ class Component extends DCLogic {
       const allRows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
       const rows = allRows.filter(row => Object.values(row).some(v => String(v).trim() !== ''));
       const platform = detectPlatform(headerRow);
-      const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, rows, fallbackDateISO);
+      const parsed = platform === 'unknown' ? { rows: [], skips: {} } : normalizeImportRows(platform, rows, fallbackDateISO, this.activeBranch());
       return { name: file.name, platform, rawCount: rows.length, rows: parsed.rows, skips: parsed.skips,
                skippedCount: Object.keys(parsed.skips).reduce((a, k) => a + parsed.skips[k], 0) };
     });
