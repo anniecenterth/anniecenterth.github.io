@@ -206,6 +206,12 @@
         <div style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
       </div>
 
+      <!-- ช่วงเวลาที่การ์ดด้านล่างใช้ + คำเตือนเมื่อข้อมูลของช่วงนั้นยังไม่ครบ -->
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:12.5px;color:#7C8699"><i data-lucide="calendar-range" style="width:15px;height:15px;flex:none"></i><span>{{ ovPeriodNote }}</span></div>
+      <sc-if value="{{ ovShowWarn }}">
+        <div style="display:flex;align-items:flex-start;gap:9px;background:#FDF4E7;border:1px solid #F0DCBF;border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:#8A5A22;line-height:1.55"><i data-lucide="triangle-alert" style="width:16px;height:16px;flex:none;margin-top:1px"></i><span>{{ ovWarnText }}</span></div>
+      </sc-if>
+
       <!-- KPI grid -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ kpiOverview }}" as="k" hint-placeholder-count="6">
@@ -216,6 +222,7 @@
             </div>
             <div style="font-size:25px;font-weight:700;color:#1B2536;letter-spacing:-0.5px">{{ k.amount }}</div>
             <div style="font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:4px;line-height:1.35;color:{{ k.deltaColor }}"><span style="font-size:9px;flex:none;margin-top:2px">{{ k.arrow }}</span><span style="flex:1;min-width:0">{{ k.delta }}</span></div>
+            <div style="font-size:11px;color:#9AA3B2;line-height:1.4">{{ k.note }}</div>
             <div style="height:36px;margin-top:1px">{{ k.spark }}</div>
           </div>
         </sc-for>
@@ -5929,13 +5936,25 @@ class Component extends DCLogic {
     const dNP    = ovDelta(ovNetProfit, ovPrevNetProfit);
     const dMg    = ovDeltaPP(ovNetMargin, ovPrevMargin);
 
+    // ---- คำอธิบายใต้การ์ดแต่ละใบ + ป้ายบอกช่วงเวลา + คำเตือนเมื่อข้อมูลยังไม่ครบ ----
+    // (เขียนไว้เพราะ 'กำไร' ที่นี่ไม่ได้ตั้งต้นจากยอดขายเต็ม แต่ตั้งต้นจากเงินเข้าจริง
+    //  ซึ่งหักค่าบริการแอปไปแล้ว — ถ้าไม่บอกไว้จะอ่านการ์ดผิดทุกครั้ง)
+    const ovThai = iso => { const [y, m, d] = iso.split('-').map(Number); return d + ' ' + THAI_MONTHS_ABBR[m - 1]; };
+    const ovRngText = rng => rng ? (ovThai(rng.from) + ' – ' + ovThai(rng.to)) : 'ทุกช่วงเวลา';
+    const ovPeriodDays = ovCurRng ? Math.round((new Date(ovCurRng.to + 'T00:00:00') - new Date(ovCurRng.from + 'T00:00:00')) / 86400000) + 1 : 0;
+    const ovPeriodNote = ovCurRng
+      ? ('ช่วงที่แสดง ' + ovRngText(ovCurRng) + ' (' + ovPeriodDays + ' วัน) · "เทียบช่วงก่อน" คือ ' + ovRngText(ovPrevRng) + ' ซึ่งยาวเท่ากัน ไม่ใช่เดือนก่อนทั้งเดือน')
+      : 'ช่วงที่แสดง: ทุกช่วงเวลาที่มีข้อมูล';
+    const ovShowWarn = ovNet > 0 && ovExpenseTotal === 0;
+    const ovWarnText = 'ช่วงนี้ยังไม่มีรายจ่ายบันทึกไว้เลยสักรายการ กำไรขั้นต้นกับกำไรสุทธิจึงเท่ากับเงินเข้าจริงพอดี และ Net Margin ขึ้น 100% — ยังไม่ใช่กำไรจริง พอคีย์วัตถุดิบกับค่าใช้จ่ายเข้าไปตัวเลขจะลดลงมาก';
+
     const kpiOverview = [
-      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
-      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
-      { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
-      { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
+      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, note:'ยอดขายเต็มของวันนี้ ก่อนแอปหักค่าบริการ · เทียบกับเมื่อวาน', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, note:'ยอดขายรวมทุกช่องทาง หักส่วนลดแล้ว แต่ยังไม่หักค่าบริการแอป', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, note:'เฉพาะรายจ่ายที่คีย์เข้าระบบ · ค่าบริการแอปไม่นับตรงนี้ เพราะหักไปแล้วในเงินเข้าจริง', icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
+      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, note:'เงินเข้าจริง ' + ovFmt(ovNet) + ' − วัตถุดิบ (COGS) ' + ovFmt(ovCogs), icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
+      { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, note:'กำไรขั้นต้น − รายจ่ายอื่นที่ไม่ใช่วัตถุดิบ ' + ovFmt(ovExpenseTotal - ovCogs), icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
+      { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, note:'กำไรสุทธิ ÷ เงินเข้าจริง (ไม่ใช่ ÷ ยอดขายเต็ม)', icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
     ];
     const fmtFin = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const noDeltaFin = '– (ยังไม่มีข้อมูลเทียบ)';
@@ -8553,7 +8572,7 @@ class Component extends DCLogic {
       holidayOpen, holidayTickRows,
       calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
       expCalCells, importCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
-      expPickToday, importPickToday, storePickToday, kpiOverview, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
+      expPickToday, importPickToday, storePickToday, kpiOverview, ovPeriodNote, ovShowWarn, ovWarnText, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, 14), brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini,
       procKpis, procTableRows, procSearch: this.state.procSearch || '', setProcSearch,
       exportProcurementCsv, procEmpty: procTableRows.length === 0,
