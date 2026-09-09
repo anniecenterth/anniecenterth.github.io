@@ -2139,11 +2139,12 @@
           <thead>
             <tr style="color:#8089A0;font-size:11.5px;text-align:right">
               <th style="padding:0 8px 12px;font-weight:500;text-align:left">แบรนด์</th>
-              <th style="padding:0 8px 12px;font-weight:500">หน้าร้าน</th>
-              <th style="padding:0 8px 12px;font-weight:500">Grab</th>
-              <th style="padding:0 8px 12px;font-weight:500">LINE MAN</th>
-              <th style="padding:0 8px 12px;font-weight:500">ShopeeFood</th>
+              <th style="padding:0 8px 12px;font-weight:500">รายรับ</th>
               <th style="padding:0 8px 12px;font-weight:500">ขายส่ง</th>
+              <th style="padding:0 8px 12px;font-weight:500">ไทยช่วยไทย</th>
+              <th style="padding:0 8px 12px;font-weight:500">Grab</th>
+              <th style="padding:0 8px 12px;font-weight:500">Lineman</th>
+              <th style="padding:0 8px 12px;font-weight:500">Shopee</th>
               <th style="padding:0 8px 12px;font-weight:500">ยอดขายรวม</th>
               <th style="padding:0 8px 12px;font-weight:500">% ต่อรวม</th>
               <th style="padding:0 8px 12px;font-weight:500">ออเดอร์</th>
@@ -2155,10 +2156,11 @@
               <tr style="border-top:1px solid #EFF0F3;color:#2B3547;font-weight:{{ r.weight }}">
                 <td style="padding:13px 8px"><span style="display:inline-flex;align-items:center;gap:10px"><span style="width:22px;height:22px;border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;background:{{ r.dotBg }};color:{{ r.dotFg }}"><i data-lucide="cake-slice" style="width:13px;height:13px"></i></span>{{ r.brand }}</span></td>
                 <td style="padding:13px 8px;text-align:right">{{ r.storefront }}</td>
+                <td style="padding:13px 8px;text-align:right">{{ r.wholesale }}</td>
+                <td style="padding:13px 8px;text-align:right">{{ r.subsidy }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.grab }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.lineman }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.shopee }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.wholesale }}</td>
                 <td style="padding:13px 8px;text-align:right;font-weight:600">{{ r.total }}</td>
                 <td style="padding:13px 8px;text-align:right;color:#7A8497">{{ r.pct }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.orders }}</td>
@@ -6971,6 +6973,12 @@ class Component extends DCLogic {
     const WHOLESALE_PAY = 'ขายส่ง';
     const wholesaleRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment === WHOLESALE_PAY);
     const wholesale = wholesaleRows.reduce((a, r) => ({ gross: a.gross + r.gross, net: a.net + r.net }), { gross:0, net:0 });
+    // ไทยช่วยไทยของทุกช่องทางถูกย้ายมาเก็บเป็น platform='หน้าร้าน' ตั้งแต่ตอนนำเข้า
+    // (ดู SUBSIDY_SPLITS) แยกได้ด้วยชื่อ payment ที่ขึ้นต้นว่า "ไทยช่วยไทย"
+    const SUBSIDY_PREFIX = 'ไทยช่วยไทย';
+    const isSubsidyRow = r => String(r.payment || '').startsWith(SUBSIDY_PREFIX);
+    const sumGross = rows => rows.reduce((a, r) => a + r.gross, 0);
+    const subsidyGross = sumGross(salesRows.filter(r => r.platform === 'หน้าร้าน' && isSubsidyRow(r)));
     const dashStorefrontGross = byChannel['หน้าร้าน'] ? byChannel['หน้าร้าน'].gross : 0;
     const dashRetailGross = dashStorefrontGross - wholesale.gross;
     const dashDeliveryGross = salesTotalGross - dashStorefrontGross;
@@ -7217,16 +7225,18 @@ class Component extends DCLogic {
       ? 'ช่วงที่เลือกยาวเกิน ' + DR_MAX_DAYS + ' วัน — แสดง ' + DR_MAX_DAYS + ' วันแรก'
       : (dailyReportRows.length + ' วัน');
 
-    const wsFor = name => wholesaleRows.filter(r => r.brand === name).reduce((a,r)=>a+r.gross,0);
     const dashMatrixRows = dashBrandNames.map(name => {
       const rowsForBrand = salesRows.filter(r => r.brand === name);
-      const gFor = k => rowsForBrand.filter(r => r.platform === k).reduce((a,r)=>a+r.gross,0);
-      const total = rowsForBrand.reduce((a,r)=>a+r.gross,0);
+      const gFor = k => sumGross(rowsForBrand.filter(r => r.platform === k));
+      const storeRows = rowsForBrand.filter(r => r.platform === 'หน้าร้าน');
+      const ws = sumGross(storeRows.filter(r => r.payment === WHOLESALE_PAY));
+      const sub = sumGross(storeRows.filter(isSubsidyRow));
+      const total = sumGross(rowsForBrand);
       const orders = rowsForBrand.length;
       return {
         brand:name, dotBg:'#EEF0F5', dotFg:'#8A93A5',
-        storefront: fmtB(gFor('หน้าร้าน') - wsFor(name)), grab: fmtB(gFor('Grab')), lineman: fmtB(gFor('LINE MAN')), shopee: fmtB(gFor('ShopeeFood')),
-        wholesale: fmtB(wsFor(name)),
+        storefront: fmtB(sumGross(storeRows) - ws - sub), wholesale: fmtB(ws), subsidy: fmtB(sub),
+        grab: fmtB(gFor('Grab')), lineman: fmtB(gFor('LINE MAN')), shopee: fmtB(gFor('ShopeeFood')),
         total: fmtB(total), pct: salesTotalGross ? (total/salesTotalGross*100).toFixed(1)+'%' : '0%',
         orders: String(orders), avg: fmtB(orders ? total/orders : 0), weight:'500'
       };
@@ -7234,9 +7244,10 @@ class Component extends DCLogic {
     if (dashMatrixRows.length) {
       dashMatrixRows.push({
         brand:'รวมทั้งหมด', dotBg:'#EEF0F5', dotFg:'#8A93A5',
-        storefront: fmtB(dashRetailGross), grab: fmtB(byChannel['Grab']?byChannel['Grab'].gross:0),
+        storefront: fmtB(dashStorefrontGross - wholesale.gross - subsidyGross), wholesale: fmtB(wholesale.gross), subsidy: fmtB(subsidyGross),
+        grab: fmtB(byChannel['Grab']?byChannel['Grab'].gross:0),
         lineman: fmtB(byChannel['LINE MAN']?byChannel['LINE MAN'].gross:0), shopee: fmtB(byChannel['ShopeeFood']?byChannel['ShopeeFood'].gross:0),
-        wholesale: fmtB(wholesale.gross), total: fmtB(salesTotalGross), pct:'100%', orders:String(salesOrderCount), avg: fmtB(salesAvgOrder), weight:'700'
+        total: fmtB(salesTotalGross), pct:'100%', orders:String(salesOrderCount), avg: fmtB(salesAvgOrder), weight:'700'
       });
     }
 
