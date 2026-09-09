@@ -2019,14 +2019,6 @@
             </div>
           </sc-if>
         </div>
-        <div data-saletype-dd="1" style="position:relative">
-          <div onClick="{{ toggleSaleType }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="layers" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ประเภทการขาย:</span><span style="font-weight:600">{{ saleType }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ saleTypeOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:200px">
-              <sc-for list="{{ saleTypeOptions }}" as="opt" hint-placeholder-count="5"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
-            </div>
-          </sc-if>
-        </div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:7px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>อัปเดตข้อมูลล่าสุด</span></div>
         <span style="font-size:12.5px;color:#9AA3B2">{{ dataAsOfLabel }}</span>
@@ -2051,8 +2043,7 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <h3 style="margin:0;font-size:16px;font-weight:600;display:flex;align-items:center;gap:7px">แนวโน้มยอดขาย <span style="color:#9AA3B2;font-weight:500;font-size:14px">(14 วันล่าสุด)</span><i data-lucide="info" style="width:14px;height:14px;color:#C2C9D6"></i></h3>
-            <div style="display:flex;align-items:center;gap:6px;border:1px solid #E7E9ED;border-radius:9px;padding:6px 11px;font-size:12.5px;color:#5A6478;cursor:pointer">รายวัน <i data-lucide="chevron-down" style="width:14px;height:14px"></i></div>
+            <h3 style="margin:0;font-size:16px;font-weight:600;display:flex;align-items:center;gap:7px">แนวโน้มยอดขาย <span style="color:#9AA3B2;font-weight:500;font-size:14px">{{ dashTrendLabel }}</span><i data-lucide="info" style="width:14px;height:14px;color:#C2C9D6"></i></h3>
           </div>
           <div style="display:flex;align-items:center;gap:20px;margin-bottom:6px;font-size:12px;color:#7A8497">
             <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:3px;background:#4A6B9E"></span>ยอดขายรวม</span>
@@ -4962,8 +4953,46 @@ class Component extends DCLogic {
     return days.map(d => d.value);
   }
 
-  realTrendChart(rows, n) {
-    const days = this.dayBuckets(rows, n);
+  /** แบ่งข้อมูลเป็นแท่งตามช่วงวันที่ที่เลือกไว้บนหัวหน้า (ไม่ล็อก 14 วันล่าสุดอีกแล้ว)
+   *  ช่วงยาวเกิน 2 เดือน จะยุบเป็นรายเดือน ไม่งั้นแท่งจะถี่จนอ่านไม่ออก
+   *  (หน้ายอดขายไม่มีปุ่มเลือก รายวัน/รายเดือน แล้ว จึงต้องเลือกให้เองตรงนี้) */
+  periodBuckets(rows) {
+    const rng = this.periodRange();
+    if (!rng) return { buckets: this.dayBuckets(rows, 14), label: '(14 วันล่าสุด)' };
+    const d0 = new Date(rng.from + 'T00:00:00'), d1 = new Date(rng.to + 'T00:00:00');
+    const nDays = Math.round((d1 - d0) / 86400000) + 1;
+    const isoOf = r => { try { return beShortToISO(r.date); } catch (e) { return null; } };
+    const rngText = iso => { const [y, m, d] = iso.split('-').map(Number); return d + ' ' + THAI_MONTHS_ABBR[m - 1]; };
+    if (nDays <= 62) {
+      const buckets = [];
+      for (let i = 0; i < nDays; i++) {
+        const d = new Date(d0.getTime() + i * 86400000);
+        const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        buckets.push({ iso, label: d.getDate() + ' ' + THAI_MONTHS_ABBR[d.getMonth()], gross: 0, net: 0, count: 0 });
+      }
+      const byIso = {};
+      buckets.forEach(b => { byIso[b.iso] = b; });
+      rows.forEach(r => { const b = byIso[isoOf(r)]; if (b) { b.gross += r.gross; b.net += r.net; b.count++; } });
+      return { buckets, label: '(' + rngText(rng.from) + ' – ' + rngText(rng.to) + ' · รายวัน)' };
+    }
+    const buckets = [];
+    let y = d0.getFullYear(), m = d0.getMonth();
+    while (y * 12 + m <= d1.getFullYear() * 12 + d1.getMonth()) {
+      buckets.push({ iso: y + '-' + String(m + 1).padStart(2, '0'), label: THAI_MONTHS_ABBR[m] + ' ' + String((y + 543) % 100).padStart(2, '0'), gross: 0, net: 0, count: 0 });
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    const byYm = {};
+    buckets.forEach(b => { byYm[b.iso] = b; });
+    rows.forEach(r => {
+      const iso = isoOf(r);
+      if (!iso || iso < rng.from || iso > rng.to) return;
+      const b = byYm[iso.slice(0, 7)];
+      if (b) { b.gross += r.gross; b.net += r.net; b.count++; }
+    });
+    return { buckets, label: '(' + rngText(rng.from) + ' – ' + rngText(rng.to) + ' · รายเดือน)' };
+  }
+  realTrendChart(rows, n, preBuckets) {
+    const days = preBuckets || this.dayBuckets(rows, n);
     const sales = days.map(d => d.gross);
     const net = days.map(d => d.net);
     const labels = days.map(d => d.label);
@@ -4978,16 +5007,24 @@ class Component extends DCLogic {
       els.push(React.createElement('line', { key: 'g' + g, x1: ml, x2: W - mr, y1: yy(g), y2: yy(g), stroke: '#F1F2F4', strokeWidth: 1 }));
       els.push(React.createElement('text', { key: 'gl' + g, x: ml - 8, y: yy(g) + 3.5, textAnchor: 'end', fontSize: 10, fill: '#9AA3B2' }, g === 0 ? '฿0' : '฿' + Math.round(g / 1000) + 'K'));
     }
-    const bw = 22;
+    // แท่งกับป้ายวันที่ต้องยืดหดตามจำนวนแท่ง เพราะช่วงที่เลือกยาวได้ถึง 62 วัน
+    // ถ้าคงความกว้าง 22 ไว้ แท่งจะทับกันและป้ายวันที่จะอ่านไม่ออก
+    const bw = Math.max(3, Math.min(22, (cw / days.length) * 0.62));
+    const labelStride = Math.ceil(days.length / 16);
     labels.forEach((d, i) => {
       const c = xc(i);
-      els.push(React.createElement('rect', { key: 's' + i, x: c - bw / 2, y: yy(sales[i]), width: bw, height: Math.max(ch - (yy(sales[i]) - mt), 0), rx: 4, fill: '#4A6B9E' }));
-      els.push(React.createElement('text', { key: 'd' + i, x: c, y: H - 8, textAnchor: 'middle', fontSize: 10, fill: '#9AA3B2', fontFamily: "'IBM Plex Sans Thai',sans-serif" }, d));
+      els.push(React.createElement('rect', { key: 's' + i, x: c - bw / 2, y: yy(sales[i]), width: bw, height: Math.max(ch - (yy(sales[i]) - mt), 0), rx: Math.min(4, bw / 2), fill: '#4A6B9E' }));
+      if (i % labelStride === 0 || i === days.length - 1) {
+        els.push(React.createElement('text', { key: 'd' + i, x: c, y: H - 8, textAnchor: 'middle', fontSize: 10, fill: '#9AA3B2', fontFamily: "'IBM Plex Sans Thai',sans-serif" }, d));
+      }
     });
     const pts = net.map((v, i) => [xc(i), yy(v)]);
     const dp = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
     els.push(React.createElement('path', { key: 'np', d: dp, fill: 'none', stroke: '#2E7D5B', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' }));
-    pts.forEach((p, i) => els.push(React.createElement('rect', { key: 'npc' + i, x: p[0] - 3.4, y: p[1] - 3.4, width: 6.8, height: 6.8, transform: `rotate(45 ${p[0]} ${p[1]})`, fill: '#fff', stroke: '#2E7D5B', strokeWidth: 1.6 })));
+    // หมุดบนเส้นยอดสุทธิ — ช่วงยาว ๆ ใส่ทุกจุดจะกลายเป็นเส้นทึบ จึงใส่เฉพาะตอนแท่งไม่เยอะ
+    if (days.length <= 20) {
+      pts.forEach((p, i) => els.push(React.createElement('rect', { key: 'npc' + i, x: p[0] - 3.4, y: p[1] - 3.4, width: 6.8, height: 6.8, transform: `rotate(45 ${p[0]} ${p[1]})`, fill: '#fff', stroke: '#2E7D5B', strokeWidth: 1.6 })));
+    }
     return React.createElement('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', height: 'auto', style: { display: 'block' } }, els);
   }
 
@@ -6881,6 +6918,8 @@ class Component extends DCLogic {
     const salesDisc = this.salesDiscountTotal(salesRows);
     const salesAfterDiscount = salesTotalGross - salesDisc.total;
     const salesTotalGrossLabel = fmtB(salesAfterDiscount);
+    const dashTrend = this.periodBuckets(salesRows);
+    const dashTrendLabel = dashTrend.label;
     const dashDayBuckets12 = this.dayBuckets(salesRows, 12);
     const dashOrderBuckets12 = dashDayBuckets12.map(d => d.count);
     const salesDashKpis = [
@@ -8407,7 +8446,7 @@ class Component extends DCLogic {
       expError: this.state.expError,
       expSearch: this.state.expSearch, setExpSearch, expCatRows, expCatDonut, expPayRows, expPayDonut, expenseTrend: this.expenseTrend(epRows, 30, this.state.monthlyBudget / 30), epTotalLabel,
       saleType, saleTypeOpen, toggleSaleType, saleTypeOptions,
-      salesDashKpis, salesDashChart: this.realTrendChart(this.salesOnly(this.state.recentRows), 14), salesTotalGrossLabel,
+      salesDashKpis, salesDashChart: this.realTrendChart(null, 0, dashTrend.buckets), dashTrendLabel, salesTotalGrossLabel,
       dashChannelRows, dashChannelDonut, dashBrandRows, dashBrandDonut, dashTypeRows, dashTypeDonut, dashPayoutRows, dashMatrixRows,
       salesKpis, platformTabs, platformDD, brandDD, typeDD, paymentDD, statusDD,
       form: f, netSales, netPayout, setGross, setDiscount, setFee, setPromo, setNote, setOrderId,
