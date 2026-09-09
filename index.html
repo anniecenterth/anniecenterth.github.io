@@ -1120,9 +1120,36 @@
 
       <!-- filters -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">ทุกแบรนด์</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่องทาง:</span><span style="font-weight:600">ทุกช่องทาง</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="layers" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">หมวดค่าใช้จ่าย:</span><span style="font-weight:600">ทั้งหมด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+        <div data-brand-dd="1" style="position:relative">
+          <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+          <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
+              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4">
+                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div data-channel-dd="1" style="position:relative">
+          <div onClick="{{ toggleChannel }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่องทาง:</span><span style="font-weight:600">{{ channel }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+          <sc-if value="{{ channelOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
+              <sc-for list="{{ channelOptions }}" as="opt" hint-placeholder-count="6">
+                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div data-inexcat-dd="1" style="position:relative">
+          <div onClick="{{ toggleInexExpCat }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="layers" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">หมวดค่าใช้จ่าย:</span><span style="font-weight:600">{{ inexExpCat }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+          <sc-if value="{{ inexExpCatOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:220px;max-height:320px;overflow-y:auto">
+              <sc-for list="{{ inexExpCatOptions }}" as="opt" hint-placeholder-count="6">
+                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
       </div>
@@ -4135,7 +4162,7 @@ class Component extends DCLogic {
     authChecked: false, authSession: null,
     authUser: '', authPassword: '', authError: null, authBusy: false,
     page: loadLastPage('salesdash'), period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
-    saleType: 'ทุกประเภท', saleTypeOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
+    saleType: 'ทุกประเภท', saleTypeOpen: false, inexExpCat: 'ทั้งหมด', inexExpCatOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
     form: { date: todayISO(), branch: 'บางโพ', platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
     formDD: null, salesListDD: null, salesPlatform: 'ทุกแพลตฟอร์ม', salesSearch: '', salesStatusFilter: 'ทุกสถานะเงินเข้า', salesPeriodFilter: 'ทั้งหมด',
@@ -4189,6 +4216,7 @@ class Component extends DCLogic {
       if (this.state.channelOpen && !e.target.closest('[data-channel-dd]')) patch.channelOpen = false;
       if (this.state.formDD && !e.target.closest('[data-form-dd]')) patch.formDD = null;
       if (this.state.saleTypeOpen && !e.target.closest('[data-saletype-dd]')) patch.saleTypeOpen = false;
+      if (this.state.inexExpCatOpen && !e.target.closest('[data-inexcat-dd]')) patch.inexExpCatOpen = false;
       if (this.state.salesListDD && !e.target.closest('[data-list-dd]')) patch.salesListDD = null;
       if (this.state.expListDD && !e.target.closest('[data-list-dd]')) patch.expListDD = null;
       if (Object.keys(patch).length) this.setState(patch);
@@ -5969,7 +5997,16 @@ class Component extends DCLogic {
     const inexNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const inexEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const inexRows = this.applySalesFilters(this.state.recentRows);
-    const inexExpAll = this.applyExpenseFilters(this.state.expRows);
+    // ตัวกรองหมวดค่าใช้จ่ายมีเฉพาะหน้านี้ จึงกรองตรงนี้ ไม่ไปแก้ applyExpenseFilters
+    // ที่หน้าภาพรวมกับหน้ารายจ่ายใช้ร่วมกัน (ไม่งั้นจะกรองข้ามหน้าแบบมองไม่เห็น)
+    const inexExpCat = this.state.inexExpCat || 'ทั้งหมด';
+    const inexExpPeriod = this.applyExpenseFilters(this.state.expRows);
+    const inexExpAll = inexExpCat === 'ทั้งหมด' ? inexExpPeriod : inexExpPeriod.filter(r => r.mainCat === inexExpCat);
+    // ตัวเลือกหมวดสร้างจากหมวดที่มีรายจ่ายจริงในช่วงที่เลือก ไม่ใช่รายชื่อหมวดทั้งหมด
+    // จะได้ไม่มีตัวเลือกที่กดแล้วได้ ฿0 เสมอ
+    const inexExpCatNames = Array.from(new Set(inexExpPeriod.map(r => r.mainCat).filter(Boolean))).sort();
+    const toggleInexExpCat = () => this.setState(s => ({ inexExpCatOpen: !s.inexExpCatOpen, brandOpen: false, channelOpen: false, periodOpen: false }));
+    const inexExpCatOptions = ['ทั้งหมด'].concat(inexExpCatNames).map(c => mkOpt(c, inexExpCat, { inexExpCat: c, inexExpCatOpen: false }));
     const inexIncomeTotal = inexRows.reduce((a, r) => a + r.gross, 0) - this.salesDiscountTotal(inexRows).total;
     // GP/ค่าคอมแพลตฟอร์ม is real money withheld from every delivery order — count it as
     // an automatic expense category so กำไรสุทธิ is honest without double keying.
@@ -8094,6 +8131,7 @@ class Component extends DCLogic {
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
+      inexExpCat, inexExpCatOpen: this.state.inexExpCatOpen, toggleInexExpCat, inexExpCatOptions,
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       monthlyRows, exportMonthlyCsv,
       productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
