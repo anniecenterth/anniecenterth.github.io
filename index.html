@@ -1975,7 +1975,7 @@
                 <td style="padding:12px 8px">{{ p.platform }}</td>
                 <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ p.gross }}</td>
                 <td style="padding:12px 8px;text-align:right;color:#B14A4A;white-space:nowrap">{{ p.service }}</td>
-                <td style="padding:12px 8px;text-align:right;font-weight:600;white-space:nowrap">{{ p.net }}</td>
+                <td style="{{ p.netStyle }}">{{ p.net }}</td>
                 <td style="padding:12px 8px;text-align:center">{{ p.statusTag }}</td>
               </tr>
             </sc-for>
@@ -6813,6 +6813,8 @@ class Component extends DCLogic {
         React.createElement('span', { style:{ width:'22px', height:'22px', borderRadius:'7px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:c[0], color:c[1] } }, c[2]),
         name);
     };
+    // ตัวเลขติดลบให้เป็นสีแดงทุกที่ (เจ้าของร้านกำหนด 9 ก.ย. 2569)
+    const drNegStyle = v => 'padding:12px 8px;text-align:right;font-weight:600;white-space:nowrap;' + (v < 0 ? 'color:#B14A4A;' : '');
     const dashStatus = (txt, type) => {
       const map = { ok:['#E6F3ED','#2E7D5B'], wait:['#F8F0DC','#B98317'], late:['#F9E7EA','#B14A4A'] };
       const c = map[type] || map.wait;
@@ -6862,7 +6864,7 @@ class Component extends DCLogic {
     if (byChannel['หน้าร้าน']) {
       const g = byChannel['หน้าร้าน'];
       const posGross = g.gross - wholesale.gross, posNet = g.net - wholesale.net;
-      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(posGross), service: fmtB(0), net: fmtB(posNet), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(posGross), service: fmtB(0), net: fmtB(posNet), netStyle: drNegStyle(posNet), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (storefrontExpanded) {
         const storeRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment !== WHOLESALE_PAY);
         const payOrder = ['Cash','K+ Shop','QR PromptPay (POS Pay)','ไทยช่วยไทย พลัส (หน้าร้าน)','Split Amount'];
@@ -6871,12 +6873,12 @@ class Component extends DCLogic {
         const orderedKeys = payOrder.filter(k => byPay[k]).concat(Object.keys(byPay).filter(k => !payOrder.includes(k)));
         orderedKeys.forEach(k => {
           const s = byPay[k];
-          dashPayoutRows.push({ platform: storefrontSubCell(k), gross: fmtB(s.gross), service: fmtB(0), net: fmtB(s.net), statusTag: '', weight:'400' });
+          dashPayoutRows.push({ platform: storefrontSubCell(k), gross: fmtB(s.gross), service: fmtB(0), net: fmtB(s.net), netStyle: drNegStyle(s.net), statusTag: '', weight:'400' });
         });
       }
     }
     if (wholesaleRows.length) {
-      dashPayoutRows.push({ platform: wholesaleHeaderCell, gross: fmtB(wholesale.gross), service: fmtB(0), net: fmtB(wholesale.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: wholesaleHeaderCell, gross: fmtB(wholesale.gross), service: fmtB(0), net: fmtB(wholesale.net), netStyle: drNegStyle(wholesale.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
     }
     // Each delivery-platform row expands into its per-brand breakdown (same interaction
     // as the หน้าร้าน row) — sub-rows are grouped from each sale's brand, so they always
@@ -6891,7 +6893,7 @@ class Component extends DCLogic {
     dashDeliveryPlatforms.filter(p => byChannel[p]).forEach(p => {
       const g = byChannel[p];
       const hasWaiting = salesRows.some(r => r.platform === p && r.status === 'รอรับเงิน');
-      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), service: fmtB(dashGp(p,g) + dashVat(p) + dashPromo(p)), net: fmtB(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), service: fmtB(dashGp(p,g) + dashVat(p) + dashPromo(p)), net: fmtB(g.net), netStyle: drNegStyle(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (expandedPlatforms[p]) {
         // แยกเป็น "ร้าน" ตามชื่อที่แพลตฟอร์มเรียก ไม่ยุบเป็นแบรนด์ เพราะแบรนด์เดียวมีหลายร้าน
         // และเจ้าของร้านต้องดูออกว่าร้านไหนทำยอดได้เท่าไร (แถวเก่าที่ไม่มีชื่อร้านถอยไปใช้แบรนด์)
@@ -6905,7 +6907,7 @@ class Component extends DCLogic {
         });
         Object.keys(byBrandPlat).sort((a, b) => byBrandPlat[b].gross - byBrandPlat[a].gross).forEach(b => {
           const s = byBrandPlat[b];
-          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), service: fmtB((s.hasGp ? s.gp : s.fee - s.vat) + s.vat + s.promo), net: fmtB(s.net), statusTag: '', weight:'400' });
+          dashPayoutRows.push({ platform: storefrontSubCell(b), gross: fmtB(s.gross), service: fmtB((s.hasGp ? s.gp : s.fee - s.vat) + s.vat + s.promo), net: fmtB(s.net), netStyle: drNegStyle(s.net), statusTag: '', weight:'400' });
         });
       }
     });
@@ -6917,7 +6919,7 @@ class Component extends DCLogic {
       const totalVat = sumBy(p=>dashVat(p));
       const totalPromo = sumBy(p=>dashPromo(p));
       const totalNet = sumBy((p,g)=>g.net);
-      dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), service: fmtB(totalGp + totalVat + totalPromo), net: fmtB(totalNet), statusTag:'—', weight:'700' });
+      dashPayoutRows.push({ platform: React.createElement('span', { style:{ fontWeight:700 } }, 'รวมทั้งหมด'), gross: fmtB(totalGross), service: fmtB(totalGp + totalVat + totalPromo), net: fmtB(totalNet), netStyle: drNegStyle(totalNet), statusTag:'—', weight:'700' });
       // ไม่มีแถว "ส่วนลดรวม" แล้ว เพราะ gross เก็บเป็นยอดหลังหักส่วนลดตั้งแต่ต้น
       // แถว "รวมทั้งหมด" ด้านบนจึงเป็นยอดหลังหักส่วนลดอยู่แล้ว ไม่ต้องกระทบยอดซ้ำ
     }
@@ -6999,7 +7001,7 @@ class Component extends DCLogic {
     // ช่องรายรับใช้สีปกติ · ช่องรายจ่ายเป็นสีแดงทั้งคอลัมน์ (เจ้าของร้านกำหนด 9 ก.ย. 2569)
     // ช่อง 0.00 ยังเป็นเทาทั้งสองฝั่ง เพราะแปลว่า "ไม่มีรายการ" ไม่ใช่ยอดจริง
     const drCell = (v, opt, red) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
-      + (v ? (red ? 'color:#B14A4A;' : '') : 'color:#C2C9D6;') + (opt || '') });
+      + (v ? ((red || v < 0) ? 'color:#B14A4A;' : '') : 'color:#C2C9D6;') + (opt || '') });
     const drTotals = { in:{}, exp:{}, income:0, expense:0, left:0 };
     const dailyReportRows = drDates.map(iso => {
       const b = drByDate[iso] || { in:{}, exp:{} };
@@ -7010,7 +7012,7 @@ class Component extends DCLogic {
         drTotals.in[c.key] = (drTotals.in[c.key] || 0) + v;
         cells.push(drCell(v));
       });
-      cells.push(drCell(income, 'font-weight:600;color:#2C4A7C;'));
+      cells.push(drCell(income, 'font-weight:600;color:' + (income < 0 ? '#B14A4A' : '#2C4A7C') + ';'));
       EXPENSE_MAIN_CATS.forEach(c => {
         const v = b.exp[c] || 0; expense += v;
         drTotals.exp[c] = (drTotals.exp[c] || 0) + v;
@@ -7028,9 +7030,10 @@ class Component extends DCLogic {
       };
     });
 
-    const drTotCell = (v, opt) => ({ v: drFmt(v), style: 'padding:11px 8px;text-align:right;white-space:nowrap;font-weight:700;' + (opt || '') });
+    const drTotCell = (v, opt) => ({ v: drFmt(v), style: 'padding:11px 8px;text-align:right;white-space:nowrap;font-weight:700;'
+      + (v < 0 ? 'color:#B14A4A;' : '') + (opt || '') });
     const dailyReportTotalCells = DR_POS_COLS.concat(DR_PLATFORM_COLS).map(c => drTotCell(drTotals.in[c.key] || 0))
-      .concat([drTotCell(drTotals.income, 'color:#2C4A7C;')])
+      .concat([drTotCell(drTotals.income, 'color:' + (drTotals.income < 0 ? '#B14A4A' : '#2C4A7C') + ';')])
       .concat(EXPENSE_MAIN_CATS.map(c => drTotCell(drTotals.exp[c] || 0, 'color:#B14A4A;')))
       .concat([drTotCell(drTotals.expense, 'color:#B14A4A;'),
                drTotCell(drTotals.left, 'color:' + (drTotals.left < 0 ? '#B14A4A' : '#2E7D5B') + ';')]);
