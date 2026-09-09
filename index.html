@@ -158,49 +158,6 @@
             </div>
           </sc-if>
         </div>
-        <div data-brand-dd="1" style="position:relative">
-          <div onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
-              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
-                </sc-for>
-              </div>
-              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
-                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
-                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
-                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
-                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
-                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
-                  <span style="color:#5A6478">{{ rangeLabel }}</span>
-                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
-                </div>
-              </div>
-            </div>
-          </sc-if>
-        </div>
-        <div data-channel-dd="1" style="position:relative">
-          <div onClick="{{ toggleChannel }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่องทางขาย:</span><span style="font-weight:600">{{ channel }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ channelOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
-              <sc-for list="{{ channelOptions }}" as="opt" hint-placeholder-count="6">
-                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="arrow-left-right" style="width:16px;height:16px"></i><span>แยกยอดขายกับเงินเข้าจริง</span></div>
         <div style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
@@ -5860,7 +5817,14 @@ class Component extends DCLogic {
     const ovNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const ovEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const ovSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
-    const ovRows = this.applySalesFilters(this.state.recentRows);
+    // หน้าภาพรวมไม่มีตัวกรองแบรนด์/ช่องทางแล้ว (นำออก 9 ก.ย. 2569) จึงกรองแค่ช่วงเวลา
+    // ถ้าเรียก applySalesFilters จะติดค่าที่ตั้งไว้จากหน้ายอดขาย ทั้งที่หน้านี้ไม่มีปุ่มให้เห็นว่าติดอยู่
+    const ovPeriodOnly = rows => {
+      const rng = this.periodRange();
+      const out = this.salesOnly(rows);
+      return rng ? out.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to) : out;
+    };
+    const ovRows = ovPeriodOnly(this.state.recentRows);
     const ovExpRows = this.applyExpenseFilters(this.state.expRows);
     const ovTodayISOStr = todayISO();
     const ovIsToday = r => { try { return beShortToISO(r.date) === ovTodayISOStr; } catch (e) { return false; } };
@@ -5890,18 +5854,8 @@ class Component extends DCLogic {
       const p0 = new Date(p1.getTime() - (days - 1) * 86400000);
       ovPrevRng = { from: ovISO(p0), to: ovISO(p1) };
     }
-    const ovNonPeriodFilters = rows => {
-      const { brand, channel, saleType } = this.state;
-      let out = this.salesOnly(rows);
-      if (brand && brand !== 'ทุกแบรนด์') out = out.filter(r => r.brand === brand);
-      if (channel && channel !== 'ทุกช่องทาง') out = out.filter(r => r.platform === channel);
-      if (saleType && saleType !== 'ทุกประเภท') {
-        if (saleType === 'Retail Sales (หน้าร้าน)') out = out.filter(r => r.platform === 'หน้าร้าน');
-        else if (saleType === 'Delivery Platform') out = out.filter(r => ['Grab', 'LINE MAN', 'ShopeeFood'].includes(r.platform));
-        else out = out.filter(() => false);
-      }
-      return out;
-    };
+    // ต้องกรองแบบเดียวกับ ovRows เป๊ะ ๆ ไม่งั้นตัวเลข "เทียบช่วงก่อน" จะคนละฐานกับการ์ด
+    const ovNonPeriodFilters = rows => this.salesOnly(rows);
     const ovInRng = (rows, rng) => rng ? rows.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to) : [];
     const ovPrevRows = ovInRng(ovNonPeriodFilters(this.state.recentRows), ovPrevRng);
     const ovPrevExpRows = ovInRng(this.state.expRows, ovPrevRng);
