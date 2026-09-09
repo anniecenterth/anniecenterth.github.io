@@ -804,11 +804,24 @@
           </tbody>
         </table>
         </div>
-        <div style="margin-top:13px;font-size:11.5px;color:#9AA3B2;line-height:1.6">ไม่แสดงเบอร์โทร/อีเมลของลูกค้าในหน้านี้ · จัดการสมาชิกรายคนทำที่ระบบ CRM โดยตรง</div>
+        <div style="margin-top:13px;font-size:11.5px;color:#9AA3B2;line-height:1.6">ไม่แสดงเบอร์โทร/อีเมลของลูกค้าในหน้านี้ · จัดการสมาชิกรายคนทำที่ระบบ CRM โดยตรง · <span onClick="{{ disconnectCrm }}" style="cursor:pointer;text-decoration:underline">ตัดการเชื่อมระบบสมาชิก</span></div>
       </div>
       </sc-if>
       <sc-if value="{{ !crmHas }}" hint-placeholder-val="{{ false }}">
-        <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:52px 24px;text-align:center;color:#8089A0"><div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">{{ crmStatusLabel }}</div><div style="font-size:13px;line-height:1.6">หน้านี้ดึงข้อมูลจากระบบสมาชิก annie-crm โดยตรง</div></div>
+        <div style="background:#fff;border:1px dashed #DFE2E7;border-radius:16px;padding:34px 24px;text-align:center;color:#8089A0">
+          <div style="font-size:15px;font-weight:600;color:#5A6478;margin-bottom:6px">{{ crmStatusLabel }}</div>
+          <div style="font-size:13px;line-height:1.6;margin-bottom:20px">หน้านี้ดึงข้อมูลจากระบบสมาชิก annie-crm ซึ่งเป็นคนละระบบกับ Command Center จึงต้องใส่รหัสของระบบสมาชิกอีกครั้ง (ใส่ครั้งเดียว เครื่องนี้จะจำไว้)</div>
+          <div style="max-width:340px;margin:0 auto;text-align:left">
+            <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ชื่อผู้ใช้ระบบสมาชิก</div>
+            <input value="{{ crmConnUser }}" onChange="{{ setCrmConnUser }}" onKeyDown="{{ onCrmConnKeyDown }}" autocomplete="username" placeholder="admin" style="width:100%;border:1px solid #DFE2E7;border-radius:11px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:13px"/>
+            <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">รหัสผ่าน</div>
+            <input value="{{ crmConnPassword }}" onChange="{{ setCrmConnPassword }}" onKeyDown="{{ onCrmConnKeyDown }}" type="password" autocomplete="current-password" style="width:100%;border:1px solid #DFE2E7;border-radius:11px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px"/>
+            <sc-if value="{{ crmConnError }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#FDF1F1;border:1px solid #F0D2D2;color:#B14A4A;border-radius:11px;padding:11px 14px;font-size:13px;margin-bottom:14px">{{ crmConnError }}</div>
+            </sc-if>
+            <div onClick="{{ connectCrm }}" style="background:#2C4A7C;color:#fff;border-radius:12px;padding:13px;font-size:14px;font-weight:600;text-align:center;cursor:pointer">{{ crmConnLabel }}</div>
+          </div>
+        </div>
       </sc-if>
     </div>
     </sc-if>
@@ -4357,6 +4370,7 @@ class Component extends DCLogic {
     purchaseRows: [], purchaseError: '', procSearch: '', procExpanded: '',
     crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
     accessRows: [], accessLoaded: false,
+    crmConnUser: '', crmConnPassword: '', crmConnBusy: false, crmConnError: null,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
     storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' },
@@ -4502,6 +4516,31 @@ class Component extends DCLogic {
       this.setState({ accessRows: [], accessLoaded: true });
     }
   };
+  /** เชื่อมระบบสมาชิกด้วยตัวเอง — annie-crm เป็นคนละโปรเจค Supabase จึงต้องล็อกอินแยก
+   *  เดิมพยายามล็อกอินให้อัตโนมัติตอนเข้าระบบด้วยรหัสเดียวกัน ซึ่งพังเงียบถ้ารหัสสองระบบไม่ตรงกัน
+   *  ปุ่มนี้ให้เจ้าของกรอกรหัสของ annie-crm เองครั้งเดียว แล้ว session เก็บไว้ในเครื่อง */
+  connectCrm = async () => {
+    if (this.state.crmConnBusy) return;
+    const raw = (this.state.crmConnUser || '').trim();
+    const email = raw.indexOf('@') >= 0 ? raw : (raw ? raw + '@annie.local' : '');
+    if (!email || !this.state.crmConnPassword) {
+      this.setState({ crmConnError: 'ใส่ชื่อผู้ใช้และรหัสผ่านของระบบสมาชิกให้ครบก่อน' }); return;
+    }
+    this.setState({ crmConnBusy: true, crmConnError: null });
+    const res = await crmClient.auth.signInWithPassword({ email, password: this.state.crmConnPassword });
+    if (res.error) {
+      this.setState({ crmConnBusy: false, crmConnPassword: '',
+        crmConnError: 'เชื่อมไม่สำเร็จ — ตรวจชื่อผู้ใช้และรหัสผ่านของระบบสมาชิกอีกครั้ง' });
+      return;
+    }
+    this.setState({ crmConnBusy: false, crmConnPassword: '', crmConnError: null });
+    await this.loadCrm();
+  };
+  disconnectCrm = async () => {
+    try { await crmClient.auth.signOut(); } catch (e) { /* ตัดการเชื่อมฝั่งเว็บให้ได้เสมอ */ }
+    this.setState({ crmMembers: [], crmTiers: [], crmCoupons: [], crmLoaded: true,
+      crmError: 'ยังไม่ได้เชื่อมระบบสมาชิก' });
+  };
   loadCrm = async () => {
     try {
       // session ของ annie-crm ฟื้นจาก localStorage แบบ async — ถ้ายิง select ก่อนมันพร้อม
@@ -4509,7 +4548,7 @@ class Component extends DCLogic {
       const crmSess = await crmClient.auth.getSession();
       if (!crmSess.data || !crmSess.data.session) {
         this.setState({ crmMembers: [], crmTiers: [], crmCoupons: [], crmLoaded: true,
-          crmError: 'ยังไม่ได้เชื่อมระบบสมาชิก — ออกจากระบบแล้วเข้าสู่ระบบใหม่อีกครั้ง' });
+          crmError: 'ยังไม่ได้เชื่อมระบบสมาชิก' });
         return;
       }
       const [mem, tie, cou] = await Promise.all([
@@ -6407,6 +6446,10 @@ class Component extends DCLogic {
       spend: crmFmt(crmNum(m.spend))
     }));
     const crmStatusLabel = this.state.crmError ? this.state.crmError : (this.state.crmLoaded ? 'เชื่อมกับ annie-crm แล้ว' : 'กำลังโหลด…');
+    const setCrmConnUser = e => { const v = e.target.value; this.setState({ crmConnUser: v }); };
+    const setCrmConnPassword = e => { const v = e.target.value; this.setState({ crmConnPassword: v }); };
+    const onCrmConnKeyDown = e => { if (e.key === 'Enter') this.connectCrm(); };
+    const crmConnLabel = this.state.crmConnBusy ? 'กำลังเชื่อม…' : 'เชื่อมระบบสมาชิก';
     const crmStatusOk = !this.state.crmError && crmHas;
     const exportMembersCsv = () => {
       const lines = [csvRow(['อันดับ','ชื่อ','รหัสสมาชิก','ระดับ','ดาวสะสม','ยอดใช้จ่าย (฿)'])];
@@ -8515,6 +8558,10 @@ class Component extends DCLogic {
       monthlyRows, exportMonthlyCsv,
       productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
       dataSourceRows, dsKpis, exportDataSourcesCsv,
+      crmConnUser: this.state.crmConnUser, crmConnPassword: this.state.crmConnPassword,
+      crmConnError: this.state.crmConnError, crmConnBusy: this.state.crmConnBusy, crmConnLabel,
+      setCrmConnUser, setCrmConnPassword, onCrmConnKeyDown,
+      connectCrm: () => this.connectCrm(), disconnectCrm: () => this.disconnectCrm(),
       crmKpis, crmTierRows, crmTierDonut, crmTierTotalLabel, crmSignupSpark, crmSignup14, crmTopRows, crmStatusLabel, crmStatusOk, crmHas, exportMembersCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
