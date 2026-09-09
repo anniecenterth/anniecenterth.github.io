@@ -3255,6 +3255,50 @@
       </div>
 
 
+      <!-- ตารางรายวันของหน้าร้าน แยกตามวิธีชำระเงิน -->
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+          <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายหน้าร้านรายวัน</h3>
+          <span style="font-size:12.5px;color:#9AA3B2">{{ headerDateDisplay }}</span>
+        </div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">แสดงเฉพาะวันที่มียอดในช่องใดช่องหนึ่ง · เรียงวันล่าสุดขึ้นก่อน</div>
+        <sc-if value="{{ salesDailyHasRows }}" hint-placeholder-val="{{ true }}">
+          <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:900px">
+            <thead>
+              <tr style="color:#5A6478;font-size:11.5px;background:#F1F4F8">
+                <th style="padding:10px;font-weight:600;text-align:left;white-space:nowrap;border-bottom:1px solid #DFE4EC">วันที่</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">Cash</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">K+ Shop</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">QR PromptPay (POS Pay)</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ไทยช่วยไทย พลัส (หน้าร้าน)</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">Split Amount</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ขายส่ง</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">รวม</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ salesDailyRows }}" as="r" hint-placeholder-count="10">
+                <tr style="{{ r.rowStyle }}">
+                  <td style="padding:11px 10px;white-space:nowrap">{{ r.date }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.cash }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.kplus }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.pospay }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.subsidy }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.split }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.wholesale }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap;font-weight:600">{{ r.total }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          </div>
+        </sc-if>
+        <sc-if value="{{ !salesDailyHasRows }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:34px 10px;text-align:center;color:#9AA3B2;font-size:13px">ช่วงวันที่ที่เลือกยังไม่มียอดขายหน้าร้าน</div>
+        </sc-if>
+      </div>
+
       <!-- FORM: บันทึกยอดขายหน้าร้าน — กรอกทุกประเภทการชำระเงิน บันทึกครั้งเดียว -->
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
@@ -7380,6 +7424,40 @@ class Component extends DCLogic {
       { title:'Net Sales ' + skRangeSuffix, amount:skFmt(skNetRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
       { title:'Net Payout รอรับ', amount:skFmt(skReceivable), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'file-text', bg:'#F8F0DC', fg:'#D98A4C', info:false }
     ];
+    // ---- ตารางรายวันของหน้าร้าน แยกตามวิธีชำระเงิน (เจ้าของร้านกำหนด 6 ช่องนี้ 9 ก.ย. 2569) ----
+    // วิธีชำระอื่นที่ไม่อยู่ใน 6 ช่องนี้จะไม่ถูกนับ เช่น "โอนเงิน" ที่ใช้ช่วง ม.ค.–ก.พ. 2569
+    // ก่อน FoodStory เปลี่ยนชื่อเป็น QR PromptPay (POS Pay) — จงใจตามที่สั่ง ไม่ใช่ตกหล่น
+    const SK_PAY_COLS = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', 'ขายส่ง'];
+    const SK_PAY_FIELDS = ['cash', 'kplus', 'pospay', 'subsidy', 'split', 'wholesale'];
+    const skDayMap = {};
+    skMonthRows.filter(r => r.platform === 'หน้าร้าน' && SK_PAY_COLS.indexOf(r.payment) >= 0).forEach(r => {
+      const iso = r.isoDate || safeBeShortToISO(r.date);
+      if (!iso) return;
+      const d = skDayMap[iso] || (skDayMap[iso] = {});
+      d[r.payment] = (d[r.payment] || 0) + r.gross;
+    });
+    const skDayKeys = Object.keys(skDayMap).sort().reverse();
+    const skCell = v => v ? skFmt(v) : '—';
+    const salesDailyRows = skDayKeys.map(iso => {
+      const d = skDayMap[iso];
+      const row = { date: isoToBEShort(iso), total: skFmt(SK_PAY_COLS.reduce((a, k) => a + (d[k] || 0), 0)) };
+      SK_PAY_COLS.forEach((k, i) => { row[SK_PAY_FIELDS[i]] = skCell(d[k]); });
+      return row;
+    });
+    if (salesDailyRows.length) {
+      const sum = k => skDayKeys.reduce((a, iso) => a + (skDayMap[iso][k] || 0), 0);
+      const totalRow = { date: 'รวม ' + skDayKeys.length + ' วัน', total: skFmt(SK_PAY_COLS.reduce((a, k) => a + sum(k), 0)), isTotal: true };
+      SK_PAY_COLS.forEach((k, i) => { totalRow[SK_PAY_FIELDS[i]] = skCell(sum(k)); });
+      salesDailyRows.push(totalRow);
+    }
+    const salesDailyHasRows = salesDailyRows.length > 0;
+    const salesDailyRowsStyled = salesDailyRows.map(r => ({
+      ...r,
+      rowStyle: r.isTotal
+        ? { borderTop: '2px solid #DFE4EC', background: '#F7F9FC', fontWeight: 700, color: '#1B2536' }
+        : { borderTop: '1px solid #F1F2F4', color: '#2B3547' }
+    }));
+
     const skPlatformColors = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245', 'หน้าร้าน':'#3A5A8C' };
     const skPlatformOrder = ['Grab','LINE MAN','ShopeeFood','หน้าร้าน'];
     const byPlatformSk = this.groupBy(skMonthRows, r => r.platform);
@@ -8215,6 +8293,7 @@ class Component extends DCLogic {
       salesKpis, platformTabs, platformDD, brandDD, typeDD, paymentDD, statusDD,
       form: f, netSales, netPayout, setGross, setDiscount, setFee, setPromo, setNote, setOrderId,
       dateOpen, toggleDate, setDate, dateDisplay: isoToBEFull(f.date),
+      salesDailyRows: salesDailyRowsStyled, salesDailyHasRows,
       headerDateDisplay, headerDateLabel, salesHeaderDateOpen, toggleSalesHeaderDate,
       salesHeadFrom: skFrom, salesHeadTo: skTo, setSalesHeadFrom, setSalesHeadTo, salesHeadPresets, clearSalesHead,
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
