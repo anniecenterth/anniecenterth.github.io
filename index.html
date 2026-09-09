@@ -6993,15 +6993,13 @@ class Component extends DCLogic {
       .concat(DR_POS_COLS.map(c => drNumHead(c.label)))
       .concat(DR_PLATFORM_COLS.map(c => drNumHead(c.label)))
       .concat([drNumHead('รวมรับ', '#2C4A7C')])
-      .concat(EXPENSE_MAIN_CATS.map(c => drNumHead(DR_EXP_SHORT[c] || c)))
+      .concat(EXPENSE_MAIN_CATS.map(c => drNumHead(DR_EXP_SHORT[c] || c, '#B14A4A')))
       .concat([drNumHead('รวมจ่าย', '#B14A4A'), drNumHead('คงเหลือ', '#1B2536')]);
 
-    // ตัวเลขที่มียอดแต่ไม่ถึง 1,000 ใส่สีแดง — เจ้าของร้านใช้กวาดตาหาช่องที่ยอดตก
-    // ช่อง 0.00 ยังเป็นเทาเหมือนเดิม เพราะแปลว่า "ไม่มีรายการ" ไม่ใช่ "ยอดน้อย"
-    // คอลัมน์สรุป (รวมรับ/รวมจ่าย/คงเหลือ) ไม่แตะ เพราะมีสีบอกความหมายของตัวเองอยู่แล้ว
-    const DR_LOW = 1000;
-    const drCell = (v, opt) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
-      + (v ? (opt ? '' : (v < DR_LOW ? 'color:#B14A4A;font-weight:600;' : '')) : 'color:#C2C9D6;') + (opt || '') });
+    // ช่องรายรับใช้สีปกติ · ช่องรายจ่ายเป็นสีแดงทั้งคอลัมน์ (เจ้าของร้านกำหนด 9 ก.ย. 2569)
+    // ช่อง 0.00 ยังเป็นเทาทั้งสองฝั่ง เพราะแปลว่า "ไม่มีรายการ" ไม่ใช่ยอดจริง
+    const drCell = (v, opt, red) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
+      + (v ? (red ? 'color:#B14A4A;' : '') : 'color:#C2C9D6;') + (opt || '') });
     const drTotals = { in:{}, exp:{}, income:0, expense:0, left:0 };
     const dailyReportRows = drDates.map(iso => {
       const b = drByDate[iso] || { in:{}, exp:{} };
@@ -7016,7 +7014,7 @@ class Component extends DCLogic {
       EXPENSE_MAIN_CATS.forEach(c => {
         const v = b.exp[c] || 0; expense += v;
         drTotals.exp[c] = (drTotals.exp[c] || 0) + v;
-        cells.push(drCell(v));
+        cells.push(drCell(v, '', true));
       });
       cells.push(drCell(expense, 'font-weight:600;color:#B14A4A;'));
       const left = income - expense;
@@ -7033,7 +7031,7 @@ class Component extends DCLogic {
     const drTotCell = (v, opt) => ({ v: drFmt(v), style: 'padding:11px 8px;text-align:right;white-space:nowrap;font-weight:700;' + (opt || '') });
     const dailyReportTotalCells = DR_POS_COLS.concat(DR_PLATFORM_COLS).map(c => drTotCell(drTotals.in[c.key] || 0))
       .concat([drTotCell(drTotals.income, 'color:#2C4A7C;')])
-      .concat(EXPENSE_MAIN_CATS.map(c => drTotCell(drTotals.exp[c] || 0)))
+      .concat(EXPENSE_MAIN_CATS.map(c => drTotCell(drTotals.exp[c] || 0, 'color:#B14A4A;')))
       .concat([drTotCell(drTotals.expense, 'color:#B14A4A;'),
                drTotCell(drTotals.left, 'color:' + (drTotals.left < 0 ? '#B14A4A' : '#2E7D5B') + ';')]);
     const dailyReportNote = drTrimmed
