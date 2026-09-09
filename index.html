@@ -78,7 +78,7 @@
       <div onClick="{{ goDataSources }}" style="background:rgba(255,255,255,0.12);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:9px 13px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer">ดูแหล่งข้อมูล <i data-lucide="arrow-right" style="width:15px;height:15px"></i></div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;border:1px solid #E7E9ED;cursor:pointer">
+    <div style="display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;border:1px solid #E7E9ED">
       <div style="width:36px;height:36px;border-radius:50%;background:#9C82C4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px;flex:none">A</div>
       <div class="sb-collapse" style="flex:1;line-height:1.2">
         <div style="font-weight:600;font-size:13.5px">Annie Admin</div>
@@ -158,8 +158,8 @@
 
       <!-- filters -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="arrow-left-right" style="width:16px;height:16px"></i><span>แยกยอดขายกับเงินเข้าจริง</span></div>
-        <div style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
+        <div onClick="{{ goInexPage }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="arrow-left-right" style="width:16px;height:16px"></i><span>แยกยอดขายกับเงินเข้าจริง</span></div>
+        <div onClick="{{ goPayout }}" style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
       </div>
 
       <!-- ช่วงเวลาที่การ์ดด้านล่างใช้ + คำเตือนเมื่อข้อมูลของช่วงนั้นยังไม่ครบ -->
@@ -217,7 +217,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);display:flex;flex-direction:column">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามแบรนด์ <span style="color:#9AA3B2;font-weight:500;font-size:13px">{{ ovRangeLabel }}</span></h3>
-            <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
+            <span onClick="{{ goSalesDash }}" style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:18px;flex:1">
             <sc-for list="{{ brandRows }}" as="b" hint-placeholder-count="3">
@@ -243,7 +243,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">รายรับตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">{{ ovRangeLabel }}</span></h3>
-            <span style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
+            <span onClick="{{ goSalesDash }}" style="font-size:12px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูรายงาน</span>
           </div>
           <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
             <div style="position:relative;width:150px;height:150px;flex:none">
@@ -315,7 +315,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
               <h3 style="margin:0;font-size:16px;font-weight:600">ศูนย์แจ้งเตือน CEO</h3>
-              <span style="font-size:12.5px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+              <span onClick="{{ goAlerts }}" style="font-size:12.5px;color:#2C4A7C;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:12px">
               <sc-for list="{{ ceoAlerts }}" as="a" hint-placeholder-count="3">
@@ -325,7 +325,7 @@
                     <div style="font-size:13.5px;font-weight:600;color:#222C3D;margin-bottom:3px">{{ a.title }}</div>
                     <div style="font-size:12px;color:#7A8497;line-height:1.4">{{ a.detail }}</div>
                   </div>
-                  <span style="font-size:11.5px;color:#2C4A7C;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
+                  <span onClick="{{ goAlerts }}" style="font-size:11.5px;color:#2C4A7C;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:3px;cursor:pointer">รายละเอียด <i data-lucide="arrow-right" style="width:13px;height:13px"></i></span>
                 </div>
               </sc-for>
             </div>
@@ -406,8 +406,8 @@
             </div>
             </sc-if>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i><span>รีเฟรช</span></div>
-          <div style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
+          <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i><span>รีเฟรช</span></div>
+          <div onClick="{{ goSalesPage }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายการเงินเข้า</span></div>
         </div>
       </div>
       <div style="text-align:right;font-size:12.5px;color:#2E7D5B;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:flex-end;gap:7px"><i data-lucide="circle-check-big" style="width:15px;height:15px"></i>{{ dataAsOfLabel }}</div>
@@ -433,7 +433,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">เงินเข้าระบบตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูรายละเอียด</span>
+            <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูรายละเอียด</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:10px">
             <sc-for list="{{ rcPlatTiles }}" as="p" hint-placeholder-count="5">
@@ -476,7 +476,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">สถานะเงินเข้าจาก Platform</h3>
-            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+            <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <sc-for list="{{ rcPlatStatus }}" as="p" hint-placeholder-count="3">
@@ -507,20 +507,18 @@
           <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">รายการเงินเข้าจริงล่าสุด</h3>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="background:#ECF1F7;color:#2C4A7C;font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:9px;cursor:pointer">ทั้งหมด</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">วันนี้</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">เมื่อวาน</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">7 วันล่าสุด</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:6px 13px;border-radius:9px;border:1px solid #E7E9ED;cursor:pointer">MTD</span>
+              <sc-for list="{{ rcQuickChips }}" as="q" hint-placeholder-count="5">
+                <span onClick="{{ q.onClick }}" style="{{ q.style }}">{{ q.label }}</span>
+              </sc-for>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end">
               <div style="display:flex;align-items:center;gap:8px;background:#F6F6F7;border:1px solid #E7E9ED;border-radius:10px;padding:8px 12px;flex:1;max-width:280px">
                 <i data-lucide="search" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i>
                 <input placeholder="ค้นหารายการ, ช่องทาง, หมายเหตุ..." style="border:none;outline:none;background:transparent;font-size:12px;color:#2B3547;width:100%;font-family:inherit"/>
               </div>
-              <div style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="funnel" style="width:15px;height:15px"></i></div>
-              <div style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="calendar" style="width:15px;height:15px"></i></div>
-              <div style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="download" style="width:15px;height:15px"></i></div>
+              <div onClick="{{ goPayout }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="funnel" style="width:15px;height:15px"></i></div>
+              <div onClick="{{ togglePeriod }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="calendar" style="width:15px;height:15px"></i></div>
+              <div onClick="{{ exportSalesCsv }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="download" style="width:15px;height:15px"></i></div>
             </div>
           </div>
           <div style="overflow-x:auto">
@@ -550,7 +548,7 @@
                   <td style="padding:11px 5px;text-align:right;font-weight:600;white-space:nowrap">{{ r.amount }}</td>
                   <td style="padding:11px 5px;color:#5A6478;white-space:nowrap">{{ r.account }}</td>
                   <td style="padding:11px 5px;text-align:center">{{ r.statusTag }}</td>
-                  <td style="padding:11px 5px;text-align:center"><i data-lucide="file-text" style="width:15px;height:15px;color:#9AA3B2;cursor:pointer"></i></td>
+                  <td onClick="{{ goPayout }}" style="padding:11px 5px;text-align:center"><i data-lucide="file-text" style="width:15px;height:15px;color:#9AA3B2;cursor:pointer"></i></td>
                   <td style="padding:11px 5px;text-align:center">{{ r.actions }}</td>
                 </tr>
               </sc-for>
@@ -567,7 +565,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
               <h3 style="margin:0;font-size:15px;font-weight:600">สรุปเงินเข้าบัญชี <span style="color:#9AA3B2;font-weight:500;font-size:12px">(MTD)</span></h3>
-              <span style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+              <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:13px">
               <sc-for list="{{ rcBankRows }}" as="b" hint-placeholder-count="3">
@@ -587,7 +585,7 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
               <h3 style="margin:0;font-size:15px;font-weight:600">เตือนความเสี่ยง / AI Alert</h3>
-              <span style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
+              <span onClick="{{ goAlerts }}" style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:11px">
               <sc-for list="{{ rcAlerts }}" as="a" hint-placeholder-count="3">
@@ -597,7 +595,7 @@
                     <div style="font-size:12px;font-weight:600;color:#2B3547">{{ a.title }}</div>
                     <div style="font-size:10.5px;color:#8089A0">{{ a.desc }}</div>
                   </div>
-                  <span style="font-size:10.5px;color:#2C4A7C;font-weight:600;cursor:pointer;white-space:nowrap;flex:none">รายละเอียด →</span>
+                  <span onClick="{{ goAlerts }}" style="font-size:10.5px;color:#2C4A7C;font-weight:600;cursor:pointer;white-space:nowrap;flex:none">รายละเอียด →</span>
                 </div>
               </sc-for>
             </div>
@@ -1113,7 +1111,7 @@
             </div>
             </sc-if>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
+          <div onClick="{{ goSalesDash }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
         </div>
       </div>
 
@@ -1150,7 +1148,7 @@
           </sc-if>
         </div>
         <div style="flex:1"></div>
-        <div style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
+        <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
       </div>
 
       <!-- KPI grid -->
@@ -1293,9 +1291,9 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:9px">
               <h3 style="margin:0;font-size:16px;font-weight:600;white-space:nowrap">รายการล่าสุด</h3>
-              <span style="background:#ECF1F7;color:#2C4A7C;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:8px;cursor:pointer">ทั้งหมด</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:8px;border:1px solid #E7E9ED;cursor:pointer">รายรับ</span>
-              <span style="color:#7A8497;font-size:11.5px;font-weight:500;padding:4px 11px;border-radius:8px;border:1px solid #E7E9ED;cursor:pointer">รายจ่าย</span>
+              <sc-for list="{{ inexRecentTabs }}" as="t" hint-placeholder-count="3">
+                <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+              </sc-for>
             </div>
             <div style="display:flex;align-items:center;gap:8px;background:#F6F6F7;border:1px solid #E7E9ED;border-radius:10px;padding:8px 12px;width:230px">
               <i data-lucide="search" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i>
@@ -1328,7 +1326,7 @@
               </sc-for>
             </tbody>
           </table>
-          <div style="text-align:center;margin-top:14px"><span style="color:#2C4A7C;font-size:12.5px;font-weight:600;cursor:pointer">ดูรายการเพิ่มเติม →</span></div>
+          <div style="text-align:center;margin-top:14px"><span onClick="{{ toggleInexRecentAll }}" style="color:#2C4A7C;font-size:12.5px;font-weight:600;cursor:pointer">{{ inexRecentMoreLabel }}</span></div>
         </div>
 
         <!-- channels + alerts -->
@@ -1360,7 +1358,7 @@
                   <div style="width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:{{ a.bg }};color:{{ a.fg }}"><i data-lucide="{{ a.icon }}" style="width:16px;height:16px"></i></div>
                   <div style="font-size:12.5px;font-weight:600;color:#2B3547;line-height:1.3">{{ a.title }}</div>
                   <div style="font-size:11px;color:#8089A0;line-height:1.4">{{ a.desc }}</div>
-                  <span style="font-size:11.5px;font-weight:600;cursor:pointer;color:{{ a.actionColor }}">{{ a.action }}</span>
+                  <span onClick="{{ a.onClick }}" style="font-size:11.5px;font-weight:600;cursor:pointer;color:{{ a.actionColor }}">{{ a.action }}</span>
                 </div>
               </sc-for>
             </div>
@@ -1408,7 +1406,7 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px"><i data-lucide="sparkles" style="width:17px;height:17px;color:#7A5BA8"></i>AI Insight แนะนำ</h3>
-            <span style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดู AI Insights ทั้งหมด →</span>
+            <span onClick="{{ goAlerts }}" style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดู AI Insights ทั้งหมด →</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
             <sc-for list="{{ inexInsights }}" as="g" hint-placeholder-count="3">
@@ -1417,7 +1415,7 @@
                 <div style="font-size:13px;font-weight:600;color:#2B3547">{{ g.title }}</div>
                 <div style="font-size:11px;color:#7A8497;line-height:1.45">{{ g.desc }}</div>
                 <div style="font-size:11px;color:#5A6478;line-height:1.45">{{ g.rec }}</div>
-                <span style="margin-top:auto;font-size:11.5px;font-weight:600;text-align:center;padding:8px 10px;border-radius:9px;cursor:pointer;background:#F3F6FA;color:#2C4A7C">{{ g.action }}</span>
+                <span onClick="{{ g.onClick }}" style="margin-top:auto;font-size:11.5px;font-weight:600;text-align:center;padding:8px 10px;border-radius:9px;cursor:pointer;background:#F3F6FA;color:#2C4A7C">{{ g.action }}</span>
               </div>
             </sc-for>
           </div>
@@ -1780,8 +1778,8 @@
             </div>
             </sc-if>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
-          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออก</span></div>
+          <div onClick="{{ goInexCompare }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="chart-no-axes-column" style="width:16px;height:16px"></i><span>เปรียบเทียบ</span></div>
+          <div onClick="{{ exportSalesCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออก</span></div>
         </div>
       </div>
 
@@ -1806,7 +1804,7 @@
           </sc-if>
         </div>
         <div style="flex:1"></div>
-        <div style="display:flex;align-items:center;gap:7px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>อัปเดตข้อมูลล่าสุด</span></div>
+        <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:7px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:9px 14px;font-size:13px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>อัปเดตข้อมูลล่าสุด</span></div>
         <span style="font-size:12.5px;color:#9AA3B2">{{ dataAsOfLabel }}</span>
       </div>
 
@@ -1919,7 +1917,7 @@
       <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายแยกตามแบรนด์ และช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-          <span style="display:flex;align-items:center;gap:6px;background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer">ดูรายงานยอดขายทั้งหมด <i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
+          <span onClick="{{ goSalesPage }}" style="display:flex;align-items:center;gap:6px;background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer">ดูรายงานยอดขายทั้งหมด <i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead>
@@ -2436,7 +2434,7 @@
           <div style="font-size:14px;color:#8089A0">เทียบยอดที่ระบบคาดว่าจะได้ กับเงินที่แพลตฟอร์มโอนเข้าบัญชีจริง</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
-          <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วง</span><span style="font-weight:600">7 วันล่าสุด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+          <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วง</span><span style="font-weight:600">7 วันล่าสุด</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
           <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>กระทบยอดใหม่</div>
         </div>
       </div>
@@ -3264,7 +3262,7 @@
           <div onClick="{{ t.onClick }}" style="{{ t.style }}"><span style="{{ t.iconStyle }}">{{ t.iconText }}</span><span>{{ t.label }}</span></div>
         </sc-for>
         <div style="flex:1"></div>
-        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 14px;font-size:13px;cursor:pointer"><i data-lucide="git-branch" style="width:15px;height:15px;color:#8089A0"></i><span style="color:#7A8497">สาขา:</span><span style="font-weight:600">บางโพ</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
+        <div onClick="{{ openBranchNote }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 14px;font-size:13px;cursor:pointer"><i data-lucide="git-branch" style="width:15px;height:15px;color:#8089A0"></i><span style="color:#7A8497">สาขา:</span><span style="font-weight:600">บางโพ</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
       </div>
 
       <!-- KPI grid -->
@@ -4261,6 +4259,7 @@ class Component extends DCLogic {
     editingSlipId: null, slipDraft: null, payrollBusy: false,
     slipImageId: null,
     expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
+    cashInQuick: 'ทั้งหมด', inexRecentType: 'ทั้งหมด', inexRecentAll: false,
     expSortKey: 'date', expSortDir: 'desc',
     expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
     monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
@@ -4856,10 +4855,12 @@ class Component extends DCLogic {
       : { ...base, color:'#7A8497' };
   }
 
-  inexChart(salesRows, expRows, n) {
-    const income = this.dayBucketsGeneric(salesRows, n, r => r.gross);
-    const expense = this.dayBucketsGeneric(expRows, n, r => r.amount);
-    const labels = this.dayBuckets(salesRows, n).map(d => d.label);
+  inexChart(salesRows, expRows, axis) {
+    // อิงช่วงวันที่ที่เลือกด้านบน (เดิมล็อก 14 วันล่าสุด ไม่สนตัวกรอง)
+    const income = this.axisSeries(axis, salesRows, r => r.gross);
+    const expense = this.axisSeries(axis, expRows, r => r.amount);
+    const labels = axis.labels;
+    const n = labels.length;
     const profit = income.map((v, i) => v - expense[i]);
     const W=900,H=320,ml=46,mr=14,mt=22,mb=30, cw=W-ml-mr, ch=H-mt-mb;
     const maxVal = Math.max(1, ...income, ...expense, ...profit.map(Math.abs));
@@ -4872,13 +4873,14 @@ class Component extends DCLogic {
       els.push(React.createElement('line',{key:'g'+g,x1:ml,x2:W-mr,y1:yy(g),y2:yy(g),stroke:'#F1F2F4',strokeWidth:1}));
       els.push(React.createElement('text',{key:'gl'+g,x:ml-8,y:yy(g)+3.5,textAnchor:'end',fontSize:10,fill:'#9AA3B2'}, g===0?'0':Math.round(g/1000)+'K'));
     }
-    const bw=9, gap=3;
+    const bw = Math.max(2, Math.min(9, slot/2 - 2)), gap = Math.min(3, bw*0.4);
+    const labelStride = Math.ceil(n / 16);
     labels.forEach((d,i)=>{
       const cx = ml + slot*i + slot/2;
       const x1 = cx - bw - gap/2, x2 = cx + gap/2;
-      els.push(React.createElement('rect',{key:'in'+i,x:x1,y:yy(income[i]),width:bw,height:Math.max(ch-(yy(income[i])-mt),0),rx:2.5,fill:'#4A6B9E'}));
-      els.push(React.createElement('rect',{key:'ex'+i,x:x2,y:yy(expense[i]),width:bw,height:Math.max(ch-(yy(expense[i])-mt),0),rx:2.5,fill:'#A9BBD6'}));
-      els.push(React.createElement('text',{key:'d'+i,x:cx,y:H-8,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},d));
+      els.push(React.createElement('rect',{key:'in'+i,x:x1,y:yy(income[i]),width:bw,height:Math.max(ch-(yy(income[i])-mt),0),rx:Math.min(2.5,bw/2),fill:'#4A6B9E'}));
+      els.push(React.createElement('rect',{key:'ex'+i,x:x2,y:yy(expense[i]),width:bw,height:Math.max(ch-(yy(expense[i])-mt),0),rx:Math.min(2.5,bw/2),fill:'#A9BBD6'}));
+      if (i % labelStride === 0 || i === n - 1) els.push(React.createElement('text',{key:'d'+i,x:cx,y:H-8,textAnchor:'middle',fontSize:10,fill:'#9AA3B2',fontFamily:"'IBM Plex Sans Thai',sans-serif"},d));
     });
     const pts = profit.map((v,i)=>[ml + slot*i + slot/2, yy(v)]);
     const dp = pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
@@ -6076,14 +6078,35 @@ class Component extends DCLogic {
     const rcRowActions = React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
       React.createElement('i', { 'data-lucide':'pencil', style:{ width:'14px', height:'14px', color:'#9AA3B2', cursor:'pointer' } }),
       React.createElement('i', { 'data-lucide':'trash-2', style:{ width:'14px', height:'14px', color:'#B99090', cursor:'pointer' } }));
-    const rcRows = rcMoneyIn.slice(0, 12).map(r => ({
+    // ชิป ทั้งหมด/วันนี้/เมื่อวาน/7 วันล่าสุด/MTD เดิมเป็นข้อความเฉย ๆ กดไม่ได้ — ต่อสายแล้ว
+    const rcQuick = this.state.cashInQuick || 'ทั้งหมด';
+    const rcYesterdayISO = (() => { const d = new Date(Date.now() - 86400000); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); })();
+    const rcMonthPrefix = rcToday.slice(0, 7);
+    const rcQuickPass = r => {
+      if (rcQuick === 'วันนี้')     return r.isoDate === rcToday;
+      if (rcQuick === 'เมื่อวาน')   return r.isoDate === rcYesterdayISO;
+      if (rcQuick === '7 วันล่าสุด') { const c = new Date(Date.now() - 6 * 86400000); const ci = c.getFullYear() + '-' + String(c.getMonth()+1).padStart(2,'0') + '-' + String(c.getDate()).padStart(2,'0'); return r.isoDate >= ci && r.isoDate <= rcToday; }
+      if (rcQuick === 'MTD')        return (r.isoDate || '').slice(0, 7) === rcMonthPrefix;
+      return true;
+    };
+    const rcQuickRows = rcMoneyIn.filter(rcQuickPass);
+    const rcQuickChips = ['ทั้งหมด','วันนี้','เมื่อวาน','7 วันล่าสุด','MTD'].map(q => ({
+      label: q,
+      onClick: () => this.setState({ cashInQuick: q }),
+      style: q === rcQuick
+        ? { padding:'7px 13px', borderRadius:'9px', fontSize:'12.5px', cursor:'pointer', whiteSpace:'nowrap', background:'#2C4A7C', color:'#fff', fontWeight:600 }
+        : { padding:'7px 13px', borderRadius:'9px', fontSize:'12.5px', cursor:'pointer', whiteSpace:'nowrap', color:'#5A6478' }
+    }));
+    const rcRows = rcQuickRows.slice(0, 12).map(r => ({
       date: r.date, time: r.time || '—', channel: r.platform, chTag: rcChCell(r.platform),
       type: r.brand || '—', detail: r.orderId || '—', amount: rcFmt(r.net), account: '—',
       statusTag: rcRowStatus('เข้าบัญชีแล้ว'), actions: rcRowActions
     }));
-    const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcMoneyIn.length + ' รายการเงินเข้าจริง';
+    const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcQuickRows.length + ' รายการเงินเข้าจริง';
     // กระทบยอดใหม่: pull everything fresh from Supabase
     const refreshData = () => { this.loadSales(); this.loadExpenses(); };
+    // ปุ่ม "ดูทั้งหมด / ดูรายงาน / รายละเอียด" ทั้งหมดพาไปหน้าที่มีข้อมูลเต็มของเรื่องนั้น
+    const goPage = pg => () => this.setState({ page: pg });
     const downloadCsv = (filename, lines) => {
       const csv = '﻿' + lines.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -6413,9 +6436,25 @@ class Component extends DCLogic {
     const inexToTimestamp = (dateBE, time) => { try { return beShortToDate(dateBE).getTime() + (time ? (parseInt(time.split(':')[0],10)*60+parseInt(time.split(':')[1],10)) : 0); } catch (e) { return 0; } };
     const inexIncomeEntries = inexRows.map(r => ({ date: r.date + ' ' + r.time, ts: inexToTimestamp(r.date, r.time), type:'รายรับ', name: r.platform + ' — ' + r.orderId, channel: r.platform, cat:'Sales', amountNum: r.gross, neg:false, status: r.status === 'เงินเข้าจริง' ? 'รับแล้ว' : 'บันทึกแล้ว' }));
     const inexExpenseEntries = inexExpAll.map(r => ({ date: r.date + ' ' + r.time, ts: inexToTimestamp(r.date, r.time), type:'รายจ่าย', name: r.detail, channel: r.mainCat, cat: r.mainCat, amountNum: r.amount, neg:true, status:'บันทึกแล้ว' }));
-    const inexRecent = [...inexIncomeEntries, ...inexExpenseEntries]
-      .sort((a, b) => b.ts - a.ts)
-      .slice(0, 4)
+    // ชิป ทั้งหมด/รายรับ/รายจ่าย และปุ่ม "ดูรายการเพิ่มเติม" เดิมกดไม่ได้ — ต่อสายแล้ว
+    const inexRecentType = this.state.inexRecentType || 'ทั้งหมด';
+    const inexRecentAll = !!this.state.inexRecentAll;
+    const inexRecentTabs = ['ทั้งหมด','รายรับ','รายจ่าย'].map(t => ({
+      label: t,
+      onClick: () => this.setState({ inexRecentType: t }),
+      style: t === inexRecentType
+        ? { background:'#ECF1F7', color:'#2C4A7C', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px', cursor:'pointer' }
+        : { color:'#7A8497', fontSize:'11.5px', fontWeight:500, padding:'4px 11px', borderRadius:'8px', border:'1px solid #E7E9ED', cursor:'pointer' }
+    }));
+    const inexRecentPool = [...inexIncomeEntries, ...inexExpenseEntries]
+      .filter(r => inexRecentType === 'ทั้งหมด' || r.type === inexRecentType)
+      .sort((a, b) => b.ts - a.ts);
+    const inexRecentMoreLabel = inexRecentAll
+      ? 'ย่อรายการ ↑'
+      : (inexRecentPool.length > 4 ? 'ดูรายการเพิ่มเติม (' + inexRecentPool.length + ' รายการ) →' : 'ไม่มีรายการเพิ่มเติม');
+    const toggleInexRecentAll = () => { if (inexRecentPool.length > 4) this.setState(st => ({ inexRecentAll: !st.inexRecentAll })); };
+    const inexRecent = inexRecentPool
+      .slice(0, inexRecentAll ? 50 : 4)
       .map(r => ({ ...r, typeTag: inexTypePill(r.type), statusTag: inexStatusPill(r.status), amountColor: r.neg ? '#2C4A7C' : '#1B2536', amountText: (r.neg ? '-' : '') + inexFmt(r.amountNum) }));
     const inexSummary = [
       { cat:'Sales', income: inexFmt(inexIncomeTotal), expense:'–', net: inexFmt(inexIncomeTotal), netColor:'#2E7D5B', pct: inexIncomeTotal ? '100.0%' : '0.0%' },
@@ -6423,11 +6462,11 @@ class Component extends DCLogic {
     ];
     const inexAlerts = [];
     if (this.state.monthlyBudget && inexExpenseTotal > this.state.monthlyBudget) {
-      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.state.monthlyBudget), action:'ดูรายละเอียด', actionColor:'#B14A4A' });
+      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.state.monthlyBudget), action:'ดูรายละเอียด', actionColor:'#B14A4A', onClick: goPage('expenserec') });
     }
     const inexReceivable = inexRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (inexReceivable > 0) {
-      inexAlerts.push({ icon:'clock', bg:'#FBF5E6', fg:'#B98317', title:'มียอดค้างรับจาก Platform', desc:'ยอดค้างรับ ' + inexFmt(inexReceivable), action:'ตรวจสอบ', actionColor:'#B98317' });
+      inexAlerts.push({ icon:'clock', bg:'#FBF5E6', fg:'#B98317', title:'มียอดค้างรับจาก Platform', desc:'ยอดค้างรับ ' + inexFmt(inexReceivable), action:'ตรวจสอบ', actionColor:'#B98317', onClick: goPage('payout') });
     }
     // No AI backend exists yet — leave empty rather than show fabricated insights.
     const inexInsights = [];
@@ -8232,9 +8271,18 @@ class Component extends DCLogic {
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
+      goAlerts: goPage('alerts'), goPayout: goPage('payout'), goSalesDash: goPage('salesdash'),
+      goSalesPage: goPage('sales'), goExpenseRec: goPage('expenserec'), goReconcile: goPage('reconcile'),
+      // "เปรียบเทียบ" ยังไม่มีหน้ารายงานเปรียบเทียบของตัวเอง — ส่งไปหน้ารายรับ-รายจ่าย
+      // ซึ่งมีตารางสรุปรายเดือนให้เทียบเดือนต่อเดือนได้จริง ใกล้เคียงเจตนาที่สุด
+      goInexPage: goPage('inex'), goInexCompare: goPage('inex'),
+      // ร้านมีสาขาเดียวที่เปิดใช้จริง ปุ่มสาขาจึงบอกสถานะแทนการให้เลือก
+      openBranchNote: () => window.alert('ตอนนี้บันทึกข้อมูลของสาขาบางโพเท่านั้น\nถ้าจะเพิ่มสาขา ตั้งค่าได้ที่หน้าตั้งค่า'),
+      rcQuickChips,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
       inexExpCat, inexExpCatOpen: this.state.inexExpCatOpen, toggleInexExpCat, inexExpCatOptions,
-      inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, 14), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
+      inexRecentTabs, inexRecentMoreLabel, toggleInexRecentAll,
+      inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, this.periodAxis(14)), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       monthlyRows, exportMonthlyCsv,
       productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
       dataSourceRows, dsKpis, exportDataSourcesCsv,
