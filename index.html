@@ -1441,7 +1441,39 @@
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลรายจ่ายทั้งหมดของร้าน</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
-          <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">วันนี้</span><span style="font-weight:600">{{ expHeaderDateDisplay }}</span></div>
+          <div data-period-dd="1" style="position:relative">
+            <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+            <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:50px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                  <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                    <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                    <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                    <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                    <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                    <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                      <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                    <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                      <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                    <span style="color:#5A6478">{{ rangeLabel }}</span>
+                    <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
           <div onClick="{{ exportExpenseCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ดูรายงาน</span></div>
           <div onClick="{{ scrollToExpenseForm }}" style="display:flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:12px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(30,34,41,0.12)"><i data-lucide="plus" style="width:17px;height:17px"></i><span>เพิ่มรายจ่าย</span></div>
         </div>
@@ -1640,22 +1672,6 @@
                 <i data-lucide="search" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i>
                 <input value="{{ expSearch }}" onChange="{{ setExpSearch }}" placeholder="ค้นหารายการ, หมวดหมู่, หมายเหตุ..." style="border:none;outline:none;background:transparent;font-size:12.5px;color:#2B3547;width:100%;font-family:inherit"/>
               </div>
-              <div data-list-dd style="position:relative">
-                <div onClick="{{ expPeriodDD.toggle }}" style="display:flex;align-items:center;gap:6px;border:1px solid #E7E9ED;border-radius:10px;padding:8px 11px;font-size:12.5px;color:#5A6478;cursor:pointer;white-space:nowrap">{{ expPeriodDD.value }}<i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
-                <sc-if value="{{ expPeriodDD.open }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;top:42px;right:0;min-width:150px;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px">
-                    <sc-for list="{{ expPeriodDD.options }}" as="opt" hint-placeholder-count="4"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
-                  </div>
-                </sc-if>
-              </div>
-              <sc-if value="{{ expRangeOpen }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-                  <input value="{{ expRangeFrom }}" onChange="{{ setExpRangeFrom }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
-                  <span style="font-size:12.5px;color:#9AA3B2">ถึง</span>
-                  <input value="{{ expRangeTo }}" onChange="{{ setExpRangeTo }}" type="date" style="border:1px solid #E7E9ED;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none"/>
-                  <div onClick="{{ clearExpRange }}" style="font-size:12.5px;color:#8089A0;cursor:pointer;padding:0 4px">ล้าง</div>
-                </div>
-              </sc-if>
               <div onClick="{{ resetExpFilters }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none" title="ล้างตัวกรองทั้งหมด"><i data-lucide="sliders-horizontal" style="width:15px;height:15px"></i></div>
             </div>
           </div>
@@ -3205,23 +3221,36 @@
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลยอดขายทั้งหมดจาก LINE MAN, Grab และ ShopeeFood</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
-          <div data-form-dd="salesHeaderDate" style="position:relative">
-            <div onClick="{{ toggleSalesHeaderDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">{{ headerDateLabel }}</span><span style="font-weight:600">{{ headerDateDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-            <sc-if value="{{ salesHeaderDateOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:50px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:280px">
-                <div style="font-size:11.5px;color:#9AA3B2;font-weight:600;margin-bottom:8px">ช่วงที่ใช้บ่อย</div>
-                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px">
-                  <sc-for list="{{ salesHeadPresets }}" as="o" hint-placeholder-count="5">
-                    <div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div>
+          <div data-period-dd="1" style="position:relative">
+            <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+            <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:50px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                  <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                    <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
                   </sc-for>
                 </div>
-                <div style="font-size:11.5px;color:#9AA3B2;font-weight:600;margin-bottom:8px">กำหนดเอง</div>
-                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-                  <input value="{{ salesHeadFrom }}" onChange="{{ setSalesHeadFrom }}" type="date" style="flex:1;min-width:0;border:1px solid #E7E9ED;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none;box-sizing:border-box"/>
-                  <span style="font-size:12.5px;color:#9AA3B2">ถึง</span>
-                  <input value="{{ salesHeadTo }}" onChange="{{ setSalesHeadTo }}" type="date" style="flex:1;min-width:0;border:1px solid #E7E9ED;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#5A6478;font-family:inherit;outline:none;box-sizing:border-box"/>
+                <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                    <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                    <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                    <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                    <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                      <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                    <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                      <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                    <span style="color:#5A6478">{{ rangeLabel }}</span>
+                    <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                  </div>
                 </div>
-                <div onClick="{{ clearSalesHead }}" style="margin-top:11px;text-align:center;font-size:12px;font-weight:600;color:#5A6478;cursor:pointer;background:#F6F6F7;border-radius:9px;padding:7px">ล้างช่วง (ดูทั้งหมด)</div>
               </div>
             </sc-if>
           </div>
@@ -6482,42 +6511,13 @@ class Component extends DCLogic {
       const c = map[m] || ['#EEF0F5','#5A6478'];
       return React.createElement('span', { style:{ background:c[0], color:c[1], fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'7px', whiteSpace:'nowrap' } }, m);
     };
-    let efiltered = this.state.expRows;
-    if (this.state.expPeriodFilter === 'เลือกช่วงวันที่') {
-      efiltered = filterByDateRange(efiltered, this.state.expRangeFrom, this.state.expRangeTo);
-    } else if (this.state.expPeriodFilter !== 'ทั้งหมด') {
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      efiltered = efiltered.filter(r => {
-        const d = beShortToDate(r.date);
-        if (this.state.expPeriodFilter === 'วันนี้') return d.getTime() === startOfToday.getTime();
-        if (this.state.expPeriodFilter === '7 วันล่าสุด') { const cutoff = new Date(startOfToday); cutoff.setDate(cutoff.getDate() - 6); return d >= cutoff && d <= startOfToday; }
-        if (this.state.expPeriodFilter === 'เดือนนี้') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-        return true;
-      });
-    }
+    // หน้านี้ใช้ปุ่ม "ช่วงเวลา" ตัวเดียวกับทุกหน้าแล้ว (เจ้าของร้านเลือก 9 ก.ย. 2569)
+    // เดิมมีดรอปดาวน์ของตัวเองในตาราง เลือกที่นี่แล้วหน้าอื่นไม่เปลี่ยนตาม
+    let efiltered = this.applyExpenseFilters(this.state.expRows);
     const eq = (this.state.expSearch || '').trim().toLowerCase();
     if (eq) efiltered = efiltered.filter(r => (r.detail + ' ' + r.mainCat + ' ' + r.subCat).toLowerCase().includes(eq));
 
-    const expPeriodDDOpen = this.state.expListDD === 'period';
-    const expPeriodOptions = ['ทั้งหมด', 'วันนี้', '7 วันล่าสุด', 'เดือนนี้', 'เลือกช่วงวันที่'];
-    const expPeriodDD = {
-      value: this.state.expPeriodFilter === 'เลือกช่วงวันที่' ? dateRangeLabel(this.state.expRangeFrom, this.state.expRangeTo) : this.state.expPeriodFilter,
-      open: expPeriodDDOpen,
-      toggle: () => this.setState(s => ({ expListDD: s.expListDD === 'period' ? null : 'period' })),
-      options: expPeriodOptions.map(o => ({
-        label: o,
-        onClick: () => this.setState({ expPeriodFilter: o, expListDD: null, expPage: 1 }),
-        style: o === this.state.expPeriodFilter ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#ECF1F7', color:'#2C4A7C', fontWeight:600 } : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
-        check: o === this.state.expPeriodFilter ? React.createElement('span', { style:{ color:'#2C4A7C', fontWeight:700 } }, '✓') : null
-      }))
-    };
     // ช่องเลือกช่วงวันที่ โผล่เฉพาะตอนเลือกโหมด "เลือกช่วงวันที่"
-    const expRangeOpen = this.state.expPeriodFilter === 'เลือกช่วงวันที่';
-    const expRangeFrom = this.state.expRangeFrom, expRangeTo = this.state.expRangeTo;
-    const setExpRangeFrom = e => { const v = e.target.value; this.setState({ expRangeFrom: v, expPage: 1 }); };
-    const setExpRangeTo   = e => { const v = e.target.value; this.setState({ expRangeTo: v, expPage: 1 }); };
-    const clearExpRange   = () => this.setState({ expRangeFrom: '', expRangeTo: '', expPeriodFilter: 'ทั้งหมด', expPage: 1 });
 
     const expPageSizeDDOpen = this.state.expListDD === 'pageSize';
     const expPageSizeOptions = [10, 25, 50, 100];
@@ -6531,7 +6531,7 @@ class Component extends DCLogic {
         check: o === this.state.expPageSize ? React.createElement('span', { style:{ color:'#2C4A7C', fontWeight:700 } }, '✓') : null
       }))
     };
-    const resetExpFilters = () => this.setState({ expSearch: '', expPeriodFilter: 'ทั้งหมด', expPage: 1 });
+    const resetExpFilters = () => this.setState({ expSearch: '', expPage: 1 });
 
     // เรียงลำดับตามคอลัมน์ที่กด — ใช้กติกาเดียวกับตารางยอดขาย
     const EXPENSE_SORT = {
@@ -7365,36 +7365,11 @@ class Component extends DCLogic {
     });
     const rowCount = filtered.length ? ((pageStart + 1) + '–' + Math.min(pageStart + this.state.salesPageSize, filtered.length)) : '0';
     const salesTotalCount = filtered.length;
-    // หัวหน้าจอเลือกเป็นช่วงวันที่ได้ ไม่ใช่วันเดียว — การ์ดสรุปและโดนัททั้งหมดอิงช่วงนี้
-    const salesHeaderDateOpen = this.state.formDD === 'salesHeaderDate';
-    const toggleSalesHeaderDate = () => this.setState(s => ({ formDD: s.formDD === 'salesHeaderDate' ? null : 'salesHeaderDate' }));
-    const skFrom = this.state.salesHeadFrom, skTo = this.state.salesHeadTo;
-    const setSalesHeadFrom = e => { const v = e.target.value; this.setState({ salesHeadFrom: v }); };
-    const setSalesHeadTo   = e => { const v = e.target.value; this.setState({ salesHeadTo: v }); };
-    const skMonthBounds = (shift) => {
-      const n = new Date();
-      const first = new Date(n.getFullYear(), n.getMonth() + shift, 1);
-      const last  = new Date(n.getFullYear(), n.getMonth() + shift + 1, 0);
-      const f = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-      return { from: f(first), to: f(last) };
-    };
-    const skDaysAgo = n => {
-      const d = new Date(Date.now() - n * 86400000);
-      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    };
-    const skPreset = (from, to) => () => this.setState({ salesHeadFrom: from, salesHeadTo: to, formDD: null });
-    const salesHeadPresets = [
-      { label: 'วันนี้',      onClick: skPreset(todayISO(), todayISO()) },
-      { label: '7 วันล่าสุด', onClick: skPreset(skDaysAgo(6), todayISO()) },
-      { label: '30 วันล่าสุด', onClick: skPreset(skDaysAgo(29), todayISO()) },
-      { label: 'เดือนนี้',    onClick: skPreset(skMonthBounds(0).from, skMonthBounds(0).to) },
-      { label: 'เดือนก่อน',   onClick: skPreset(skMonthBounds(-1).from, skMonthBounds(-1).to) }
-    ].map(o => ({ ...o, style: { padding:'8px 12px', borderRadius:'9px', fontSize:'12.5px', cursor:'pointer',
-      background: (o.label === 'วันนี้' && skFrom === todayISO() && skTo === todayISO()) ? '#F3F6FA' : 'transparent',
-      color:'#3A4456' } }));
-    const clearSalesHead = () => this.setState({ salesHeadFrom: '', salesHeadTo: '', formDD: null });
-    const headerDateDisplay = (skFrom === todayISO() && skTo === todayISO()) ? 'วันนี้' : dateRangeLabel(skFrom, skTo);
-    const headerDateLabel = 'ช่วงวันที่';
+    // หน้านี้ใช้ปุ่ม "ช่วงเวลา" ตัวเดียวกับทุกหน้าแล้ว (เจ้าของร้านเลือก 9 ก.ย. 2569)
+    // เดิมมี salesHeadFrom/To เป็นของตัวเอง เลือกที่นี่แล้วหน้าอื่นไม่เปลี่ยนตาม
+    const skRng = this.periodRange();
+    const skFrom = skRng ? skRng.from : '', skTo = skRng ? skRng.to : '';
+    const headerDateDisplay = skRng ? dateRangeLabel(skFrom, skTo) : 'ทุกช่วงเวลา';
     const skFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
     const skNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const skEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
@@ -7415,7 +7390,7 @@ class Component extends DCLogic {
     const skAvgPerDay = skDayCount ? skGrossRange / skDayCount : 0;
     const skNetRange = skMonthRows.reduce((a,r)=>a+(r.net||0),0);
     const skReceivable = skRows.filter(r=>r.status==='รอรับเงิน').reduce((a,r)=>a+(r.net||0),0);
-    const skRangeSuffix = (skFrom === todayISO() && skTo === todayISO()) ? 'วันนี้' : 'ในช่วงที่เลือก';
+    const skRangeSuffix = this.state.period === 'วันนี้' ? 'วันนี้' : 'ในช่วงที่เลือก';
     const salesKpis = [
       { title:'ยอดขาย' + skRangeSuffix, amount:skFmt(skGrossRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'เฉลี่ยต่อวัน (' + skDayCount + ' วันที่มีข้อมูล)', amount:skFmt(skAvgPerDay), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
@@ -8272,7 +8247,7 @@ class Component extends DCLogic {
       clearExp, saveExp: saveExp(false), saveExpAndContinue: saveExp(true), expDisplayRows, expRowCount, expTotalCount,
       isEditingExpense, expFormTitle, expClearButtonLabel, expSaveButtonLabel,
       openExpAttachPicker, handleExpAttachChange, removeExpAttachment, hasExpAttachment: !!ef.attachmentName,
-      expPeriodDD, expPageSizeDD, resetExpFilters, scrollToExpenseForm, exportExpenseCsv,
+      expPageSizeDD, resetExpFilters, scrollToExpenseForm, exportExpenseCsv,
       expPage, expTotalPages, expPrevPage, expNextPage,
       expHeadDate, expHeadMainCat, expHeadSubCat, expHeadDetail, expHeadAmount, expHeadPayment,
       todaySpentDisplay: '฿' + expFmt(todaySpent), todayCountDisplay: todayRows.length + ' รายการ',
@@ -8292,15 +8267,12 @@ class Component extends DCLogic {
       salesKpis, platformTabs, platformDD, brandDD, typeDD, paymentDD, statusDD,
       form: f, netSales, netPayout, setGross, setDiscount, setFee, setPromo, setNote, setOrderId,
       dateOpen, toggleDate, setDate, dateDisplay: isoToBEFull(f.date),
-      salesDailyRows: salesDailyRowsStyled, salesDailyHasRows,
-      headerDateDisplay, headerDateLabel, salesHeaderDateOpen, toggleSalesHeaderDate,
-      salesHeadFrom: skFrom, salesHeadTo: skTo, setSalesHeadFrom, setSalesHeadTo, salesHeadPresets, clearSalesHead,
+      salesDailyRows: salesDailyRowsStyled, salesDailyHasRows, headerDateDisplay,
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
       isEditingSales, salesFormTitle, clearButtonLabel, saveButtonLabel: isEditingSales ? 'บันทึกการแก้ไข' : 'บันทึกรายการ',
       salesBranchDD, expBranchDD,
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
       salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
-      expRangeOpen, expRangeFrom, expRangeTo, setExpRangeFrom, setExpRangeTo, clearExpRange,
       salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
       dailyReportRows, dailyReportHeads, dailyReportTotalCells, dailyReportNote,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
