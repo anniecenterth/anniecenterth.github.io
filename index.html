@@ -69,6 +69,11 @@
       </sc-if>
     </div>
 
+    <sc-if value="{{ hasNoAccess }}" hint-placeholder-val="{{ false }}">
+      <div class="sb-collapse" style="display:flex;align-items:flex-start;gap:8px;background:#F9E7EA;border:1px solid #EFC9CE;border-radius:11px;padding:9px 12px;margin-bottom:12px;font-size:11.5px;color:#8E2F36;line-height:1.5">
+        <i data-lucide="lock" style="width:15px;height:15px;flex:none;margin-top:1px"></i><span>บัญชีนี้ยังไม่ได้รับสิทธิ์ดูสาขาใด — ติดต่อเจ้าของร้านให้เปิดสิทธิ์ก่อน</span>
+      </div>
+    </sc-if>
     <sc-if value="{{ isReadOnly }}" hint-placeholder-val="{{ false }}">
       <div class="sb-collapse" style="display:flex;align-items:flex-start;gap:8px;background:#FDF4E7;border:1px solid #F0DCBF;border-radius:11px;padding:9px 12px;margin-bottom:12px;font-size:11.5px;color:#8A5A22;line-height:1.5">
         <i data-lucide="eye" style="width:15px;height:15px;flex:none;margin-top:1px"></i><span>โหมดดูอย่างเดียว — บันทึกหรือแก้ไขข้อมูลไม่ได้</span>
@@ -6209,7 +6214,9 @@ class Component extends DCLogic {
       ? accessRows.map(r => r.branch)
       : BRANCH_OPTIONS.map(b => b.code);
     const canWriteHere = accessRows.some(r => r.branch === activeBranch && r.can_write);
-    const isReadOnly = this.state.accessLoaded && !canWriteHere;
+    const isReadOnly = this.state.accessLoaded && accessRows.length > 0 && !canWriteHere;
+    // ผู้ใช้ที่ยังไม่ได้รับสิทธิ์สาขาไหนเลย จะเห็นตัวเลข 0 ทั้งหน้าโดยไม่รู้สาเหตุ ต้องบอกให้ชัด
+    const hasNoAccess = this.state.accessLoaded && accessRows.length === 0;
     const branchOptionsAllowed = BRANCH_OPTIONS.filter(b => allowedBranches.indexOf(b.code) >= 0);
     const branchDD = {
       value: activeBranchLabel + (isReadOnly ? ' · ดูอย่างเดียว' : ''),
@@ -8469,7 +8476,7 @@ class Component extends DCLogic {
     return {
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
-      activeBranchLabel, branchDD, isReadOnly, canWriteHere, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
+      activeBranchLabel, branchDD, isReadOnly, canWriteHere, hasNoAccess, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       goAlerts: goPage('alerts'), goPayout: goPage('payout'), goSalesDash: goPage('salesdash'),
       goSalesPage: goPage('sales'), goExpenseRec: goPage('expenserec'), goReconcile: goPage('reconcile'),
       // "เปรียบเทียบ" ยังไม่มีหน้ารายงานเปรียบเทียบของตัวเอง — ส่งไปหน้ารายรับ-รายจ่าย
