@@ -55,6 +55,20 @@
       </div>
     </div>
 
+    <div data-branch-dd="1" class="sb-collapse" style="position:relative;margin-bottom:12px">
+      <div onClick="{{ branchDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#F6F7F9;border:1px solid #E7E9ED;border-radius:11px;padding:10px 13px;font-size:13px;cursor:pointer">
+        <span style="display:flex;align-items:center;gap:9px;min-width:0"><i data-lucide="git-branch" style="width:16px;height:16px;color:#8089A0;flex:none"></i><span style="color:#7A8497;flex:none">สาขา</span><span style="font-weight:700;color:#1B2536;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ branchDD.value }}</span></span>
+        <i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i>
+      </div>
+      <sc-if value="{{ branchDD.open }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:46px;left:0;right:0;z-index:60;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.12);padding:6px">
+          <sc-for list="{{ branchDD.options }}" as="opt" hint-placeholder-count="2">
+            <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
     <nav style="display:flex;flex-direction:column;gap:3px;flex:1">
       <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
         <div onClick="{{ item.onClick }}" style="{{ item.style }}">
@@ -95,7 +109,7 @@
 
     <!-- ===================== OVERVIEW PAGE ===================== -->
     <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
-    <div data-screen-label="Overview — สาขาบางโพ">
+    <div data-screen-label="Overview — ภาพรวมสาขา">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
         <sc-for list="{{ overviewTabs }}" as="t" hint-placeholder-count="2">
           <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</div>
@@ -106,10 +120,10 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap">
         <div style="min-width:0;flex:1 1 260px">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;line-height:1.25">ภาพรวมผู้บริหาร — สาขาบางโพ</h1>
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;line-height:1.25">ภาพรวมผู้บริหาร — สาขา{{ activeBranchLabel }}</h1>
             <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap;flex:none">Branch P&L</span>
           </div>
-          <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย และกำไรของสาขาบางโพ</div>
+          <div style="font-size:14px;color:#8089A0">รายรับ รายจ่าย และกำไรของสาขา{{ activeBranchLabel }}</div>
         </div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;width:300px;max-width:100%;color:#9AA3B2">
@@ -367,7 +381,7 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">เงินเข้าระบบ — สาขาบางโพ</h1>
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">เงินเข้าระบบ — สาขา{{ activeBranchLabel }}</h1>
             <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Cash In Dashboard</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ตรวจสอบเงินเข้าจริงจากทุกช่องทาง แบบเรียลไทม์</div>
@@ -1072,10 +1086,10 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">รายรับ-รายจ่าย — สาขาบางโพ</h1>
+            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">รายรับ-รายจ่าย — สาขา{{ activeBranchLabel }}</h1>
             <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">Income & Expense</span>
           </div>
-          <div style="font-size:14px;color:#8089A0">ภาพรวมรายรับ รายจ่าย และโครงสร้างต้นทุนของสาขาบางโพ</div>
+          <div style="font-size:14px;color:#8089A0">ภาพรวมรายรับ รายจ่าย และโครงสร้างต้นทุนของสาขา{{ activeBranchLabel }}</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
           <div data-period-dd="1" style="position:relative">
@@ -1434,7 +1448,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">บันทึกรายจ่าย</h1>
-            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขา{{ activeBranchLabel }}</span>
           </div>
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลรายจ่ายทั้งหมดของร้าน</div>
         </div>
@@ -1739,7 +1753,7 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px 24px;margin-bottom:18px;flex-wrap:wrap">
         <div style="flex:1 1 300px;min-width:0">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
-            <h1 style="margin:0;font-size:25px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;white-space:nowrap">ยอดขาย — สาขาบางโพ</h1>
+            <h1 style="margin:0;font-size:25px;font-weight:700;letter-spacing:-0.4px;color:#1B2536;white-space:nowrap">ยอดขาย — สาขา{{ activeBranchLabel }}</h1>
             <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap">Sales Dashboard</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ภาพรวมยอดขาย แยกตามแบรนด์ ช่องทาง และประเภทการขาย</div>
@@ -3214,7 +3228,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">บันทึกยอดขาย</h1>
-            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขาบางโพ</span>
+            <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สาขา{{ activeBranchLabel }}</span>
           </div>
           <div style="font-size:14px;color:#8089A0">กรอกข้อมูลยอดขายทั้งหมดจาก LINE MAN, Grab และ ShopeeFood</div>
         </div>
@@ -3262,7 +3276,16 @@
           <div onClick="{{ t.onClick }}" style="{{ t.style }}"><span style="{{ t.iconStyle }}">{{ t.iconText }}</span><span>{{ t.label }}</span></div>
         </sc-for>
         <div style="flex:1"></div>
-        <div onClick="{{ openBranchNote }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 14px;font-size:13px;cursor:pointer"><i data-lucide="git-branch" style="width:15px;height:15px;color:#8089A0"></i><span style="color:#7A8497">สาขา:</span><span style="font-weight:600">บางโพ</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
+        <div data-branch-dd="1" style="position:relative">
+          <div onClick="{{ branchDD.toggle }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 14px;font-size:13px;cursor:pointer"><i data-lucide="git-branch" style="width:15px;height:15px;color:#8089A0"></i><span style="color:#7A8497">สาขา:</span><span style="font-weight:600">{{ branchDD.value }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
+          <sc-if value="{{ branchDD.open }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:44px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:180px">
+              <sc-for list="{{ branchDD.options }}" as="opt" hint-placeholder-count="2">
+                <div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
       </div>
 
       <!-- KPI grid -->
@@ -3424,7 +3447,7 @@
           <div style="width:46px;height:46px;border-radius:14px;background:#9C82C4;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:21px;box-shadow:0 6px 14px rgba(124,138,224,0.35)">A</div>
           <div style="line-height:1.2">
             <div style="font-weight:700;font-size:17px;color:#202A3C">Annie Group</div>
-            <div style="font-size:12px;color:#9AA3B2">Command Center · สาขาบางโพ</div>
+            <div style="font-size:12px;color:#9AA3B2">Command Center · สาขา{{ activeBranchLabel }}</div>
           </div>
         </div>
         <div style="font-size:13px;color:#6B7486;margin-bottom:20px;line-height:1.6">ระบบนี้เก็บยอดขาย รายจ่าย และเงินเดือนพนักงาน — ต้องเข้าสู่ระบบก่อนใช้งาน</div>
@@ -3510,11 +3533,33 @@ function saveObject(key, obj) {
 const BRAND_KEYWORDS = [
   { kw: 'หอมมนต์', brand: 'หอมมนต์' },
   { kw: 'hommon', brand: 'หอมมนต์' },
+  { kw: 'midnight', brand: 'MidnightCookies' },
+  { kw: 'มิดไนท์', brand: 'MidnightCookies' },
   { kw: 'สวีทซอฟ', brand: 'AnnieCake' },
   { kw: 'sweet soft', brand: 'AnnieCake' },
   { kw: 'เทศกาล', brand: 'AnnieCake' },
   { kw: 'annie', brand: 'AnnieCake' }
 ];
+/** ทะเบียนร้านแยกตามสาขา — ใช้เดาสาขาจาก Store ID ตอนนำเข้าไฟล์
+ *  ยืนยันโดยเจ้าของร้าน 9 ก.ย. 2569
+ *  บางโพ: ดูที่ [[store-registry-bangpho]] (Store ID ครบใน docs)
+ *  ถนนจันทร์: 2 ร้าน — AnnieCake ถนนจันทร์ กับ MidnightCookies */
+const BRANCH_STORE_IDS = {
+  chanroad: [
+    'e9e01453-3a2b-435e-8a25-dd0f5211168c', '2610826ZG', '10203359',
+    '3f7c9629-f698-44d7-93d9-80536b6864d3', '2281356ou', '10146337'
+  ]
+};
+const BRANCH_STORE_LOOKUP = (function () {
+  const m = {};
+  Object.keys(BRANCH_STORE_IDS).forEach(code => BRANCH_STORE_IDS[code].forEach(id => { m[String(id).toLowerCase()] = code; }));
+  return m;
+})();
+/** สาขาของแถวที่นำเข้า — ดูจาก Store ID ก่อน ถ้าไม่รู้จักถือเป็นสาขาที่กำลังเปิดอยู่ */
+function branchFromStoreId(id, fallback) {
+  const hit = BRANCH_STORE_LOOKUP[String(id || '').toLowerCase()];
+  return hit || fallback || DEFAULT_BRANCH;
+}
 const POS_ALLOWED_PAYMENT_TYPES = ['Cash', 'QR PromptPay (POS Pay)', 'K+shop', 'K+ Shop', 'K+Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount'];
 function detectBrandFromName(name) {
   const lower = String(name || '').toLowerCase();
@@ -3900,6 +3945,16 @@ const APP_PAGES = ['overview','mobile','salesdash','sales','import','payout','re
   'subsidy','inex','expenserec','payroll','tax','taxforms','products','members','marketing',
   'campaign','content','alerts','datasources','settings','procurement'];
 const LAST_PAGE_KEY = 'bangpho_last_page';
+const LAST_BRANCH_KEY = 'annie_last_branch';
+function loadLastBranch() {
+  try {
+    const v = localStorage.getItem(LAST_BRANCH_KEY);
+    return BRANCH_OPTIONS.some(b => b.code === v) ? v : DEFAULT_BRANCH;
+  } catch (e) { return DEFAULT_BRANCH; }
+}
+function saveLastBranch(code) {
+  try { if (BRANCH_OPTIONS.some(b => b.code === code)) localStorage.setItem(LAST_BRANCH_KEY, code); } catch (e) { /* ไม่ใช่เรื่องคอขาดบาดตาย */ }
+}
 function loadLastPage(fallback) {
   try {
     const v = localStorage.getItem(LAST_PAGE_KEY);
@@ -4237,7 +4292,7 @@ class Component extends DCLogic {
     // ---- ระบบเข้าสู่ระบบ ----
     authChecked: false, authSession: null,
     authUser: '', authPassword: '', authError: null, authBusy: false,
-    page: loadLastPage('salesdash'), period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
+    page: loadLastPage('salesdash'), activeBranch: loadLastBranch(), branchDDOpen: false, period: 'เดือนนี้', periodOpen: false, customFrom: '', customTo: '', brand: 'ทุกแบรนด์', brandOpen: false, channel: 'ทุกช่องทาง', channelOpen: false,
     saleType: 'ทุกประเภท', saleTypeOpen: false, inexExpCat: 'ทั้งหมด', inexExpCatOpen: false, storefrontExpanded: false, expandedPlatforms: {}, calMonth: null,
     form: { date: todayISO(), branch: 'บางโพ', platform: 'LINE MAN', brand: 'AnnieCake', type: 'อาหาร / เครื่องดื่ม', orderId: '', payment: 'ลูกค้าชำระเงินปลายทาง (COD)', status: 'รอรับเงิน', gross: '', discount: '', fee: '', promo: '', note: '', attachmentName: '' },
     editingSalesId: null,
@@ -4294,6 +4349,7 @@ class Component extends DCLogic {
       if (this.state.formDD && !e.target.closest('[data-form-dd]')) patch.formDD = null;
       if (this.state.saleTypeOpen && !e.target.closest('[data-saletype-dd]')) patch.saleTypeOpen = false;
       if (this.state.inexExpCatOpen && !e.target.closest('[data-inexcat-dd]')) patch.inexExpCatOpen = false;
+      if (this.state.branchDDOpen && !e.target.closest('[data-branch-dd]')) patch.branchDDOpen = false;
       if (this.state.salesListDD && !e.target.closest('[data-list-dd]')) patch.salesListDD = null;
       if (this.state.expListDD && !e.target.closest('[data-list-dd]')) patch.expListDD = null;
       if (Object.keys(patch).length) this.setState(patch);
@@ -4372,8 +4428,10 @@ class Component extends DCLogic {
       ]);
       const err = emp.error || hol.error || hw.error || ps.error;
       if (err) throw err;
-      this.setState({ employees: emp.data || [], holidays: hol.data || [],
-                      holidayWork: hw.data || [], payslips: ps.data || [], payrollError: null });
+      // แถวเก่าที่ยังไม่มี branch ถือเป็นบางโพ — เติมตั้งแต่ตอนอ่านเข้ามา ofBranch() จะได้ทำงานตรง
+      const wb = arr => (arr || []).map(r => ({ ...r, branch: r.branch || DEFAULT_BRANCH }));
+      this.setState({ employees: wb(emp.data), holidays: wb(hol.data),
+                      holidayWork: hw.data || [], payslips: wb(ps.data), payrollError: null });
     } catch (e) {
       this.setState({ payrollError: 'โหลดข้อมูลเงินเดือนไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
     }
@@ -4396,7 +4454,8 @@ class Component extends DCLogic {
         qty: Number(r.qty) || 0,
         unit: Number(r.unit_price) || 0,
         paid: Number(r.paid_price) || 0,
-        iso: r.purchased_at || ''
+        iso: r.purchased_at || '',
+        branch: r.branch || DEFAULT_BRANCH
       })), purchaseError: '' });
     } catch (err) {
       this.setState({ purchaseError: 'โหลดข้อมูลจัดซื้อไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง' });
@@ -4445,6 +4504,7 @@ class Component extends DCLogic {
     this.icons();
     // จำหน้าปัจจุบันไว้ทุกครั้งที่เปลี่ยนหน้า เพื่อให้รีเฟรชแล้วกลับมาที่เดิม
     if (prevState && prevState.page !== this.state.page) saveLastPage(this.state.page);
+    if (prevState && prevState.activeBranch !== this.state.activeBranch) saveLastBranch(this.state.activeBranch);
   }
   /** วาดไอคอน "ข้างใน" แท็ก <i> แทนการให้ lucide แทนที่ทั้งแท็ก
    *
@@ -4633,8 +4693,17 @@ class Component extends DCLogic {
   }
   // Discount records (platform 'ส่วนลด', captured from the POS report's delivery-row
   // ส่วนลด column) are bookkeeping rows, not sales — every aggregate works on salesOnly().
+  /** สาขาที่กำลังดูอยู่ — ทุกหน้าต้องกรองด้วยตัวนี้ ไม่งั้นยอดสองสาขาจะปนกันเงียบ ๆ */
+  activeBranch() {
+    return this.state.activeBranch || DEFAULT_BRANCH;
+  }
+  /** แถวเก่าที่ยังไม่มีค่า branch ถือเป็นบางโพ (ข้อมูลก่อนเปิดสาขาที่สองทั้งหมดเป็นของบางโพ) */
+  ofBranch(rows) {
+    const b = this.activeBranch();
+    return rows.filter(r => (r.branch || DEFAULT_BRANCH) === b);
+  }
   salesOnly(rows) {
-    return rows.filter(r => r.platform !== 'ส่วนลด');
+    return this.ofBranch(rows).filter(r => r.platform !== 'ส่วนลด');
   }
   /** ส่วนลดที่ต้องหักออกจาก gross — ตอนนี้เป็น 0 เสมอ
    *
@@ -4665,9 +4734,10 @@ class Component extends DCLogic {
     return out;
   }
   applyExpenseFilters(rows) {
+    const out = this.ofBranch(rows);
     const rng = this.periodRange();
-    if (!rng) return rows;
-    return rows.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to);
+    if (!rng) return out;
+    return out.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to);
   }
 
   dayBuckets(rows, n) {
@@ -5033,7 +5103,7 @@ class Component extends DCLogic {
     const pyPeriodDate = pyPeriod + '-01';
     const pyMonthLabel = iso => THAI_MONTHS[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(0, 4) + 543);
 
-    const pyActiveEmps = this.state.employees.filter(e => e.active);
+    const pyActiveEmps = this.ofBranch(this.state.employees).filter(e => e.active);
     const pySetTab = t => () => this.setState({ payrollTab: t });
     const payrollTabs = [['slips', 'สลิปเดือนนี้'], ['employees', 'พนักงาน'], ['calendar', 'ปฏิทินวันหยุด']].map(([k, label]) => ({
       label, onClick: pySetTab(k),
@@ -5061,7 +5131,7 @@ class Component extends DCLogic {
     const payrollPeriodLabel = pyMonthLabel(pyPeriodDate);
 
     // วันหยุดของงวดนี้ พร้อมสถานะที่ติ๊กไว้ของพนักงานแต่ละคน
-    const pyWorksFor = empId => this.state.holidays
+    const pyWorksFor = empId => this.ofBranch(this.state.holidays)
       .filter(h => h.holiday_date.slice(0, 7) === pyPeriod)
       .map(h => {
         const w = this.state.holidayWork.find(x => x.holiday_id === h.id && x.employee_id === empId);
@@ -5324,7 +5394,7 @@ class Component extends DCLogic {
       this.setState({ payrollBusy: false });
     };
 
-    const payrollEmpRows = this.state.employees.map(emp => ({
+    const payrollEmpRows = this.ofBranch(this.state.employees).map(emp => ({
       name: emp.name, salary: pyBaht(emp.base_salary), daily: pyBaht(emp.daily_rate),
       sso: emp.sso_enabled ? 'หัก 5%' : 'ไม่หัก',
       start: emp.start_date ? isoToBEShort(emp.start_date) : '—',
@@ -6105,6 +6175,23 @@ class Component extends DCLogic {
     const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcQuickRows.length + ' รายการเงินเข้าจริง';
     // กระทบยอดใหม่: pull everything fresh from Supabase
     const refreshData = () => { this.loadSales(); this.loadExpenses(); };
+    /** ตัวสลับสาขา — ทุกหน้าอ่านผ่าน ofBranch() จึงเปลี่ยนพร้อมกันทั้งระบบ
+     *  ข้อมูลสองสาขาแยกกันเด็ดขาด ไม่มีหน้าไหนรวมยอดข้ามสาขา (เจ้าของร้านกำหนด 9 ก.ย. 2569) */
+    const activeBranch = this.activeBranch();
+    const activeBranchLabel = branchLabel(activeBranch);
+    const branchDD = {
+      value: activeBranchLabel,
+      open: !!this.state.branchDDOpen,
+      toggle: () => this.setState(st => ({ branchDDOpen: !st.branchDDOpen })),
+      options: BRANCH_OPTIONS.map(b => ({
+        label: b.label,
+        onClick: () => this.setState({ activeBranch: b.code, branchDDOpen: false }),
+        style: b.code === activeBranch
+          ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 }
+          : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
+        check: b.code === activeBranch ? React.createElement('span', { style:{ color:'#223C66', fontWeight:700 } }, '✓') : null
+      }))
+    };
     // ปุ่ม "ดูทั้งหมด / ดูรายงาน / รายละเอียด" ทั้งหมดพาไปหน้าที่มีข้อมูลเต็มของเรื่องนั้น
     const goPage = pg => () => this.setState({ page: pg });
     const downloadCsv = (filename, lines) => {
@@ -6330,7 +6417,7 @@ class Component extends DCLogic {
       .replace(/พร้อมส่ง|ส่งฟรี|ราคาส่ง|ราคาโรงงาน|ขายส่ง/g, ' ')
       .replace(/\(\s*\)/g, ' ').replace(/\[\s*\]/g, ' ')
       .replace(/^[\s\-–·,]+/, '').replace(/\s+/g, ' ').trim();
-    const procRows = this.state.purchaseRows || [];
+    const procRows = this.ofBranch(this.state.purchaseRows || []);
     const procQuery = (this.state.procSearch || '').toLowerCase().trim();
     const procGroupMap = {};
     procRows.forEach(r => {
@@ -7778,11 +7865,15 @@ class Component extends DCLogic {
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       // ต้องพาทุกช่องที่ normalizeImportRow คำนวณไว้ไปด้วย — เดิมสร้างออบเจกต์ใหม่แล้วลืม
       // ส่วนลด/GP/VAT/แถวดิบ/ช่องทางชำระ ค่าจึงหล่นหายก่อนถึงฐานข้อมูลทุกครั้ง
+      // สาขาของแต่ละแถวเดาจาก Store ID ในไฟล์ก่อน ถ้าไม่รู้จักใช้สาขาที่กำลังเปิดอยู่
+      // (ไฟล์ของถนนจันทร์ที่เผลอนำเข้าตอนเปิดบางโพ จะยังลงสาขาถูกเพราะ Store ID บอกได้)
+      const impBranch = this.activeBranch();
       const rowsToInsert = included.map(r => ({
         date: r.date || isoToBEShort(this.state.importReportDate), time: r.time,
         platform: r.platformLabel || r.meta.label, brand: r.brand,
         orderId: r.orderId, gross: r.gross, fee: r.fee, net: r.net, status: r.status,
         discount: r.discount, gp: r.gp, vat: r.vat, raw: r.raw, payment: r.payment, type: r.type,
+        branch: branchFromStoreId(storeIdOf(r.raw), impBranch),
         source: r.meta.label === 'หน้าร้าน' || r.meta.label === 'ส่วนลด' ? 'POS' : 'PLATFORM_IMPORT'
       }));
       try {
@@ -8110,7 +8201,7 @@ class Component extends DCLogic {
      *  ใช้ total_earning (ค่าจ้างก่อนหัก) เพราะ ภ.ง.ด.1 รายงานเงินได้ที่จ่าย ไม่ใช่เงินสดสุทธิ
      *  ช่องภาษีหัก ณ ที่จ่ายไม่เติมให้ เพราะระบบยังไม่คำนวณภาษีรายบุคคล ห้ามเดา */
     const pnd1PeriodLabel = payrollPeriodLabel;
-    const pnd1PaidSlips = this.state.payslips.filter(sl =>
+    const pnd1PaidSlips = this.ofBranch(this.state.payslips).filter(sl =>
       String(sl.period).slice(0, 10) === pyPeriodDate && sl.status === 'จ่ายแล้ว');
     const pnd1HasSlips = pnd1PaidSlips.length > 0;
     const pnd1PullLabel = pnd1HasSlips
@@ -8345,14 +8436,12 @@ class Component extends DCLogic {
     return {
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
-      refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
+      activeBranchLabel, branchDD, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
       goAlerts: goPage('alerts'), goPayout: goPage('payout'), goSalesDash: goPage('salesdash'),
       goSalesPage: goPage('sales'), goExpenseRec: goPage('expenserec'), goReconcile: goPage('reconcile'),
       // "เปรียบเทียบ" ยังไม่มีหน้ารายงานเปรียบเทียบของตัวเอง — ส่งไปหน้ารายรับ-รายจ่าย
       // ซึ่งมีตารางสรุปรายเดือนให้เทียบเดือนต่อเดือนได้จริง ใกล้เคียงเจตนาที่สุด
       goInexPage: goPage('inex'), goInexCompare: goPage('inex'),
-      // ร้านมีสาขาเดียวที่เปิดใช้จริง ปุ่มสาขาจึงบอกสถานะแทนการให้เลือก
-      openBranchNote: () => window.alert('ตอนนี้บันทึกข้อมูลของสาขาบางโพเท่านั้น\nถ้าจะเพิ่มสาขา ตั้งค่าได้ที่หน้าตั้งค่า'),
       rcQuickChips,
       mktAdSpendDisplay: mktFmt(mktAdSpend), mktPerfKpis,
       inexExpCat, inexExpCatOpen: this.state.inexExpCatOpen, toggleInexExpCat, inexExpCatOptions,
