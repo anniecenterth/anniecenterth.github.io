@@ -2143,8 +2143,7 @@
               <th style="padding:0 8px 12px;font-weight:500">Grab</th>
               <th style="padding:0 8px 12px;font-weight:500">LINE MAN</th>
               <th style="padding:0 8px 12px;font-weight:500">ShopeeFood</th>
-              <th style="padding:0 8px 12px;font-weight:500">Custom Cake</th>
-              <th style="padding:0 8px 12px;font-weight:500">Wholesale (บางโพ)</th>
+              <th style="padding:0 8px 12px;font-weight:500">ขายส่ง</th>
               <th style="padding:0 8px 12px;font-weight:500">ยอดขายรวม</th>
               <th style="padding:0 8px 12px;font-weight:500">% ต่อรวม</th>
               <th style="padding:0 8px 12px;font-weight:500">ออเดอร์</th>
@@ -2159,7 +2158,6 @@
                 <td style="padding:13px 8px;text-align:right">{{ r.grab }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.lineman }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.shopee }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.custom }}</td>
                 <td style="padding:13px 8px;text-align:right">{{ r.wholesale }}</td>
                 <td style="padding:13px 8px;text-align:right;font-weight:600">{{ r.total }}</td>
                 <td style="padding:13px 8px;text-align:right;color:#7A8497">{{ r.pct }}</td>
@@ -6965,16 +6963,23 @@ class Component extends DCLogic {
     const dashBrandDonut = salesTotalGross > 0
       ? this.donut(dashBrandRows.map(c => ({ value: byBrand[c.name].gross, color: c.color })), 135, 20)
       : emptyDonut(135, 20);
-    const dashRetailGross = byChannel['หน้าร้าน'] ? byChannel['หน้าร้าน'].gross : 0;
-    const dashDeliveryGross = salesTotalGross - dashRetailGross;
+    // ขายส่งเก็บใน `sales` เป็น platform='หน้าร้าน' payment='ขายส่ง' (คีย์เองผ่านฟอร์ม ไม่ผ่าน POS)
+    // แต่เจ้าของร้านดูเป็นคนละช่องทาง จึงแยกออกจากหน้าร้านทุกที่ที่แบ่งตามประเภทการขาย
+    const WHOLESALE_PAY = 'ขายส่ง';
+    const wholesaleRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment === WHOLESALE_PAY);
+    const wholesale = wholesaleRows.reduce((a, r) => ({ gross: a.gross + r.gross, net: a.net + r.net }), { gross:0, net:0 });
+    const dashStorefrontGross = byChannel['หน้าร้าน'] ? byChannel['หน้าร้าน'].gross : 0;
+    const dashRetailGross = dashStorefrontGross - wholesale.gross;
+    const dashDeliveryGross = salesTotalGross - dashStorefrontGross;
+    const dashPct = v => salesTotalGross ? (v / salesTotalGross * 100).toFixed(1) + '%' : '0%';
+    // ไม่มีหมวด Custom Cake แล้ว — ไม่มีแหล่งข้อมูลรองรับ โชว์ ฿0 ตลอดกาลจึงเป็นตัวเลขหลอก
     const dashTypeRows = [
-      { name:'Retail Sales (หน้าร้าน)', amount:fmtB(dashRetailGross), pct: salesTotalGross ? (dashRetailGross/salesTotalGross*100).toFixed(1)+'%' : '0%', color:'#4A6B9E' },
-      { name:'Delivery Platform Sales', amount:fmtB(dashDeliveryGross), pct: salesTotalGross ? (dashDeliveryGross/salesTotalGross*100).toFixed(1)+'%' : '0%', color:'#4E9E77' },
-      { name:'Custom Cake', amount:fmtB(0), pct:'0%', color:'#9C82C4' },
-      { name:'Wholesale (บางโพ)', amount:fmtB(0), pct:'0%', color:'#D98A4C' }
+      { name:'Retail Sales (หน้าร้าน)', amount:fmtB(dashRetailGross), pct: dashPct(dashRetailGross), color:'#4A6B9E' },
+      { name:'Delivery Platform Sales', amount:fmtB(dashDeliveryGross), pct: dashPct(dashDeliveryGross), color:'#4E9E77' },
+      { name:'ขายส่ง', amount:fmtB(wholesale.gross), pct: dashPct(wholesale.gross), color:'#D98A4C' }
     ];
     const dashTypeDonut = salesTotalGross > 0
-      ? this.donut([{ value: dashRetailGross || 0.0001, color:'#4A6B9E' },{ value: dashDeliveryGross || 0.0001, color:'#4E9E77' }], 135, 20)
+      ? this.donut(dashTypeRows.filter(r => r.pct !== '0%').map(r => ({ value: r.name === 'ขายส่ง' ? wholesale.gross : (r.name === 'Retail Sales (หน้าร้าน)' ? dashRetailGross : dashDeliveryGross), color: r.color })), 135, 20)
       : emptyDonut(135, 20);
     const pIconCell = (name) => {
       const m = { 'Grab':['#E7F1EA','#26663F','G'], 'LINE MAN':['#EFEBF6','#5F4A87','L'], 'ShopeeFood':['#F9ECE7','#A64A31','S'] };
@@ -7021,12 +7026,8 @@ class Component extends DCLogic {
       { title: name, style:{ display:'inline-flex', alignItems:'center', gap:'8px', paddingLeft:'31px', color:'#7A8398', maxWidth:'290px' } },
       React.createElement('span', { style:{ width:'5px', height:'5px', borderRadius:'50%', background:'#C3CAD6', flex:'none' } }),
       React.createElement('span', { style:{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } }, name));
-    // ขายส่งเก็บใน `sales` เป็น platform='หน้าร้าน' payment='ขายส่ง' (คีย์เองผ่านฟอร์ม ไม่ผ่าน POS)
-    // แต่เจ้าของร้านดูเป็นคนละช่องทางกับหน้าร้าน จึงแยกออกมาเป็นหัวข้อหลักของตัวเอง
+    // ขายส่งแยกเป็นหัวข้อหลักของตัวเอง (คำนวณ wholesale ไว้ด้านบนแล้ว)
     // ยอดของหน้าร้านด้านบนถูกหักออกแล้ว แถว "รวมทั้งหมด" จึงยังกระทบยอดเท่าเดิม
-    const WHOLESALE_PAY = 'ขายส่ง';
-    const wholesaleRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment === WHOLESALE_PAY);
-    const wholesale = wholesaleRows.reduce((a, r) => ({ gross: a.gross + r.gross, net: a.net + r.net }), { gross:0, net:0 });
     const wholesaleHeaderCell = React.createElement('span',
       { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
       React.createElement('span', { style:{ width:'22px', height:'22px', borderRadius:'7px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:'#EEF0F5', color:'#5A6478' } }, '•'),
@@ -7210,6 +7211,7 @@ class Component extends DCLogic {
       ? 'ช่วงที่เลือกยาวเกิน ' + DR_MAX_DAYS + ' วัน — แสดง ' + DR_MAX_DAYS + ' วันแรก'
       : (dailyReportRows.length + ' วัน');
 
+    const wsFor = name => wholesaleRows.filter(r => r.brand === name).reduce((a,r)=>a+r.gross,0);
     const dashMatrixRows = dashBrandNames.map(name => {
       const rowsForBrand = salesRows.filter(r => r.brand === name);
       const gFor = k => rowsForBrand.filter(r => r.platform === k).reduce((a,r)=>a+r.gross,0);
@@ -7217,8 +7219,8 @@ class Component extends DCLogic {
       const orders = rowsForBrand.length;
       return {
         brand:name, dotBg:'#EEF0F5', dotFg:'#8A93A5',
-        storefront: fmtB(gFor('หน้าร้าน')), grab: fmtB(gFor('Grab')), lineman: fmtB(gFor('LINE MAN')), shopee: fmtB(gFor('ShopeeFood')),
-        custom: fmtB(0), wholesale: fmtB(0),
+        storefront: fmtB(gFor('หน้าร้าน') - wsFor(name)), grab: fmtB(gFor('Grab')), lineman: fmtB(gFor('LINE MAN')), shopee: fmtB(gFor('ShopeeFood')),
+        wholesale: fmtB(wsFor(name)),
         total: fmtB(total), pct: salesTotalGross ? (total/salesTotalGross*100).toFixed(1)+'%' : '0%',
         orders: String(orders), avg: fmtB(orders ? total/orders : 0), weight:'500'
       };
@@ -7226,9 +7228,9 @@ class Component extends DCLogic {
     if (dashMatrixRows.length) {
       dashMatrixRows.push({
         brand:'รวมทั้งหมด', dotBg:'#EEF0F5', dotFg:'#8A93A5',
-        storefront: fmtB(byChannel['หน้าร้าน']?byChannel['หน้าร้าน'].gross:0), grab: fmtB(byChannel['Grab']?byChannel['Grab'].gross:0),
+        storefront: fmtB(dashRetailGross), grab: fmtB(byChannel['Grab']?byChannel['Grab'].gross:0),
         lineman: fmtB(byChannel['LINE MAN']?byChannel['LINE MAN'].gross:0), shopee: fmtB(byChannel['ShopeeFood']?byChannel['ShopeeFood'].gross:0),
-        custom: fmtB(0), wholesale: fmtB(0), total: fmtB(salesTotalGross), pct:'100%', orders:String(salesOrderCount), avg: fmtB(salesAvgOrder), weight:'700'
+        wholesale: fmtB(wholesale.gross), total: fmtB(salesTotalGross), pct:'100%', orders:String(salesOrderCount), avg: fmtB(salesAvgOrder), weight:'700'
       });
     }
 
