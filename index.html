@@ -1955,7 +1955,7 @@
             <tr style="color:#8089A0;font-size:11.5px;text-align:right">
               <th style="padding:0 8px 12px;font-weight:500;text-align:left">แบรนด์</th>
               <th style="padding:0 8px 12px;font-weight:500">รายรับ</th>
-              <th style="padding:0 8px 12px;font-weight:500">ขายส่ง</th>
+              <th style="padding:0 8px 12px;font-weight:500">{{ specialPayLabel }}</th>
               <th style="padding:0 8px 12px;font-weight:500">ไทยช่วยไทย</th>
               <th style="padding:0 8px 12px;font-weight:500">Grab</th>
               <th style="padding:0 8px 12px;font-weight:500">Lineman</th>
@@ -3339,7 +3339,7 @@
                 <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">QR PromptPay (POS Pay)</th>
                 <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ไทยช่วยไทย พลัส (หน้าร้าน)</th>
                 <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">Split Amount</th>
-                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">ขายส่ง</th>
+                <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">{{ specialPayLabel }}</th>
                 <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #DFE4EC">รวม</th>
               </tr>
             </thead>
@@ -3944,6 +3944,10 @@ const SALES_PLATFORMS = ['หน้าร้าน', 'LINE MAN', 'Grab', 'Shopee
 // ตรวจแล้ว 9 ก.ย. 2569: brand เป็น null 731 แถว = หน้าร้าน POS 726 + ขายส่ง 5 ไม่มีของแพลตฟอร์มปนเลย
 // จึงเรียกว่า "หน้าร้าน" ตรง ๆ แทน "ไม่ระบุแบรนด์" ซึ่งอ่านเหมือนข้อมูลขาด
 const BRAND_UNSPEC = 'หน้าร้าน';
+/** ยอดที่ขายหน้าร้านแต่เจ้าของดูแยกเป็นช่องทางของตัวเอง — คนละอย่างกันแต่ละสาขา
+ *  บางโพ = ขายส่ง (คีย์เอง ไม่ผ่าน POS) · ถนนจันทร์ = ล็อตเตอรี่ (ขายผ่าน POS)
+ *  เก็บใน `sales` เป็น platform='หน้าร้าน' แล้วแยกด้วยชื่อ payment */
+const BRANCH_SPECIAL_PAY = { main: 'ขายส่ง', chanroad: 'ล็อตเตอรี่' };
 const NON_BRAND_VALUES = ['หน้าร้าน', 'Delivery', ''];
 const brandName = b => (b == null || NON_BRAND_VALUES.indexOf(b) >= 0) ? BRAND_UNSPEC : b;
 const brandToDb = b => (b == null || b === BRAND_UNSPEC || NON_BRAND_VALUES.indexOf(b) >= 0) ? null : b;
@@ -4521,6 +4525,7 @@ class Component extends DCLogic {
   /** สิทธิ์รายสาขาของผู้ใช้ที่ล็อกอินอยู่ — ตัวจริงบังคับที่ RLS ในฐานข้อมูล
    *  ตรงนี้อ่านมาเพื่อให้หน้าเว็บแสดงเฉพาะสาขาที่เขาเห็นได้ และซ่อนปุ่มบันทึกถ้าดูอย่างเดียว
    *  ถ้าอ่านไม่ได้ให้ถือว่าไม่มีสิทธิ์ ปลอดภัยกว่าเดาว่ามีสิทธิ์ */
+  specialPay() { return BRANCH_SPECIAL_PAY[this.activeBranch()] || BRANCH_SPECIAL_PAY[DEFAULT_BRANCH]; }
   expenseCats() { return EXPENSE_CATS_BY_BRANCH[this.activeBranch()] || EXPENSE_CATS_BY_BRANCH[DEFAULT_BRANCH]; }
   /** รวมยอดของหมวดที่ "ความหมายตรงกัน" ข้ามสาขา — ชื่อหมวดต่างกันแต่ละสาขา
    *  เช่น บางโพใช้ 'วัตถุดิบ (COGS)' ถนนจันทร์แยกเป็น วัตถุดิบเค้ก/คุกกี้/เครื่องดื่ม
@@ -4837,7 +4842,11 @@ class Component extends DCLogic {
     const rng = this.periodRange();
     if (rng) out = out.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to);
     if (brand && brand !== 'ทุกแบรนด์') out = out.filter(r => r.brand === brand);
-    if (channel && channel !== 'ทุกช่องทาง') out = out.filter(r => r.platform === channel);
+    if (channel && channel !== 'ทุกช่องทาง') {
+      // ช่องทางพิเศษของสาขา (ขายส่ง/ล็อตเตอรี่) เก็บเป็น platform='หน้าร้าน' แยกด้วย payment
+      const sp = this.specialPay();
+      out = channel === sp ? out.filter(r => r.payment === sp) : out.filter(r => r.platform === channel);
+    }
     if (saleType && saleType !== 'ทุกประเภท') {
       if (saleType === 'Retail Sales (หน้าร้าน)') out = out.filter(r => r.platform === 'หน้าร้าน');
       else if (saleType === 'Delivery Platform') out = out.filter(r => ['Grab', 'LINE MAN', 'ShopeeFood'].includes(r.platform));
@@ -5213,7 +5222,7 @@ class Component extends DCLogic {
     const brandNames = Array.from(new Set((BRANCH_BRANDS[this.activeBranch()] || []).concat(brandsInData)));
     const brandOptions = ['ทุกแบรนด์'].concat(brandNames).concat([BRAND_UNSPEC])
       .map(b => mkOpt(b, brand, { brand: b, brandOpen: false }));
-    const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood','ขายส่ง'].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
+    const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood', this.specialPay()].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
     const saleTypeOptions = ['ทุกประเภท','Retail Sales (หน้าร้าน)','Delivery Platform','Custom Cake','Wholesale (บางโพ)'].map(t => mkOpt(t, saleType, { saleType: t, saleTypeOpen: false }));
@@ -6974,7 +6983,7 @@ class Component extends DCLogic {
     const byChannel = this.groupBy(salesRows, r => r.platform);
     // When the view is narrowed to หน้าร้าน only (channel filter), a single 100% segment
     // says nothing — split it by POS payment method instead.
-    const DASH_PAY_COLORS = { 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
+    const DASH_PAY_COLORS = { 'ล็อตเตอรี่':'#B98317', 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
     const dashStoreOnly = byChannel['หน้าร้าน'] && dashChannelOrder.filter(p => byChannel[p]).length === 1;
     let dashChannelRows, dashChannelDonut;
     if (dashStoreOnly) {
@@ -7006,7 +7015,7 @@ class Component extends DCLogic {
       : emptyDonut(135, 20);
     // ขายส่งเก็บใน `sales` เป็น platform='หน้าร้าน' payment='ขายส่ง' (คีย์เองผ่านฟอร์ม ไม่ผ่าน POS)
     // แต่เจ้าของร้านดูเป็นคนละช่องทาง จึงแยกออกจากหน้าร้านทุกที่ที่แบ่งตามประเภทการขาย
-    const WHOLESALE_PAY = 'ขายส่ง';
+    const WHOLESALE_PAY = this.specialPay();
     const wholesaleRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment === WHOLESALE_PAY);
     const wholesale = wholesaleRows.reduce((a, r) => ({ gross: a.gross + r.gross, net: a.net + r.net }), { gross:0, net:0 });
     // ไทยช่วยไทยของทุกช่องทางถูกย้ายมาเก็บเป็น platform='หน้าร้าน' ตั้งแต่ตอนนำเข้า
@@ -7023,7 +7032,7 @@ class Component extends DCLogic {
     const dashTypeParts = [
       { name:'Retail Sales (หน้าร้าน)', value: dashRetailGross, color:'#4A6B9E' },
       { name:'Delivery Platform Sales', value: dashDeliveryGross, color:'#4E9E77' },
-      { name:'ขายส่ง', value: wholesale.gross, color:'#D98A4C' }
+      { name: WHOLESALE_PAY, value: wholesale.gross, color:'#D98A4C' }
     ];
     const dashTypeRows = dashTypeParts.map(t => ({ name:t.name, amount:fmtB(t.value), pct:dashPct(t.value), color:t.color }));
     // หมวดที่ยอดเป็น 0 ยังอยู่ในรายการข้าง ๆ แต่ต้องไม่วาดลงวงโดนัท
@@ -7166,7 +7175,7 @@ class Component extends DCLogic {
       { key:'tcLmHm',  label:'ไทยช่วยไทย พลัส (Lineman หอมมนต์)',   match: p => /Lineman หอมมนต์/.test(p) },
       { key:'tcGbHm',  label:'ไทยช่วยไทย พลัส (Grab หอมมนต์)',      match: p => /Grab หอมมนต์/.test(p) },
       { key:'thaipl',  label:'ไทยช่วยไทย (หน้าร้าน)', match: p => /ไทยช่วยไทย/.test(p) },
-      { key:'whole',   label:'ขายส่ง',      match: p => /ขายส่ง/.test(p) },
+      { key:'whole',   label:this.specialPay(), match: p => String(p || '') === this.specialPay() },
       { key:'posetc',  label:'อื่นๆ (หน้าร้าน)', match: () => true }
     ];
     const DR_PLATFORM_COLS = [
@@ -7392,7 +7401,7 @@ class Component extends DCLogic {
     // ---- storefront (หน้าร้าน) daily batch entry form ----
     // One row per payment type, all saved together. Amounts are ยอดก่อนลด; discounts go
     // to fee so gross/fee/net matches the POS-report convention used everywhere else.
-    const STORE_PAY_TYPES = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', 'ขายส่ง'];
+    const STORE_PAY_TYPES = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', this.specialPay()];
     const storeBatch = this.state.storeBatch;
     const sbNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
     const setStoreBatchDate = e => { const val = e.target.value; this.setState(s => ({ storeBatch: { ...s.storeBatch, date: val } })); };
@@ -7679,7 +7688,7 @@ class Component extends DCLogic {
     // ---- ตารางรายวันของหน้าร้าน แยกตามวิธีชำระเงิน (เจ้าของร้านกำหนด 6 ช่องนี้ 9 ก.ย. 2569) ----
     // วิธีชำระอื่นที่ไม่อยู่ใน 6 ช่องนี้จะไม่ถูกนับ เช่น "โอนเงิน" ที่ใช้ช่วง ม.ค.–ก.พ. 2569
     // ก่อน FoodStory เปลี่ยนชื่อเป็น QR PromptPay (POS Pay) — จงใจตามที่สั่ง ไม่ใช่ตกหล่น
-    const SK_PAY_COLS = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', 'ขายส่ง'];
+    const SK_PAY_COLS = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', this.specialPay()];
     const SK_PAY_FIELDS = ['cash', 'kplus', 'pospay', 'subsidy', 'split', 'wholesale'];
     const skDayMap = {};
     skMonthRows.filter(r => r.platform === 'หน้าร้าน' && SK_PAY_COLS.indexOf(r.payment) >= 0).forEach(r => {
@@ -7719,7 +7728,7 @@ class Component extends DCLogic {
       : skEmptyDonut(150, 22);
     const salesTotalLabel = skFmt(skGrossMTD);
     // หน้าร้าน broken down by payment method (each store row carries its POS payment type).
-    const PAY_METHOD_COLORS = { 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
+    const PAY_METHOD_COLORS = { 'ล็อตเตอรี่':'#B98317', 'Cash':'#3A5A8C', 'QR PromptPay (POS Pay)':'#5B7FB3', 'K+ Shop':'#35875A', 'ไทยช่วยไทย พลัส (หน้าร้าน)':'#7B62A8', 'Split Amount':'#C96245', 'ขายส่ง':'#B98317' };
     const byPayMethod = {};
     skMonthRows.filter(r => r.platform === 'หน้าร้าน').forEach(r => { const k = r.payment || 'อื่นๆ'; byPayMethod[k] = (byPayMethod[k] || 0) + r.gross; });
     const payMethodTotal = Object.values(byPayMethod).reduce((a, b) => a + b, 0);
@@ -8601,6 +8610,7 @@ class Component extends DCLogic {
       crmConnError: this.state.crmConnError, crmConnBusy: this.state.crmConnBusy, crmConnLabel,
       setCrmConnUser, setCrmConnPassword, onCrmConnKeyDown,
       connectCrm: () => this.connectCrm(), disconnectCrm: () => this.disconnectCrm(),
+      specialPayLabel: this.specialPay(),
       crmKpis, crmTierRows, crmTierDonut, crmTierTotalLabel, crmSignupSpark, crmSignup14, crmTopRows, crmStatusLabel, crmStatusOk, crmHas, exportMembersCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
