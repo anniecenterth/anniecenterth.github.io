@@ -3373,6 +3373,15 @@
                 </div>
               </sc-if>
             </div>
+            <span style="font-size:12.5px;color:#6B7486;font-weight:500;margin-left:5px">แบรนด์</span>
+            <div data-form-dd="storeBrand" style="position:relative;min-width:132px">
+              <div onClick="{{ storeBrandDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="font-weight:600">{{ storeBrandDD.value }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2;flex:none"></i></div>
+              <sc-if value="{{ storeBrandDD.open }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:46px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:150px">
+                  <sc-for list="{{ storeBrandDD.options }}" as="opt" hint-placeholder-count="4"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
+                </div>
+              </sc-if>
+            </div>
             <span style="font-size:12.5px;color:#6B7486;font-weight:500;margin-left:5px">วันที่ <span style="color:#2C4A7C">*</span></span>
             <div data-form-dd="storeDate" style="position:relative">
               <div onClick="{{ toggleStoreDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><i data-lucide="calendar" style="width:16px;height:16px;color:#8089A0"></i><span style="font-weight:600">{{ storeDateDisplay }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2"></i></div>
@@ -4364,7 +4373,7 @@ class Component extends DCLogic {
     accessRows: [], accessLoaded: false,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
-    storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' },
+    storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' },
     storeFormError: null, storeSaving: false
   };
 
@@ -5063,11 +5072,12 @@ class Component extends DCLogic {
   mkFormDD(field, options, sk, onPick) {
     sk = sk || 'form';
     const cur = this.state[sk][field];
-    const open = this.state.formDD === field;
+    const ddKey = sk + '.' + field;
+    const open = this.state.formDD === ddKey;
     const optBase = { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer' };
     return {
       value: cur, open,
-      toggle: () => this.setState(s => ({ formDD: s.formDD === field ? null : field, periodOpen:false, brandOpen:false, channelOpen:false })),
+      toggle: () => this.setState(s => ({ formDD: s.formDD === ddKey ? null : ddKey, periodOpen:false, brandOpen:false, channelOpen:false })),
       options: options.map(o => ({
         label: o,
         onClick: () => this.setState(s => ({ [sk]: { ...s[sk], [field]: o, ...(onPick ? onPick(o, s[sk]) : {}) }, formDD: null })),
@@ -7235,7 +7245,11 @@ class Component extends DCLogic {
     const toggleDate = () => this.setState(s => ({ formDD: s.formDD === 'date' ? null : 'date' }));
     const platformDD = this.mkFormDD('platform', ['LINE MAN','Grab','ShopeeFood','หน้าร้าน']);
     const salesBranchDD = this.mkFormDD('branch', BRANCH_OPTIONS.map(b => b.label), 'storeBatch');
-    const brandDD = this.mkFormDD('brand', ['AnnieCake','หอมมนต์']);
+    // แบรนด์ในฟอร์มต้องเป็นของสาขาที่เปิดอยู่ ไม่งั้นบางโพจะเลือก Lottery ได้ทั้งที่ไม่มีขาย
+    const formBrandNames = BRANCH_BRANDS[this.activeBranch()] || [];
+    const brandDD = this.mkFormDD('brand', formBrandNames);
+    // ฟอร์มหน้าร้านเลือกแบรนด์ได้ด้วย — ค่าเริ่มต้น "หน้าร้าน" คือไม่แยกแบรนด์เหมือนเดิม
+    const storeBrandDD = this.mkFormDD('brand', [BRAND_UNSPEC].concat(formBrandNames), 'storeBatch');
     const typeDD = this.mkFormDD('type', ['อาหาร / เครื่องดื่ม','เบเกอรี่','เค้กสั่งทำ','อื่น ๆ']);
     const paymentDD = this.mkFormDD('payment', ['ลูกค้าชำระเงินปลายทาง (COD)','ชำระผ่านแอป/บัตร','โอนเงิน']);
     const statusDD = this.mkFormDD('status', ['รอรับเงิน','เงินเข้าจริง']);
@@ -7334,7 +7348,7 @@ class Component extends DCLogic {
       disc: '−฿' + Number(sbDisc).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       net: '฿' + Number(sbBefore - sbDisc).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     };
-    const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' }, storeFormError: null });
+    const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' }, storeFormError: null });
     const saveStoreBatch = async () => {
       if (this.state.storeSaving) return;
       const f = this.state.storeBatch;
@@ -7347,7 +7361,9 @@ class Component extends DCLogic {
       if (bad) { this.setState({ storeFormError: 'ส่วนลดของ "' + bad.p + '" มากกว่ายอดขาย — ตรวจอีกครั้ง' }); return; }
       const beDate = isoToBEShort(f.date);
       // Same-day same-type rows already saved → confirm overwrite (they get replaced).
-      const dupes = this.state.recentRows.filter(r => r.platform === 'หน้าร้าน' && r.date === beDate && entries.some(x => x.p === r.payment));
+      const sbBrand = f.brand || BRAND_UNSPEC;
+      const dupes = this.state.recentRows.filter(r => r.platform === 'หน้าร้าน' && r.date === beDate
+        && (r.brand || BRAND_UNSPEC) === sbBrand && entries.some(x => x.p === r.payment));
       if (dupes.length && !window.confirm('วันที่ ' + beDate + ' มีข้อมูล ' + dupes.length + ' ประเภทนี้อยู่แล้ว — เขียนทับด้วยค่าที่กรอกใหม่หรือไม่?')) return;
       this.setState({ storeSaving: true, storeFormError: null });
       try {
@@ -7357,8 +7373,9 @@ class Component extends DCLogic {
         }
         const note = (f.note || '').trim();
         const dbRows = entries.map(x => mapSaleToDbRow({
-          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: BRAND_UNSPEC,
-          orderId: x.p + ' (หน้าร้าน ' + beDate + ')',
+          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: sbBrand,
+          // ใส่ชื่อแบรนด์ใน order_id เมื่อแยกแบรนด์ ไม่งั้นวันเดียวกันหลายแบรนด์จะได้ id ซ้ำกัน
+          orderId: x.p + (sbBrand === BRAND_UNSPEC ? '' : ' · ' + sbBrand) + ' (หน้าร้าน ' + beDate + ')',
           gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
           status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: '', source: 'MANUAL_FORM'
         }));
@@ -7375,7 +7392,7 @@ class Component extends DCLogic {
         this.setState(s => ({
           storeSaving: false,
           recentRows: [...res.data.map(mapDbRowToSale), ...s.recentRows.filter(r => !dupeIds.includes(r.id))],
-          storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' },
+          storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' },
           storeFormError: noteDropped ? 'บันทึก ' + entries.length + ' รายการสำเร็จ แต่หมายเหตุยังไม่ถูกเก็บ (ต้องรัน migration 0007_sales_note.sql ก่อน)' : null
         }));
       } catch (err) {
@@ -8611,7 +8628,7 @@ class Component extends DCLogic {
       holidayOpen, holidayTickRows,
       calTitle, calDowCells, calPrev: calShift(-1), calNext: calShift(1), periodCalCells, rangeLabel, clearRange,
       expCalCells, importCalCells, storeCalCells, storeDateOpen, toggleStoreDate, storeDateDisplay,
-      expPickToday, importPickToday, storePickToday, kpiOverview, ovPeriodNote, ovShowWarn, ovWarnText, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, ovAxis, Number(this.state.dailyTarget) || 0), ovChartLabel: ovAxis.label, ovRangeLabel: ovAxis.short, brandRowsTotalLabel, channelTotalLabel,
+      storeBrandDD, expPickToday, importPickToday, storePickToday, kpiOverview, ovPeriodNote, ovShowWarn, ovWarnText, kpiFinance, overviewChart: this.barLine(ovRows, ovExpRows, ovAxis, Number(this.state.dailyTarget) || 0), ovChartLabel: ovAxis.label, ovRangeLabel: ovAxis.short, brandRowsTotalLabel, channelTotalLabel,
       ceoAlerts, brandRows, channelRows, channelDonut, channelExpenseMini,
       procKpis, procTableRows, procSearch: this.state.procSearch || '', setProcSearch,
       exportProcurementCsv, procEmpty: procTableRows.length === 0,
