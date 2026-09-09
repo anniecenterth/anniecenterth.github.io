@@ -1935,18 +1935,6 @@
         </div>
       </div>
 
-      <!-- bottom charts -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 6px;font-size:15.5px;font-weight:600">แนวโน้มรายจ่าย <span style="color:#9AA3B2;font-weight:500;font-size:13px">(30 วันล่าสุด)</span></h3>
-          <div style="display:flex;align-items:center;gap:18px;margin-bottom:6px;font-size:12px;color:#7A8497">
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:3px;border-radius:2px;background:#4A6B9E"></span><span style="width:6px;height:6px;border-radius:50%;background:#4A6B9E;margin-left:-9px"></span>รายจ่าย</span>
-            <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;border-top:2px dashed #B9C2D0"></span>งบประมาณ</span>
-          </div>
-          <div>{{ expenseTrend }}</div>
-        </div>
-      </div>
-
     </div>
     </sc-if>
 
@@ -6733,7 +6721,6 @@ class Component extends DCLogic {
     const epRows = this.state.expRows;
     // การ์ดโดนัท 2 ใบย้ายไปอยู่หน้ารายรับ-รายจ่ายแล้ว (9 ก.ย. 2569) จึงต้องกรองตามช่วงเวลา
     // ของหน้านั้น ไม่ใช่รายจ่ายทั้งฐาน ไม่งั้นตัวเลขจะไม่ตรงกับการ์ดอื่นบนหน้าเดียวกัน
-    // ส่วนกราฟแนวโน้มรายจ่ายยังอยู่หน้ารายจ่ายและใช้ epRows เต็ม (มันตัด 30 วันเองอยู่แล้ว)
     const epDonutRows = inexExpAll;
     const epTotal = epDonutRows.reduce((a,r)=>a+r.amount,0);
     const epTotalLabel = epFmt(epTotal);
@@ -8324,7 +8311,7 @@ class Component extends DCLogic {
       avgPerDayDisplay: '฿' + expFmt(avgPerDay),
       budgetEditing: this.state.budgetEditing, budgetDraft: this.state.budgetDraft, startBudgetEdit, setBudgetDraft, confirmBudgetEdit, cancelBudgetEdit,
       expError: this.state.expError,
-      expSearch: this.state.expSearch, setExpSearch, expCatRows, expCatDonut, expPayRows, expPayDonut, expenseTrend: this.expenseTrend(epRows, 30, this.state.monthlyBudget / 30), epTotalLabel,
+      expSearch: this.state.expSearch, setExpSearch, expCatRows, expCatDonut, expPayRows, expPayDonut, epTotalLabel,
       saleType, saleTypeOpen, toggleSaleType, saleTypeOptions,
       salesDashKpis, salesDashChart: this.realTrendChart(null, 0, dashTrend.buckets), dashTrendLabel, salesTotalGrossLabel,
       dashChannelRows, dashChannelDonut, dashBrandRows, dashBrandDonut, dashTypeRows, dashTypeDonut, dashPayoutRows, dashMatrixRows,
