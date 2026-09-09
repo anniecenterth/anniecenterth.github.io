@@ -120,45 +120,44 @@
             <i data-lucide="bell" style="width:20px;height:20px"></i>
             <span style="position:absolute;top:8px;right:9px;width:17px;height:17px;border-radius:50%;background:#4A6B9E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff">3</span>
           </div>
+          <div data-period-dd="1" style="position:relative">
+            <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+            <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:50px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                  <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                    <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                    <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                    <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                    <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                    <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                      <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                    <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                      <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                    <span style="color:#5A6478">{{ rangeLabel }}</span>
+                    <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
         </div>
       </div>
 
       <!-- filters -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-        <div data-period-dd="1" style="position:relative">
-          <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#7A8497">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-          <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
-              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
-                <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
-                  <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
-                </sc-for>
-              </div>
-              <div style="border-top:1px solid #EFF0F3;padding-top:11px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
-                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
-                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
-                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
-                  <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
-                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
-                  </sc-for>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
-                  <span style="color:#5A6478">{{ rangeLabel }}</span>
-                  <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
-                </div>
-              </div>
-            </div>
-          </sc-if>
-        </div>
-        <div style="flex:1"></div>
         <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="arrow-left-right" style="width:16px;height:16px"></i><span>แยกยอดขายกับเงินเข้าจริง</span></div>
         <div style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
       </div>
