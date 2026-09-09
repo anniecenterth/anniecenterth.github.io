@@ -4043,7 +4043,7 @@ function pyTotals(lines) {
 /** ข้อความแสดงวิธีคิดของแต่ละบรรทัด ให้เหมือนที่เจ้าของร้านพิมพ์เอง
  *  "50 × 19" สำหรับค่าชิ้นงาน · "533.33 × 2" สำหรับวันหยุด */
 function pyLineDetail(l) {
-  var f = function (n) { return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 }); };
+  var f = function (n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
   if (l.label === 'ทำวันหยุด' && l.mult) {
     return f(l.rate) + ' × ' + f(l.mult) + (l.qty > 1 ? ' × ' + l.qty + ' วัน' : '');
   }
@@ -4558,7 +4558,7 @@ class Component extends DCLogic {
       '.bl-col:hover .bl-tip{opacity:1}' +
       '.bl-col .bl-hit{fill:transparent}' +
       '.bl-col:hover .bl-hit{fill:rgba(44,74,124,0.05)}'));
-    const money = v => '฿' + Math.round(v || 0).toLocaleString('en-US');
+    const money = v => '฿' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const tipW = 160, tipH = 78, lineH = 15;
     labels.forEach((d, i) => {
       const c = xc(i);
@@ -4811,7 +4811,7 @@ class Component extends DCLogic {
     grossSales = grossSales || 0; netSales = netSales || 0; cogs = cogs || 0; opex = opex || 0;
     const grossProfit = netSales - cogs;
     const netProfit = grossProfit - opex;
-    const fmtStep = n => (n < 0 ? '(' + Math.round(-n).toLocaleString('en-US') + ')' : Math.round(n).toLocaleString('en-US'));
+    const fmtStep = n => (n < 0 ? '(' + Number(-n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')' : Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     const steps = [
       { l:['Gross Sales'], from:0, to:grossSales, c:'#A9BBD6', t:fmtStep(grossSales) },
       { l:['Platform Fee'], from:netSales, to:grossSales, c:'#A9BBD6', t:fmtStep(netSales - grossSales) },
@@ -5594,7 +5594,7 @@ class Component extends DCLogic {
     const taxPageTabs = mkTabs([{ label:'สรุปภาษี & ส่งออก', page:'tax' }, { label:'แบบฟอร์ม ภ.พ./ภ.ง.ด.', page:'taxforms' }]);
     const marketingTabs = mkTabs([{ label:'ภาพรวมการตลาด', page:'marketing' }, { label:'แคมเปญ', page:'campaign' }, { label:'คอนเทนต์', page:'content' }]);
 
-    const ovFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const ovFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const ovNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const ovEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const ovSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
@@ -5692,7 +5692,7 @@ class Component extends DCLogic {
       { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, note:'กำไรขั้นต้น − รายจ่ายอื่นที่ไม่ใช่วัตถุดิบ ' + ovFmt(ovExpenseTotal - ovCogs), icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
       { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, note:'กำไรสุทธิ ÷ เงินเข้าจริง (ไม่ใช่ ÷ ยอดขายเต็ม)', icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
     ];
-    const fmtFin = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const fmtFin = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const noDeltaFin = '– (ยังไม่มีข้อมูลเทียบ)';
     const emptyDonutFin = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const finRows = this.applySalesFilters(this.state.recentRows);
@@ -6014,7 +6014,7 @@ class Component extends DCLogic {
 
     // ---- เช็คยอดเงินเข้าระบบ — real money-in derivation from sales.status/net ----
     const rcAll = this.applySalesFilters(this.state.recentRows);
-    const rcFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const rcFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const rcToday = todayISO();
     const rcMoneyIn = rcAll.filter(r => r.status === 'เงินเข้าจริง');
     const rcPend = rcAll.filter(r => r.status !== 'เงินเข้าจริง');
@@ -6124,7 +6124,7 @@ class Component extends DCLogic {
     // marketing/campaign/content/members/products pages show; those pages are empty-state) ----
     const mktExp = this.applyExpenseFilters(this.state.expRows);
     const mktAdSpend = mktExp.filter(r => r.mainCat === 'การตลาด').reduce((a, r) => a + r.amount, 0);
-    const mktFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const mktFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     // ประสิทธิภาพจริง: ROAS = ยอดขาย delivery ÷ ค่าโฆษณาที่บันทึกในรายจ่ายหมวดการตลาด
     const mktSalesRows = this.applySalesFilters(this.state.recentRows);
     const mktDeliverySales = mktSalesRows.filter(r => ['Grab','LINE MAN','ShopeeFood'].includes(r.platform)).reduce((a, r) => a + r.gross, 0);
@@ -6137,7 +6137,7 @@ class Component extends DCLogic {
     ];
 
     // ---- รายรับ-รายจ่าย overview ----
-    const inexFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const inexFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const inexNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const inexEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const inexRows = this.applySalesFilters(this.state.recentRows);
@@ -6213,7 +6213,7 @@ class Component extends DCLogic {
     };
     // ---- สมาชิก (CRM) — ข้อมูลจริงจากโปรเจค annie-crm ----
     const crmMembers = this.state.crmMembers, crmTiersRaw = this.state.crmTiers;
-    const crmFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const crmFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const crmNum = n => (Number(n) || 0);
     const crmHas = crmMembers.length > 0;
     const crmMonthStart = todayISO().slice(0, 7);
@@ -6269,7 +6269,7 @@ class Component extends DCLogic {
     // ---- แหล่งข้อมูล (Data Sources) — §26: ทุกการเชื่อมต่ออยู่ที่เดียว ----
     const dsToday = todayISO();
     const dsDaysBetween = (iso) => { if (!iso) return null; return Math.round((beShortToDate(isoToBEShort(dsToday)) - beShortToDate(isoToBEShort(iso))) / 86400000); };
-    const dsFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const dsFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const dsAllSales = this.salesOnly(this.state.recentRows);
     const dsBuild = (cfg) => {
       const rows = cfg.rows;
@@ -6323,7 +6323,7 @@ class Component extends DCLogic {
     };
 
     // ---- หน้าจัดซื้อ (ประวัติราคาที่จ่ายจริงจาก Shopee) ----
-    const procFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const procFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     // ตัดคำโปรยออกจากชื่อสินค้า Shopee — ต้องให้ผลเหมือน displayName() ในบอท Telegram
     const procClean = s => String(s || '')
       .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
@@ -6407,7 +6407,7 @@ class Component extends DCLogic {
     const prodList = PRODUCT_SALES[productsMonth] || [];
     const prodTotalGross = prodList.reduce((a, p) => a + p[3], 0);
     const prodTotalQty = prodList.reduce((a, p) => a + p[2], 0);
-    const pFmt = n => '฿' + Math.round(n).toLocaleString('en-US');
+    const pFmt = n => '฿' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const productRows = prodList.map((p, i) => ({ rank: i + 1, name: p[0], cat: p[1], qty: p[2].toLocaleString('en-US'), gross: pFmt(p[3]), pct: prodTotalGross ? (p[3] / prodTotalGross * 100).toFixed(1) + '%' : '0%' }));
     const prodByCat = {};
     prodList.forEach(p => { prodByCat[p[1]] = (prodByCat[p[1]] || 0) + p[3]; });
@@ -6694,7 +6694,7 @@ class Component extends DCLogic {
       this.setState({ dailyTarget: n, targetEditing: false });
     };
     const cancelTargetEdit = () => this.setState({ targetEditing: false });
-    const epFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const epFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const epEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const epRows = this.state.expRows;
     // การ์ดโดนัท 2 ใบย้ายไปอยู่หน้ารายรับ-รายจ่ายแล้ว (9 ก.ย. 2569) จึงต้องกรองตามช่วงเวลา
@@ -6719,7 +6719,7 @@ class Component extends DCLogic {
       : epEmptyDonut(150, 22);
 
     // ---- sales dashboard (real data from recentRows; 0/empty until real sales exist) ----
-    const fmtB = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const fmtB = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const noDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const emptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const salesRows = this.applySalesFilters(this.state.recentRows);
@@ -7178,9 +7178,9 @@ class Component extends DCLogic {
       if (a > 0) { sbCount++; sbBefore += a; sbDisc += sbNum(storeBatch.discounts[p]); }
     });
     const storeBatchTotals = {
-      before: '฿' + Math.round(sbBefore).toLocaleString('en-US'),
-      disc: '−฿' + Math.round(sbDisc).toLocaleString('en-US'),
-      net: '฿' + Math.round(sbBefore - sbDisc).toLocaleString('en-US')
+      before: '฿' + Number(sbBefore).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      disc: '−฿' + Number(sbDisc).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      net: '฿' + Number(sbBefore - sbDisc).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     };
     const clearStoreBatch = () => this.setState({ storeBatch: { date: todayISO(), branch: 'บางโพ', amounts: {}, discounts: {}, note: '' }, storeFormError: null });
     const saveStoreBatch = async () => {
@@ -7413,7 +7413,7 @@ class Component extends DCLogic {
     const skRng = this.periodRange();
     const skFrom = skRng ? skRng.from : '', skTo = skRng ? skRng.to : '';
     const headerDateDisplay = skRng ? dateRangeLabel(skFrom, skTo) : 'ทุกช่วงเวลา';
-    const skFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const skFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const skNoDelta = '– (ยังไม่มีข้อมูลเทียบ)';
     const skEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
     const skRows = this.salesOnly(this.state.recentRows);
@@ -7869,7 +7869,7 @@ class Component extends DCLogic {
     // ---- 1. กระทบยอดเงินโอน (Payout Reconciliation) — no bank-matching backend yet; cleared to 0/empty ----
     // กระทบยอดเงินโอน — expected side derived from sales; actual/bank side has no source (empty).
     const pyRows = this.applySalesFilters(this.state.recentRows);
-    const pyFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const pyFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const pyBy = {}; pyRows.forEach(r => { pyBy[r.platform] = (pyBy[r.platform] || 0) + r.net; });
     const pyExpectedTotal = Object.values(pyBy).reduce((a, v) => a + v, 0);
     const payoutKpis = [
@@ -7891,7 +7891,7 @@ class Component extends DCLogic {
     // ---- เงินรัฐรอรับ — real GOVERNMENT_WALLET / ไทยช่วยไทย orders with T+3 settlement.
     // NOTE: the cust/gov split is not retained in stored sales rows, so ลูกค้าจ่าย/รัฐอุดหนุน
     // show "—" and the receivable amount (full gross) is PROVISIONAL pending a real settlement.
-    const subFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const subFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const subToday = todayISO();
     const subAddDays = (iso, d) => { const x = new Date(iso + 'T00:00:00'); x.setDate(x.getDate() + d); return dateToISO(x); };
     const subDaysBetween = (aIso, bIso) => Math.round((new Date(bIso) - new Date(aIso)) / 86400000);
@@ -7941,7 +7941,7 @@ class Component extends DCLogic {
     // ---- ศูนย์แจ้งเตือน — real threshold rules over sales data (no fake alerts) ----
     const alRows = this.salesOnly(this.state.recentRows);
     const alToday = todayISO();
-    const alFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const alFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const alByDay = {}; alRows.forEach(r => { if (r.isoDate) alByDay[r.isoDate] = (alByDay[r.isoDate] || 0) + r.gross; });
     const alTodayGross = alByDay[alToday] || 0;
     const alPrior7 = []; for (let i = 1; i <= 7; i++) { const x = new Date(alToday + 'T00:00:00'); x.setDate(x.getDate() - i); alPrior7.push(alByDay[dateToISO(x)] || 0); }
@@ -8092,7 +8092,7 @@ class Component extends DCLogic {
     const txRows = this.applySalesFilters(this.state.recentRows);
     const txNet = txRows.reduce((a, r) => a + r.net, 0);
     const txGross = txRows.reduce((a, r) => a + r.gross, 0);
-    const txFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const txFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const taxWht = [];
 
     // ---- 7b. แบบฟอร์ม ภ.พ./ภ.ง.ด. ----
@@ -8259,7 +8259,7 @@ class Component extends DCLogic {
      *  ทุกการ์ดยึด "วันนี้" กับ "เดือนนี้" ตายตัว ไม่ผูกกับตัวกรองช่วงเวลา
      *  เพราะเจ้าของเปิดดูสรุปประจำวัน ไม่ได้มานั่งเลือกช่วง — และของเดิมเคยเอา
      *  ยอดทั้งเดือนมาแปะป้ายว่า "วันนี้" ซึ่งอ่านผิดได้ทันที */
-    const mobFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
+    const mobFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const mobAll = this.salesOnly(this.state.recentRows);
     const mobToday = todayISO();
     const mobShift = d => { const t = new Date(mobToday + 'T00:00:00'); t.setDate(t.getDate() + d);
@@ -8376,7 +8376,7 @@ class Component extends DCLogic {
       mtdSpentDisplay: '฿' + expFmt(mtdSpent), mtdCountDisplay: mtdRows.length + ' รายการเดือนนี้',
       daysInMonthDisplay: 'จาก ' + nowForBudget.getDate() + ' วัน',
       budget, budgetDisplay: '฿' + expFmt(budget), budgetRemaining, budgetRemainingDisplay: '฿' + expFmt(budgetRemaining),
-      dailyTargetLabel: 'เป้ารายวัน (฿' + Math.round(this.state.dailyTarget || 0).toLocaleString('en-US') + ')',
+      dailyTargetLabel: 'เป้ารายวัน (฿' + Number(this.state.dailyTarget || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')',
       targetEditing: this.state.targetEditing, targetDraft: this.state.targetDraft, startTargetEdit, setTargetDraft, confirmTargetEdit, cancelTargetEdit,
       budgetUsedPct: budgetUsedPct.toFixed(1) + '%', budgetUsedPctBar: Math.min(100, budgetUsedPct) + '%', budgetRemainingPctDisplay: budgetRemainingPct.toFixed(1) + '%',
       avgPerDayDisplay: '฿' + expFmt(avgPerDay),
