@@ -4058,7 +4058,7 @@ function mapExpenseToDbRow(row) {
 /** หมวดหมู่รายจ่าย — หมวดย่อยผูกกับหมวดหลัก (แอนนี่กำหนดเอง 27 ส.ค. 2569)
  *  ไม่มีหมวด "ค่าคอมมิชชันแพลตฟอร์ม" โดยตั้งใจ — ค่าคอมฯ บันทึกอยู่ในช่อง fee ของฝั่งรายรับแล้ว
  *  ถ้าเพิ่มเป็นรายจ่ายอีกจะนับซ้ำ ทำให้กำไรต่ำกว่าความจริง */
-const EXPENSE_CATS = [
+const EXPENSE_CATS_MAIN = [
   ['วัตถุดิบ (COGS)',        ['ต้นทุนเค้ก AnnieCake','ต้นทุนเค้ก หอมมนต์','วิปครีม','ผลไม้','สีผสมอาหาร','ขนมสำหรับตกแต่ง','ไอซ์ซิ่ง','อื่นๆ']],
   ['บรรจุภัณฑ์',             ['กล่องเค้ก','ฐานรอง/จานรอง','ถุง/หูหิ้ว','ช้อนส้อม/มีดตัด','สติกเกอร์/ฉลาก','อื่นๆ']],
   ['ของตกแต่งเค้ก',          ['เทียนวันเกิด','ป้าย/ท็อปเปอร์','ริบบิ้น/โบว์','ดอกไม้/ของประดับ','อื่นๆ']],
@@ -4070,8 +4070,26 @@ const EXPENSE_CATS = [
   ['การตลาด',               ['ยิงแอด Facebook/IG','ยิงแอด TikTok','อื่นๆ']],
   ['อื่นๆ',                  ['อื่นๆ']]
 ];
-const EXPENSE_MAIN_CATS = EXPENSE_CATS.map(function (c) { return c[0]; });
-const EXPENSE_SUB_BY_MAIN = EXPENSE_CATS.reduce(function (m, c) { m[c[0]] = c[1]; return m; }, {});
+/** ถนนจันทร์ใช้หมวดหลักคนละชุด (เจ้าของกำหนด 9 ก.ย. 2569) — แยกวัตถุดิบเป็น 3 ชุด
+ *  แยกซ่อมบำรุงออกจากอุปกรณ์ และไม่มีหมวดค่าขนส่ง */
+const EXPENSE_CATS_CHANROAD = [
+  ['วัตถุดิบเค้ก',           ['แป้ง/น้ำตาล/ไข่','วิปครีม','ผลไม้','สีผสมอาหาร','ไอซ์ซิ่ง','อื่นๆ']],
+  ['วัตถุดิบคุกกี้',          ['แป้ง/เนย/น้ำตาล','ช็อกโกแลต','ถั่ว/ธัญพืช','อื่นๆ']],
+  ['วัตถุดิบเครื่องดื่ม',      ['เมล็ดกาแฟ','นม','ชา/ผงชง','ไซรัป','น้ำแข็ง','อื่นๆ']],
+  ['บรรจุภัณฑ์',             ['กล่องเค้ก','ฐานรอง/จานรอง','ถุง/หูหิ้ว','ช้อนส้อม/มีดตัด','แก้ว/ฝา/หลอด','สติกเกอร์/ฉลาก','อื่นๆ']],
+  ['ของตกแต่งเค้ก',          ['เทียนวันเกิด','ป้าย/ท็อปเปอร์','ริบบิ้น/โบว์','ดอกไม้/ของประดับ','อื่นๆ']],
+  ['อุปกรณ์ต่างๆ',           ['อุปกรณ์เบเกอรี่ (พิมพ์/หัวบีบ)','อุปกรณ์เครื่องดื่ม','ของใช้สิ้นเปลืองในร้าน','อื่นๆ']],
+  ['ค่าซ่อมบำรุง',           ['ซ่อมเครื่องครัว/เตาอบ','ซ่อมแอร์/ไฟฟ้า','ค่าทำความสะอาด','อื่นๆ']],
+  ['ค่าเช่าและสาธารณูปโภค',  ['ค่าเช่าร้าน','ค่าไฟ','ค่าน้ำ','อินเทอร์เน็ต/โทรศัพท์','ค่าส่วนกลาง','อื่นๆ']],
+  ['ค่าแรง',                 ['เงินเดือนประจำ','ค่าจ้างรายวัน','ค่าล่วงเวลา (OT)','ประกันสังคม (ส่วนนายจ้าง)','โบนัส/สวัสดิการ','อื่นๆ']],
+  ['ธรรมเนียมและภาษี',       ['ค่าธรรมเนียมธนาคาร/QR','ค่าเช่าเครื่องรูดบัตร','ภาษีป้าย','ภาษีอื่นๆ','ค่าใบอนุญาต','ดอกเบี้ย','อื่นๆ']],
+  ['การตลาด',               ['ยิงแอด Facebook/IG','ยิงแอด TikTok','อื่นๆ']],
+  ['อื่นๆ',                  ['อื่นๆ']]
+];
+const EXPENSE_CATS_BY_BRANCH = { main: EXPENSE_CATS_MAIN, chanroad: EXPENSE_CATS_CHANROAD };
+/** สีของหมวดที่มีเฉพาะถนนจันทร์ — ไม่ให้โดนัทกลายเป็นสีเทาทั้งวง */
+const EXP_CAT_COLORS_CHANROAD = { 'วัตถุดิบเค้ก':'#4A6B9E', 'วัตถุดิบคุกกี้':'#6E8FC4', 'วัตถุดิบเครื่องดื่ม':'#A9BBD6',
+  'อุปกรณ์ต่างๆ':'#D98A4C', 'ค่าซ่อมบำรุง':'#C97A7A', 'ค่าเช่าและสาธารณูปโภค':'#8B6FB8', 'ธรรมเนียมและภาษี':'#7A8CA6' };
 
 // ---------- ระบบเงินเดือน — ตรรกะคำนวณ ----------
 // กติกาทั้งหมดยืนยันโดยเจ้าของร้าน 1 ก.ย. 2569
@@ -4503,6 +4521,21 @@ class Component extends DCLogic {
   /** สิทธิ์รายสาขาของผู้ใช้ที่ล็อกอินอยู่ — ตัวจริงบังคับที่ RLS ในฐานข้อมูล
    *  ตรงนี้อ่านมาเพื่อให้หน้าเว็บแสดงเฉพาะสาขาที่เขาเห็นได้ และซ่อนปุ่มบันทึกถ้าดูอย่างเดียว
    *  ถ้าอ่านไม่ได้ให้ถือว่าไม่มีสิทธิ์ ปลอดภัยกว่าเดาว่ามีสิทธิ์ */
+  expenseCats() { return EXPENSE_CATS_BY_BRANCH[this.activeBranch()] || EXPENSE_CATS_BY_BRANCH[DEFAULT_BRANCH]; }
+  /** รวมยอดของหมวดที่ "ความหมายตรงกัน" ข้ามสาขา — ชื่อหมวดต่างกันแต่ละสาขา
+   *  เช่น บางโพใช้ 'วัตถุดิบ (COGS)' ถนนจันทร์แยกเป็น วัตถุดิบเค้ก/คุกกี้/เครื่องดื่ม
+   *  รวมชื่อเก่าที่ยังค้างในฐานด้วย (เช่น 'ค่าน้ำค่าไฟ') ไม่ให้ยอดหล่นหาย */
+  sumCatsLike(byCat, words) {
+    let t = 0;
+    Object.keys(byCat || {}).forEach(function (k) {
+      if (words.some(function (w) { return k.indexOf(w) >= 0; })) t += Number(byCat[k]) || 0;
+    });
+    return t;
+  }
+  cogsOf(byCat) { return this.sumCatsLike(byCat, ['วัตถุดิบ']); }
+  rentUtilOf(byCat) { return this.sumCatsLike(byCat, ['ค่าเช่า', 'ค่าน้ำ', 'สาธารณูปโภค']); }
+  expenseMainCats() { return this.expenseCats().map(function (c) { return c[0]; }); }
+  expenseSubCats(main) { const f = this.expenseCats().find(function (c) { return c[0] === main; }); return f ? f[1] : []; }
   loadAccess = async () => {
     try {
       const { data, error } = await supabaseClient.from('user_access').select('branch,can_write');
@@ -5774,7 +5807,7 @@ class Component extends DCLogic {
     const ovNet = ovRows.reduce((a, r) => a + r.net, 0);
     const ovExpenseTotal = ovExpRows.reduce((a, r) => a + r.amount, 0);
     const ovByExpCat = ovSumByKey(ovExpRows, r => r.mainCat, r => r.amount);
-    const ovCogs = ovByExpCat['วัตถุดิบ (COGS)'] || 0;
+    const ovCogs = this.cogsOf(ovByExpCat);
     const ovGrossProfit = ovNet - ovCogs;
     const ovNetProfit = ovGrossProfit - (ovExpenseTotal - ovCogs);
     const ovNetMargin = ovNet ? (ovNetProfit / ovNet * 100) : 0;
@@ -5802,7 +5835,7 @@ class Component extends DCLogic {
     const ovPrevGross = ovPrevRows.reduce((a, r) => a + r.gross, 0);
     const ovPrevNet = ovPrevRows.reduce((a, r) => a + r.net, 0);
     const ovPrevExpense = ovPrevExpRows.reduce((a, r) => a + r.amount, 0);
-    const ovPrevCogs = ovSumByKey(ovPrevExpRows, r => r.mainCat, r => r.amount)['วัตถุดิบ (COGS)'] || 0;
+    const ovPrevCogs = this.cogsOf(ovSumByKey(ovPrevExpRows, r => r.mainCat, r => r.amount));
     const ovPrevGrossProfit = ovPrevNet - ovPrevCogs;
     const ovPrevNetProfit = ovPrevGrossProfit - (ovPrevExpense - ovPrevCogs);
     const ovPrevMargin = ovPrevNet ? (ovPrevNetProfit / ovPrevNet * 100) : 0;
@@ -5846,7 +5879,7 @@ class Component extends DCLogic {
       { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, note:'ยอดขายเต็มของวันนี้ ก่อนแอปหักค่าบริการ · เทียบกับเมื่อวาน', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
       { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, note:'ยอดขายรวมทุกช่องทาง หักส่วนลดแล้ว แต่ยังไม่หักค่าบริการแอป', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
       { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, note:'เฉพาะรายจ่ายที่คีย์เข้าระบบ · ค่าบริการแอปไม่นับตรงนี้ เพราะหักไปแล้วในเงินเข้าจริง', icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
-      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, note:'เงินเข้าจริง ' + ovFmt(ovNet) + ' − วัตถุดิบ (COGS) ' + ovFmt(ovCogs), icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
+      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, note:'เงินเข้าจริง ' + ovFmt(ovNet) + ' − ค่าวัตถุดิบ ' + ovFmt(ovCogs), icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
       { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, note:'กำไรขั้นต้น − รายจ่ายอื่นที่ไม่ใช่วัตถุดิบ ' + ovFmt(ovExpenseTotal - ovCogs), icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
       { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, note:'กำไรสุทธิ ÷ เงินเข้าจริง (ไม่ใช่ ÷ ยอดขายเต็ม)', icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
     ];
@@ -5933,7 +5966,7 @@ class Component extends DCLogic {
     const ovFeeTotal = ovRows.reduce((a,r)=>a+r.fee,0);
     // แถบนี้เคยแสดง ค่าแรง กับ อื่น ๆ เป็น % ส่วนอีกสามช่องเป็นบาท เทียบกันไม่ได้เลย
     // ตอนนี้เป็นบาททั้งหมด และ "อื่น ๆ" คือรายจ่ายที่เหลือจริง ไม่ใช่เฉพาะหมวดชื่อ "อื่นๆ"
-    const ovRentUtil = (ovByExpCat['ค่าเช่า'] || 0) + (ovByExpCat['ค่าน้ำค่าไฟ'] || 0);
+    const ovRentUtil = this.rentUtilOf(ovByExpCat);
     const ovLabor = ovByExpCat['ค่าแรง'] || 0;
     const ovMiniOther = Math.max(0, ovExpenseTotal - ovCogs - ovLabor - ovRentUtil);
     const channelExpenseMini = [
@@ -6027,7 +6060,7 @@ class Component extends DCLogic {
       prev: rpSumBy(rpSalesPrev, r => r.platform === p, rpServiceOf),
       cum: rpSumBy(ovRows,       r => r.platform === p, rpServiceOf)
     })).filter(x => x.cur || x.prev || x.cum);
-    const rpExpItems = EXPENSE_MAIN_CATS.map(c => ({
+    const rpExpItems = this.expenseMainCats().map(c => ({
       name: c,
       cur: rpSumBy(rpExpCur,  r => r.mainCat === c, r => r.amount),
       prev: rpSumBy(rpExpPrev, r => r.mainCat === c, r => r.amount),
@@ -6103,7 +6136,7 @@ class Component extends DCLogic {
       : 'ยังไม่มีข้อมูลในช่วงที่เลือก';
 
     // ---- finance page (real data from recentRows + expRows) ----
-    const finCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#D98A4C', 'บรรจุภัณฑ์':'#A9BBD6', 'ค่าน้ำค่าไฟ':'#4E9E77', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#9C82C4', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#8B6FB8', 'อื่นๆ':'#B6BECC' };
+    const finCatColors = Object.assign({}, EXP_CAT_COLORS_CHANROAD, { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#D98A4C', 'บรรจุภัณฑ์':'#A9BBD6', 'ค่าน้ำค่าไฟ':'#4E9E77', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#9C82C4', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#8B6FB8', 'อื่นๆ':'#B6BECC' });
     const finSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byExpCat = finSumByKey(finExpRows, r => r.mainCat, r => r.amount);
     const expCatNames = Object.keys(byExpCat);
@@ -6284,7 +6317,9 @@ class Component extends DCLogic {
       toggle: () => { if (branchOptionsAllowed.length > 1) this.setState(st => ({ branchDDOpen: !st.branchDDOpen })); },
       options: branchOptionsAllowed.map(b => ({
         label: b.label,
-        onClick: () => this.setState({ activeBranch: b.code, branchDDOpen: false }),
+        // หมวดรายจ่ายคนละชุดต่อสาขา — ล้างหมวดที่ค้างไว้ ไม่ให้บันทึกหมวดของสาขาอื่น
+        onClick: () => this.setState(st => ({ activeBranch: b.code, branchDDOpen: false,
+          expForm: { ...st.expForm, mainCat: 'เลือกหมวดหมู่', subCat: 'เลือกหมวดหมู่ย่อย' } })),
         style: b.code === activeBranch
           ? { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', background:'#F3F6FA', color:'#223C66', fontWeight:600 }
           : { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'14px', padding:'9px 12px', borderRadius:'8px', fontSize:'13px', cursor:'pointer', color:'#3A4456' },
@@ -6358,7 +6393,7 @@ class Component extends DCLogic {
       { title:'รายรับหน้าร้าน', amount:inexFmt(inexStorefront), delta:inexNoDelta, icon:'store', bg:'#F8F0DC', fg:'#D98A4C', amtColor:'#1B2536' },
       { title:'รายรับแพลตฟอร์ม', amount:inexFmt(inexPlatformIncome), delta:inexNoDelta, icon:'smartphone', bg:'#E7F2F0', fg:'#3E9E92', amtColor:'#1B2536' }
     ];
-    const inexCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าธรรมเนียมแพลตฟอร์ม (อัตโนมัติ)':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
+    const inexCatColors = Object.assign({}, EXP_CAT_COLORS_CHANROAD, { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'Platform Fee':'#9C82C4', 'ค่าธรรมเนียมแพลตฟอร์ม (อัตโนมัติ)':'#9C82C4', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#C97A7A', 'การตลาด':'#8B6FB8', 'อุปกรณ์/ของใช้ร้าน':'#3E9E92', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' });
     const inexSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byCatInex = inexSumByKey(inexExpAll, r => r.mainCat, r => r.amount);
     if (inexPlatformFees > 0) byCatInex['ค่าธรรมเนียมแพลตฟอร์ม (อัตโนมัติ)'] = inexPlatformFees;
@@ -6672,8 +6707,9 @@ class Component extends DCLogic {
     const toggleExpDate = () => this.setState(s => ({ formDD: s.formDD === 'expDate' ? null : 'expDate' }));
     // เลือกหมวดหลักแล้วหมวดย่อยเปลี่ยนตาม และรีเซ็ตค่าเดิมทิ้ง กันเลือกคู่ที่ไม่มีความหมาย
     // (ของเดิมเป็นรายการลอย เลือก "ค่าเช่า" คู่กับ "วิปครีม" ได้)
-    const expMainDD = this.mkFormDD('mainCat', EXPENSE_MAIN_CATS, 'expForm', () => ({ subCat: 'เลือกหมวดหมู่ย่อย' }));
-    const expSubDD = this.mkFormDD('subCat', EXPENSE_SUB_BY_MAIN[ef.mainCat] || [], 'expForm');
+    const expMainCats = this.expenseMainCats();
+    const expMainDD = this.mkFormDD('mainCat', expMainCats, 'expForm', () => ({ subCat: 'เลือกหมวดหมู่ย่อย' }));
+    const expSubDD = this.mkFormDD('subCat', this.expenseSubCats(ef.mainCat), 'expForm');
     // ทะเบียนร้านยืนยันว่ามี 2 แบรนด์ — สวีทซอฟต์อยู่ใต้ AnnieCake ไม่ใช่แบรนด์แยก
     const expBrandDD = this.mkFormDD('expBrand', ['ไม่ระบุ','AnnieCake','หอมมนต์'], 'expForm');
     const expPayDD = this.mkFormDD('expPayment', ['โอนเงิน','เงินสด','บัตรเครดิต','อื่นๆ'], 'expForm');
@@ -6891,7 +6927,7 @@ class Component extends DCLogic {
     const epDonutRows = inexExpAll;
     const epTotal = epDonutRows.reduce((a,r)=>a+r.amount,0);
     const epTotalLabel = epFmt(epTotal);
-    const epCatColors = { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#9C82C4', 'การตลาด':'#3E9E92', 'อุปกรณ์/ของใช้ร้าน':'#8B6FB8', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' };
+    const epCatColors = Object.assign({}, EXP_CAT_COLORS_CHANROAD, { 'วัตถุดิบ (COGS)':'#4A6B9E', 'ค่าแรง':'#4A6B9E', 'บรรจุภัณฑ์':'#4E9E77', 'ค่าน้ำค่าไฟ':'#D98A4C', 'ค่าขนส่ง':'#9C82C4', 'การตลาด':'#3E9E92', 'อุปกรณ์/ของใช้ร้าน':'#8B6FB8', 'ค่าเช่า':'#D98A4C', 'อื่นๆ':'#B6BECC' });
     const epSumByKey = (rows, keyFn, valFn) => { const map = {}; rows.forEach(r => { const k = keyFn(r); map[k] = (map[k] || 0) + valFn(r); }); return map; };
     const byCatEp = epSumByKey(epDonutRows, r => r.mainCat, r => r.amount);
     const epCatNames = Object.keys(byCatEp);
@@ -7141,8 +7177,11 @@ class Component extends DCLogic {
     // หมวดรายจ่ายใช้รายการกลางชุดเดียวกับฟอร์มรายจ่าย เพิ่มหมวดใหม่ที่นั่นแล้วโผล่ที่นี่เอง
     const DR_EXP_SHORT = {
       'วัตถุดิบ (COGS)':'วัตถุดิบ', 'ของตกแต่งเค้ก':'ของตกแต่ง', 'อุปกรณ์ & ซ่อมบำรุง':'อุปกรณ์/ซ่อม',
-      'ค่าขนส่ง':'ขนส่ง', 'ค่าเช่า & สาธารณูปโภค':'เช่า/สาธารณูปโภค', 'ค่าธรรมเนียม & ภาษี':'ค่าธรรมเนียม/ภาษี'
+      'ค่าขนส่ง':'ขนส่ง', 'ค่าเช่า & สาธารณูปโภค':'เช่า/สาธารณูปโภค', 'ค่าธรรมเนียม & ภาษี':'ค่าธรรมเนียม/ภาษี',
+      'วัตถุดิบเครื่องดื่ม':'วัตถุดิบเครื่องดื่ม', 'อุปกรณ์ต่างๆ':'อุปกรณ์', 'ค่าซ่อมบำรุง':'ซ่อมบำรุง',
+      'ค่าเช่าและสาธารณูปโภค':'เช่า/สาธารณูปโภค', 'ธรรมเนียมและภาษี':'ค่าธรรมเนียม/ภาษี'
     };
+    const drExpCats = this.expenseMainCats();
     const drPosKeyOf = pay => (DR_POS_COLS.find(c => c.match(String(pay || ''))) || DR_POS_COLS[DR_POS_COLS.length - 1]).key;
 
     const drRange = this.periodRange();
@@ -7174,7 +7213,7 @@ class Component extends DCLogic {
     ovExpRows.forEach(r => {
       if (!r.isoDate) return;
       const b = drBucket(r.isoDate).exp;
-      const k = EXPENSE_MAIN_CATS.indexOf(r.mainCat) >= 0 ? r.mainCat : 'อื่นๆ';
+      const k = drExpCats.indexOf(r.mainCat) >= 0 ? r.mainCat : 'อื่นๆ';
       b[k] = (b[k] || 0) + (Number(r.amount) || 0);
     });
 
@@ -7184,7 +7223,7 @@ class Component extends DCLogic {
       .concat(DR_POS_COLS.map(c => drNumHead(c.label)))
       .concat(DR_PLATFORM_COLS.map(c => drNumHead(c.label)))
       .concat([drNumHead('รวมรับ', '#2C4A7C')])
-      .concat(EXPENSE_MAIN_CATS.map(c => drNumHead(DR_EXP_SHORT[c] || c, '#B14A4A')))
+      .concat(drExpCats.map(c => drNumHead(DR_EXP_SHORT[c] || c, '#B14A4A')))
       .concat([drNumHead('รวมจ่าย', '#B14A4A'), drNumHead('คงเหลือ', '#1B2536')]);
 
     // ช่องรายรับใช้สีปกติ · ช่องรายจ่ายเป็นสีแดงทั้งคอลัมน์ (เจ้าของร้านกำหนด 9 ก.ย. 2569)
@@ -7202,7 +7241,7 @@ class Component extends DCLogic {
         cells.push(drCell(v));
       });
       cells.push(drCell(income, 'font-weight:600;color:' + (income < 0 ? '#B14A4A' : '#2C4A7C') + ';'));
-      EXPENSE_MAIN_CATS.forEach(c => {
+      drExpCats.forEach(c => {
         const v = b.exp[c] || 0; expense += v;
         drTotals.exp[c] = (drTotals.exp[c] || 0) + v;
         cells.push(drCell(v, '', true));
@@ -7223,7 +7262,7 @@ class Component extends DCLogic {
       + (v < 0 ? 'color:#B14A4A;' : '') + (opt || '') });
     const dailyReportTotalCells = DR_POS_COLS.concat(DR_PLATFORM_COLS).map(c => drTotCell(drTotals.in[c.key] || 0))
       .concat([drTotCell(drTotals.income, 'color:' + (drTotals.income < 0 ? '#B14A4A' : '#2C4A7C') + ';')])
-      .concat(EXPENSE_MAIN_CATS.map(c => drTotCell(drTotals.exp[c] || 0, 'color:#B14A4A;')))
+      .concat(drExpCats.map(c => drTotCell(drTotals.exp[c] || 0, 'color:#B14A4A;')))
       .concat([drTotCell(drTotals.expense, 'color:#B14A4A;'),
                drTotCell(drTotals.left, 'color:' + (drTotals.left < 0 ? '#B14A4A' : '#2E7D5B') + ';')]);
     const dailyReportNote = drTrimmed
@@ -8669,7 +8708,7 @@ class Component extends DCLogic {
         : (ovInsights[0] ? ovInsights[0].text : 'ยังไม่มีข้อมูลในช่วงที่เลือก')),
       goDataSources: () => this.setState({ page: 'datasources' }),
       reportRows, reportCurLabel, reportPrevLabel, reportCumLabel,
-      expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, byExpCat['วัตถุดิบ (COGS)'] || 0, finExpenseTotal - (byExpCat['วัตถุดิบ (COGS)'] || 0)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
+      expenseRows, expenseDonut, waterfall: this.waterfall(finGross, finNet, this.cogsOf(byExpCat), finExpenseTotal - this.cogsOf(byExpCat)), payoutRows, cashflowCards, financeAlerts, categoryRows, finExpenseTotalLabel, finTodayLabel
     };
   }
 }
