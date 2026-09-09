@@ -1536,7 +1536,7 @@
               </tr>
             </thead>
             <tbody>
-              <sc-for list="{{ inexRecent }}" as="r" hint-placeholder-count="10">
+              <sc-for list="{{ inexRecent }}" as="r" hint-placeholder-count="4">
                 <tr style="border-top:1px solid #F1F2F4;color:#2B3547">
                   <td style="padding:9px 5px;color:#5A6478;white-space:nowrap">{{ r.date }}</td>
                   <td style="padding:9px 5px">{{ r.typeTag }}</td>
@@ -6459,7 +6459,7 @@ class Component extends DCLogic {
     const inexExpenseEntries = inexExpAll.map(r => ({ date: r.date + ' ' + r.time, ts: inexToTimestamp(r.date, r.time), type:'รายจ่าย', name: r.detail, channel: r.mainCat, cat: r.mainCat, amountNum: r.amount, neg:true, status:'บันทึกแล้ว' }));
     const inexRecent = [...inexIncomeEntries, ...inexExpenseEntries]
       .sort((a, b) => b.ts - a.ts)
-      .slice(0, 20)
+      .slice(0, 4)
       .map(r => ({ ...r, typeTag: inexTypePill(r.type), statusTag: inexStatusPill(r.status), amountColor: r.neg ? '#2C4A7C' : '#1B2536', amountText: (r.neg ? '-' : '') + inexFmt(r.amountNum) }));
     const inexSummary = [
       { cat:'Sales', income: inexFmt(inexIncomeTotal), expense:'–', net: inexFmt(inexIncomeTotal), netColor:'#2E7D5B', pct: inexIncomeTotal ? '100.0%' : '0.0%' },
