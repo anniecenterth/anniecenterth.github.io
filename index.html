@@ -4547,6 +4547,14 @@ class Component extends DCLogic {
   // ดึงสรุประบบสมาชิกจากโปรเจค annie-crm (อ่านอย่างเดียว) — หน้าไม่พังถ้าเชื่อมไม่ได้
   loadCrm = async () => {
     try {
+      // session ของ annie-crm ฟื้นจาก localStorage แบบ async — ถ้ายิง select ก่อนมันพร้อม
+      // จะได้ 0 แถวโดยไม่มี error ซึ่งอ่านผิดเป็น "ไม่มีสมาชิก" ต้องเช็กก่อนเสมอ
+      const crmSess = await crmClient.auth.getSession();
+      if (!crmSess.data || !crmSess.data.session) {
+        this.setState({ crmMembers: [], crmTiers: [], crmCoupons: [], crmLoaded: true,
+          crmError: 'ยังไม่ได้เชื่อมระบบสมาชิก — ออกจากระบบแล้วเข้าสู่ระบบใหม่อีกครั้ง' });
+        return;
+      }
       const [mem, tie, cou] = await Promise.all([
         crmClient.from('members').select('id,member_code,name,tier,reward_stars,spend,registered_at').order('reward_stars', { ascending: false }),
         crmClient.from('tiers').select('key,name,emoji,color,min_stars,sort').order('sort'),
@@ -5508,6 +5516,13 @@ class Component extends DCLogic {
       }
       this.setState({ authBusy: true, authError: null });
       try {
+        // ระบบสมาชิกอยู่คนละโปรเจค Supabase และ RLS เปิดให้เฉพาะ role authenticated
+        // ถ้าไม่ล็อกอินที่ annie-crm ด้วย คำสั่ง select จะคืน 0 แถวโดยไม่มี error
+        // (หน้าสมาชิกจึงขึ้นว่า "เชื่อมกับ annie-crm แล้ว" แต่ว่างเปล่า ทั้งที่มีสมาชิก 65 คน)
+        // ทำก่อนล็อกอินแดชบอร์ด เพราะ onAuthStateChange จะสั่ง loadCrm ทันทีที่ล็อกอินสำเร็จ
+        // ถ้ารหัสผ่านของสองระบบไม่ตรงกัน ปล่อยผ่าน — แดชบอร์ดต้องเข้าได้เหมือนเดิม
+        const crmLogin = await crmClient.auth.signInWithPassword({ email, password: this.state.authPassword });
+        if (crmLogin.error) console.warn('crm sign-in failed', crmLogin.error);
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password: this.state.authPassword });
         if (error) throw error;
         // ไม่เก็บรหัสผ่านไว้ในหน่วยความจำหลังใช้เสร็จ
@@ -5519,6 +5534,7 @@ class Component extends DCLogic {
     const onLoginKeyDown = e => { if (e.key === 'Enter') doLogin(); };
     const doLogout = async () => {
       try { await supabaseClient.auth.signOut(); } catch (e) { /* ออกจากระบบฝั่งเว็บให้ได้เสมอ */ }
+      try { await crmClient.auth.signOut(); } catch (e) { /* ระบบสมาชิกออกไม่ได้ก็ไม่ควรค้างหน้าจอ */ }
       // ล้างข้อมูลที่โหลดไว้ ไม่ให้คนถัดไปเห็นตัวเลขค้างบนจอ
       this.setState({
         authSession: null, authUser: '', authPassword: '', authError: null,
