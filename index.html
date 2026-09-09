@@ -6996,8 +6996,12 @@ class Component extends DCLogic {
       .concat(EXPENSE_MAIN_CATS.map(c => drNumHead(DR_EXP_SHORT[c] || c)))
       .concat([drNumHead('รวมจ่าย', '#B14A4A'), drNumHead('คงเหลือ', '#1B2536')]);
 
+    // ตัวเลขที่มียอดแต่ไม่ถึง 1,000 ใส่สีแดง — เจ้าของร้านใช้กวาดตาหาช่องที่ยอดตก
+    // ช่อง 0.00 ยังเป็นเทาเหมือนเดิม เพราะแปลว่า "ไม่มีรายการ" ไม่ใช่ "ยอดน้อย"
+    // คอลัมน์สรุป (รวมรับ/รวมจ่าย/คงเหลือ) ไม่แตะ เพราะมีสีบอกความหมายของตัวเองอยู่แล้ว
+    const DR_LOW = 1000;
     const drCell = (v, opt) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
-      + (v ? '' : 'color:#C2C9D6;') + (opt || '') });
+      + (v ? (opt ? '' : (v < DR_LOW ? 'color:#B14A4A;font-weight:600;' : '')) : 'color:#C2C9D6;') + (opt || '') });
     const drTotals = { in:{}, exp:{}, income:0, expense:0, left:0 };
     const dailyReportRows = drDates.map(iso => {
       const b = drByDate[iso] || { in:{}, exp:{} };
