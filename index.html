@@ -7021,13 +7021,25 @@ class Component extends DCLogic {
       { title: name, style:{ display:'inline-flex', alignItems:'center', gap:'8px', paddingLeft:'31px', color:'#7A8398', maxWidth:'290px' } },
       React.createElement('span', { style:{ width:'5px', height:'5px', borderRadius:'50%', background:'#C3CAD6', flex:'none' } }),
       React.createElement('span', { style:{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } }, name));
+    // ขายส่งเก็บใน `sales` เป็น platform='หน้าร้าน' payment='ขายส่ง' (คีย์เองผ่านฟอร์ม ไม่ผ่าน POS)
+    // แต่เจ้าของร้านดูเป็นคนละช่องทางกับหน้าร้าน จึงแยกออกมาเป็นหัวข้อหลักของตัวเอง
+    // ยอดของหน้าร้านด้านบนถูกหักออกแล้ว แถว "รวมทั้งหมด" จึงยังกระทบยอดเท่าเดิม
+    const WHOLESALE_PAY = 'ขายส่ง';
+    const wholesaleRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment === WHOLESALE_PAY);
+    const wholesale = wholesaleRows.reduce((a, r) => ({ gross: a.gross + r.gross, net: a.net + r.net }), { gross:0, net:0 });
+    const wholesaleHeaderCell = React.createElement('span',
+      { style:{ display:'inline-flex', alignItems:'center', gap:'9px' } },
+      React.createElement('span', { style:{ width:'22px', height:'22px', borderRadius:'7px', flex:'none', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, background:'#EEF0F5', color:'#5A6478' } }, '•'),
+      WHOLESALE_PAY);
+
     const dashPayoutRows = [];
     if (byChannel['หน้าร้าน']) {
       const g = byChannel['หน้าร้าน'];
-      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(g.gross), service: fmtB(0), net: fmtB(g.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      const posGross = g.gross - wholesale.gross, posNet = g.net - wholesale.net;
+      dashPayoutRows.push({ platform: storefrontHeaderCell(storefrontExpanded), gross: fmtB(posGross), service: fmtB(0), net: fmtB(posNet), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (storefrontExpanded) {
-        const storeRows = salesRows.filter(r => r.platform === 'หน้าร้าน');
-        const payOrder = ['Cash','K+ Shop','QR PromptPay (POS Pay)','ไทยช่วยไทย พลัส (หน้าร้าน)','Split Amount','ขายส่ง'];
+        const storeRows = salesRows.filter(r => r.platform === 'หน้าร้าน' && r.payment !== WHOLESALE_PAY);
+        const payOrder = ['Cash','K+ Shop','QR PromptPay (POS Pay)','ไทยช่วยไทย พลัส (หน้าร้าน)','Split Amount'];
         const byPay = {};
         storeRows.forEach(r => { const k = r.payment || 'อื่นๆ'; (byPay[k] || (byPay[k] = { gross:0, net:0 })); byPay[k].gross += r.gross; byPay[k].net += r.net; });
         const orderedKeys = payOrder.filter(k => byPay[k]).concat(Object.keys(byPay).filter(k => !payOrder.includes(k)));
@@ -7036,6 +7048,9 @@ class Component extends DCLogic {
           dashPayoutRows.push({ platform: storefrontSubCell(k), gross: fmtB(s.gross), service: fmtB(0), net: fmtB(s.net), statusTag: '', weight:'400' });
         });
       }
+    }
+    if (wholesaleRows.length) {
+      dashPayoutRows.push({ platform: wholesaleHeaderCell, gross: fmtB(wholesale.gross), service: fmtB(0), net: fmtB(wholesale.net), statusTag: dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
     }
     // Each delivery-platform row expands into its per-brand breakdown (same interaction
     // as the หน้าร้าน row) — sub-rows are grouped from each sale's brand, so they always
