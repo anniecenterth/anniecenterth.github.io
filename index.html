@@ -1584,14 +1584,7 @@
             </div>
             <div>
               <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">สาขา</div>
-              <div data-form-dd="expBranch" style="position:relative">
-                <div onClick="{{ expBranchDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ expBranchDD.value }}</span><i data-lucide="chevron-down" style="width:16px;height:16px;color:#9AA3B2;flex:none"></i></div>
-                <sc-if value="{{ expBranchDD.open }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px">
-                    <sc-for list="{{ expBranchDD.options }}" as="opt" hint-placeholder-count="2"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
-                  </div>
-                </sc-if>
-              </div>
+              <div style="display:flex;align-items:center;gap:8px;border:1px solid #EFF0F3;background:#F8F9FB;border-radius:10px;padding:11px 13px;font-size:13px;color:#5A6478"><i data-lucide="git-branch" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i><span style="font-weight:600;color:#2B3547">{{ activeBranchLabel }}</span></div>
             </div>
             <div>
               <div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">หมวดหมู่หลัก <span style="color:#2C4A7C">*</span></div>
@@ -3365,14 +3358,7 @@
           <h3 style="margin:0;font-size:16px;font-weight:600">บันทึกยอดขายหน้าร้าน — ทั้งวัน</h3>
           <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
             <span style="font-size:12.5px;color:#6B7486;font-weight:500">สาขา</span>
-            <div data-form-dd="storeBranch" style="position:relative;min-width:132px">
-              <div onClick="{{ salesBranchDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="font-weight:600">{{ salesBranchDD.value }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2;flex:none"></i></div>
-              <sc-if value="{{ salesBranchDD.open }}" hint-placeholder-val="{{ false }}">
-                <div style="position:absolute;top:46px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:132px">
-                  <sc-for list="{{ salesBranchDD.options }}" as="opt" hint-placeholder-count="2"><div onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div></sc-for>
-                </div>
-              </sc-if>
-            </div>
+            <div style="display:flex;align-items:center;gap:8px;background:#F8F9FB;border:1px solid #EFF0F3;border-radius:10px;padding:9px 13px;font-size:13px;color:#5A6478;min-width:132px"><i data-lucide="git-branch" style="width:14px;height:14px;color:#9AA3B2;flex:none"></i><span style="font-weight:600;color:#2B3547">{{ activeBranchLabel }}</span></div>
             <span style="font-size:12.5px;color:#6B7486;font-weight:500;margin-left:5px">แบรนด์</span>
             <div data-form-dd="storeBrand" style="position:relative;min-width:132px">
               <div onClick="{{ storeBrandDD.toggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:10px;padding:9px 13px;font-size:13px;color:#2B3547;cursor:pointer"><span style="font-weight:600">{{ storeBrandDD.value }}</span><i data-lucide="chevron-down" style="width:14px;height:14px;color:#9AA3B2;flex:none"></i></div>
@@ -6646,7 +6632,6 @@ class Component extends DCLogic {
     const expMainDD = this.mkFormDD('mainCat', EXPENSE_MAIN_CATS, 'expForm', () => ({ subCat: 'เลือกหมวดหมู่ย่อย' }));
     const expSubDD = this.mkFormDD('subCat', EXPENSE_SUB_BY_MAIN[ef.mainCat] || [], 'expForm');
     // ทะเบียนร้านยืนยันว่ามี 2 แบรนด์ — สวีทซอฟต์อยู่ใต้ AnnieCake ไม่ใช่แบรนด์แยก
-    const expBranchDD = this.mkFormDD('branch', BRANCH_OPTIONS.map(b => b.label), 'expForm');
     const expBrandDD = this.mkFormDD('expBrand', ['ไม่ระบุ','AnnieCake','หอมมนต์'], 'expForm');
     const expPayDD = this.mkFormDD('expPayment', ['โอนเงิน','เงินสด','บัตรเครดิต','อื่นๆ'], 'expForm');
     const toggleAsset = () => this.setState(s => ({ expForm: { ...s.expForm, asset: !s.expForm.asset } }));
@@ -6660,7 +6645,7 @@ class Component extends DCLogic {
       const e2 = this.state.expForm;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time, branch: branchCodeOf(e2.branch), mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time, branch: this.activeBranch(), mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
     };
     const saveExp = (keepGoing) => async () => {
       const editingId = this.state.editingExpenseId;
@@ -7244,7 +7229,6 @@ class Component extends DCLogic {
     const dateOpen = this.state.formDD === 'date';
     const toggleDate = () => this.setState(s => ({ formDD: s.formDD === 'date' ? null : 'date' }));
     const platformDD = this.mkFormDD('platform', ['LINE MAN','Grab','ShopeeFood','หน้าร้าน']);
-    const salesBranchDD = this.mkFormDD('branch', BRANCH_OPTIONS.map(b => b.label), 'storeBatch');
     // แบรนด์ในฟอร์มต้องเป็นของสาขาที่เปิดอยู่ ไม่งั้นบางโพจะเลือก Lottery ได้ทั้งที่ไม่มีขาย
     const formBrandNames = BRANCH_BRANDS[this.activeBranch()] || [];
     const brandDD = this.mkFormDD('brand', formBrandNames);
@@ -7266,7 +7250,7 @@ class Component extends DCLogic {
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       const pre = { 'LINE MAN':'LM', 'Grab':'GRAB', 'ShopeeFood':'SPF', 'หน้าร้าน':'POS' }[ff.platform] || 'LM';
       const orderId = ff.orderId || (pre + '-' + isoToBEShort(ff.date).split('/').reverse().join('') + '-' + String(Math.floor(Math.random()*900)+100));
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time, branch: branchCodeOf(ff.branch), platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time, branch: this.activeBranch(), platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
     };
     const saveRow = (keepGoing) => async () => {
       const editingId = this.state.editingSalesId;
@@ -7373,7 +7357,7 @@ class Component extends DCLogic {
         }
         const note = (f.note || '').trim();
         const dbRows = entries.map(x => mapSaleToDbRow({
-          date: beDate, time: '23:59', branch: branchCodeOf(f.branch), platform: 'หน้าร้าน', brand: sbBrand,
+          date: beDate, time: '23:59', branch: this.activeBranch(), platform: 'หน้าร้าน', brand: sbBrand,
           // ใส่ชื่อแบรนด์ใน order_id เมื่อแยกแบรนด์ ไม่งั้นวันเดียวกันหลายแบรนด์จะได้ id ซ้ำกัน
           orderId: x.p + (sbBrand === BRAND_UNSPEC ? '' : ' · ' + sbBrand) + ' (หน้าร้าน ' + beDate + ')',
           gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
