@@ -3128,77 +3128,77 @@
         </sc-for>
       </div>
       <div style="margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
           <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">มุมมองเจ้าของ</h1>
-          <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">มือถือ</span>
+          <span style="background:#ECF1F7;color:#2C4A7C;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">สรุปประจำวัน</span>
         </div>
-        <div style="font-size:14px;color:#8089A0">สรุปวันสำหรับเจ้าของ — เช็คยอด กำไร และความเสี่ยงได้จบในจอเดียว</div>
+        <div style="font-size:14px;color:#8089A0">ยึดวันนี้กับเดือนนี้เสมอ ไม่ขึ้นกับช่วงเวลาที่เลือกในหน้าอื่น</div>
       </div>
-      <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;padding:10px 0 30px">
 
-        <!-- phone 1: สรุปวันนี้ -->
-        <div style="width:332px;background:#0F1320;border-radius:42px;padding:11px;box-shadow:0 24px 60px rgba(20,28,56,0.3);flex:none">
-          <div style="background:#F7F7F8;border-radius:33px;overflow:hidden;height:680px;display:flex;flex-direction:column">
-            <div style="background:#23262D;padding:30px 22px 22px;color:#fff">
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:#C9CFE0;margin-bottom:18px"><span>9:41</span><span style="display:flex;gap:5px"><i data-lucide="signal" style="width:14px;height:14px"></i><i data-lucide="wifi" style="width:14px;height:14px"></i><i data-lucide="battery-full" style="width:16px;height:16px"></i></span></div>
-              <div style="font-size:13px;color:#C9B3DC;margin-bottom:3px">สวัสดีตอนเย็น คุณ Annie</div>
-              <div style="font-size:15px;font-weight:600;margin-bottom:20px">สาขาบางโพ · 28 มิ.ย.</div>
-              <div style="font-size:12.5px;color:#B9BED0;margin-bottom:4px">ยอดขายวันนี้</div>
-              <div style="font-size:38px;font-weight:700;letter-spacing:-1px;margin-bottom:6px">{{ mobileSales }}</div>
-            </div>
-            <div style="flex:1;overflow:hidden;padding:18px 16px;display:flex;flex-direction:column;gap:14px">
-              <div style="display:flex;gap:12px">
-                <div style="flex:1;background:#fff;border:1px solid #E7E9ED;border-radius:15px;padding:14px"><div style="font-size:11px;color:#8089A0;margin-bottom:5px">กำไรสุทธิ</div><div style="font-size:19px;font-weight:700;color:#2E7D5B">{{ mobileProfit }}</div></div>
-                <div style="flex:1;background:#fff;border:1px solid #E7E9ED;border-radius:15px;padding:14px"><div style="font-size:11px;color:#8089A0;margin-bottom:5px">ออเดอร์</div><div style="font-size:19px;font-weight:700;color:#1B2536">{{ mobileOrders }}</div></div>
-              </div>
-              <div style="background:#fff;border:1px solid #E7E9ED;border-radius:15px;padding:15px">
-                <div style="font-size:12.5px;font-weight:600;color:#1B2536;margin-bottom:13px">ยอดตามช่องทาง</div>
-                <div style="display:flex;flex-direction:column;gap:11px">
-                  <sc-for list="{{ mobileChannels }}" as="c" hint-placeholder-count="4">
-                    <div>
-                      <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:#5A6478">{{ c.name }}</span><span style="font-weight:600;color:#1B2536">{{ c.amount }}</span></div>
-                      <div style="height:6px;background:#EFF0F3;border-radius:3px;overflow:hidden"><div style="height:100%;width:{{ c.pct }};background:{{ c.color }};border-radius:3px"></div></div>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-            </div>
-            <div style="background:#fff;border-top:1px solid #E7E9ED;padding:13px 30px 20px;display:flex;align-items:center;justify-content:space-between;color:#9AA3B2">
-              <i data-lucide="house" style="width:21px;height:21px;color:#2C4A7C"></i>
-              <i data-lucide="chart-column" style="width:21px;height:21px"></i>
-              <i data-lucide="bell" style="width:21px;height:21px"></i>
-              <i data-lucide="user" style="width:21px;height:21px"></i>
-            </div>
+      <div style="max-width:760px;display:flex;flex-direction:column;gap:16px">
+
+        <!-- 1 · ยอดวันนี้ เทียบของจริง -->
+        <div style="background:#2C3D5E;color:#fff;border-radius:20px;padding:22px 24px;box-shadow:0 10px 26px rgba(30,34,41,0.14)">
+          <div style="font-size:13px;color:#B9C3D8;margin-bottom:2px">{{ mobileHello }}</div>
+          <div style="font-size:14.5px;font-weight:600;margin-bottom:18px">{{ mobileToday }}</div>
+          <div style="font-size:12.5px;color:#B9C3D8;margin-bottom:4px">ยอดขายวันนี้</div>
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.05">{{ mobileSales }}</span>
+            <span style="font-size:13px;font-weight:700;color:{{ mobileVsColor }};background:#fff;border-radius:8px;padding:3px 10px">{{ mobileVsYesterday }}</span>
           </div>
+          <div style="font-size:12.5px;color:#B9C3D8">{{ mobileCompare }}</div>
+          <div style="margin-top:12px;background:rgba(255,255,255,0.08);border-radius:12px;padding:8px 10px">{{ mobileSpark }}</div>
+          <div style="font-size:11px;color:#98A4BE;margin-top:7px">กราฟ 7 วันล่าสุด</div>
         </div>
 
-        <!-- phone 2: แจ้งเตือน -->
-        <div style="width:332px;background:#0F1320;border-radius:42px;padding:11px;box-shadow:0 24px 60px rgba(20,28,56,0.3);flex:none">
-          <div style="background:#F7F7F8;border-radius:33px;overflow:hidden;height:680px;display:flex;flex-direction:column">
-            <div style="background:#fff;border-bottom:1px solid #E7E9ED;padding:30px 22px 18px">
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:#9AA3B2;margin-bottom:18px"><span>9:41</span><span style="display:flex;gap:5px"><i data-lucide="signal" style="width:14px;height:14px"></i><i data-lucide="wifi" style="width:14px;height:14px"></i><i data-lucide="battery-full" style="width:16px;height:16px"></i></span></div>
-              <div style="font-size:20px;font-weight:700;color:#1B2536">แจ้งเตือน</div>
-              <div style="font-size:12.5px;color:#8089A0;margin-top:3px">{{ mobileAlertCount }}</div>
-            </div>
-            <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:12px">
-              <sc-for list="{{ mobileAlerts }}" as="a" hint-placeholder-count="3">
-                <div style="background:{{ a.bg }};border-radius:14px;padding:15px;display:flex;align-items:center;gap:12px">
-                  <div style="width:38px;height:38px;border-radius:11px;background:#fff;color:{{ a.c }};display:flex;align-items:center;justify-content:center;flex:none"><i data-lucide="triangle-alert" style="width:18px;height:18px"></i></div>
-                  <span style="font-size:13px;font-weight:600;color:#1B2536;line-height:1.35">{{ a.title }}</span>
-                </div>
-              </sc-for>
-              <div style="background:#fff;border:1px solid #E7E9ED;border-radius:15px;padding:16px;margin-top:4px">
-                <div style="font-size:12.5px;font-weight:600;color:#1B2536;margin-bottom:8px">สรุปจาก Annie Brain AI</div>
-                <div style="font-size:12px;color:#9AA3B2;line-height:1.6">ยังไม่มีข้อมูลวิเคราะห์จาก AI</div>
-              </div>
-            </div>
-            <div style="background:#fff;border-top:1px solid #E7E9ED;padding:13px 30px 20px;display:flex;align-items:center;justify-content:space-between;color:#9AA3B2">
-              <i data-lucide="house" style="width:21px;height:21px"></i>
-              <i data-lucide="chart-column" style="width:21px;height:21px"></i>
-              <i data-lucide="bell" style="width:21px;height:21px;color:#2C4A7C"></i>
-              <i data-lucide="user" style="width:21px;height:21px"></i>
-            </div>
+        <!-- 2 · ข้อมูลครบหรือยัง — ตัวชี้ว่าตัวเลขข้างบนเชื่อได้แค่ไหน -->
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <sc-if value="{{ mobileFreshWarn }}" hint-placeholder-val="{{ true }}">
+              <i data-lucide="triangle-alert" style="width:17px;height:17px;color:#B14A4A"></i>
+            </sc-if>
+            <h3 style="margin:0;font-size:15.5px;font-weight:600">ข้อมูลครบถึงวันไหน</h3>
           </div>
+          <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">ถ้ายังขาด ตัวเลขยอดขายกับกำไรจะต่ำกว่าความจริง</div>
+          <sc-for list="{{ mobileFreshRows }}" as="f" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid #F1F2F4;font-size:12.5px">
+              <span style="color:#5A6478;flex:1;min-width:0">{{ f.label }}</span>
+              <span style="color:#3A4456;white-space:nowrap">{{ f.value }}</span>
+              <span style="font-weight:700;color:{{ f.color }};white-space:nowrap;width:76px;text-align:right">{{ f.note }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- 3 · เงินเข้าบัญชีเดือนนี้ -->
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 14px;font-size:15.5px;font-weight:600">เงินเข้าบัญชีเดือนนี้</h3>
+          <sc-for list="{{ mobileCashRows }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #F1F2F4;font-size:13px">
+              <span style="color:#5A6478">{{ c.label }}</span>
+              <span style="font-weight:700;color:{{ c.color }};white-space:nowrap">{{ c.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- 4 · กำไรที่เชื่อได้ -->
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 10px;font-size:15.5px;font-weight:600">กำไรสุทธิเดือนนี้</h3>
+          <div style="font-size:28px;font-weight:700;letter-spacing:-0.6px;color:{{ mobileProfitColor }};margin-bottom:5px">{{ mobileProfit }}</div>
+          <div style="font-size:12.5px;color:#8089A0;line-height:1.5">{{ mobileProfitNote }}</div>
+        </div>
+
+        <!-- 5 · สิ่งที่ต้องทำวันนี้ -->
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <h3 style="margin:0 0 14px;font-size:15.5px;font-weight:600">สิ่งที่ต้องทำวันนี้</h3>
+          <sc-if value="{{ mobileTodosEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:9px;padding:14px 0;color:#2E7D5B;font-size:13px"><i data-lucide="circle-check" style="width:18px;height:18px"></i><span>ข้อมูลครบ ไม่มีอะไรค้าง</span></div>
+          </sc-if>
+          <sc-for list="{{ mobileTodos }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #F1F2F4;cursor:pointer">
+              <span style="font-size:13px;color:#3A4456;line-height:1.45;flex:1;min-width:0">{{ t.text }}</span>
+              <span style="font-size:12px;font-weight:600;color:#2C4A7C;white-space:nowrap;flex:none">{{ t.cta }} →</span>
+            </div>
+          </sc-for>
         </div>
 
       </div>
@@ -8249,23 +8249,93 @@ class Component extends DCLogic {
       { f:'จัดการผู้ใช้', vals:[true,false,false,false] }
     ].map(r => ({ f:r.f, c0:permCell(r.vals[0]), c1:permCell(r.vals[1]), c2:permCell(r.vals[2]), c3:permCell(r.vals[3]) }));
 
-    // ---- 9. มุมมองเจ้าของ (มือถือ) — real data from sales + shared alerts ----
-    const mobRows = this.applySalesFilters(this.state.recentRows);
+    /** ---- 9. มุมมองเจ้าของ ----
+     *  ออกแบบใหม่ 9 ก.ย. 2569 ให้ตอบคำถามที่เจ้าของถามจริงตอนเปิดมือถือ
+     *  วันนี้ขายดีไหม / เงินเข้าเท่าไหร่ / ข้อมูลครบไหม / ต้องทำอะไรต่อ
+     *  ทุกการ์ดยึด "วันนี้" กับ "เดือนนี้" ตายตัว ไม่ผูกกับตัวกรองช่วงเวลา
+     *  เพราะเจ้าของเปิดดูสรุปประจำวัน ไม่ได้มานั่งเลือกช่วง — และของเดิมเคยเอา
+     *  ยอดทั้งเดือนมาแปะป้ายว่า "วันนี้" ซึ่งอ่านผิดได้ทันที */
     const mobFmt = n => '฿' + Math.round(n || 0).toLocaleString('en-US');
-    const mobTotal = mobRows.reduce((a, r) => a + r.gross, 0);
-    const mobileSales = mobFmt(mobTotal - this.salesDiscountTotal(mobRows).total);
-    const mobPalette = { 'หน้าร้าน':'#3A5A8C', 'LINE MAN':'#7B62A8', 'Grab':'#35875A', 'ShopeeFood':'#C96245' };
-    const mobBy = {}; mobRows.forEach(r => { mobBy[r.platform] = (mobBy[r.platform] || 0) + r.gross; });
-    const mobileChannels = ['หน้าร้าน','LINE MAN','Grab','ShopeeFood'].filter(p => mobBy[p]).map(p => ({
-      name: p, amount: mobFmt(mobBy[p]), pct: mobTotal ? Math.round(mobBy[p] / mobTotal * 100) + '%' : '0%', color: mobPalette[p] || '#9AA3B2'
-    }));
-    const mobileAlerts = alertItems.map(a => ({ title: a.title, sev: a.sev, c: a.sevC, bg: a.sevBg }));
-    const mobExpTotal = this.applyExpenseFilters(this.state.expRows).reduce((a, r) => a + r.amount, 0);
-    const mobNetTotal = mobRows.reduce((a, r) => a + r.net, 0);
-    const mobileProfit = mobFmt(mobNetTotal - mobExpTotal);
-    const mobileOrders = String(mobRows.length);
-    const mobileAlertCount = alertItems.length ? (alertItems.length + ' รายการต้องดูวันนี้') : 'ไม่มีรายการต้องดูวันนี้';
-    const mobileAlertsEmpty = alertItems.length === 0;
+    const mobAll = this.salesOnly(this.state.recentRows);
+    const mobToday = todayISO();
+    const mobShift = d => { const t = new Date(mobToday + 'T00:00:00'); t.setDate(t.getDate() + d);
+      return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); };
+    const mobOn = iso => mobAll.filter(r => (r.isoDate || safeBeShortToISO(r.date)) === iso);
+    const mobSum = rows => rows.reduce((a, r) => a + r.gross, 0);
+    const mobSalesToday = mobSum(mobOn(mobToday));
+    const mobSalesYest = mobSum(mobOn(mobShift(-1)));
+    const mob30From = mobShift(-29);
+    const mob30 = mobAll.filter(r => { const d = r.isoDate || safeBeShortToISO(r.date); return d >= mob30From && d <= mobToday; });
+    const mobAvg30 = mobSum(mob30) / 30;
+    const mobileSales = mobFmt(mobSalesToday);
+    const mobileCompare = 'เมื่อวาน ' + mobFmt(mobSalesYest) + ' · เฉลี่ย 30 วัน ' + mobFmt(mobAvg30) + '/วัน';
+    const mobDiffPct = mobSalesYest ? (mobSalesToday - mobSalesYest) / mobSalesYest * 100 : null;
+    const mobileVsYesterday = mobDiffPct == null ? 'เมื่อวานไม่มียอด'
+      : (mobDiffPct >= 0 ? '▲ +' : '▼ ') + mobDiffPct.toFixed(0) + '% เทียบเมื่อวาน';
+    const mobileVsColor = mobDiffPct == null ? '#8089A0' : (mobDiffPct >= 0 ? '#2E7D5B' : '#B14A4A');
+    const mobileSpark = this.spark(Array.from({ length: 7 }, (_, i) => mobSum(mobOn(mobShift(i - 6)))), '#4A6B9E');
+    const mobGreeting = (() => { const h = new Date().getHours();
+      return h < 11 ? 'สวัสดีตอนเช้า' : (h < 16 ? 'สวัสดีตอนบ่าย' : (h < 20 ? 'สวัสดีตอนเย็น' : 'สวัสดีตอนค่ำ')); })();
+    const mobileHello = mobGreeting + ' คุณ Annie';
+    const mobileToday = 'สาขาบางโพ · ' + (() => { const [y, m, d] = mobToday.split('-').map(Number);
+      return d + ' ' + THAI_MONTHS_ABBR[m - 1] + ' ' + String((y + 543) % 100).padStart(2, '0'); })();
+
+    // 2 · ข้อมูลยังไม่ครบ — ตัวชี้ขาดว่าตัวเลขบนจอเชื่อได้แค่ไหน
+    const mobLatestOf = rows => rows.reduce((m, r) => { const d = r.isoDate || safeBeShortToISO(r.date); return d && d > m ? d : m; }, '');
+    const mobDaysBehind = iso => iso ? Math.round((new Date(mobToday + 'T00:00:00') - new Date(iso + 'T00:00:00')) / 86400000) : null;
+    const mobFreshRaw = [
+      { label: 'ยอดหน้าร้าน (POS)', iso: mobLatestOf(mobAll.filter(r => r.platform === 'หน้าร้าน')) },
+      { label: 'ยอดเดลิเวอรี (Grab · LINE MAN · Shopee)', iso: mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')) },
+      { label: 'รายจ่าย', iso: mobLatestOf(this.state.expRows) }
+    ].map(f => {
+      const gap = mobDaysBehind(f.iso);
+      return { label: f.label,
+        value: f.iso ? ('ถึง ' + isoToBEShort(f.iso)) : 'ยังไม่มีข้อมูล',
+        note: gap == null ? '' : (gap <= 0 ? 'ล่าสุด' : 'ขาด ' + gap + ' วัน'),
+        color: (gap == null || gap > 1) ? '#B14A4A' : '#2E7D5B' };
+    });
+    const mobileFreshRows = mobFreshRaw;
+    const mobileFreshWarn = mobFreshRaw.some(f => f.color === '#B14A4A');
+
+    // 3 · เงินเข้าบัญชี — คิดจากเดือนนี้เสมอ
+    const mobMonth = mobToday.slice(0, 7);
+    const mobMonthRows = mobAll.filter(r => (r.isoDate || safeBeShortToISO(r.date) || '').slice(0, 7) === mobMonth);
+    const mobMonthGross = mobSum(mobMonthRows);
+    const mobMonthNet = mobMonthRows.reduce((a, r) => a + r.net, 0);
+    const mobPendingRows = mobMonthRows.filter(r => r.status === 'รอรับเงิน');
+    const mobPending = mobPendingRows.reduce((a, r) => a + (r.net || 0), 0);
+    const mobServiceFee = mobMonthGross - mobMonthNet;
+    const mobileCashRows = [
+      { label: 'เข้าบัญชีแล้วเดือนนี้', value: mobFmt(mobMonthNet), color: '#1B2536' },
+      { label: 'รอรับจากแอป', value: mobFmt(mobPending), color: mobPending > 0 ? '#B98317' : '#8089A0' },
+      { label: 'ค่าบริการที่โดนหัก', value: mobFmt(mobServiceFee) + (mobMonthGross ? ' (' + (mobServiceFee / mobMonthGross * 100).toFixed(1) + '%)' : ''), color: '#B14A4A' }
+    ];
+
+    // 4 · กำไร — ถ้ารายจ่ายยังไม่ครบ ห้ามโชว์ตัวเลข เพราะจะสวยเกินจริง
+    const mobExpMonth = this.state.expRows.filter(r => (r.isoDate || safeBeShortToISO(r.date) || '').slice(0, 7) === mobMonth);
+    const mobExpMonthTotal = mobExpMonth.reduce((a, r) => a + r.amount, 0);
+    const mobExpGap = mobDaysBehind(mobLatestOf(this.state.expRows));
+    const mobProfitTrusted = mobExpMonthTotal > 0 && mobExpGap != null && mobExpGap <= 2;
+    const mobileProfit = mobProfitTrusted ? mobFmt(mobMonthNet - mobExpMonthTotal) : 'ยังคำนวณไม่ได้';
+    const mobileProfitNote = mobProfitTrusted
+      ? ('เงินเข้าจริง ' + mobFmt(mobMonthNet) + ' − รายจ่าย ' + mobFmt(mobExpMonthTotal))
+      : (mobExpMonthTotal === 0 ? 'เดือนนี้ยังไม่ได้คีย์รายจ่ายเลย' : 'รายจ่ายบันทึกล่าสุดค้าง ' + mobExpGap + ' วัน');
+    const mobileProfitColor = mobProfitTrusted ? '#2E7D5B' : '#8089A0';
+
+    // 5 · สิ่งที่ต้องทำวันนี้ — สร้างจากช่องว่างของข้อมูลจริง ไม่ใช่รายการตายตัว
+    const mobileTodos = [];
+    const mobDeliGap = mobDaysBehind(mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')));
+    if (mobDeliGap != null && mobDeliGap > 1) {
+      mobileTodos.push({ text: 'นำเข้ารายงาน Grab / LINE MAN / Shopee ที่ยังขาด ' + mobDeliGap + ' วัน', cta: 'นำเข้ารายงาน', onClick: goPage('import') });
+    }
+    if (mobExpMonthTotal === 0 || (mobExpGap != null && mobExpGap > 2)) {
+      mobileTodos.push({ text: 'คีย์รายจ่ายของเดือนนี้ ยังไม่มีข้อมูลให้คำนวณกำไร', cta: 'คีย์รายจ่าย', onClick: goPage('expenserec') });
+    }
+    if (mobPending > 0) {
+      mobileTodos.push({ text: 'มีเงินรอรับจากแอป ' + mobFmt(mobPending) + ' ตรวจว่าเข้าบัญชีแล้วหรือยัง', cta: 'กระทบยอด', onClick: goPage('payout') });
+    }
+    alertItems.slice(0, 2).forEach(a => mobileTodos.push({ text: a.title, cta: 'ดูรายละเอียด', onClick: goPage('alerts') }));
+    const mobileTodosEmpty = mobileTodos.length === 0;
 
     return {
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
@@ -8361,7 +8431,9 @@ class Component extends DCLogic {
       pnd50Profit: tfFmt(pnd50Profit), pnd50Tax: tfFmt(pnd50Tax),
       pnd51EstTax: tfFmt(pnd51EstTax), pnd51Installment: tfFmt(pnd51Installment),
       users, roleDefs, permMatrix, userCountLabel: users.length + ' ผู้ใช้',
-      mobileSales, mobileChannels, mobileAlerts, mobileProfit, mobileOrders, mobileAlertCount, mobileAlertsEmpty,
+      mobileSales, mobileCompare, mobileVsYesterday, mobileVsColor, mobileSpark, mobileHello, mobileToday,
+      mobileFreshRows, mobileFreshWarn, mobileCashRows, mobileProfit, mobileProfitNote, mobileProfitColor,
+      mobileTodos, mobileTodosEmpty,
       isLoggedIn, showLogin, authLoading, authUserValue, authPasswordValue, authError, authButtonLabel, authBusy,
       setAuthUser, setAuthPassword, doLogin, onLoginKeyDown, doLogout,
       navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs,
