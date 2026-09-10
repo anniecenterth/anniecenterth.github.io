@@ -7477,9 +7477,10 @@ class Component extends DCLogic {
     };
     const storeSaveLabel = this.state.storeSaving ? 'กำลังบันทึก…' : (sbCount > 0 ? 'บันทึกทั้งวัน (' + sbCount + ' รายการ)' : 'บันทึกทั้งวัน');
     const setSearch = e => { const val = e.target.value; this.setState({ salesSearch: val }); };
-    const setSalesPlatform = p => () => this.setState({ salesPlatform: p });
+    const setSalesPlatform = p => () => this.setState({ salesPlatform: p, salesPage: 1 });
     const ptabs = [
       { label:'ทุกแพลตฟอร์ม', badge:'◉', bg:'#ECF1F7', fg:'#2C4A7C' },
+      { label:'หน้าร้าน', badge:'ร', bg:'#F1EFF7', fg:'#7A5BA8' },
       { label:'LINE MAN', badge:'L', bg:'#E6F3ED', fg:'#2E7D5B' },
       { label:'Grab', badge:'G', bg:'#E6F3ED', fg:'#2E7D5B' },
       { label:'ShopeeFood', badge:'S', bg:'#F7ECE1', fg:'#C77435' }
@@ -7495,7 +7496,11 @@ class Component extends DCLogic {
           : { display:'flex', alignItems:'center', gap:'8px', background:'#fff', border:'1px solid #E7E9ED', borderRadius:'10px', padding:'8px 14px', fontSize:'13px', fontWeight:500, color:'#5A6478', cursor:'pointer' }
       };
     });
-    let filtered = this.state.recentRows;
+    // รายการนี้เหลือผู้ใช้เดียวคือปุ่มส่งออกรายงาน (ตารางรายการยอดขายถูกนำออกไปแล้ว)
+    // เดิมอ่าน recentRows ดิบ ๆ ไฟล์ที่ได้จึงมีทุกสาขาและทุกช่วงเวลา ไม่ตรงกับที่เห็นบนจอ
+    const salesExpRng = this.periodRange();
+    let filtered = this.salesOnly(this.state.recentRows);
+    if (salesExpRng) filtered = filtered.filter(r => r.isoDate && r.isoDate >= salesExpRng.from && r.isoDate <= salesExpRng.to);
     if (this.state.salesPlatform !== 'ทุกแพลตฟอร์ม') filtered = filtered.filter(r => r.platform === this.state.salesPlatform);
     if (this.state.salesStatusFilter !== 'ทุกสถานะเงินเข้า') filtered = filtered.filter(r => r.status === this.state.salesStatusFilter);
     if (this.state.salesPeriodFilter === 'เลือกช่วงวันที่') {
@@ -7668,7 +7673,12 @@ class Component extends DCLogic {
     }, '');
     const dataAsOfLabel = skLatestISO ? 'ข้อมูลถึง ' + isoToBEShort(skLatestISO) : 'ยังไม่มีข้อมูล';
     // ทุกการ์ดและโดนัทบนหน้านี้อิง "ช่วงวันที่" ที่เลือกบนหัวหน้าจอ ไม่ใช่วันเดียวอีกต่อไป
-    const skMonthRows = filterByDateRange(skRows, skFrom, skTo);
+    const skMonthRowsAll = filterByDateRange(skRows, skFrom, skTo);
+    // ชิปแพลตฟอร์มด้านบนมีผลกับการ์ด KPI เท่านั้น — ตารางด้านล่างเป็น "ยอดขายหน้าร้านรายวัน"
+    // อยู่แล้ว ถ้ากรองด้วยจะกลายเป็นว่างเปล่าทันทีที่เลือก Grab/LINE MAN ซึ่งอ่านแล้วเข้าใจผิด
+    const skPlat = this.state.salesPlatform;
+    const skInPlat = r => skPlat === 'ทุกแพลตฟอร์ม' || r.platform === skPlat;
+    const skMonthRows = skMonthRowsAll.filter(skInPlat);
     const skGrossRange = skMonthRows.reduce((a,r)=>a+r.gross,0);
     const skGrossMTD = skGrossRange;
     const skDayCount = Object.keys(skMonthRows.reduce((m, r) => {
@@ -7676,8 +7686,9 @@ class Component extends DCLogic {
     }, {})).length;
     const skAvgPerDay = skDayCount ? skGrossRange / skDayCount : 0;
     const skNetRange = skMonthRows.reduce((a,r)=>a+(r.net||0),0);
-    const skReceivable = skRows.filter(r=>r.status==='รอรับเงิน').reduce((a,r)=>a+(r.net||0),0);
-    const skRangeSuffix = this.state.period === 'วันนี้' ? 'วันนี้' : 'ในช่วงที่เลือก';
+    const skReceivable = skRows.filter(r=>skInPlat(r)&&r.status==='รอรับเงิน').reduce((a,r)=>a+(r.net||0),0);
+    const skRangeSuffix = (this.state.period === 'วันนี้' ? 'วันนี้' : 'ในช่วงที่เลือก')
+      + (skPlat === 'ทุกแพลตฟอร์ม' ? '' : ' · ' + skPlat);
     const salesKpis = [
       { title:'ยอดขาย' + skRangeSuffix, amount:skFmt(skGrossRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'เฉลี่ยต่อวัน (' + skDayCount + ' วันที่มีข้อมูล)', amount:skFmt(skAvgPerDay), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
@@ -7691,7 +7702,7 @@ class Component extends DCLogic {
     const SK_PAY_COLS = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', this.specialPay()];
     const SK_PAY_FIELDS = ['cash', 'kplus', 'pospay', 'subsidy', 'split', 'wholesale'];
     const skDayMap = {};
-    skMonthRows.filter(r => r.platform === 'หน้าร้าน' && SK_PAY_COLS.indexOf(r.payment) >= 0).forEach(r => {
+    skMonthRowsAll.filter(r => r.platform === 'หน้าร้าน' && SK_PAY_COLS.indexOf(r.payment) >= 0).forEach(r => {
       const iso = r.isoDate || safeBeShortToISO(r.date);
       if (!iso) return;
       const d = skDayMap[iso] || (skDayMap[iso] = {});
