@@ -3323,7 +3323,10 @@
           <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายหน้าร้านรายวัน</h3>
           <span style="font-size:12.5px;color:#9AA3B2">{{ headerDateDisplay }}</span>
         </div>
-        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">แสดงเฉพาะวันที่มียอดในช่องใดช่องหนึ่ง · เรียงวันล่าสุดขึ้นก่อน</div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">แสดงเฉพาะวันที่มียอดในช่องใดช่องหนึ่ง · เรียงวันล่าสุดขึ้นก่อน · คลิกตัวเลขในช่อง Cash · K+ Shop · ไทยช่วยไทย พลัส เพื่อแก้ไข (ใส่ 0 = ลบยอดวันนั้นทิ้ง)</div>
+        <sc-if value="{{ skEditError }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FDF1F1;border:1px solid #F0D2D2;color:#B14A4A;border-radius:10px;padding:9px 13px;font-size:12.5px;margin-bottom:12px">{{ skEditError }}</div>
+        </sc-if>
         <sc-if value="{{ salesDailyHasRows }}" hint-placeholder-val="{{ true }}">
           <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:900px">
@@ -3343,12 +3346,48 @@
               <sc-for list="{{ salesDailyRows }}" as="r" hint-placeholder-count="10">
                 <tr style="{{ r.rowStyle }}">
                   <td style="padding:11px 10px;white-space:nowrap">{{ r.date }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.cash }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.kplus }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.pospay }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.subsidy }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.split }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.wholesale }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">
+                    <sc-if value="{{ r.cash.editing }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:inline-flex;align-items:center;gap:5px;justify-content:flex-end">
+                        <input value="{{ skEditValue }}" onChange="{{ setSkEditValue }}" onKeyDown="{{ onSkEditKey }}" inputmode="decimal" placeholder="0" style="width:96px;border:1px solid #A9BBD6;border-radius:8px;padding:5px 8px;font-size:12.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit"/>
+                        <span onClick="{{ saveSkEdit }}" style="cursor:pointer;color:#2E7D5B;font-weight:700;padding:0 2px">{{ skEditSaveLabel }}</span>
+                        <span onClick="{{ cancelSkEdit }}" style="cursor:pointer;color:#9AA3B2;font-weight:700;padding:0 2px">✕</span>
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ r.cash.canEdit }}" hint-placeholder-val="{{ true }}">
+                      <span onClick="{{ r.cash.onEdit }}" style="cursor:pointer;border-bottom:1px dashed #C2C9D6;padding-bottom:1px">{{ r.cash.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ r.cash.plain }}" hint-placeholder-val="{{ false }}">{{ r.cash.text }}</sc-if>
+                  </td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">
+                    <sc-if value="{{ r.kplus.editing }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:inline-flex;align-items:center;gap:5px;justify-content:flex-end">
+                        <input value="{{ skEditValue }}" onChange="{{ setSkEditValue }}" onKeyDown="{{ onSkEditKey }}" inputmode="decimal" placeholder="0" style="width:96px;border:1px solid #A9BBD6;border-radius:8px;padding:5px 8px;font-size:12.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit"/>
+                        <span onClick="{{ saveSkEdit }}" style="cursor:pointer;color:#2E7D5B;font-weight:700;padding:0 2px">{{ skEditSaveLabel }}</span>
+                        <span onClick="{{ cancelSkEdit }}" style="cursor:pointer;color:#9AA3B2;font-weight:700;padding:0 2px">✕</span>
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ r.kplus.canEdit }}" hint-placeholder-val="{{ true }}">
+                      <span onClick="{{ r.kplus.onEdit }}" style="cursor:pointer;border-bottom:1px dashed #C2C9D6;padding-bottom:1px">{{ r.kplus.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ r.kplus.plain }}" hint-placeholder-val="{{ false }}">{{ r.kplus.text }}</sc-if>
+                  </td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.pospay.text }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">
+                    <sc-if value="{{ r.subsidy.editing }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:inline-flex;align-items:center;gap:5px;justify-content:flex-end">
+                        <input value="{{ skEditValue }}" onChange="{{ setSkEditValue }}" onKeyDown="{{ onSkEditKey }}" inputmode="decimal" placeholder="0" style="width:96px;border:1px solid #A9BBD6;border-radius:8px;padding:5px 8px;font-size:12.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit"/>
+                        <span onClick="{{ saveSkEdit }}" style="cursor:pointer;color:#2E7D5B;font-weight:700;padding:0 2px">{{ skEditSaveLabel }}</span>
+                        <span onClick="{{ cancelSkEdit }}" style="cursor:pointer;color:#9AA3B2;font-weight:700;padding:0 2px">✕</span>
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ r.subsidy.canEdit }}" hint-placeholder-val="{{ true }}">
+                      <span onClick="{{ r.subsidy.onEdit }}" style="cursor:pointer;border-bottom:1px dashed #C2C9D6;padding-bottom:1px">{{ r.subsidy.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ r.subsidy.plain }}" hint-placeholder-val="{{ false }}">{{ r.subsidy.text }}</sc-if>
+                  </td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.split.text }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.wholesale.text }}</td>
                   <td style="padding:11px 10px;text-align:right;white-space:nowrap;font-weight:600">{{ r.total }}</td>
                 </tr>
               </sc-for>
@@ -4389,6 +4428,7 @@ class Component extends DCLogic {
     crmMembers: [], crmTiers: [], crmCoupons: [], crmError: null, crmLoaded: false,
     accessRows: [], accessLoaded: false,
     crmConnUser: '', crmConnPassword: '', crmConnBusy: false, crmConnError: null,
+    skEditKey: null, skEditValue: '', skEditSaving: false, skEditError: null,
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
     storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' },
@@ -7706,16 +7746,90 @@ class Component extends DCLogic {
     });
     const skDayKeys = Object.keys(skDayMap).sort().reverse();
     const skCell = v => v ? skFmt(v) : '—';
+
+    /** แก้ไขยอดในตารางได้ 3 ช่อง (เจ้าของร้านกำหนด 10 ก.ย. 2569)
+     *  ตรวจแล้วว่าหนึ่งวัน + หนึ่งวิธีชำระ = หนึ่งแถวใน `sales` เสมอ (Cash 244 วัน 244 แถว
+     *  K+ Shop 116/116 ไทยช่วยไทย 96/96) การแก้ยอดจึงชี้ไปที่แถวเดียวไม่กำกวม */
+    const SK_EDITABLE_PAYS = ['Cash', 'K+ Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)'];
+    const skRowByKey = {};
+    skMonthRowsAll.filter(r => r.platform === 'หน้าร้าน').forEach(r => {
+      const iso = r.isoDate || safeBeShortToISO(r.date);
+      if (iso) skRowByKey[iso + '|' + (r.payment || '')] = r;
+    });
+    const skEditValue = this.state.skEditValue;
+    const skEditError = this.state.skEditError;
+    const setSkEditValue = e => { const v = e.target.value; this.setState({ skEditValue: v }); };
+    const startSkEdit = (iso, pay, cur) => () => this.setState({
+      skEditKey: iso + '|' + pay, skEditValue: cur ? String(cur) : '', skEditError: null });
+    const cancelSkEdit = () => this.setState({ skEditKey: null, skEditValue: '', skEditError: null });
+    const saveSkEdit = async () => {
+      if (this.state.skEditSaving) return;
+      const key = this.state.skEditKey;
+      if (!key) return;
+      const cut = key.indexOf('|');
+      const iso = key.slice(0, cut), pay = key.slice(cut + 1);
+      const raw = String(this.state.skEditValue || '').replace(/,/g, '').trim();
+      const v = raw === '' ? 0 : parseFloat(raw);
+      if (isNaN(v) || v < 0) { this.setState({ skEditError: 'ใส่ตัวเลขที่ไม่ติดลบ' }); return; }
+      const val = Math.round(v * 100) / 100;
+      const row = skRowByKey[key];
+      this.setState({ skEditSaving: true, skEditError: null });
+      try {
+        // ใส่ 0 = ไม่มียอดวันนั้น จึงลบแถวทิ้ง ไม่ใช่เก็บแถวยอด 0 ไว้ให้รายงานนับวันเกินจริง
+        if (row && val === 0) {
+          const { error } = await supabaseClient.from('sales').delete().eq('id', row.id);
+          if (error) throw error;
+          this.setState(st => ({ recentRows: st.recentRows.filter(x => x.id !== row.id),
+            skEditKey: null, skEditValue: '', skEditSaving: false }));
+          return;
+        }
+        if (row) {
+          // ส่วนลดเดิมคงไว้ แต่ห้ามมากกว่ายอดใหม่ ไม่งั้นเงินเข้าจริงจะติดลบ
+          const fee = Math.min(Number(row.fee) || 0, val);
+          const net = Math.round((val - fee) * 100) / 100;
+          const { error } = await supabaseClient.from('sales').update({ gross: val, fee: fee, net: net }).eq('id', row.id);
+          if (error) throw error;
+          this.setState(st => ({
+            recentRows: st.recentRows.map(x => x.id === row.id ? { ...x, gross: val, fee: fee, net: net } : x),
+            skEditKey: null, skEditValue: '', skEditSaving: false }));
+          return;
+        }
+        if (val === 0) { this.setState({ skEditKey: null, skEditValue: '', skEditSaving: false }); return; }
+        const beDate = isoToBEShort(iso);
+        const dbRow = mapSaleToDbRow({
+          date: beDate, isoDate: iso, time: '23:59', branch: this.activeBranch(), platform: 'หน้าร้าน',
+          brand: BRAND_UNSPEC, orderId: pay + ' (หน้าร้าน ' + beDate + ')',
+          gross: val, fee: 0, net: val, status: 'เงินเข้าจริง', type: 'หน้าร้าน',
+          payment: pay, attachmentName: '', source: 'MANUAL_FORM'
+        });
+        const res = await supabaseClient.from('sales').insert([dbRow]).select();
+        if (res.error) throw res.error;
+        this.setState(st => ({ recentRows: [...res.data.map(mapDbRowToSale), ...st.recentRows],
+          skEditKey: null, skEditValue: '', skEditSaving: false }));
+      } catch (err) {
+        console.error('saveSkEdit failed', err);
+        this.setState({ skEditSaving: false, skEditError: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' });
+      }
+    };
+    const onSkEditKey = e => { if (e.key === 'Enter') saveSkEdit(); else if (e.key === 'Escape') cancelSkEdit(); };
+    const skEditSaveLabel = this.state.skEditSaving ? '…' : '✓';
+    const skCellObj = (iso, pay, v) => {
+      const editable = !!iso && SK_EDITABLE_PAYS.indexOf(pay) >= 0 && !isReadOnly;
+      const editing = editable && this.state.skEditKey === (iso + '|' + pay);
+      return { text: skCell(v), editing: editing, canEdit: editable && !editing, plain: !editable && !editing,
+        onEdit: editable ? startSkEdit(iso, pay, v) : null };
+    };
+
     const salesDailyRows = skDayKeys.map(iso => {
       const d = skDayMap[iso];
       const row = { date: isoToBEShort(iso), total: skFmt(SK_PAY_COLS.reduce((a, k) => a + (d[k] || 0), 0)) };
-      SK_PAY_COLS.forEach((k, i) => { row[SK_PAY_FIELDS[i]] = skCell(d[k]); });
+      SK_PAY_COLS.forEach((k, i) => { row[SK_PAY_FIELDS[i]] = skCellObj(iso, k, d[k]); });
       return row;
     });
     if (salesDailyRows.length) {
       const sum = k => skDayKeys.reduce((a, iso) => a + (skDayMap[iso][k] || 0), 0);
       const totalRow = { date: 'รวม ' + skDayKeys.length + ' วัน', total: skFmt(SK_PAY_COLS.reduce((a, k) => a + sum(k), 0)), isTotal: true };
-      SK_PAY_COLS.forEach((k, i) => { totalRow[SK_PAY_FIELDS[i]] = skCell(sum(k)); });
+      SK_PAY_COLS.forEach((k, i) => { totalRow[SK_PAY_FIELDS[i]] = skCellObj('', k, sum(k)); });
       salesDailyRows.push(totalRow);
     }
     const salesDailyHasRows = salesDailyRows.length > 0;
@@ -8618,6 +8732,7 @@ class Component extends DCLogic {
       setCrmConnUser, setCrmConnPassword, onCrmConnKeyDown,
       connectCrm: () => this.connectCrm(), disconnectCrm: () => this.disconnectCrm(),
       specialPayLabel: this.specialPay(),
+      skEditValue, setSkEditValue, onSkEditKey, saveSkEdit, cancelSkEdit, skEditError, skEditSaveLabel,
       crmKpis, crmTierRows, crmTierDonut, crmTierTotalLabel, crmSignupSpark, crmSignup14, crmTopRows, crmStatusLabel, crmStatusOk, crmHas, exportMembersCsv,
       inexExpenseTotalLabel: inexFmt(inexExpenseTotal), inexIncomeTotalLabel: inexFmt(inexIncomeTotal),
       inexNetProfitLabel: inexFmt(inexNetProfit), inexMarginLabel: inexMargin.toFixed(1) + '%',
