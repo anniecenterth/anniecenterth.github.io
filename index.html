@@ -3323,7 +3323,7 @@
           <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายหน้าร้านรายวัน</h3>
           <span style="font-size:12.5px;color:#9AA3B2">{{ headerDateDisplay }}</span>
         </div>
-        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">แสดงเฉพาะวันที่มียอดในช่องใดช่องหนึ่ง · เรียงวันล่าสุดขึ้นก่อน · คลิกตัวเลขในช่อง Cash · K+ Shop · ไทยช่วยไทย พลัส เพื่อแก้ไข (ใส่ 0 = ลบยอดวันนั้นทิ้ง)</div>
+        <div style="font-size:12px;color:#9AA3B2;margin-bottom:14px">แสดงเฉพาะวันที่มียอดในช่องใดช่องหนึ่ง · เรียงวันล่าสุดขึ้นก่อน · คลิกตัวเลขในช่อง Cash · K+ Shop · ไทยช่วยไทย พลัส · {{ specialPayLabel }} เพื่อแก้ไข (ใส่ 0 = ลบยอดวันนั้นทิ้ง)</div>
         <sc-if value="{{ skEditError }}" hint-placeholder-val="{{ false }}">
           <div style="background:#FDF1F1;border:1px solid #F0D2D2;color:#B14A4A;border-radius:10px;padding:9px 13px;font-size:12.5px;margin-bottom:12px">{{ skEditError }}</div>
         </sc-if>
@@ -3387,7 +3387,19 @@
                     <sc-if value="{{ r.subsidy.plain }}" hint-placeholder-val="{{ false }}">{{ r.subsidy.text }}</sc-if>
                   </td>
                   <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.split.text }}</td>
-                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">{{ r.wholesale.text }}</td>
+                  <td style="padding:11px 10px;text-align:right;white-space:nowrap">
+                    <sc-if value="{{ r.wholesale.editing }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:inline-flex;align-items:center;gap:5px;justify-content:flex-end">
+                        <input value="{{ skEditValue }}" onChange="{{ setSkEditValue }}" onKeyDown="{{ onSkEditKey }}" inputmode="decimal" placeholder="0" style="width:96px;border:1px solid #A9BBD6;border-radius:8px;padding:5px 8px;font-size:12.5px;color:#2B3547;text-align:right;outline:none;font-family:inherit"/>
+                        <span onClick="{{ saveSkEdit }}" style="cursor:pointer;color:#2E7D5B;font-weight:700;padding:0 2px">{{ skEditSaveLabel }}</span>
+                        <span onClick="{{ cancelSkEdit }}" style="cursor:pointer;color:#9AA3B2;font-weight:700;padding:0 2px">✕</span>
+                      </span>
+                    </sc-if>
+                    <sc-if value="{{ r.wholesale.canEdit }}" hint-placeholder-val="{{ true }}">
+                      <span onClick="{{ r.wholesale.onEdit }}" style="cursor:pointer;border-bottom:1px dashed #C2C9D6;padding-bottom:1px">{{ r.wholesale.text }}</span>
+                    </sc-if>
+                    <sc-if value="{{ r.wholesale.plain }}" hint-placeholder-val="{{ false }}">{{ r.wholesale.text }}</sc-if>
+                  </td>
                   <td style="padding:11px 10px;text-align:right;white-space:nowrap;font-weight:600">{{ r.total }}</td>
                 </tr>
               </sc-for>
@@ -7750,7 +7762,8 @@ class Component extends DCLogic {
     /** แก้ไขยอดในตารางได้ 3 ช่อง (เจ้าของร้านกำหนด 10 ก.ย. 2569)
      *  ตรวจแล้วว่าหนึ่งวัน + หนึ่งวิธีชำระ = หนึ่งแถวใน `sales` เสมอ (Cash 244 วัน 244 แถว
      *  K+ Shop 116/116 ไทยช่วยไทย 96/96) การแก้ยอดจึงชี้ไปที่แถวเดียวไม่กำกวม */
-    const SK_EDITABLE_PAYS = ['Cash', 'K+ Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)'];
+    // ขายส่ง/ล็อตเตอรี่ก็หนึ่งวันหนึ่งแถวเหมือนกัน (บางโพ ขายส่ง 5 วัน 5 แถว) จึงแก้ในตารางได้
+    const SK_EDITABLE_PAYS = ['Cash', 'K+ Shop', 'ไทยช่วยไทย พลัส (หน้าร้าน)', this.specialPay()];
     const skRowByKey = {};
     skMonthRowsAll.filter(r => r.platform === 'หน้าร้าน').forEach(r => {
       const iso = r.isoDate || safeBeShortToISO(r.date);
