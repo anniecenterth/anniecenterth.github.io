@@ -3633,6 +3633,8 @@ function beShortToISO(beShort) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 const EXPENSE_BUDGET_KEY = 'bangpho_expense_budget';
+/** คีย์งบประมาณรายจ่ายใน app_settings แยกสาขา — บางโพคงคีย์เดิม 'monthly_budget' ไว้ ไม่ต้องย้ายข้อมูล */
+const budgetKeyOf = code => code === 'main' ? 'monthly_budget' : 'monthly_budget:' + code;
 const DAILY_TARGET_KEY = 'bangpho_daily_target';
 function loadNumber(key, fallback) {
   const raw = window.localStorage.getItem(key);
@@ -4774,12 +4776,23 @@ class Component extends DCLogic {
       const { data, error } = await supabaseClient.from('app_settings').select('key,value');
       if (error) throw error;
       const map = {}; (data || []).forEach(r => { map[r.key] = r.value; });
+      const budgetByBranch = {};
+      BRANCH_OPTIONS.forEach(b => { const v = map[budgetKeyOf(b.code)]; if (v != null && v !== '') budgetByBranch[b.code] = Number(v); });
       this.setState({
+        budgetByBranch,
         monthlyBudget: map.monthly_budget != null ? Number(map.monthly_budget) : this.state.monthlyBudget,
         dailyTarget: map.daily_sales_target != null ? Number(map.daily_sales_target) : this.state.dailyTarget
       });
     } catch (err) { /* keep defaults; non-fatal */ }
   };
+  /** งบรายจ่ายของสาขาที่เปิดอยู่ — แต่ละสาขาตั้งแยกกัน สาขาที่ยังไม่ตั้ง = 0 (ไม่เตือนเกินงบ)
+   *  บางโพยังอ่านค่าเดิมจาก localStorage ได้ถ้า app_settings โหลดไม่สำเร็จ */
+  branchBudget() {
+    const b = this.activeBranch();
+    const m = this.state.budgetByBranch || {};
+    if (m[b] != null) return m[b];
+    return b === DEFAULT_BRANCH ? (this.state.monthlyBudget || 0) : 0;
+  }
   saveSetting = async (key, value) => {
     try { await supabaseClient.from('app_settings').upsert({ key, value: String(value), updated_at: new Date().toISOString() }); }
     catch (err) { /* non-fatal */ }
@@ -6011,7 +6024,8 @@ class Component extends DCLogic {
     const ovNonPeriodFilters = rows => this.salesOnly(rows);
     const ovInRng = (rows, rng) => rng ? rows.filter(r => r.isoDate && r.isoDate >= rng.from && r.isoDate <= rng.to) : [];
     const ovPrevRows = ovInRng(ovNonPeriodFilters(this.state.recentRows), ovPrevRng);
-    const ovPrevExpRows = ovInRng(this.state.expRows, ovPrevRng);
+    // รายจ่ายแยกสาขาเสมอ (11 ก.ย. 2569) — เดิม "เทียบช่วงก่อน" ใช้รายจ่ายทุกสาขารวมกัน
+    const ovPrevExpRows = ovInRng(this.ofBranch(this.state.expRows), ovPrevRng);
     const ovPrevGross = ovPrevRows.reduce((a, r) => a + r.gross, 0);
     const ovPrevNet = ovPrevRows.reduce((a, r) => a + r.net, 0);
     const ovPrevExpense = ovPrevExpRows.reduce((a, r) => a + r.amount, 0);
@@ -6085,8 +6099,8 @@ class Component extends DCLogic {
     ];
 
     const ceoAlerts = [];
-    if (ovExpenseTotal > 0 && this.state.monthlyBudget && ovExpenseTotal > this.state.monthlyBudget) {
-      ceoAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + ovFmt(ovExpenseTotal) + ' / งบ ' + ovFmt(this.state.monthlyBudget), icon:'triangle-alert', bg:'#FBF5E6', border:'#F2E6C8', iconBg:'#F8F0DC', iconFg:'#B98317' });
+    if (ovExpenseTotal > 0 && this.branchBudget() && ovExpenseTotal > this.branchBudget()) {
+      ceoAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + ovFmt(ovExpenseTotal) + ' / งบ ' + ovFmt(this.branchBudget()), icon:'triangle-alert', bg:'#FBF5E6', border:'#F2E6C8', iconBg:'#F8F0DC', iconFg:'#B98317' });
     }
     const ovReceivable = ovRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (ovReceivable > 0) {
@@ -6172,7 +6186,7 @@ class Component extends DCLogic {
     })();
     const rpMonthLabel = ym => THAI_MONTHS_ABBR[+ym.slice(5, 7) - 1] + ' ' + (+ym.slice(0, 4) + 543).toString().slice(2);
     const rpSalesAll = ovNonPeriodFilters(this.state.recentRows);
-    const rpExpAll = this.state.expRows;
+    const rpExpAll = this.ofBranch(this.state.expRows);
     const rpPick = (rows, ym) => rows.filter(r => rpMonthOf(r.isoDate) === ym);
     const rpSalesCur = rpPick(rpSalesAll, rpCurMonth), rpSalesPrev = rpPick(rpSalesAll, rpPrevMonth);
     const rpExpCur = rpPick(rpExpAll, rpCurMonth), rpExpPrev = rpPick(rpExpAll, rpPrevMonth);
@@ -6367,8 +6381,8 @@ class Component extends DCLogic {
     if (finReceivable > 0) {
       financeAlerts.push({ title:'ยอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + fmtFin(finReceivable), icon:'mail', accent:'#4A6B9E', border:'rgba(110,151,232,0.38)', iconBg:'rgba(110,151,232,0.2)', iconFg:'#A9BBD6', titleColor:'#A9BBD6' });
     }
-    if (this.state.monthlyBudget && finExpenseTotal > this.state.monthlyBudget) {
-      financeAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + fmtFin(finExpenseTotal) + ' / งบ ' + fmtFin(this.state.monthlyBudget), icon:'triangle-alert', accent:'#BE4F4F', border:'rgba(226,97,108,0.4)', iconBg:'rgba(226,97,108,0.18)', iconFg:'#DBA3A8', titleColor:'#DBA3A8' });
+    if (this.branchBudget() && finExpenseTotal > this.branchBudget()) {
+      financeAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + fmtFin(finExpenseTotal) + ' / งบ ' + fmtFin(this.branchBudget()), icon:'triangle-alert', accent:'#BE4F4F', border:'rgba(226,97,108,0.4)', iconBg:'rgba(226,97,108,0.18)', iconFg:'#DBA3A8', titleColor:'#DBA3A8' });
     }
 
     const categoryRows = [];
@@ -6550,7 +6564,7 @@ class Component extends DCLogic {
     // ตัวเลือกหมวดสร้างจากหมวดที่มีรายจ่ายจริงในฐานข้อมูล ไม่ใช่รายชื่อหมวดตั้งต้นทั้งหมด
     // ใช้ทุกแถว ไม่ใช่เฉพาะช่วงที่เลือก ไม่งั้นเดือนที่ยังไม่มีรายจ่ายจะเหลือตัวเลือกเดียว
     // แล้วเปลี่ยนช่วงเวลาทีหลังไม่ได้เพราะไม่มีอะไรให้เลือก
-    const inexExpCatNames = Array.from(new Set(this.state.expRows.map(r => r.mainCat).filter(Boolean))).sort();
+    const inexExpCatNames = Array.from(new Set(this.ofBranch(this.state.expRows).map(r => r.mainCat).filter(Boolean))).sort();
     const toggleInexExpCat = () => this.setState(s => ({ inexExpCatOpen: !s.inexExpCatOpen, brandOpen: false, channelOpen: false, periodOpen: false }));
     const inexExpCatOptions = ['ทั้งหมด'].concat(inexExpCatNames).map(c => mkOpt(c, inexExpCat, { inexExpCat: c, inexExpCatOpen: false }));
     const inexIncomeTotal = inexRows.reduce((a, r) => a + r.gross, 0) - this.salesDiscountTotal(inexRows).total;
@@ -6599,8 +6613,9 @@ class Component extends DCLogic {
       if (r.platform === 'หน้าร้าน') o.storeDisc += r.fee;
       else if (['Grab','LINE MAN','ShopeeFood'].includes(r.platform)) o.gp += r.fee;
     });
-    this.state.recentRows.filter(r => r.platform === 'ส่วนลด' && r.isoDate).forEach(r => { mSlot(r.isoDate.slice(0, 7)).deliveryDisc += r.gross; });
-    this.state.expRows.forEach(r => { if (r.isoDate) mSlot(r.isoDate.slice(0, 7)).exp += r.amount; });
+    // ส่วนลดกับรายจ่ายต้องกรองสาขาเหมือนยอดขายด้านบน ไม่งั้นกำไรรายเดือน = ยอดสาขานี้ − รายจ่ายทุกสาขา
+    this.ofBranch(this.state.recentRows).filter(r => r.platform === 'ส่วนลด' && r.isoDate).forEach(r => { mSlot(r.isoDate.slice(0, 7)).deliveryDisc += r.gross; });
+    this.ofBranch(this.state.expRows).forEach(r => { if (r.isoDate) mSlot(r.isoDate.slice(0, 7)).exp += r.amount; });
     const monthlyRows = Object.keys(monthAgg).sort().reverse().map(m => {
       const o = monthAgg[m]; const [y, mo] = m.split('-').map(Number);
       const income = o.gross - o.storeDisc - o.deliveryDisc;
@@ -6698,7 +6713,7 @@ class Component extends DCLogic {
         _days: days, _state: state
       };
     };
-    const dsExpAll = this.state.expRows;
+    const dsExpAll = this.ofBranch(this.state.expRows);
     const dataSourceRows = [
       dsBuild({ name:'POS หน้าร้าน (FoodStory)', kind:'ยอดขาย', icon:'store', how:'ดึงจากรายงาน POS', warnAfter:2, lateAfter:5,
         rows: dsAllSales.filter(r => r.platform === 'หน้าร้าน' && r.source !== 'MANUAL_FORM') }),
@@ -6866,8 +6881,8 @@ class Component extends DCLogic {
       ...inexCatNames.map(name => ({ cat:name, income:'–', expense: inexFmt(byCatInex[name]), net: '-' + inexFmt(byCatInex[name]).slice(1), netColor:'#2C4A7C', pct: inexIncomeTotal ? (byCatInex[name] / inexIncomeTotal * 100).toFixed(1) + '%' : '0.0%' }))
     ];
     const inexAlerts = [];
-    if (this.state.monthlyBudget && inexExpenseTotal > this.state.monthlyBudget) {
-      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.state.monthlyBudget), action:'ดูรายละเอียด', actionColor:'#B14A4A', onClick: goPage('expenserec') });
+    if (this.branchBudget() && inexExpenseTotal > this.branchBudget()) {
+      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.branchBudget()), action:'ดูรายละเอียด', actionColor:'#B14A4A', onClick: goPage('expenserec') });
     }
     const inexReceivable = inexRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (inexReceivable > 0) {
@@ -7072,11 +7087,13 @@ class Component extends DCLogic {
     // ---- monthly budget (real, computed from expRows) ----
     const nowForBudget = new Date();
     const todayStr = String(nowForBudget.getDate()).padStart(2,'0') + '/' + String(nowForBudget.getMonth()+1).padStart(2,'0') + '/' + String((nowForBudget.getFullYear()+543) % 100).padStart(2,'0');
-    const todayRows = this.state.expRows.filter(r => r.date === todayStr);
+    // การ์ดรายจ่ายวันนี้/เดือนนี้/งบ ต้องเป็นของสาขาที่เปิดอยู่ (เดิมรวมทุกสาขา)
+    const branchExpRows = this.ofBranch(this.state.expRows);
+    const todayRows = branchExpRows.filter(r => r.date === todayStr);
     const todaySpent = todayRows.reduce((sum, r) => sum + r.amount, 0);
-    const mtdRows = this.state.expRows.filter(r => { const d = beShortToDate(r.date); return d.getFullYear() === nowForBudget.getFullYear() && d.getMonth() === nowForBudget.getMonth(); });
+    const mtdRows = branchExpRows.filter(r => { const d = beShortToDate(r.date); return d.getFullYear() === nowForBudget.getFullYear() && d.getMonth() === nowForBudget.getMonth(); });
     const mtdSpent = mtdRows.reduce((sum, r) => sum + r.amount, 0);
-    const budget = this.state.monthlyBudget;
+    const budget = this.branchBudget();
     const budgetRemaining = budget - mtdSpent;
     const budgetUsedPct = budget > 0 ? Math.min(999, (mtdSpent / budget) * 100) : 0;
     const budgetRemainingPct = budget > 0 ? Math.max(0, 100 - budgetUsedPct) : 0;
@@ -7085,9 +7102,11 @@ class Component extends DCLogic {
     const setBudgetDraft = e => { const val = e.target.value; this.setState({ budgetDraft: val }); };
     const confirmBudgetEdit = () => {
       const n = expNum(this.state.budgetDraft);
-      saveNumber(EXPENSE_BUDGET_KEY, n);
-      this.saveSetting('monthly_budget', n);
-      this.setState({ monthlyBudget: n, budgetEditing: false });
+      const bb = this.activeBranch();
+      if (bb === DEFAULT_BRANCH) saveNumber(EXPENSE_BUDGET_KEY, n);
+      this.saveSetting(budgetKeyOf(bb), n);
+      this.setState(st => ({ budgetByBranch: { ...(st.budgetByBranch || {}), [bb]: n },
+        monthlyBudget: bb === DEFAULT_BRANCH ? n : st.monthlyBudget, budgetEditing: false }));
     };
     const cancelBudgetEdit = () => this.setState({ budgetEditing: false });
     const startTargetEdit = () => this.setState({ targetEditing: true, targetDraft: String(this.state.dailyTarget) });
@@ -7101,7 +7120,6 @@ class Component extends DCLogic {
     const cancelTargetEdit = () => this.setState({ targetEditing: false });
     const epFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const epEmptyDonut = (size, thick) => this.donut([{ value: 1, color: '#EEF0F5' }], size, thick);
-    const epRows = this.state.expRows;
     // การ์ดโดนัท 2 ใบย้ายไปอยู่หน้ารายรับ-รายจ่ายแล้ว (9 ก.ย. 2569) จึงต้องกรองตามช่วงเวลา
     // ของหน้านั้น ไม่ใช่รายจ่ายทั้งฐาน ไม่งั้นตัวเลขจะไม่ตรงกับการ์ดอื่นบนหน้าเดียวกัน
     const epDonutRows = inexExpAll;
@@ -8865,7 +8883,7 @@ class Component extends DCLogic {
     const mobFreshRaw = [
       { label: 'ยอดหน้าร้าน (POS)', iso: mobLatestOf(mobAll.filter(r => r.platform === 'หน้าร้าน')) },
       { label: 'ยอดเดลิเวอรี (Grab · LINE MAN · Shopee)', iso: mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')) },
-      { label: 'รายจ่าย', iso: mobLatestOf(this.state.expRows) }
+      { label: 'รายจ่าย', iso: mobLatestOf(this.ofBranch(this.state.expRows)) }
     ].map(f => {
       const gap = mobDaysBehind(f.iso);
       return { label: f.label,
@@ -8891,9 +8909,10 @@ class Component extends DCLogic {
     ];
 
     // 4 · กำไร — ถ้ารายจ่ายยังไม่ครบ ห้ามโชว์ตัวเลข เพราะจะสวยเกินจริง
-    const mobExpMonth = this.state.expRows.filter(r => (r.isoDate || safeBeShortToISO(r.date) || '').slice(0, 7) === mobMonth);
+    const mobExpRows = this.ofBranch(this.state.expRows);
+    const mobExpMonth = mobExpRows.filter(r => (r.isoDate || safeBeShortToISO(r.date) || '').slice(0, 7) === mobMonth);
     const mobExpMonthTotal = mobExpMonth.reduce((a, r) => a + r.amount, 0);
-    const mobExpGap = mobDaysBehind(mobLatestOf(this.state.expRows));
+    const mobExpGap = mobDaysBehind(mobLatestOf(mobExpRows));
     const mobProfitTrusted = mobExpMonthTotal > 0 && mobExpGap != null && mobExpGap <= 2;
     const mobileProfit = mobProfitTrusted ? mobFmt(mobMonthNet - mobExpMonthTotal) : 'ยังคำนวณไม่ได้';
     const mobileProfitNote = mobProfitTrusted
@@ -8954,7 +8973,9 @@ class Component extends DCLogic {
       todaySpentDisplay: '฿' + expFmt(todaySpent), todayCountDisplay: todayRows.length + ' รายการ',
       mtdSpentDisplay: '฿' + expFmt(mtdSpent), mtdCountDisplay: mtdRows.length + ' รายการเดือนนี้',
       daysInMonthDisplay: 'จาก ' + nowForBudget.getDate() + ' วัน',
-      budget, budgetDisplay: '฿' + expFmt(budget), budgetRemaining, budgetRemainingDisplay: '฿' + expFmt(budgetRemaining),
+      // สาขาที่ยังไม่ตั้งงบ ห้ามโชว์ "คงเหลือ ฿-xxx" สีเขียว เหมือนใช้เกินงบทั้งที่ไม่มีงบ
+      budget, budgetDisplay: budget > 0 ? '฿' + expFmt(budget) : 'ยังไม่ตั้งงบ', budgetRemaining,
+      budgetRemainingDisplay: budget > 0 ? '฿' + expFmt(budgetRemaining) : '—',
       dailyTargetLabel: 'เป้ารายวัน (฿' + Number(this.state.dailyTarget || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')',
       targetEditing: this.state.targetEditing, targetDraft: this.state.targetDraft, startTargetEdit, setTargetDraft, confirmTargetEdit, cancelTargetEdit,
       budgetUsedPct: budgetUsedPct.toFixed(1) + '%', budgetUsedPctBar: Math.min(100, budgetUsedPct) + '%', budgetRemainingPctDisplay: budgetRemainingPct.toFixed(1) + '%',
