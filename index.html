@@ -2115,32 +2115,60 @@
           <h3 style="margin:0;font-size:15px;font-weight:600">ความครบถ้วนข้อมูล</h3>
           <span style="{{ coverageHeadStyle }}">{{ coverageHeadline }}</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">
-          <sc-for list="{{ coverageRows }}" as="c" hint-placeholder-count="4">
-            <div style="border:1px solid #EEF0F5;border-radius:12px;padding:12px 14px;min-width:0">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="{{ c.dotStyle }}"></span>
-                <span style="font-size:13px;font-weight:600;color:#2B3547;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.platform }}</span>
-              </div>
-              <div style="font-size:12.5px;color:#8089A0;margin-bottom:3px">ข้อมูลถึง {{ c.last }}</div>
-              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-                <span style="{{ c.noteStyle }}">{{ c.note }}</span>
-                <span style="font-size:11.5px;color:#9AA3B2">{{ c.recent }}</span>
-              </div>
-              <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:9px">
-                <sc-for list="{{ c.strip }}" as="d" hint-placeholder-count="30">
-                  <span title="{{ d.title }}" style="{{ d.style }}"></span>
-                </sc-for>
-              </div>
-              <sc-if value="{{ c.missingLabel }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:11px;color:#B14A4A;margin-top:6px;line-height:1.45">{{ c.missingLabel }}</div>
-              </sc-if>
+        <sc-for list="{{ coverageBranches }}" as="b" hint-placeholder-count="2">
+          <div style="margin-bottom:14px">
+            <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px">
+              <span style="font-size:14px;font-weight:700;color:#1B2536">สาขา{{ b.label }}</span>
+              <span style="{{ b.headStyle }}">{{ b.headline }}</span>
             </div>
-          </sc-for>
-        </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px">
+              <sc-for list="{{ b.platforms }}" as="c" hint-placeholder-count="4">
+                <div style="border:1px solid #EEF0F5;border-radius:12px;padding:12px 14px;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                    <span style="{{ c.dotStyle }}"></span>
+                    <span style="font-size:13px;font-weight:600;color:#2B3547;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.platform }}</span>
+                    <sc-if value="{{ c.hasStores }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:#9AA3B2;margin-left:auto">{{ c.storeCount }}</span></sc-if>
+                  </div>
+                  <div style="font-size:12.5px;color:#8089A0;margin-bottom:3px">ข้อมูลถึง {{ c.lastLabel }}</div>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                    <span style="{{ c.noteStyle }}">{{ c.note }}</span>
+                    <span style="font-size:11.5px;color:#9AA3B2">{{ c.recent }}</span>
+                  </div>
+                  <sc-if value="{{ c.noStores }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:9px">
+                      <sc-for list="{{ c.strip }}" as="d" hint-placeholder-count="30">
+                        <span title="{{ d.title }}" style="{{ d.style }}"></span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ c.missingLabel }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11px;color:#B14A4A;margin-top:6px;line-height:1.45">{{ c.missingLabel }}</div>
+                    </sc-if>
+                  </sc-if>
+                  <sc-for list="{{ c.stores }}" as="st" hint-placeholder-count="3">
+                    <div style="border-top:1px solid #F3F4F7;margin-top:9px;padding-top:8px">
+                      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                        <span title="{{ st.fullName }}" style="font-size:12px;font-weight:600;color:#3A4456;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">{{ st.name }}</span>
+                        <span style="{{ st.noteStyle }}">{{ st.note }}</span>
+                      </div>
+                      <div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:6px">
+                        <sc-for list="{{ st.strip }}" as="d" hint-placeholder-count="30">
+                          <span title="{{ d.title }}" style="{{ d.style }}"></span>
+                        </sc-for>
+                      </div>
+                      <sc-if value="{{ st.missingLabel }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11px;color:#B14A4A;margin-top:5px;line-height:1.45">{{ st.missingLabel }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:#9AA3B2">
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4A6B9E"></span>มีข้อมูล</span>
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#E7C9C9"></span>ไม่มีข้อมูล</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#EFE4E4"></span>ไม่มียอด (ร้านขายไม่ทุกวัน)</span>
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#EEF0F5"></span>วันนี้ / ก่อนเริ่มเก็บ</span>
           <span>· {{ covWindowLabel }} เรียงซ้ายไปขวา</span>
         </div>
@@ -4025,6 +4053,47 @@ const branchCodeOf = label => (BRANCH_OPTIONS.find(b => b.label === label) || {}
  *  แปลงตอนอ่านเข้ามาให้เป็นค่าเดียวกันหมด ทุกที่ในแอปจะได้จัดกลุ่ม/กรองด้วยค่าเดียวกัน
  *  และเขียนกลับฐานเป็น NULL เพื่อไม่ให้ค่าปนกลับเข้าไปอีก */
 const SALES_PLATFORMS = ['หน้าร้าน', 'LINE MAN', 'Grab', 'ShopeeFood'];
+/** ร้านที่ "ต้องมี" ข้อมูลในแต่ละสาขา/แอป — ใช้ตรวจความครบถ้วนรายร้าน
+ *  ต้องเป็นทะเบียนตายตัว ไม่ใช่เดาจากข้อมูลที่มี เพราะร้านที่ไม่เคยลงเลยสักวันจะไม่โผล่ในข้อมูล
+ *  บางโพ = ทะเบียนที่แอนนี่ยืนยัน 13 ส.ค. 2569 · ถนนจันทร์ = Store ID ที่ให้มา 9 ก.ย. 2569
+ *  Grab 44b8a636 เปลี่ยนชื่อร้านจาก "เค้กสวีทซอฟ บางโพ" เป็น "เค้กวันเกิด สาขาบางโพ" ตั้งแต่ ก.ค. 2569
+ *  Shopee 10042597 Shopee ออกรายงานในชื่อ "เค้กหอมมนต์ บางบัวทอง" (ตั้งชื่อผิดฝั่ง Shopee) */
+const STORE_REGISTRY = {
+  main: {
+    'LINE MAN': [
+      { id: '1292668qr', name: 'AnnieCake เค้กมินิมอล' },
+      { id: '1411550sR', name: 'AnnieCake สวีทซอฟต์' },
+      { id: '642851iH',  name: 'AnnieCake เค้กเทศกาล (Mart)' },
+      { id: '625974Dg',  name: 'หอมมนต์' },
+      { id: '1411527WE', name: 'หอมมนต์ (Mart)' }
+    ],
+    'Grab': [
+      { id: '006f5483-04dd-4c67-b4fb-6b0c35cba90a', name: 'AnnieCake บางซื่อ' },
+      { id: '44b8a636-556b-43ff-b75e-14e19cac264f', name: 'AnnieCake สาขาบางโพ (เดิมสวีทซอฟ)' },
+      { id: '448180fb-c0ef-4606-acb7-a019f0fe8b3d', name: 'หอมมนต์' }
+    ],
+    'ShopeeFood': [
+      { id: '10061955', name: 'AnnieCake บางโพ (บางซื่อ)' },
+      { id: '2302836',  name: 'AnnieCake สวีทซอฟต์' },
+      { id: '10042597', name: 'AnnieCake เค้กมินิมอล' },
+      { id: '2248748',  name: 'หอมมนต์' }
+    ]
+  },
+  chanroad: {
+    'LINE MAN': [
+      { id: '2610826ZG', name: 'AnnieCake ถนนจันทร์' },
+      { id: '2281356ou', name: 'Midnight Cookies' }
+    ],
+    'Grab': [
+      { id: 'e9e01453-3a2b-435e-8a25-dd0f5211168c', name: 'AnnieCake ถนนจันทร์' },
+      { id: '3f7c9629-f698-44d7-93d9-80536b6864d3', name: 'Midnight Cookies' }
+    ],
+    'ShopeeFood': [
+      { id: '10203359', name: 'AnnieCake ถนนจันทร์' },
+      { id: '10146337', name: 'Midnight Cookies' }
+    ]
+  }
+};
 // แถวที่ไม่มีแบรนด์ในฐานข้อมูลคือยอดหน้าร้านทั้งหมด (POS ของ FoodStory กับขายส่งที่คีย์เอง)
 // ตรวจแล้ว 9 ก.ย. 2569: brand เป็น null 731 แถว = หน้าร้าน POS 726 + ขายส่ง 5 ไม่มีของแพลตฟอร์มปนเลย
 // จึงเรียกว่า "หน้าร้าน" ตรง ๆ แทน "ไม่ระบุแบรนด์" ซึ่งอ่านเหมือนข้อมูลขาด
@@ -7955,51 +8024,104 @@ class Component extends DCLogic {
       ? dateRangeLabel(covWindowDates[0], covWindowDates[covWindowDates.length - 1])
         + (covTrimmed ? ' (ช่วงยาวเกิน ' + COV_MAX_DAYS + ' วัน แสดงเฉพาะ ' + COV_MAX_DAYS + ' วันท้าย)' : '')
       : 'ช่วงที่เลือกยังไม่ถึง';
-    const coverageRows = SALES_PLATFORMS.map(p => {
-      const has = covDaysByPlatform[p] || {};
+    // ---- แยกสาขา → แอป → ร้าน (เจ้าของร้านขอ 11 ก.ย. 2569) ----
+    // ภาพรวมระดับแอปบอกได้แค่ว่า "แอปนี้มีข้อมูลบางร้าน" ร้านที่ลืมลงทั้งร้านจะถูกร้านอื่นกลบไว้
+    // จึงเช็คทีละร้านตาม STORE_REGISTRY และแยกสาขาเพราะสองสาขาลงข้อมูลคนละคนคนละเวลา
+    const covCell = { width:'10px', height:'10px', borderRadius:'3px', flex:'none' };
+    const covDaysByKey = {};       // สาขา|แอป|ร้าน → { วันที่: true }
+    const covStoreNames = {};      // สาขา|แอป|ร้าน → ชื่อร้านจากรายงาน (ใช้กับร้านนอกทะเบียน)
+    const covKeyOfStore = id => String(id || '').trim().toLowerCase() || '?';
+    (this.state.recentRows || []).forEach(r => {
+      if (!r.isoDate || SALES_PLATFORMS.indexOf(r.platform) < 0) return;
+      const br = r.branch || DEFAULT_BRANCH;
+      const st = r.platform === 'หน้าร้าน' ? '_' : covKeyOfStore(r.storeId);
+      const k = br + '|' + r.platform + '|' + st;
+      (covDaysByKey[k] = covDaysByKey[k] || {})[r.isoDate] = true;
+      if (r.store && !covStoreNames[k]) covStoreNames[k] = r.store;
+    });
+    const covStatusOf = has => {
       const days = Object.keys(has).sort();
       const last = days.length ? days[days.length - 1] : null;
+      const firstEver = days.length ? days[0] : null;
       // นับถึง "เมื่อวาน" ไม่ใช่วันนี้ เพราะรายงานของวันนี้ยังออกไม่ครบ ไม่ควรนับว่าขาด
       const gap = last ? Math.max(0, covDaysBetween(last, covYesterday)) : null;
-      const recent = days.filter(d => d >= covWindowStart && d <= covEnd).length;
+      // ร้านที่ขายไม่ทุกวัน (60 วันหลังสุดมียอดไม่ถึงครึ่ง) วันที่ว่างส่วนใหญ่คือ "ไม่มีออเดอร์"
+      // ไม่ใช่ลืมลง — ถ้าทาสีแดงเหมือนร้านหลักจะเตือนผิดทุกวันจนไม่มีใครดูอีก
+      const spanFrom = firstEver && firstEver > covISO(new Date(Date.now() - 60 * covDayMs)) ? firstEver : covISO(new Date(Date.now() - 60 * covDayMs));
+      const span = firstEver ? Math.max(1, covDaysBetween(spanFrom, covYesterday) + 1) : 0;
+      const hits = days.filter(d => d >= spanFrom && d <= covYesterday).length;
+      const sporadic = !!firstEver && hits / span < 0.5;
       let tone, note;
-      if (!last)          { tone = '#9AA3B2'; note = 'ยังไม่มีข้อมูลเลย'; }
+      if (!last)          { tone = '#B14A4A'; note = 'ยังไม่มีข้อมูลเลย'; }
+      else if (sporadic)  { tone = '#8089A0'; note = 'ขายไม่ทุกวัน · ล่าสุด ' + isoToBEShort(last).slice(0, 5); }
       else if (gap === 0) { tone = '#2E7D5B'; note = 'ครบถึงเมื่อวาน'; }
       else if (gap <= 2)  { tone = '#B98317'; note = 'ขาด ' + gap + ' วัน'; }
       else                { tone = '#B14A4A'; note = 'ขาด ' + gap + ' วัน'; }
-
-      // ปฏิทิน 30 วันย้อนหลัง — ตัวเลข "ขาดกี่วัน" ด้านบนมองเห็นแค่ช่วงท้าย
-      // ถ้าเว้นวันกลางเดือนไว้จะไม่มีอะไรฟ้อง แถบนี้ทำให้เห็นรูโหว่ทั้งเดือนในภาพเดียว
-      // วันก่อนที่ช่องทางนั้นจะมีข้อมูลวันแรก ไม่ถือว่าขาด (เพิ่งเริ่มเก็บ)
-      const firstEver = days.length ? days[0] : null;
-      const covCell = { width:'11px', height:'11px', borderRadius:'3px', flex:'none' };
       const strip = covWindowDates.map(d => {
         let bg, label;
-        if (has[d])                        { bg = '#4A6B9E'; label = 'มีข้อมูล'; }
-        else if (d === covToday)           { bg = '#EEF0F5'; label = 'วันนี้ ยังไม่ถึงเวลาลง'; }
+        if (has[d])                           { bg = '#4A6B9E'; label = 'มีข้อมูล'; }
+        else if (d === covToday)              { bg = '#EEF0F5'; label = 'วันนี้ ยังไม่ถึงเวลาลง'; }
         else if (!firstEver || d < firstEver) { bg = '#F3F4F7'; label = 'ก่อนเริ่มเก็บข้อมูล'; }
-        else                               { bg = '#E7C9C9'; label = 'ไม่มีข้อมูล'; }
+        else if (sporadic)                    { bg = '#EFE4E4'; label = 'ไม่มียอด (ร้านขายไม่ทุกวัน)'; }
+        else                                  { bg = '#E7C9C9'; label = 'ไม่มีข้อมูล'; }
         return { style: { ...covCell, background: bg }, title: isoToBEShort(d) + ' · ' + label };
       });
-      const missing = covWindowDates.filter(d =>
-        !has[d] && d !== covToday && firstEver && d >= firstEver);
+      const missing = sporadic ? [] : covWindowDates.filter(d => !has[d] && d !== covToday && firstEver && d >= firstEver);
       const missingLabel = missing.length
         ? 'ขาด: ' + missing.slice(0, 5).map(d => isoToBEShort(d).slice(0, 5)).join(', ')
             + (missing.length > 5 ? ' และอีก ' + (missing.length - 5) + ' วัน' : '')
         : '';
-      return {
-        platform: p,
-        last: last ? isoToBEShort(last) : '—',
-        note, recent: recent + '/' + covWindowDates.length + ' วัน', strip, missingLabel,
+      const recent = days.filter(d => d >= covWindowStart && d <= covEnd).length;
+      return { last, gap, tone, note, strip, missingLabel, sporadic,
+        recent: recent + '/' + covWindowDates.length + ' วัน',
+        lastLabel: last ? isoToBEShort(last) : '—',
         dotStyle: { width:'9px', height:'9px', borderRadius:'50%', background:tone, flex:'none' },
-        noteStyle: { fontSize:'12.5px', fontWeight:600, color:tone }
+        noteStyle: { fontSize:'12.5px', fontWeight:600, color:tone } };
+    };
+    const covMergeDays = keys => keys.reduce((m, k) => Object.assign(m, covDaysByKey[k] || {}), {});
+    const covBranchCodes = BRANCH_OPTIONS.map(b => b.code).filter(c => allowedBranches.indexOf(c) >= 0);
+    let covBehindTotal = 0, covEmptyStores = 0;
+    const coverageBranches = covBranchCodes.map(br => {
+      const reg = STORE_REGISTRY[br] || {};
+      const behind = [];
+      const platforms = SALES_PLATFORMS.map(p => {
+        if (p === 'หน้าร้าน') {
+          const st = covStatusOf(covDaysByKey[br + '|หน้าร้าน|_'] || {});
+          if (!st.last || st.gap > 0) behind.push(p + ' (' + st.note + ')');
+          return { platform: p, ...st, hasStores: false, noStores: true, stores: [] };
+        }
+        const regIds = (reg[p] || []).map(x => covKeyOfStore(x.id));
+        // ร้านที่มีข้อมูลแต่ไม่อยู่ในทะเบียน — แสดงด้วย ไม่ซ่อน (อาจเป็นร้านที่ควรข้ามแต่หลุดเข้ามา)
+        const extraIds = Object.keys(covDaysByKey)
+          .filter(k => k.indexOf(br + '|' + p + '|') === 0)
+          .map(k => k.slice((br + '|' + p + '|').length))
+          .filter(id => regIds.indexOf(id) < 0);
+        const stores = (reg[p] || []).map(x => ({ id: covKeyOfStore(x.id), name: x.name, fullName: x.name + ' · ' + x.id }))
+          .concat(extraIds.map(id => ({ id, name: (covStoreNames[br + '|' + p + '|' + id] || 'ไม่ทราบชื่อร้าน') + ' (นอกทะเบียน)',
+            fullName: 'ร้านนอกทะเบียน · Store ID ' + (id === '?' ? 'ไม่มีในรายงาน' : id) })))
+          .map(x => {
+            const st = covStatusOf(covDaysByKey[br + '|' + p + '|' + x.id] || {});
+            if (!st.last) covEmptyStores++;
+            return { name: x.name, fullName: x.fullName, note: st.note, noteStyle: { ...st.noteStyle, fontSize:'11.5px', flex:'none' },
+              strip: st.strip, missingLabel: st.missingLabel };
+          });
+        // สถานะระดับแอป = ร้านที่ล่าสุดที่สุด — ใช้บอกว่า "รายงานของแอปนี้ลงถึงวันไหน"
+        const st = covStatusOf(covMergeDays(Object.keys(covDaysByKey).filter(k => k.indexOf(br + '|' + p + '|') === 0)));
+        if (!st.last || st.gap > 0) behind.push(p + ' (' + st.note + ')');
+        return { platform: p, ...st, strip: [], missingLabel: '', hasStores: stores.length > 0, noStores: false,
+          stores, storeCount: stores.length + ' ร้าน' };
+      });
+      covBehindTotal += behind.length;
+      return {
+        label: branchLabel(br), platforms,
+        headline: behind.length ? 'ยังลงไม่ครบ: ' + behind.join(' · ') : 'ครบถึงเมื่อวานทุกช่องทาง',
+        headStyle: { fontSize:'12.5px', fontWeight:600, color: behind.length ? '#B14A4A' : '#2E7D5B' }
       };
     });
-    const covBehind = coverageRows.filter(r => /^ขาด/.test(r.note));
-    const coverageHeadline = covBehind.length
-      ? covBehind.length + ' ช่องทางยังลงไม่ครบ: ' + covBehind.map(r => r.platform + ' (' + r.note + ')').join(' · ')
-      : 'ทุกช่องทางมีข้อมูลถึงเมื่อวานครบแล้ว';
-    const coverageHeadStyle = covBehind.length
+    const coverageHeadline = covBehindTotal
+      ? covBehindTotal + ' ช่องทางยังลงไม่ครบ' + (covEmptyStores ? ' · ' + covEmptyStores + ' ร้านยังไม่มีข้อมูลเลย' : '')
+      : 'ทุกสาขาทุกช่องทางมีข้อมูลถึงเมื่อวานครบแล้ว';
+    const coverageHeadStyle = covBehindTotal
       ? { fontSize:'13px', fontWeight:600, color:'#B14A4A' }
       : { fontSize:'13px', fontWeight:600, color:'#2E7D5B' };
 
@@ -8855,7 +8977,7 @@ class Component extends DCLogic {
       openImportFilePicker, handleImportFilesChange, handleImportDrop, preventDefault, removeImportFiles, gotoPreview, backToUpload, goSales, toggleDedupe,
       confirmImport, resetImport, confirmImportLabel, doneHeadline, doneGrossTotal, doneFeeTotal, doneNetTotal,
       importDateOpen, toggleImportDate, setImportReportDate, importReportDateDisplay, importReportDate: this.state.importReportDate,
-      coverageRows, coverageHeadline, coverageHeadStyle, importDateWarn,
+      coverageBranches, coverageHeadline, coverageHeadStyle, importDateWarn,
       importFileSummary, importParsing: this.state.importParsing, importError: this.state.importError,
       importTabs, impTabUpload, impTabAuto, impTabHistory, autoConnections, autoSteps, importHistory, hasImportHistory, importToast, closeToast,
       payoutKpis, payoutPlatforms, payoutRecRows,
