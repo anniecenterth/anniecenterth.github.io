@@ -2064,26 +2064,36 @@
           <div style="font-size:14px;color:#8089A0">โยนไฟล์รายงานรายวันของแต่ละแพลตฟอร์มเข้ามา ระบบแปลงเป็นรายการยอดขายให้ · ทุกช่องทางลงเองผ่านหน้านี้</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex:none">
-          <div data-form-dd="importDate" style="position:relative">
-            <div onClick="{{ toggleImportDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">วันที่รายงาน</span><span style="font-weight:600">{{ importReportDateDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
-            <sc-if value="{{ importDateOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:10px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
-                  <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
-                  <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
-                  <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
-                  <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
-                    <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+          <div data-period-dd="1" style="position:relative">
+            <div onClick="{{ togglePeriod }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">ช่วงเวลา:</span><span style="font-weight:600">{{ periodDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+            <sc-if value="{{ periodOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:50px;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:14px;box-shadow:0 16px 36px rgba(30,34,41,0.12);padding:12px;width:290px">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+                  <sc-for list="{{ periodOptions }}" as="opt" hint-placeholder-count="4">
+                    <div onClick="{{ opt.onClick }}" style="{{ opt.chipStyle }}">{{ opt.label }}</div>
                   </sc-for>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
-                  <sc-for list="{{ importCalCells }}" as="c" hint-placeholder-count="42">
-                    <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
-                  </sc-for>
+                <div style="border-top:1px solid #EFF0F3;padding-top:11px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                    <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                    <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                    <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                    <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                      <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                    <sc-for list="{{ periodCalCells }}" as="c" hint-placeholder-count="42">
+                      <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;font-size:11.5px">
+                    <span style="color:#5A6478">{{ rangeLabel }}</span>
+                    <span onClick="{{ clearRange }}" style="color:#2C4A7C;font-weight:600;cursor:pointer;flex:none">ล้าง</span>
+                  </div>
                 </div>
-                <div onClick="{{ importPickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
               </div>
             </sc-if>
           </div>
@@ -2132,7 +2142,7 @@
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4A6B9E"></span>มีข้อมูล</span>
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#E7C9C9"></span>ไม่มีข้อมูล</span>
           <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#EEF0F5"></span>วันนี้ / ก่อนเริ่มเก็บ</span>
-          <span>· 30 วันล่าสุด เรียงซ้ายไปขวา</span>
+          <span>· {{ covWindowLabel }} เรียงซ้ายไปขวา</span>
         </div>
         <sc-if value="{{ importDateWarn }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:flex-start;gap:9px;background:#F8F0DC;border:1px solid #E4CFA0;color:#8A6414;border-radius:11px;padding:11px 14px;font-size:12.5px;font-weight:500;margin-top:13px;line-height:1.5">
@@ -2164,6 +2174,34 @@
         <sc-if value="{{ importNotLoaded }}" hint-placeholder-val="{{ true }}">
           <input id="import-file-input" type="file" accept=".csv,.xlsx" multiple onChange="{{ handleImportFilesChange }}" style="display:none"/>
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:26px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-bottom:18px">
+            <!-- วันที่ประทับให้ไฟล์ที่ไม่มีวันที่ในตัว (ไฟล์สรุปหน้าร้านจาก POS) — ย้ายลงมาจากหัวหน้า 11 ก.ย. 2569
+                 หัวหน้าเป็นปุ่มช่วงเวลาร่วมทุกหน้าแล้ว แต่การนำเข้ายังต้องใช้วันที่เดียว ห้ามลบช่องนี้ -->
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+              <div data-form-dd="importDate" style="position:relative;display:inline-block;width:280px;max-width:100%">
+                <div onClick="{{ toggleImportDate }}" style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;cursor:pointer"><i data-lucide="calendar" style="width:17px;height:17px;color:#8089A0"></i><span style="color:#5A6478">วันที่ของไฟล์</span><span style="font-weight:600">{{ importReportDateDisplay }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#9AA3B2"></i></div>
+                <sc-if value="{{ importDateOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;top:50px;left:0;right:0;z-index:40;background:#fff;border:1px solid #E7E9ED;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:10px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+                      <div onClick="{{ calPrev }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-left" style="width:15px;height:15px"></i></div>
+                      <div style="font-size:13.5px;font-weight:600;color:#1B2536">{{ calTitle }}</div>
+                      <div onClick="{{ calNext }}" style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5A6478;background:#F6F6F7"><i data-lucide="chevron-right" style="width:15px;height:15px"></i></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px">
+                      <sc-for list="{{ calDowCells }}" as="d" hint-placeholder-count="7">
+                        <div style="text-align:center;font-size:10.5px;color:#9AA3B2;font-weight:600">{{ d.label }}</div>
+                      </sc-for>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+                      <sc-for list="{{ importCalCells }}" as="c" hint-placeholder-count="42">
+                        <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</div>
+                      </sc-for>
+                    </div>
+                    <div onClick="{{ importPickToday }}" style="margin-top:10px;text-align:center;font-size:12px;font-weight:600;color:#2C4A7C;cursor:pointer;background:#ECF1F7;border-radius:9px;padding:7px">วันนี้</div>
+                  </div>
+                </sc-if>
+              </div>
+              <span style="font-size:12.5px;color:#8089A0;line-height:1.5">ใช้กับไฟล์ที่ไม่มีวันที่ในตัว เช่น ไฟล์สรุปหน้าร้านจาก POS · ไฟล์ Grab / LINE MAN / Shopee ใช้วันที่ในไฟล์เอง</span>
+            </div>
             <div onClick="{{ openImportFilePicker }}" onDrop="{{ handleImportDrop }}" onDragOver="{{ preventDefault }}" style="border:1.8px dashed #C9D2E2;border-radius:16px;padding:46px 24px;text-align:center;background:#FBFBFC;cursor:pointer">
               <div style="width:64px;height:64px;border-radius:18px;background:#ECF1F7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="cloud-upload" style="width:30px;height:30px;color:#2C4A7C"></i></div>
               <div style="font-size:17px;font-weight:600;color:#1B2536;margin-bottom:7px">ลากไฟล์รายงานมาวางที่นี่</div>
@@ -7889,24 +7927,41 @@ class Component extends DCLogic {
     const covDaysBetween = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / covDayMs);
     const covDaysByPlatform = {};
     const covCountByDate = {};
-    (this.state.recentRows || []).forEach(r => {
+    // ต้องกรองสาขา — เดิมอ่าน recentRows ดิบ ถนนจันทร์จึงเห็นวันที่มีข้อมูลของบางโพปนมาด้วย
+    this.ofBranch(this.state.recentRows || []).forEach(r => {
       if (!r.isoDate) return;
       (covDaysByPlatform[r.platform] = covDaysByPlatform[r.platform] || {})[r.isoDate] = true;
       const k = r.platform + '|' + r.isoDate;
       covCountByDate[k] = (covCountByDate[k] || 0) + 1;
     });
-    const COV_WINDOW = 30;
+    // ปฏิทินตาม "ช่วงเวลา" บนหัวหน้า (ใช้ร่วมทุกหน้า) — เดิมตายตัว 30 วันล่าสุด
+    // ไม่แสดงวันในอนาคต · ช่วงยาวเกิน 92 วันแสดงเฉพาะ 92 วันท้ายช่วง ไม่งั้นช่องเล็กจนอ่านไม่ออก
+    const COV_MAX_DAYS = 92;
     const covToday = covISO(new Date());
+    const covRng = this.periodRange();
+    const covEnd = covRng && covRng.to < covToday ? covRng.to : covToday;
+    const covFrom = covRng ? covRng.from : covISO(new Date(Date.now() - 29 * covDayMs));
     const covWindowDates = [];
-    for (let i = COV_WINDOW - 1; i >= 0; i--) covWindowDates.push(covISO(new Date(Date.now() - i * covDayMs)));
-    const covWindowStart = covWindowDates[0];
+    let covTrimmed = false;
+    {
+      const end = new Date(covEnd + 'T00:00:00');
+      let d = new Date(covFrom + 'T00:00:00');
+      const minStart = new Date(end.getTime() - (COV_MAX_DAYS - 1) * covDayMs);
+      if (d < minStart) { d = minStart; covTrimmed = true; }
+      for (; d <= end; d = new Date(d.getTime() + covDayMs)) covWindowDates.push(covISO(d));
+    }
+    const covWindowStart = covWindowDates[0] || covEnd;
+    const covWindowLabel = covWindowDates.length
+      ? dateRangeLabel(covWindowDates[0], covWindowDates[covWindowDates.length - 1])
+        + (covTrimmed ? ' (ช่วงยาวเกิน ' + COV_MAX_DAYS + ' วัน แสดงเฉพาะ ' + COV_MAX_DAYS + ' วันท้าย)' : '')
+      : 'ช่วงที่เลือกยังไม่ถึง';
     const coverageRows = SALES_PLATFORMS.map(p => {
       const has = covDaysByPlatform[p] || {};
       const days = Object.keys(has).sort();
       const last = days.length ? days[days.length - 1] : null;
       // นับถึง "เมื่อวาน" ไม่ใช่วันนี้ เพราะรายงานของวันนี้ยังออกไม่ครบ ไม่ควรนับว่าขาด
       const gap = last ? Math.max(0, covDaysBetween(last, covYesterday)) : null;
-      const recent = days.filter(d => d >= covWindowStart).length;
+      const recent = days.filter(d => d >= covWindowStart && d <= covEnd).length;
       let tone, note;
       if (!last)          { tone = '#9AA3B2'; note = 'ยังไม่มีข้อมูลเลย'; }
       else if (gap === 0) { tone = '#2E7D5B'; note = 'ครบถึงเมื่อวาน'; }
@@ -7935,7 +7990,7 @@ class Component extends DCLogic {
       return {
         platform: p,
         last: last ? isoToBEShort(last) : '—',
-        note, recent: recent + '/30 วัน', strip, missingLabel,
+        note, recent: recent + '/' + covWindowDates.length + ' วัน', strip, missingLabel,
         dotStyle: { width:'9px', height:'9px', borderRadius:'50%', background:tone, flex:'none' },
         noteStyle: { fontSize:'12.5px', fontWeight:600, color:tone }
       };
@@ -8793,6 +8848,7 @@ class Component extends DCLogic {
       period, periodOpen, togglePeriod, periodOptions, periodDisplay, customFrom, customTo, setCustomFrom, setCustomTo,
       brand, brandOpen, toggleBrand, brandOptions,
       channel, channelOpen, toggleChannel, channelOptions,
+      covWindowLabel,
       importStep, importLoaded, importNotLoaded: !importLoaded, impUpload: importStep === 'upload', impPreview: importStep === 'preview', impDone: importStep === 'done',
       importStepItems, importMaps, importFiles, importStats, importRowsPreview,
       importSkipRows, importSkipHeadline, hasImportSkips: importSkipTotal > 0, importRowsCountLabel, importHasMoreRows, importMoreRowsCount, dedupeSkip, dedupeTrackStyle, dedupeKnobStyle,
