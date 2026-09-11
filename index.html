@@ -177,12 +177,6 @@
         </div>
       </div>
 
-      <!-- filters -->
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-        <div onClick="{{ goInexPage }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer;color:#5A6478"><i data-lucide="arrow-left-right" style="width:16px;height:16px"></i><span>แยกยอดขายกับเงินเข้าจริง</span></div>
-        <div onClick="{{ goPayout }}" style="display:flex;align-items:center;gap:8px;background:#E6F3ED;border:1px solid #C4E0D2;border-radius:11px;padding:10px 14px;font-size:13.5px;font-weight:600;color:#2E7D5B;cursor:pointer"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i><span>Net Payout tracked</span><i data-lucide="chevron-down" style="width:15px;height:15px"></i></div>
-      </div>
-
       <!-- ช่วงเวลาที่การ์ดด้านล่างใช้ + คำเตือนเมื่อข้อมูลของช่วงนั้นยังไม่ครบ -->
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:12.5px;color:#7C8699"><i data-lucide="calendar-range" style="width:15px;height:15px;flex:none"></i><span>{{ ovPeriodNote }}</span></div>
       <sc-if value="{{ ovShowWarn }}">
