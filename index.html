@@ -4152,6 +4152,24 @@ function loadLastPage(fallback) {
 function saveLastPage(page) {
   try { if (APP_PAGES.indexOf(page) >= 0) localStorage.setItem(LAST_PAGE_KEY, page); } catch (e) { /* ไม่ใช่เรื่องคอขาดบาดตาย */ }
 }
+/** จำนวนออเดอร์จริงของแต่ละแถว — รวมกันแล้วได้ "จำนวนออเดอร์" ไม่ใช่ "จำนวนแถว" (แก้ 11 ก.ย. 2569)
+ *  เดิมนับแถว ก.ย. บางโพขึ้น 354 ทั้งที่ 113 แถวเป็นแถวหักค่าธรรมเนียม/ปรับยอด/ค่าผ่อน (ยอดขาย 0)
+ *  - ส่วนลด / แถวยอดขาย ≤ 0 = ไม่ใช่ออเดอร์
+ *  - หน้าร้านจาก POS เก็บเป็นยอดรวม วัน × วิธีชำระ → ใช้จำนวนบิลในหมายเหตุ "FoodStory · 9 บิล · ..."
+ *    (ตรวจแล้ว ถนนจันทร์ทั้งปีได้ 3,552 บิล ตรงกับ FoodStory) ไม่มีเลขบิล = 1 รายการ
+ *  - ไทยช่วยไทยแยกเป็น 2 แถว: ส่วนรัฐย้ายมาหน้าร้าน (นับ 1) + แถวบนแอป payment GOVERNMENT_WALLET (นับ 0)
+ *    ตรวจแล้วคู่กันพอดี LINE MAN 1,213 แถว · Grab แถวบนแอปยอด 0 อยู่แล้ว */
+function orderWeightOf(r) {
+  if (!r || r.platform === 'ส่วนลด') return 0;
+  if (r.platform === 'หน้าร้าน') {
+    if (r.source === 'PLATFORM_IMPORT') return 1;
+    const m = /([0-9][0-9,]*)\s*บิล/.exec(r.note || '');
+    if (m) return Number(m[1].replace(/,/g, '')) || 0;
+    return Number(r.gross) > 0 ? 1 : 0;
+  }
+  return Number(r.gross) > 0 && r.payment !== 'GOVERNMENT_WALLET' ? 1 : 0;
+}
+function orderCountOf(rows) { return (rows || []).reduce((a, r) => a + orderWeightOf(r), 0); }
 function mapDbRowToSale(dbRow) {
   return {
     id: dbRow.id, date: dbRow.date, isoDate: dbRow.sale_date || safeBeShortToISO(dbRow.date), time: dbRow.time, platform: dbRow.platform, brand: brandName(dbRow.brand),
@@ -5028,7 +5046,7 @@ class Component extends DCLogic {
       let iso = null;
       try { iso = beShortToISO(r.date); } catch (e) { iso = null; }
       const b = iso && byIso[iso];
-      if (b) { b.gross += r.gross; b.net += r.net; b.count++; }
+      if (b) { b.gross += r.gross; b.net += r.net; b.count += orderWeightOf(r); }
     });
     return days;
   }
@@ -7112,7 +7130,7 @@ class Component extends DCLogic {
     const salesRows = this.applySalesFilters(this.state.recentRows);
     const salesTotalGross = salesRows.reduce((a, r) => a + r.gross, 0);
     const salesTotalNet = salesRows.reduce((a, r) => a + r.net, 0);
-    const salesOrderCount = salesRows.length;
+    const salesOrderCount = orderCountOf(salesRows);
     const salesAvgOrder = salesOrderCount ? salesTotalGross / salesOrderCount : 0;
     // Headline "ยอดขายรวม" = after every discount (หน้าร้าน per-row fee + POS delivery
     // discount records); per-platform breakdowns stay ก่อนลด so they reconcile to gross.
@@ -7438,7 +7456,7 @@ class Component extends DCLogic {
       const ws = sumGross(storeRows.filter(r => r.payment === WHOLESALE_PAY));
       const sub = sumGross(storeRows.filter(isSubsidyRow));
       const total = sumGross(rowsForBrand);
-      const orders = rowsForBrand.length;
+      const orders = orderCountOf(rowsForBrand);
       return {
         brand:name, dotBg:'#EEF0F5', dotFg:'#8A93A5',
         storefront: fmtB(sumGross(storeRows) - ws - sub), wholesale: fmtB(ws), subsidy: fmtB(sub),
@@ -7845,7 +7863,7 @@ class Component extends DCLogic {
     const salesKpis = [
       { title:'ยอดขาย' + skRangeSuffix, amount:skFmt(skGrossRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'เฉลี่ยต่อวัน (' + skDayCount + ' วันที่มีข้อมูล)', amount:skFmt(skAvgPerDay), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
-      { title:'ออเดอร์' + skRangeSuffix, amount:String(skMonthRows.length), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'users', bg:'#ECF1F7', fg:'#2C4A7C', info:true },
+      { title:'ออเดอร์' + skRangeSuffix, amount:String(orderCountOf(skMonthRows)), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'users', bg:'#ECF1F7', fg:'#2C4A7C', info:true },
       { title:'Net Sales ' + skRangeSuffix, amount:skFmt(skNetRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
       { title:'Net Payout รอรับ', amount:skFmt(skReceivable), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'file-text', bg:'#F8F0DC', fg:'#D98A4C', info:false }
     ];
