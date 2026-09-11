@@ -4766,11 +4766,14 @@ class Component extends DCLogic {
     catch (err) { /* non-fatal */ }
   };
   componentWillUnmount() { document.removeEventListener('click', this.onDocClick); }
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     this.icons();
-    // จำหน้าปัจจุบันไว้ทุกครั้งที่เปลี่ยนหน้า เพื่อให้รีเฟรชแล้วกลับมาที่เดิม
-    if (prevState && prevState.page !== this.state.page) saveLastPage(this.state.page);
-    if (prevState && prevState.activeBranch !== this.state.activeBranch) saveLastBranch(this.state.activeBranch);
+    // จำหน้าและสาขาปัจจุบันไว้ เพื่อให้รีเฟรชแล้วกลับมาที่เดิม
+    // ห้ามพึ่ง prevState — dc-runtime เรียก componentDidUpdate(prevProps) อย่างเดียว ไม่ส่ง prevState มา
+    // เดิมเขียน `if (prevState && ...)` เงื่อนไขจึงเป็นเท็จทุกครั้ง ไม่เคยบันทึกเลย
+    // รีเฟรชแล้วเด้งกลับหน้ายอดขาย + สาขาบางโพทุกครั้ง (แก้ 11 ก.ย. 2569)
+    if (this.state.page !== this._savedPage) { this._savedPage = this.state.page; saveLastPage(this.state.page); }
+    if (this.state.activeBranch !== this._savedBranch) { this._savedBranch = this.state.activeBranch; saveLastBranch(this.state.activeBranch); }
   }
   /** วาดไอคอน "ข้างใน" แท็ก <i> แทนการให้ lucide แทนที่ทั้งแท็ก
    *
