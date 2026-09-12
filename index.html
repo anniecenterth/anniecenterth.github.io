@@ -6967,9 +6967,11 @@ class Component extends DCLogic {
           expRows: nextRows,
           expError: null,
           editingExpenseId: null,
+          // คงวันที่ที่เลือกไว้หลังบันทึก — คนคีย์ย้อนหลังทีละหลายรายการของวันเดียวกัน
+          // ถ้าเด้งกลับเป็นวันนี้ทุกครั้งจะต้องเลือกวันใหม่ซ้ำ ๆ และพลาดลงผิดวันได้ง่าย
           expForm: keepGoing && !editingId
             ? { ...s.expForm, amount: '', note: '', attachmentName: '' }
-            : defaultExpenseForm()
+            : { ...defaultExpenseForm(), date: s.expForm.date }
         }));
       } catch (err) {
         this.setState({ expError: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' });
