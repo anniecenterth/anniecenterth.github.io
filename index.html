@@ -4442,6 +4442,8 @@ function pyMoney(n) {
 /** คืน { svg, w, h } — ความสูงยืดตามจำนวนบรรทัด ไม่ตัดข้อมูลทิ้ง */
 function pySlipSvg(opts) {
   var empName = opts.employeeName || '';
+  // สาขาบนหัวสลิปต้องตามสาขาของสลิปใบนั้น เดิมพิมพ์ "สาขาบางโพ" ตายตัวทุกใบ
+  var branchName = opts.branchLabel || 'บางโพ';
   var periodLabel = opts.periodLabel || '';
   var lines = opts.lines || [];
   var paidDate = opts.paidDate || '';
@@ -4476,7 +4478,7 @@ function pySlipSvg(opts) {
 
   // ---- หัวสลิป ----
   y = 48;
-  text(PAD, y, 'Annie Group · สาขาบางโพ', { size: 12.5, fill: '#8089A0', weight: 500 });
+  text(PAD, y, 'Annie Group · สาขา' + branchName, { size: 12.5, fill: '#8089A0', weight: 500 });
   y += 30;
   text(PAD, y, 'สลิปเงินเดือน', { size: 23, weight: 700 });
   if (status) {
@@ -5490,7 +5492,7 @@ class Component extends DCLogic {
                     total_earning: t.earning, total_deduction: t.deduction, net_pay: t.net, status };
       const res = existing
         ? await supabaseClient.from('payslips').update(row).eq('id', existing.id).select().single()
-        : await supabaseClient.from('payslips').insert(row).select().single();
+        : await supabaseClient.from('payslips').insert({ ...row, branch: this.activeBranch() }).select().single();
       if (res.error) throw res.error;
       return res.data;
     };
@@ -5641,6 +5643,7 @@ class Component extends DCLogic {
       ? (this.state.employees.find(e => e.id === pyImageSlip.employee_id) || {}) : null;
     const pySvgOut = pyImageSlip ? pySlipSvg({
       employeeName: pyImageEmp.name || '',
+      branchLabel: branchLabel(pyImageSlip.branch || DEFAULT_BRANCH),
       periodLabel: pyMonthLabel(String(pyImageSlip.period).slice(0, 10)),
       lines: pyImageSlip.lines || [],
       status: pyImageSlip.status,
@@ -5728,7 +5731,8 @@ class Component extends DCLogic {
                       sso_enabled: !!f.sso_enabled, start_date: f.start_date || null, note: f.note || null };
         const res = this.state.editingEmpId
           ? await supabaseClient.from('employees').update(row).eq('id', this.state.editingEmpId)
-          : await supabaseClient.from('employees').insert(row);
+          // แถวใหม่ต้องผูกสาขาที่เปิดอยู่ — ไม่ระบุ ฐานจะใส่ 'main' ให้ แล้วสาขาอื่นบันทึกไม่ได้เลย
+          : await supabaseClient.from('employees').insert({ ...row, branch: this.activeBranch() });
         if (res.error) throw res.error;
         await this.loadPayroll();
         this.setState({ editingEmpId: null, payrollError: null,
@@ -5770,7 +5774,7 @@ class Component extends DCLogic {
       for (let i = 0; i < lead; i++) cells.push({ label: '', style: 'padding:12px 0', onClick: () => {} });
       for (let d = 1; d <= days; d++) {
         const iso = pyCalMonth + '-' + String(d).padStart(2, '0');
-        const hol = this.state.holidays.find(h => h.holiday_date === iso);
+        const hol = this.ofBranch(this.state.holidays).find(h => h.holiday_date === iso);
         const nWork = hol ? this.state.holidayWork.filter(w => w.holiday_id === hol.id).length : 0;
         cells.push({
           label: String(d), holidayName: hol ? hol.name : '', workedCount: nWork ? nWork + ' คน' : '',
@@ -5801,7 +5805,7 @@ class Component extends DCLogic {
         const row = { holiday_date: f.holiday_date, name: f.name.trim(), pay_multiplier: pyNum(f.pay_multiplier) };
         const res = this.state.editingHolId
           ? await supabaseClient.from('holidays').update(row).eq('id', this.state.editingHolId)
-          : await supabaseClient.from('holidays').insert(row);
+          : await supabaseClient.from('holidays').insert({ ...row, branch: this.activeBranch() });
         if (res.error) throw res.error;
         await this.loadPayroll();
         this.setState({ payrollError: null });
