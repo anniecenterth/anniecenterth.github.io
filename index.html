@@ -5592,25 +5592,35 @@ class Component extends DCLogic {
       if (!pySlipEditing || pySlipLocked || this.state.payrollBusy) return;
       this.setState({ payrollBusy: true });
       try {
-        const saved = await pySaveSlip(pySlipEditing.employee_id, this.state.slipDraft || [], 'จ่ายแล้ว', pySlipEditing);
+        // บันทึกรายการในสลิปก่อน แต่ยัง "ไม่" เปลี่ยนสถานะเป็นจ่ายแล้ว
+        // เดิมล็อกสลิปก่อนแล้วค่อยลงรายจ่าย ถ้ารายจ่ายล้มเหลวสลิปจะค้างสถานะจ่ายแล้ว
+        // ทั้งที่ไม่มีรายจ่ายสักแถว และกดจ่ายซ้ำไม่ได้อีกเลย (เกิดจริงกับถนนจันทร์ 3 ใบ)
+        const saved = await pySaveSlip(pySlipEditing.employee_id, this.state.slipDraft || [], pySlipEditing.status || 'ร่าง', pySlipEditing);
         const lines = saved.lines || [];
         const emp = this.state.employees.find(e => e.id === saved.employee_id) || {};
         const today = todayISO();
         // วันที่ของรายจ่าย = วันสิ้นเดือนงวด ไม่ใช่วันที่กดปุ่ม
         const expDate = pyMonthEnd(pyPeriod);
+        // รายจ่ายต้องอยู่สาขาเดียวกับสลิป — ไม่ระบุ ฐานจะใส่ 'main' แล้ว RLS ปฏิเสธ
+        // ทำให้กด "จ่ายเงิน & ลงรายจ่าย" ไม่สำเร็จสำหรับผู้ใช้ที่เขียนได้เฉพาะสาขาตัวเอง
+        const expBranch = saved.branch || emp.branch || this.activeBranch();
         const rows = pyExpenseSplit(lines).map(r => ({
           date: isoToBEShort(expDate), time: '00:00', expense_date: expDate,
           main_cat: 'ค่าแรง', sub_cat: r.sub, amount: r.amount, payment: 'โอนเงิน',
           detail: 'เงินเดือน ' + payrollPeriodLabel + ' · ' + (emp.name || ''),
-          source: 'PAYROLL', source_ref: saved.id, created_by: null, attachment_name: null
+          source: 'PAYROLL', source_ref: saved.id, created_by: null, attachment_name: null,
+          branch: expBranch
         }));
         let ids = [];
         if (rows.length) {
           const ins = await supabaseClient.from('expenses').insert(rows).select('id');
           if (ins.error) throw ins.error;
           ids = (ins.data || []).map(x => x.id);
-          await supabaseClient.from('payslips').update({ paid_date: today, expense_ids: ids }).eq('id', saved.id);
         }
+        // ลงรายจ่ายสำเร็จแล้วค่อยล็อกสลิป — ล้มเหลวตรงไหนสลิปยังกดจ่ายใหม่ได้
+        const lock = await supabaseClient.from('payslips')
+          .update({ status: 'จ่ายแล้ว', paid_date: today, expense_ids: ids }).eq('id', saved.id);
+        if (lock.error) throw lock.error;
         await this.loadPayroll(); await this.loadExpenses();
         this.setState({ editingSlipId: null, slipDraft: null });
       } catch (e) { this.setState({ payrollError: 'บันทึกการจ่ายไม่สำเร็จ — ' + (e.message || '') }); }
