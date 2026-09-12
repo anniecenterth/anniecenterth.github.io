@@ -3814,9 +3814,9 @@ function parseGenericDateTime(str) {
  *  เจ้าของร้านจึงให้ย้าย "เฉพาะยอดขาย" ไปนับรวมกับหน้าร้าน ส่วนค่าบริการยังอยู่กับแพลตฟอร์มเดิม
  *  (ยืนยัน 8 ก.ย. 2569) */
 const SUBSIDY_SPLITS = [
-  { platform: 'grab',    storeKw: 'เค้กหอมมนต์ บางโพ',                    label: 'ไทยช่วยไทย พลัส (Grab หอมมนต์)' },
-  { platform: 'lineman', storeKw: 'เค้กหอมมนต์ เค้กวันเกิด เบเกอรี่ บางโพ', label: 'ไทยช่วยไทย พลัส (Lineman หอมมนต์)' },
-  { platform: 'lineman', storeKw: 'Annie cake เค้กวันเกิด เค้กมินิมอล',      label: 'ไทยช่วยไทย พลัส (Lineman Anniecake)' }
+  { branch: 'main', platform: 'grab',    storeKw: 'เค้กหอมมนต์ บางโพ',                    label: 'ไทยช่วยไทย พลัส (Grab หอมมนต์)' },
+  { branch: 'main', platform: 'lineman', storeKw: 'เค้กหอมมนต์ เค้กวันเกิด เบเกอรี่ บางโพ', label: 'ไทยช่วยไทย พลัส (Lineman หอมมนต์)' },
+  { branch: 'main', platform: 'lineman', storeKw: 'Annie cake เค้กวันเกิด เค้กมินิมอล',      label: 'ไทยช่วยไทย พลัส (Lineman Anniecake)' }
 ];
 function subsidyLabelOf(platform, storeName) {
   const n = String(storeName || '');
@@ -3962,7 +3962,12 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
   if (platform === 'shopee') {
     const orderId = row['Order ID'] || '';
     if (!orderId) return skip('ไม่มีรหัสออเดอร์');
+    // กันแถวขยะ 2 แบบที่เคยหลุดเข้าฐาน (11 ก.ย. 2569 · ถนนจันทร์ 3 แถว)
+    //  1) หัวตารางซ้ำในไฟล์ → ทุกค่าเท่ากับชื่อคอลัมน์ของตัวเอง
+    //  2) แถวของแอปอื่นที่อยู่ในไฟล์เดียวกัน → ไม่มีสถานะและไม่มียอดเลย
+    if (String(orderId).trim() === 'Order ID' || String(row['Store ID'] || '').trim() === 'Store ID') return skip('แถวหัวตาราง ไม่ใช่ข้อมูล');
     const orderStatus = String(row['Order Status'] || '').trim();
+    if (!orderStatus && num(row['Order Amount']) === 0 && num(row['Net Income']) === 0) return skip('แถวไม่ใช่ออเดอร์ Shopee (ไม่มีสถานะและไม่มียอด)');
     if (/cancel/i.test(orderStatus)) return skip('ออเดอร์ยกเลิก');       // สเปก: กรองออก Order Status = cancelled
     if (isExcludedStore('shopee', row['Store Name'])) return skip('ร้านนอกสาขาบางโพ');
     const gross = num(row['Order Amount']);
@@ -7373,17 +7378,21 @@ class Component extends DCLogic {
     // จึงจับด้วยคำสำคัญ ไม่ใช่เทียบตรงตัว · ที่ไม่เข้ากฎไหนเลยตกลงช่อง "อื่นๆ" ไม่ให้เงินหาย
     // เรียงจากเจาะจงไปกว้าง — ตัวจับเอาอันแรกที่ตรง ถ้าเอา "ไทยช่วยไทย" กว้างๆ ไว้ก่อน
     // ยอดของ 3 ร้านจะไหลเข้าช่องเดียวกันหมด แยกไม่ออกว่ามาจากช่องทางไหน
+    // คอลัมน์ไทยช่วยไทยรายร้านมาจากทะเบียน SUBSIDY_SPLITS ของสาขาที่เปิดอยู่เท่านั้น
+    // ถนนจันทร์ไม่ได้เข้าโครงการนี้ จึงไม่ต้องมี 3 ช่องของบางโพให้ว่างเปล่า (12 ก.ย. 2569)
+    // ถ้าสาขาไหนเข้าโครงการเพิ่ม ใส่ใน SUBSIDY_SPLITS แล้วคอลัมน์จะขึ้นเอง
+    const drSubsidyCols = SUBSIDY_SPLITS
+      .filter(x => (x.branch || DEFAULT_BRANCH) === this.activeBranch())
+      .map((x, i) => ({ key: 'tcSub' + i, label: x.label, match: p => String(p || '') === x.label }));
     const DR_POS_COLS = [
       { key:'cash',    label:'Cash',        match: p => /^cash$|เงินสด/i.test(p) },
       { key:'kshop',   label:'K+ Shop',     match: p => /k\+\s*shop/i.test(p) },
-      { key:'pospay',  label:'POS Pay',     match: p => /pos\s*pay|promptpay/i.test(p) },
-      { key:'tcLmAc',  label:'ไทยช่วยไทย พลัส (Lineman Anniecake)', match: p => /Lineman Anniecake/i.test(p) },
-      { key:'tcLmHm',  label:'ไทยช่วยไทย พลัส (Lineman หอมมนต์)',   match: p => /Lineman หอมมนต์/.test(p) },
-      { key:'tcGbHm',  label:'ไทยช่วยไทย พลัส (Grab หอมมนต์)',      match: p => /Grab หอมมนต์/.test(p) },
+      { key:'pospay',  label:'POS Pay',     match: p => /pos\s*pay|promptpay/i.test(p) }
+    ].concat(drSubsidyCols).concat([
       { key:'thaipl',  label:'ไทยช่วยไทย (หน้าร้าน)', match: p => /ไทยช่วยไทย/.test(p) },
       { key:'whole',   label:this.specialPay(), match: p => String(p || '') === this.specialPay() },
       { key:'posetc',  label:'อื่นๆ (หน้าร้าน)', match: () => true }
-    ];
+    ]);
     const DR_PLATFORM_COLS = [
       { key:'lineman', label:'LINE MAN',   platform:'LINE MAN' },
       { key:'grab',    label:'Grab',       platform:'Grab' },
