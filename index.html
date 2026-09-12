@@ -3801,9 +3801,14 @@ function parseGrabDateTime(dateField, createdOnField) {
   return { date: null, time };
 }
 function parseGenericDateTime(str) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(String(str || ''));
+  // ชั่วโมงหลักเดียวและแถวที่มีแต่วันที่ก็ต้องอ่านได้ — เดิมบังคับ 2 หลัก
+  // แถวหักของ LINE MAN (Installment / Listing Ads / POS Subscription) เขียน "2026-01-30 0:00:00"
+  // จึงอ่านวันที่ไม่ได้ แล้วตกไปใช้ "วันที่ของไฟล์" ทั้งหมด — 432 แถวไปกองรวมกันวันเดียว
+  // ทำให้ค่าบริการของเดือนก่อน ๆ ขาดหายและเดือนที่นำเข้าติดลบ (เจอ 12 ก.ย. 2569)
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/.exec(String(str || '').trim());
   if (!m) return { date: null, time: '00:00' };
-  return { date: isoToBEShort(m[1] + '-' + m[2] + '-' + m[3]), time: m[4] + ':' + m[5] };
+  const hh = m[4] == null ? '00' : String(m[4]).padStart(2, '0');
+  return { date: isoToBEShort(m[1] + '-' + m[2] + '-' + m[3]), time: hh + ':' + (m[5] || '00') };
 }
 /** ยอดขายจากโครงการไทยช่วยไทย ลูกค้าจ่ายที่ร้านผ่านกระเป๋ารัฐ ไม่ใช่ยอดที่แพลตฟอร์มเก็บเงินแทน
  *  เจ้าของร้านจึงให้ย้าย "เฉพาะยอดขาย" ไปนับรวมกับหน้าร้าน ส่วนค่าบริการยังอยู่กับแพลตฟอร์มเดิม
@@ -3830,6 +3835,13 @@ function normalizeImportRows(platform, rows, fallbackDateISO, activeBranch) {
     const r = normalizeImportRow(platform, row, fallbackDateISO, ctx);
     if (!r) return;
     if (Array.isArray(r)) out.push.apply(out, r); else out.push(r);
+  });
+  // ค่าบริการของแพลตฟอร์ม = ยอดขาย − ยอดโอนออกให้ร้าน เสมอ
+  // แต่ละแอปนับส่วนลด/ค่าโฆษณาคนละแบบ ถ้าไล่บวกทีละช่องจะไม่มีวันตรงใบสรุป
+  // สูตรนี้ตรงกับใบสรุปของทั้ง 3 แอป (ตรวจกับถนนจันทร์ ส.ค. 2569 ครบทุกร้าน)
+  const PLAT_FEE = ['Grab', 'LINE MAN', 'ShopeeFood'];
+  out.forEach(r => {
+    if (PLAT_FEE.indexOf(r.platformLabel) >= 0) r.fee = Math.round(((r.gross || 0) - (r.net || 0)) * 100) / 100;
   });
   return { rows: out, skips: ctx.skips };
 }
@@ -3879,13 +3891,16 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     // ค่าบริการ = Amount − Total ใช้เลขคณิตของ Grab เอง
     // Grab หักหลายคอลัมน์และไม่เท่ากันทุกออเดอร์ (Channel Commission, Marketing success fee,
     // Step-up commission ฯลฯ) ถ้าไล่บวกทีละคอลัมน์จะตกหล่นทันทีที่ Grab เพิ่มคอลัมน์ใหม่
-    const gross = isAdjustment ? 0 : amount;
-    const service = isAdjustment ? -amount : amount - total;
-    // แถวที่ยังไม่โอน (Status = Completed) Grab ยังไม่หักค่าคอม Amount จึงเท่ากับ Total
-    // เงินยังไม่เข้าบัญชี ยอดโอนของแถวนี้จึงเป็น 0 แต่ยอดขายนับแล้ว และสถานะขึ้นว่ารอรับเงิน
-    const net = (!isAdjustment && !settled) ? 0 : total;
     const vat = mag(loosePick(row, 'Tax on GrabFood / GrabMart Commission, Adjustments, Ads'));
     const discount = mag(loosePick(row, 'Discount (Merchant-Funded)'));
+    // ยอดขาย = Amount − ส่วนลดที่ร้านออกเอง ให้ตรงกับ "ยอดขาย" ในรายงานของ Grab
+    // (Amount ของ Grab เป็นยอดก่อนหักส่วนลดร้าน — เทียบใบสรุปถนนจันทร์ ส.ค. 2569 แล้วตรงเป๊ะ)
+    const gross = isAdjustment ? 0 : Math.round((amount - discount) * 100) / 100;
+    const service = isAdjustment ? -amount : amount - total;
+    // ยอดโอนใช้ Total ตามไฟล์เสมอ แม้แถวยังไม่โอน (Status = Completed)
+    // เดิมบังคับเป็น 0 แล้วรอไฟล์รอบหน้ามาอัปเดต แต่ตัวเช็คซ้ำข้ามแถวเดิมทิ้ง
+    // ออเดอร์จึงค้าง "รอรับเงิน" ยอด 0 ตลอดกาล (บางโพค้างอยู่ 402 ออเดอร์ ตั้งแต่ ม.ค.)
+    const net = total;
     // VAT กับส่วนลดร้านรวมอยู่ในผลต่างข้างบนแล้ว จึงถอดออกให้ gp เป็นค่าคอมล้วน
     const gp = service - vat - discount;
     const payMethod = String(row['Payment Method'] || row['วิธีการชำระเงิน'] || '').trim();
@@ -3906,7 +3921,9 @@ function normalizeImportRow(platform, row, fallbackDateISO, ctx) {
     // ก็ตรงกัน (ส.ค. 2569: 78 ออเดอร์ ฿16,649 · ค่าคอม ฿890.67 ÷ 5.35% = ฿16,648)
     // เดิมไล่จับคู่จากช่อง Description ซึ่งจับผิดออเดอร์ได้เพราะ Short Order ID วนใช้ซ้ำ
     const subsidyLabel = !isAdjustment && !settled && subsidyLabelOf('grab', storeName);
-    if (subsidyLabel) return splitSubsidyRow(built, subsidyLabel);
+    // ออเดอร์ไทยช่วยไทย: ยอดขายย้ายไปหน้าร้านทั้งก้อน เหลือเฉพาะค่าคอมที่ยังต้องจ่ายคืน Grab
+    // แถวที่เหลือจึงเป็น ยอดขาย 0 · ยอดโอน −ค่าคอม (เดิมเป็น 0 ทำให้ ยอดขาย−ค่าบริการ ≠ ยอดโอน)
+    if (subsidyLabel) return splitSubsidyRow({ ...built, net: -(gp + vat) }, subsidyLabel);
     return built;
   }
   if (platform === 'lineman') {
@@ -7316,7 +7333,7 @@ class Component extends DCLogic {
     dashDeliveryPlatforms.filter(p => byChannel[p]).forEach(p => {
       const g = byChannel[p];
       const hasWaiting = salesRows.some(r => r.platform === p && r.status === 'รอรับเงิน');
-      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), service: fmtB(dashGp(p,g) + dashVat(p) + dashPromo(p)), net: fmtB(g.net), netStyle: drNegStyle(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
+      dashPayoutRows.push({ platform: platHeaderCell(p), gross: fmtB(g.gross), service: fmtB(g.gross - g.net), net: fmtB(g.net), netStyle: drNegStyle(g.net), statusTag: hasWaiting ? dashStatus('รอรับเงิน','wait') : dashStatus('เข้าบัญชีแล้ว','ok'), weight:'500' });
       if (expandedPlatforms[p]) {
         // แยกเป็น "ร้าน" ตามชื่อที่แพลตฟอร์มเรียก ไม่ยุบเป็นแบรนด์ เพราะแบรนด์เดียวมีหลายร้าน
         // และเจ้าของร้านต้องดูออกว่าร้านไหนทำยอดได้เท่าไร (แถวเก่าที่ไม่มีชื่อร้านถอยไปใช้แบรนด์)
