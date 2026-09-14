@@ -702,6 +702,9 @@
             </tr>
           </thead>
           <tbody>
+            <sc-if value="{{ productsEmpty }}" hint-placeholder-val="{{ false }}">
+              <tr><td colspan="6" style="padding:26px 8px;text-align:center;color:#9AA3B2">ยังไม่มีข้อมูลสินค้าขายดีของสาขานี้</td></tr>
+            </sc-if>
             <sc-for list="{{ productRows }}" as="p" hint-placeholder-count="10">
               <tr style="border-top:1px solid #F1F2F4;color:#2B3547">
                 <td style="padding:10px 8px;color:#9AA3B2;font-weight:600">{{ p.rank }}</td>
@@ -4060,9 +4063,6 @@ function safeBeShortToISO(be) {
 // (LINE MAN vat / ShopeeFood VAT on Commission / Grab Tax on MDR). Bridge lookup so GP/VAT
 // display correctly without a DB migration; superseded by a stored sales.vat column if added.
 const SALES_VAT_BY_ORDER = {"LMF-260709-704801585":3.94,"LMF-260709-787669571":5.92,"LMF-260709-413932190":6.09,"LMF-260709-393224230":2.02,"LMF-260709-692751786":3.07,"LMF-260709-715602127":1.58,"LMF-260709-462287476":2.44,"LMF-260709-890927833":4.65,"LMF-260709-787651836":2.02,"LMF-260709-155690969":6.91,"LMF-260709-725447805":8.02,"LMF-260709-266743635":8.48,"LMF-260709-389876107":6.18,"LMF-260709-681142560":2.23,"LMF-260709-587097997":0.69,"LMF-260709-484208458":3.41,"LMF-260709-444764461":0.69,"LMF-260709-503460076":2.02,"LMF-260709-185052299":4.65,"LMF-260709-220863937":0.69,"LMF-260709-258521595":3.24,"LMF-260709-622871999":0.59,"LMF-260709-306459254":8.23,"LMF-260709-803002201":5.66,"LMF-260709-220113355":1.67,"LMF-260709-449886412":1.92,"LMF-260709-559613632":2.05,"LMF-260709-444711232":0.98,"LMF-260709-495605765":0.69,"LMF-260709-886109869":4.02,"LMF-260709-808412904":1.37,"LMF-260709-700223952":0.69,"LMF-260709-822272149":1.37,"LMF-260709-884894174":0.69,"LMF-260709-834439905":1.65,"LMF-260709-412057678":0.69,"LMF-260709-587301196":1.92,"LMF-260709-456497358":1.92,"LMF-260709-311430879":1.03,"LMF-260709-861692299":2.02,"LMF-260709-360993557":1.92,"LMF-260709-914874294":1.37,"LMF-260709-901772850":0.69,"LMF-260709-031191085":1.03,"LMF-260709-171234633":0.69,"LMF-260709-209138682":2.32,"LMF-260709-703814992":0.69,"LMF-260709-978177258":1.37,"LMF-260709-173093145":4.02,"LMF-260709-793813688":1.92,"LMF-260709-696264678":1.47,"LMF-260709-684613642":2.02,"LMF-260709-098133980":2.02,"LMF-260709-038197653":5.66,"LMF-260709-860440022":0.59,"LMF-260709-745702379":2.88,"LMF-260709-868171460":4.25,"LMF-260709-253310365":3.21,"LMF-260709-903912161":0.89,"LMF-260709-143494368":1.37,"LMF-260709-270426788":0.69,"LMF-260709-963590331":2.78,"LMF-260709-122403641":9.47,"LMF-260709-834337631":2.29,"LME-260709-269169057":4.53,"LMF-260709-866687693":7.08,"LMF-260709-203175726":1.99,"3165324356910592426":1.72,"3165440867973120714":2.67,"3165751359897088041":7.94,"3165815021385728436":2.06,"3165863706376192603":1.89,"3165867421366272789":6.13,"3165902673559040799":3.61,"3165944973000192487":6.87,"3165987704322048395":2.37,"3166085639372288521":12.14,"3165752505612288883":5.02,"3166079655147520985":2.79};
-// Product sales snapshot pulled from the POS "ยอดขายตามสินค้า" report (top 60 by
-// gross per month). Real data; refresh by asking Claude to "อัปเดตข้อมูลสินค้า".
-const PRODUCT_SALES = {"asOf":"10/08/2569","jul":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",1041,100551],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",125,35723],["เค้ก 90 Buttercream เค้กโบราณ","เมนูใหม่ประจำวัน",79,20731],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",47,13061],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",39,12597],["H มะพร้าว","ครึ่งปอนด์",52,12338],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",34,11012],["เค้กมะพร้าว","2 ปอนด์",217,8778],["H Bear Brown Cake","ครึ่งปอนด์",39,8541],["เครปเค้กเรนโบว์","2 ปอนด์",173,8329],["Flowers","เมนูแนะนำ (เมนูใหม่)",25,8153],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",55,7559],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",183,7336],["H ช็อคบราวนี่","ครึ่งปอนด์",33,7317],["เค้กแบล็คฟอเรสต์","2 ปอนด์",168,6769],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",19,6682],["เค้กส้ม","2 ปอนด์",164,6545],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",20,6521],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",163,6510],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",161,6433],["Be Smiles","เค้กมินิมอล",27,6063],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",149,5992],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",150,5915],["เค้กมะพร้าวใบเตย","2 ปอนด์",145,5852],["เค้กบลูเบอร์รี่","2 ปอนด์",148,5775],["เค้กช็อคหน้านิ่ม","2 ปอนด์",147,5768],["Blessing","เค้กมินิมอล",17,5673],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",143,5586],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",133,5257],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",16,5229],["เค้กช็อคโอริโอ้","2 ปอนด์",131,5222],["White Ruby","เมนูแนะนำ (เมนูใหม่)",12,5159],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",16,5073],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",18,4872],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",15,4851],["เค้กเชอร์รี่ช็อกโกแลต","2 ปอนด์",120,4795],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",14,4740],["เค้กมิกซ์เบอร์รี่","2 ปอนด์",118,4599],["เค้กช็อกโกแลต ครัช","2 ปอนด์",115,4585],["เค้กโอริโอ้","2 ปอนด์",118,4571],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",14,4473],["1P เค้กช็อคโก้โอริโอ้","เค้ก 1 ปอนด์",14,4395],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",18,4332],["เค้กเชดด้าชีส","2 ปอนด์",110,4284],["Boy Choco","เค้กช็อกโกแลตหน้านิ่ม",11,4275],["เค้กบลูเลิฟเวอร์","2 ปอนด์",105,4116],["เค้กลูกตาล","2 ปอนด์",100,3913],["H เรนโบว์ช็อค","ครึ่งปอนด์",18,3862],["เค้กชาเขียวมัจฉะ","2 ปอนด์",94,3794],["เค้กช็อคโกแลตพีนัทบัตเตอร์","2 ปอนด์",94,3724],["1P ช็อกโกแลตนูเทลล่า","เค้ก 1 ปอนด์",11,3495],["เค้กฝอยทอง","2 ปอนด์",87,3465],["1P ไวท์ช็อกโกแลต","เค้ก 1 ปอนด์",11,3378],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",80,3160],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",11,3135],["เค้กช็อคโอช็อค","2 ปอนด์",79,3101],["คนพิเศษเกิดวันนี้","เมนูแนะนำ (เมนูใหม่)",9,3037],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",8,2970],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",9,2904],["เค้กไวท์กรีนทีเชอรี่","2 ปอนด์",73,2884]],"aug":[["เค้ก 90 Buttercream Mini เค้กโบราณ","เมนูใหม่ประจำวัน",117,11106],["เค้กสั่งทำหน้าร้าน","เคกสั่งทำ",18,5924],["H มะพร้าว","ครึ่งปอนด์",21,4819],["Little Boy","เมนูใหม่ประจำวัน",16,3662],["เค้กสั่งทำออนไลน์","เคกสั่งทำ",7,3055],["Flowers","เมนูแนะนำ (เมนูใหม่)",8,2543],["อายุ วัณโณ สุขังพลัง สาธุ","เมนูแนะนำ (เมนูใหม่)",8,2299],["เค้ก 90 Buttercream Mini × 6","เมนูใหม่ประจำวัน",4,2160],["HBD Choco","เค้กช็อกโกแลตหน้านิ่ม",6,2086],["Blushing Heart","เมนูแนะนำ (เมนูใหม่)",7,2066],["H Bear Brown Cake","ครึ่งปอนด์",9,2031],["เครปเค้กเรนโบว์","2 ปอนด์",41,1917],["1P เค้กมะพร้าว","เค้ก 1 ปอนด์",6,1917],["1P แบล็คฟอเรสต์","เค้ก 1 ปอนด์",6,1917],["เค้กมะพร้าวใบเตย","2 ปอนด์",47,1911],["เค้กมะพร้าว","2 ปอนด์",44,1764],["พวงมาลัย (กลาง)","เค้กวันแม่",5,1745],["Red Ruby","เมนูแนะนำ (เมนูใหม่)",4,1705],["เค้กยุค 90 เค้กโบราณ","เมนูใหม่ประจำวัน",6,1669],["เค้กบลูเลิฟเวอร์","2 ปอนด์",42,1638],["เค้กช็อกโกแลตนูเทลล่า","2 ปอนด์",40,1582],["1P เค้กมะพร้าวฝอยทอง","เค้ก 1 ปอนด์",5,1578],["เค้กอัลมอนด์ช็อกโกแลต","2 ปอนด์",40,1575],["H ช็อคนูเทล่า","ครึ่งปอนด์",7,1573],["เค้กแบล็คฟอเรสต์","2 ปอนด์",38,1449],["เค้ก 90 Buttercream Mini × 3","เมนูใหม่ประจำวัน",5,1425],["ว้ายยยย เเก่เเล้ว","เมนูแนะนำ (เมนูใหม่)",5,1413],["พวงมาลัย (ใหญ่)","เค้กวันแม่",4,1396],["Blessing","เค้กมินิมอล",4,1377],["H ช็อคโอริโอ้","ครึ่งปอนด์",6,1354],["H ช็อคเลิฟเวอร์","ครึ่งปอนด์",6,1284],["Cherry","เค้กมินิมอล",4,1276],["เค้กมะพร้าวฝอยทอง","2 ปอนด์",33,1260],["เค้กช็อคหน้านิ่ม","2 ปอนด์",32,1239],["เค้กบลูเบอร์รี่","2 ปอนด์",31,1225],["Pink Painted Ladies","เมนูแนะนำ (เมนูใหม่)",3,1221],["H มิกซ์เบอร์รี่","ครึ่งปอนด์",5,1145],["Cinderella Princess","เมนูดังคนสั่งเยอะ",3,1142],["เค้กไวท์ช็อกโกแลต","2 ปอนด์",29,1120],["Love Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1116],["H Bear Pink Cake","ครึ่งปอนด์",5,1115],["Pink Heart Choco","เค้กช็อกโกแลตหน้านิ่ม",3,1112],["เค้กช็อกโกแลต ครัช","2 ปอนด์",29,1106],["เค้กช็อคโอช็อค","2 ปอนด์",29,1099],["Piggy Cake","เมนูแนะนำ (เมนูใหม่)",3,1045],["เค้กเชดด้าชีส","2 ปอนด์",26,1001],["Be Smiles","เค้กมินิมอล",3,957],["Blue Ocean","เค้กมินิมอล",3,956],["เค้กช็อคโอริโอ้","2 ปอนด์",25,952],["เค้กโอริโอ้","2 ปอนด์",24,952],["H เรนโบว์ช็อค","ครึ่งปอนด์",5,945],["1P มิกซ์เบอร์รี่","เค้ก 1 ปอนด์",3,939],["1P ช็อคเลิฟเวอร์","เค้ก 1 ปอนด์",3,939],["เค้กสตรอว์เบอร์รี่โยเกิร์ต","2 ปอนด์",25,938],["เค้กสตรอว์เบอร์รี่","2 ปอนด์",24,931],["H คาราเมล อัลมอนด์เค้ก","ครึ่งปอนด์",4,926],["เค้กช็อกโกแลตเลิฟเวอร์","2 ปอนด์",24,924],["เค้กฝอยทอง","2 ปอนด์",23,903],["เทียนตัวเลขสีพาสเทล","เทียน-อุปกรณ์ตกแต่ง",23,888],["Girl Choco","เค้กช็อกโกแลตหน้านิ่ม",3,887]]};
 /** รหัสสาขา — ต้องตรงกับฐาน annie-cake เป๊ะ (ดู Annie AI System/นิยามกลาง.md)
  *  ห้ามคิดรหัสใหม่เอง ไม่งั้นวันรวมฐานจะแมปกันไม่ได้
  *  Command Center ทำสาขาบางโพเป็นหลัก จึงตั้ง main เป็นค่าเริ่มต้น */
@@ -4631,6 +4631,7 @@ class Component extends DCLogic {
     this.loadAccess();
     this.loadCrm();
     this.loadPurchases();
+    this.loadProducts();
     this.loadPayroll();
   };
 
@@ -4707,6 +4708,17 @@ class Component extends DCLogic {
     }
   };
   // ประวัติราคาที่ซื้อจริงจาก Shopee — ใช้เทียบก่อนสั่งซื้อรอบใหม่
+  // สินค้าขายดี (snapshot จากรายงาน POS "ยอดขายตามสินค้า") — เก็บในตาราง product_sales_top แยกสาขา
+  // RLS ให้อ่านได้เฉพาะสาขาที่มีสิทธิ์ ข้อมูลไม่อยู่ในไฟล์เว็บสาธารณะแล้ว
+  loadProducts = async () => {
+    try {
+      const r = await supabaseClient.from('product_sales_top').select('*').order('period_key').order('rank');
+      if (r.error) throw r.error;
+      this.setState({ productSalesRows: (r.data || []).map(x => ({ ...x, branch: x.branch || DEFAULT_BRANCH })) });
+    } catch (err) {
+      this.setState({ productSalesRows: [] });
+    }
+  };
   loadPurchases = async () => {
     try {
       const data = await this.fetchAllRows('purchases');
@@ -6861,14 +6873,19 @@ class Component extends DCLogic {
         + (procSpikes.length > 3 ? ' และอีก ' + (procSpikes.length - 3) + ' รายการ' : '')
       : '';
 
-    // ---- สินค้าขายดี (POS snapshot — PRODUCT_SALES) ----
-    const productsMonth = this.state.productsMonth || 'aug';
+    // ---- สินค้าขายดี (POS snapshot — ตาราง product_sales_top แยกสาขา) ----
+    const prodBranchRows = this.ofBranch(this.state.productSalesRows || []);
+    const prodPeriods = [];
+    prodBranchRows.forEach(r => { if (!prodPeriods.some(p => p.key === r.period_key)) prodPeriods.push({ key: r.period_key, label: r.period_label }); });
+    const productsMonth = prodPeriods.some(p => p.key === this.state.productsMonth)
+      ? this.state.productsMonth : (prodPeriods.length ? prodPeriods[prodPeriods.length - 1].key : '');
     const prodTabBase = { display:'flex', alignItems:'center', borderRadius:'11px', padding:'9px 16px', fontSize:'13px', fontWeight:600, cursor:'pointer' };
-    const productMonthTabs = [{ key:'jul', label:'ก.ค. 69' }, { key:'aug', label:'ส.ค. 69 (1–9)' }].map(t => ({
+    const productMonthTabs = prodPeriods.map(t => ({
       label: t.label, onClick: () => this.setState({ productsMonth: t.key }),
       style: t.key === productsMonth ? { ...prodTabBase, background:'#2C4A7C', color:'#fff' } : { ...prodTabBase, background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
     }));
-    const prodList = PRODUCT_SALES[productsMonth] || [];
+    const prodList = prodBranchRows.filter(r => r.period_key === productsMonth)
+      .map(r => [r.name, r.category || '', Number(r.qty) || 0, Number(r.gross) || 0]);
     const prodTotalGross = prodList.reduce((a, p) => a + p[3], 0);
     const prodTotalQty = prodList.reduce((a, p) => a + p[2], 0);
     const pFmt = n => '฿' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -6884,9 +6901,10 @@ class Component extends DCLogic {
     const exportProductsCsv = () => {
       const lines = [csvRow(['อันดับ','สินค้า','หมวดหมู่','จำนวน','ยอดขาย (฿)'])];
       prodList.forEach((p, i) => lines.push(csvRow([i + 1, p[0], p[1], p[2], p[3]])));
-      downloadCsv('สินค้าขายดี-' + (productsMonth === 'jul' ? 'กค69' : 'สค69') + '.csv', lines);
+      downloadCsv('สินค้าขายดี-' + branchLabel(this.activeBranch()) + '-' + productsMonth + '.csv', lines);
     };
-    const productAsOf = PRODUCT_SALES.asOf;
+    const productAsOf = (prodBranchRows.find(r => r.period_key === productsMonth) || {}).as_of || '—';
+    const productsEmpty = prodList.length === 0;
     const inexTypePill = (t) => {
       const c = t === 'รายรับ' ? ['#2E7D5B','▲'] : ['#2C4A7C','▼'];
       return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', gap:'4px', color:c[0], fontWeight:600 } },
@@ -9000,7 +9018,7 @@ class Component extends DCLogic {
       inexRecentTabs, inexRecentMoreLabel, toggleInexRecentAll,
       inexKpis, inexChart: this.inexChart(inexRows, inexExpAll, this.periodAxis(14)), inexExpRows, inexExpDonut, inexChannelRows, inexRecent, inexSummary, inexAlerts, inexInsights,
       monthlyRows, exportMonthlyCsv,
-      productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf,
+      productMonthTabs, productRows, productKpis, exportProductsCsv, productAsOf, productsEmpty,
       dataSourceRows, dsKpis, exportDataSourcesCsv,
       crmConnUser: this.state.crmConnUser, crmConnPassword: this.state.crmConnPassword,
       crmConnError: this.state.crmConnError, crmConnBusy: this.state.crmConnBusy, crmConnLabel,
