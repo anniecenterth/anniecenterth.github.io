@@ -2605,7 +2605,7 @@
         <div>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
             <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1B2536">เงินรัฐรอรับ</h1>
-            <span style="background:#F8F0DC;color:#B98317;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">คนละครึ่ง · เราเที่ยวด้วยกัน</span>
+            <span style="background:#F8F0DC;color:#B98317;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">ไทยช่วยไทย พลัส</span>
           </div>
           <div style="font-size:14px;color:#8089A0">ติดตามเงินอุดหนุนรัฐที่ยังไม่เข้าบัญชี — ส่วนที่รัฐจ่ายแยกรอบจากลูกค้า</div>
         </div>
@@ -2623,7 +2623,7 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <h3 style="margin:0 0 6px;font-size:16px;font-weight:600">ออเดอร์ที่รอเงินอุดหนุน</h3>
-          <div style="font-size:11.5px;color:#8F6511;background:#FBF5E6;border:1px solid #F2E6C8;border-radius:9px;padding:8px 11px;margin-bottom:13px;line-height:1.5">หมายเหตุ: ยอดเงินรัฐเป็นค่าประมาณการ (T+3) — ลูกค้าจ่าย/รัฐอุดหนุนยังไม่ได้เก็บแยกต่อออเดอร์ รอตรวจสอบกับใบสรุปการโอนจริง</div>
+          <div style="font-size:11.5px;color:#8F6511;background:#FBF5E6;border:1px solid #F2E6C8;border-radius:9px;padding:8px 11px;margin-bottom:13px;line-height:1.5">หมายเหตุ: ยอดเงินรัฐเป็นค่าประมาณการ (T+3) — ออเดอร์ Grab/LINE MAN แยกลูกค้าจ่าย/รัฐอุดหนุนแล้ว · แถวหน้าร้านเป็นยอดรวมทั้งวัน · รอตรวจสอบกับใบสรุปการโอนจริง</div>
           <table style="width:100%;border-collapse:collapse;font-size:12.5px">
             <thead>
               <tr style="color:#8089A0;font-size:11.5px">
@@ -2667,7 +2667,7 @@
             </sc-for>
           </div>
           <div style="background:#FBF5E6;border:1px solid #F2E6C8;border-radius:12px;padding:13px 15px;margin-top:8px">
-            <div style="font-size:12.5px;color:#8F6511;line-height:1.6">รัฐโอนเงินอุดหนุนเป็นรอบทุก 7 วัน หากเกินกำหนดควรตรวจสอบกับแพลตฟอร์ม</div>
+            <div style="font-size:12.5px;color:#8F6511;line-height:1.6">ระบบคาดว่าเงินรัฐเข้า 3 วันหลังวันขาย (ยังไม่ได้ยืนยันกับยอดโอนจริง) หากเลยกำหนดแล้วเงินยังไม่เข้า ควรตรวจสอบกับแพลตฟอร์ม</div>
           </div>
         </div>
       </div>
@@ -8625,35 +8625,43 @@ class Component extends DCLogic {
     // เพราะเงินรัฐของออเดอร์นั้นแยกลงแถวไทยช่วยไทยแล้ว ยอดที่เหลือในแถวแพลตฟอร์มเป็นส่วนลูกค้าจ่าย (เจ้าของสั่ง 15 ก.ย.)
     const subSrc = this.applySalesFilters(this.state.recentRows)
       .filter(r => /ไทยช่วยไทย/.test(r.payment || ''));
+    // ยอดที่ลูกค้าจ่ายเองของออเดอร์แพลตฟอร์ม (แถวแม่ ที่ order id เดียวกันแต่ไม่มีท้าย " · ไทยช่วยไทย")
+    const subCustByOid = {};
+    this.ofBranch(this.state.recentRows).forEach(r => {
+      if (r.orderId && !/ไทยช่วยไทย/.test(r.payment || '') && (r.platform === 'LINE MAN' || r.platform === 'Grab')) subCustByOid[r.orderId] = Number(r.gross) || 0;
+    });
     const subEnriched = subSrc.map(r => {
       const settle = r.isoDate ? subAddDays(r.isoDate, 3) : null;
-      let st = 'รอรับ';
-      if (settle && settle <= subToday) st = 'รับแล้ว';
-      if (settle && subDaysBetween(settle, subToday) > 14) st = 'เกินกำหนด';
-      return { plat: r.platform, oid: r.orderId, full: r.gross, settle, st,
+      // ยังไม่มีข้อมูลเงินเข้าบัญชีจริง — ถึงกำหนดแล้วถือว่ารับแล้ว (ประมาณการ)
+      // เดิมมีกฎ "เลยกำหนด 14 วัน = เกินกำหนด" ซึ่งทำให้ทุกรอบที่เก่ากว่า 14 วันขึ้นแดงทั้งที่ไม่รู้ว่าเงินเข้าหรือยัง
+      const st = settle && settle <= subToday ? 'รับแล้ว' : 'รอรับ';
+      const parentOid = String(r.orderId || '').replace(/ · ไทยช่วยไทย$/, '');
+      const cust = parentOid !== r.orderId && subCustByOid[parentOid] != null ? subCustByOid[parentOid] : null;
+      return { plat: r.platform, oid: r.orderId, full: r.gross, gov: Number(r.gross) || 0, cust, settle, st, weight: orderWeightOf(r),
         dateLabel: r.isoDate ? isoToBEShort(r.isoDate) : (r.date || ''),
         dueLabel: settle ? isoToBEShort(settle) : '—' };
     });
     const subPending = subEnriched.filter(r => r.st === 'รอรับ');
     const subDone = subEnriched.filter(r => r.st === 'รับแล้ว');
     const exportSubsidyCsv = () => {
-      const lines = [csvRow(['วันที่ขาย','ช่องทาง','Order ID','ยอดเต็ม (฿)','กำหนดเงินเข้า (T+3)','สถานะ'])];
-      subEnriched.forEach(r => lines.push(csvRow([r.dateLabel, r.plat, r.oid || '', r.full, r.dueLabel, r.st])));
+      const lines = [csvRow(['วันที่ขาย','ช่องทาง','Order ID','ลูกค้าจ่าย (฿)','รัฐอุดหนุน (฿)','กำหนดเงินเข้า (T+3)','สถานะ'])];
+      subEnriched.forEach(r => lines.push(csvRow([r.dateLabel, r.plat, r.oid || '', r.cust != null ? r.cust : '', r.gov, r.dueLabel, r.st])));
       downloadCsv('เงินรัฐรอรับ-' + todayISO() + '.csv', lines);
     };
-    const subOverdue = subEnriched.filter(r => r.st === 'เกินกำหนด');
+    // นับออเดอร์ตามจำนวนบิลจริง — แถวหน้าร้านจาก POS หนึ่งแถวรวมหลายบิล (orderWeightOf อ่าน "N บิล" จากหมายเหตุ)
+    const subCount = rows => rows.reduce((a, r) => a + (r.weight || 0), 0);
     const subNextSettle = subPending.map(r => r.settle).filter(Boolean).sort()[0];
     const subsidyKpis = [
-      { title:'เงินรัฐรอรับ (ประมาณการ)', amount: subFmt(subPending.reduce((a, r) => a + r.full, 0)), sub: subPending.length + ' ออเดอร์รัฐ', icon:'hourglass', bg:'#F8F0DC', fg:'#D98A4C' },
-      { title:'รับแล้ว (ช่วงที่เลือก)', amount: subFmt(subDone.reduce((a, r) => a + r.full, 0)), sub: subDone.length + ' ออเดอร์', icon:'circle-check-big', bg:'#E6F3ED', fg:'#2E7D5B' },
+      { title:'เงินรัฐรอรับ (ประมาณการ)', amount: subFmt(subPending.reduce((a, r) => a + r.full, 0)), sub: subCount(subPending) + ' ออเดอร์รัฐ', icon:'hourglass', bg:'#F8F0DC', fg:'#D98A4C' },
+      { title:'ถึงกำหนดแล้ว (ช่วงที่เลือก)', amount: subFmt(subDone.reduce((a, r) => a + r.full, 0)), sub: subCount(subDone) + ' ออเดอร์ · ยังไม่ได้เทียบบัญชี', icon:'circle-check-big', bg:'#E6F3ED', fg:'#2E7D5B' },
       { title:'รอบจ่ายถัดไป', amount: subNextSettle ? isoToBEShort(subNextSettle) : '–', sub:'รัฐโอนเข้า T+3', icon:'calendar-clock', bg:'#ECF1F7', fg:'#2C4A7C' },
-      { title:'เกินกำหนดรับ', amount: subFmt(subOverdue.reduce((a, r) => a + r.full, 0)), sub: subOverdue.length + ' ออเดอร์ค้างเกิน 14 วัน', icon:'triangle-alert', bg:'#F9E7EA', fg:'#BE4F4F' }
+      { title:'เกินกำหนดรับ', amount: '—', sub: 'ต้องมีข้อมูลเงินเข้าบัญชีจริงก่อน', icon:'triangle-alert', bg:'#EFF0F3', fg:'#9AA3B2' }
     ];
     const subStBase = (st) => st === 'รับแล้ว' ? { background:'#E6F3ED', color:'#2E7D5B' } : (st === 'เกินกำหนด' ? { background:'#F9E7EA', color:'#BE4F4F' } : { background:'#F8F0DC', color:'#B98317' });
     const subsidyRows = subEnriched.filter(r => r.st !== 'รับแล้ว').map(r => {
       const m = platMeta[r.plat] || { pfg:'#7A8497', pbg:'#EFF0F3' };
       return { plat:r.plat, oid:r.oid, date:r.dateLabel, due:r.dueLabel, st:r.st,
-        full: subFmt(r.full), cust:'—', gov:'—', pfg:m.pfg, pbg:m.pbg,
+        full: r.cust != null ? subFmt(r.cust + r.gov) : '—', cust: r.cust != null ? subFmt(r.cust) : '—', gov: subFmt(r.gov), pfg:m.pfg, pbg:m.pbg,
         stStyle: { ...subStBase(r.st), fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' } };
     });
     const subRoundMap = {}; subEnriched.forEach(r => { if (r.settle) { subRoundMap[r.settle] = (subRoundMap[r.settle] || 0) + r.full; } });
