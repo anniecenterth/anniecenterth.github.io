@@ -997,6 +997,10 @@
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <div onClick="{{ toggleEmpSso }}" style="{{ empSsoStyle }}">{{ empSsoLabel }}</div>
+            <div onClick="{{ toggleEmpSplit }}" style="{{ empSplitStyle }}">{{ empSplitLabel }}</div>
+            <sc-if value="{{ empSplitOn }}" hint-placeholder-val="{{ false }}">
+              <input value="{{ empForm.first_installment }}" onChange="{{ setEmpFirst }}" inputmode="decimal" placeholder="ยอดงวด 1 (บาท)" style="width:150px;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none;text-align:right"/>
+            </sc-if>
             <div style="flex:1;min-width:160px">
               <input value="{{ empForm.note }}" onChange="{{ setEmpNote }}" placeholder="หมายเหตุ (ถ้ามี)" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:11px 13px;font-size:13px;font-family:inherit;outline:none"/>
             </div>
@@ -1005,7 +1009,7 @@
               <div onClick="{{ cancelEmpEdit }}" style="cursor:pointer;color:#8089A0;font-size:13px">ยกเลิก</div>
             </sc-if>
           </div>
-          <div style="margin-top:12px;font-size:12px;color:#8089A0;line-height:1.6">ค่าแรงรายวันตั้งแยกจากเงินเดือน ระบบไม่คิดให้เอง · ประกันสังคมหัก 5% ของเงินเดือน เพดาน 750 บาท</div>
+          <div style="margin-top:12px;font-size:12px;color:#8089A0;line-height:1.6">ค่าแรงรายวันตั้งแยกจากเงินเดือน ระบบไม่คิดให้เอง · ประกันสังคมหัก 5% ของเงินเดือน เพดาน 750 บาท · จ่าย 2 งวด: งวด 1 ลงรายจ่ายวันที่ 15 · งวด 2 = ส่วนที่เหลือ + ค่าแรงวันหยุด − ประกันสังคม ลงวันสิ้นเดือน</div>
         </div>
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:6px 18px 14px;overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:640px">
@@ -4565,7 +4569,7 @@ class Component extends DCLogic {
     // ---- ระบบเงินเดือน ----
     employees: [], holidays: [], holidayWork: [], payslips: [], payrollError: null,
     payrollTab: 'slips', payrollPeriod: todayISO().slice(0, 7), payrollCalMonth: todayISO().slice(0, 7),
-    empForm: { name: '', base_salary: '', daily_rate: '', sso_enabled: true, start_date: todayISO(), note: '' },
+    empForm: { name: '', base_salary: '', daily_rate: '', sso_enabled: true, start_date: todayISO(), note: '', split_pay: false, first_installment: '' },
     editingEmpId: null,
     holForm: { holiday_date: todayISO(), name: '', pay_multiplier: '2' },
     editingHolId: null, openHolidayId: null,
@@ -5496,25 +5500,49 @@ class Component extends DCLogic {
         return w ? { status: w.status, multiplier: Number(h.pay_multiplier) || 0 } : null;
       }).filter(Boolean);
 
-    const pySlipOf = empId => this.state.payslips.find(s2 => s2.employee_id === empId && String(s2.period).slice(0, 10) === pyPeriodDate);
+    // installment: 0 = จ่ายเดือนละครั้ง · 1 = งวด 1 (วันที่ 15) · 2 = งวด 2 (สิ้นเดือน)
+    const pyInstOf = s2 => Number(s2 && s2.installment) || 0;
+    const pySlipOf = (empId, inst) => this.state.payslips.find(s2 => s2.employee_id === empId
+      && String(s2.period).slice(0, 10) === pyPeriodDate && pyInstOf(s2) === (inst || 0));
+    const pyInstLabel = inst => inst ? ' · งวด ' + inst : '';
+    /** บรรทัดเริ่มต้นของสลิปแต่ละงวด
+     *  งวด 1 = ยอดที่ตั้งไว้ในข้อมูลพนักงาน ยังไม่หักอะไร
+     *  งวด 2 = เงินเดือนที่เหลือ + ค่าแรงวันหยุด − ประกันสังคมทั้งเดือน
+     *  ถ้างวด 1 สร้างสลิปแล้ว ใช้ยอดเงินเดือนในสลิปงวด 1 จริง (เผื่อแก้ตัวเลขในสลิป) */
+    const pyLinesFor = (emp, inst) => {
+      const base = Number(emp.base_salary) || 0;
+      if (inst === 1) {
+        return [{ kind: 'earning', label: 'เงินเดือน', qty: null, rate: null, mult: null,
+                  amount: pyRound2(Math.min(Number(emp.first_installment) || 0, base)), auto: true }];
+      }
+      const lines = pyBuildLines(emp, pyWorksFor(emp.id));
+      if (inst === 2) {
+        const s1 = pySlipOf(emp.id, 1);
+        const first = s1
+          ? (s1.lines || []).filter(l => l.kind !== 'deduction' && l.label === 'เงินเดือน').reduce((a, l) => a + (Number(l.amount) || 0), 0)
+          : Math.min(Number(emp.first_installment) || 0, base);
+        lines[0] = Object.assign({}, lines[0], { amount: pyRound2(Math.max(base - first, 0)) });
+      }
+      return lines;
+    };
 
-    const pySaveSlip = async (empId, rawLines, status, existing) => {
+    const pySaveSlip = async (empId, rawLines, status, existing, inst) => {
       const lines = pyNormalizeLines(rawLines);
       const t = pyTotals(lines);
       const row = { employee_id: empId, period: pyPeriodDate, lines,
                     total_earning: t.earning, total_deduction: t.deduction, net_pay: t.net, status };
       const res = existing
         ? await supabaseClient.from('payslips').update(row).eq('id', existing.id).select().single()
-        : await supabaseClient.from('payslips').insert({ ...row, branch: this.activeBranch() }).select().single();
+        : await supabaseClient.from('payslips').insert({ ...row, installment: inst || 0, branch: this.activeBranch() }).select().single();
       if (res.error) throw res.error;
       return res.data;
     };
 
-    const pyCreateSlip = emp => async () => {
+    const pyCreateSlip = (emp, inst) => async () => {
       if (this.state.payrollBusy) return;
       this.setState({ payrollBusy: true });
       try {
-        const created = await pySaveSlip(emp.id, pyBuildLines(emp, pyWorksFor(emp.id)), 'ร่าง', null);
+        const created = await pySaveSlip(emp.id, pyLinesFor(emp, inst || 0), 'ร่าง', null, inst || 0);
         await this.loadPayroll();
         this.setState({ editingSlipId: created.id, slipDraft: created.lines });
       } catch (e) { this.setState({ payrollError: 'สร้างสลิปไม่สำเร็จ — ' + (e.message || '') }); }
@@ -5566,7 +5594,7 @@ class Component extends DCLogic {
     const pyDraftTotals = pyTotals(this.state.slipDraft || []);
     const slipEditorOpen = !!pySlipEditing;
     const slipEditorTitle = pySlipEditing
-      ? ((this.state.employees.find(e => e.id === pySlipEditing.employee_id) || {}).name || '') + ' · ' + payrollPeriodLabel : '';
+      ? ((this.state.employees.find(e => e.id === pySlipEditing.employee_id) || {}).name || '') + ' · ' + payrollPeriodLabel + pyInstLabel(pyInstOf(pySlipEditing)) : '';
     const slipEditorLocked = pySlipLocked;
     const slipEditorRows = (this.state.slipDraft || []).map((l, i) => ({
       label: l.label, detail: pyLineDetail(l),
@@ -5612,15 +5640,16 @@ class Component extends DCLogic {
         const lines = saved.lines || [];
         const emp = this.state.employees.find(e => e.id === saved.employee_id) || {};
         const today = todayISO();
-        // วันที่ของรายจ่าย = วันสิ้นเดือนงวด ไม่ใช่วันที่กดปุ่ม
-        const expDate = pyMonthEnd(pyPeriod);
+        // วันที่ของรายจ่าย = วันสิ้นเดือนงวด ไม่ใช่วันที่กดปุ่ม · จ่าย 2 งวด: งวด 1 ลงวันที่ 15
+        const inst = pyInstOf(saved);
+        const expDate = inst === 1 ? pyPeriod + '-15' : pyMonthEnd(pyPeriod);
         // รายจ่ายต้องอยู่สาขาเดียวกับสลิป — ไม่ระบุ ฐานจะใส่ 'main' แล้ว RLS ปฏิเสธ
         // ทำให้กด "จ่ายเงิน & ลงรายจ่าย" ไม่สำเร็จสำหรับผู้ใช้ที่เขียนได้เฉพาะสาขาตัวเอง
         const expBranch = saved.branch || emp.branch || this.activeBranch();
         const rows = pyExpenseSplit(lines).map(r => ({
           date: isoToBEShort(expDate), time: '00:00', expense_date: expDate,
           main_cat: 'ค่าแรง', sub_cat: r.sub, amount: r.amount, payment: 'โอนเงิน',
-          detail: 'เงินเดือน ' + payrollPeriodLabel + ' · ' + (emp.name || ''),
+          detail: 'เงินเดือน ' + payrollPeriodLabel + pyInstLabel(inst) + ' · ' + (emp.name || ''),
           source: 'PAYROLL', source_ref: saved.id, created_by: null, attachment_name: null,
           branch: expBranch
         }));
@@ -5667,7 +5696,7 @@ class Component extends DCLogic {
     const pySvgOut = pyImageSlip ? pySlipSvg({
       employeeName: pyImageEmp.name || '',
       branchLabel: branchLabel(pyImageSlip.branch || DEFAULT_BRANCH),
-      periodLabel: pyMonthLabel(String(pyImageSlip.period).slice(0, 10)),
+      periodLabel: pyMonthLabel(String(pyImageSlip.period).slice(0, 10)) + pyInstLabel(pyInstOf(pyImageSlip)),
       lines: pyImageSlip.lines || [],
       status: pyImageSlip.status,
       paidDate: pyImageSlip.paid_date ? isoToBEShort(pyImageSlip.paid_date) : '',
@@ -5710,11 +5739,19 @@ class Component extends DCLogic {
       img.src = slipImageSrc;
     };
 
-    const payrollSlipRows = pyActiveEmps.map(emp => {
-      const slip = pySlipOf(emp.id);
+    // แผนสลิปของเดือน: คนที่จ่าย 2 งวดได้ 2 แถว
+    // แต่ถ้าเดือนนั้นมีสลิปแบบจ่ายครั้งเดียวอยู่แล้ว (สร้างก่อนเปิดจ่าย 2 งวด) ให้แสดงใบเดิมใบเดียว ไม่ซ่อนของที่จ่ายไปแล้ว
+    const pySlipPlan = [];
+    pyActiveEmps.forEach(emp => {
+      if (emp.split_pay && !pySlipOf(emp.id, 0)) { pySlipPlan.push({ emp, inst: 1 }); pySlipPlan.push({ emp, inst: 2 }); }
+      else pySlipPlan.push({ emp, inst: 0 });
+    });
+    const payrollSlipRows = pySlipPlan.map(({ emp, inst }) => {
+      const slip = pySlipOf(emp.id, inst);
       const paid = slip && slip.status === 'จ่ายแล้ว';
       return {
-        name: emp.name, salary: pyBaht(emp.base_salary),
+        name: emp.name + (inst ? ' · งวด ' + inst + (inst === 1 ? ' (15)' : ' (สิ้นเดือน)') : ''),
+        salary: inst === 2 ? '' : pyBaht(emp.base_salary),
         earning: slip ? pyBaht(slip.total_earning) : '—',
         deduction: slip ? pyBaht(slip.total_deduction) : '—',
         net: slip ? pyBaht(slip.net_pay) : '—',
@@ -5722,11 +5759,11 @@ class Component extends DCLogic {
         statusStyle: 'font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;'
           + (paid ? 'background:#E6F3ED;color:#2E7D5B' : slip ? 'background:#F8F0DC;color:#B98317' : 'background:#F1F2F5;color:#8089A0'),
         actionLabel: slip ? (paid ? 'ดูสลิป' : 'แก้ไข') : 'สร้างสลิป',
-        onAction: slip ? (paid ? openSlipImage(slip) : pyOpenSlip(slip)) : pyCreateSlip(emp)
+        onAction: slip ? (paid ? openSlipImage(slip) : pyOpenSlip(slip)) : pyCreateSlip(emp, inst)
       };
     });
-    const payrollTotalNet = pyBaht(pyActiveEmps.reduce((a, e) => { const s2 = pySlipOf(e.id); return a + (s2 ? Number(s2.net_pay) : 0); }, 0));
-    const payrollPaidCount = String(pyActiveEmps.filter(e => { const s2 = pySlipOf(e.id); return s2 && s2.status === 'จ่ายแล้ว'; }).length) + '/' + pyActiveEmps.length;
+    const payrollTotalNet = pyBaht(pySlipPlan.reduce((a, p) => { const s2 = pySlipOf(p.emp.id, p.inst); return a + (s2 ? Number(s2.net_pay) : 0); }, 0));
+    const payrollPaidCount = String(pySlipPlan.filter(p => { const s2 = pySlipOf(p.emp.id, p.inst); return s2 && s2.status === 'จ่ายแล้ว'; }).length) + '/' + pySlipPlan.length;
     const payrollHasEmployees = pyActiveEmps.length > 0;
     const payrollNoEmployees = pyActiveEmps.length === 0;
 
@@ -5741,17 +5778,30 @@ class Component extends DCLogic {
       ? 'display:inline-flex;align-items:center;gap:8px;border:1.5px solid #2C4A7C;background:#ECF1F7;color:#2C4A7C;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer'
       : 'display:inline-flex;align-items:center;gap:8px;border:1px solid #DFE2E7;background:#fff;color:#8089A0;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer';
     const empSsoLabel = empSsoOn ? 'หักประกันสังคม 5%' : 'ไม่หักประกันสังคม';
+    const toggleEmpSplit = () => this.setState(st => ({ empForm: Object.assign({}, st.empForm, { split_pay: !st.empForm.split_pay }) }));
+    const setEmpFirst = setEmpF('first_installment');
+    const empSplitOn = !!empForm.split_pay;
+    const empSplitStyle = empSplitOn
+      ? 'display:inline-flex;align-items:center;gap:8px;border:1.5px solid #2C4A7C;background:#ECF1F7;color:#2C4A7C;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer'
+      : 'display:inline-flex;align-items:center;gap:8px;border:1px solid #DFE2E7;background:#fff;color:#8089A0;border-radius:10px;padding:10px 14px;font-size:13px;cursor:pointer';
+    const empSplitLabel = empSplitOn ? 'จ่าย 2 งวด' : 'จ่ายเดือนละครั้ง';
     const empSaveLabel = this.state.editingEmpId ? 'บันทึกการแก้ไข' : 'เพิ่มพนักงาน';
     const empEditing = !!this.state.editingEmpId;
-    const cancelEmpEdit = () => this.setState({ editingEmpId: null, empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'' } });
+    const cancelEmpEdit = () => this.setState({ editingEmpId: null, empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'', split_pay:false, first_installment:'' } });
 
     const saveEmployee = async () => {
       const f = this.state.empForm;
+      // กันกดซ้ำระหว่างบันทึก — เคยได้พนักงานซ้ำ 2 คน (นาโน ถนนจันทร์ 14 ก.ย.)
+      if (this.state.payrollBusy) return;
       if (!f.name.trim()) { this.setState({ payrollError: 'ใส่ชื่อพนักงานก่อน' }); return; }
+      if (f.split_pay && !(pyNum(f.first_installment) > 0 && pyNum(f.first_installment) < pyNum(f.base_salary))) {
+        this.setState({ payrollError: 'ยอดงวด 1 ต้องมากกว่า 0 และน้อยกว่าเงินเดือน' }); return;
+      }
       this.setState({ payrollBusy: true });
       try {
         const row = { name: f.name.trim(), base_salary: pyNum(f.base_salary), daily_rate: pyNum(f.daily_rate),
-                      sso_enabled: !!f.sso_enabled, start_date: f.start_date || null, note: f.note || null };
+                      sso_enabled: !!f.sso_enabled, start_date: f.start_date || null, note: f.note || null,
+                      split_pay: !!f.split_pay, first_installment: f.split_pay ? pyNum(f.first_installment) : 0 };
         const res = this.state.editingEmpId
           ? await supabaseClient.from('employees').update(row).eq('id', this.state.editingEmpId)
           // แถวใหม่ต้องผูกสาขาที่เปิดอยู่ — ไม่ระบุ ฐานจะใส่ 'main' ให้ แล้วสาขาอื่นบันทึกไม่ได้เลย
@@ -5759,13 +5809,13 @@ class Component extends DCLogic {
         if (res.error) throw res.error;
         await this.loadPayroll();
         this.setState({ editingEmpId: null, payrollError: null,
-          empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'' } });
+          empForm: { name:'', base_salary:'', daily_rate:'', sso_enabled:true, start_date: todayISO(), note:'', split_pay:false, first_installment:'' } });
       } catch (e) { this.setState({ payrollError: 'บันทึกพนักงานไม่สำเร็จ — ' + (e.message || '') }); }
       this.setState({ payrollBusy: false });
     };
 
     const payrollEmpRows = this.ofBranch(this.state.employees).map(emp => ({
-      name: emp.name, salary: pyBaht(emp.base_salary), daily: pyBaht(emp.daily_rate),
+      name: emp.name, salary: pyBaht(emp.base_salary) + (emp.split_pay ? ' · 2 งวด' : ''), daily: pyBaht(emp.daily_rate),
       sso: emp.sso_enabled ? 'หัก 5%' : 'ไม่หัก',
       start: emp.start_date ? isoToBEShort(emp.start_date) : '—',
       statusLabel: emp.active ? 'ทำงานอยู่' : 'ไม่ได้ทำแล้ว',
@@ -5774,7 +5824,8 @@ class Component extends DCLogic {
       toggleLabel: emp.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน',
       onEdit: () => this.setState({ editingEmpId: emp.id, payrollTab: 'employees',
         empForm: { name: emp.name, base_salary: Number(emp.base_salary).toFixed(2), daily_rate: Number(emp.daily_rate).toFixed(2),
-                   sso_enabled: !!emp.sso_enabled, start_date: emp.start_date || todayISO(), note: emp.note || '' } }),
+                   sso_enabled: !!emp.sso_enabled, start_date: emp.start_date || todayISO(), note: emp.note || '',
+                   split_pay: !!emp.split_pay, first_installment: emp.split_pay ? Number(emp.first_installment).toFixed(2) : '' } }),
       // ไม่มีปุ่มลบพนักงานโดยตั้งใจ — ลบแล้วสลิปเก่าจะอ้างอิงไม่ได้ ใช้ปิดใช้งานแทน
       onToggle: async () => {
         try {
@@ -8773,15 +8824,17 @@ class Component extends DCLogic {
     const pnd1PaidSlips = this.ofBranch(this.state.payslips).filter(sl =>
       String(sl.period).slice(0, 10) === pyPeriodDate && sl.status === 'จ่ายแล้ว');
     const pnd1HasSlips = pnd1PaidSlips.length > 0;
+    // คนที่จ่าย 2 งวดมี 2 สลิป — นับจำนวนคนจาก employee_id ไม่ใช่จำนวนสลิป
+    const pnd1EmpCount = new Set(pnd1PaidSlips.map(sl => sl.employee_id)).size;
     const pnd1PullLabel = pnd1HasSlips
-      ? 'ดึงจากสลิป ' + pnd1PeriodLabel + ' (' + pnd1PaidSlips.length + ' คน)'
+      ? 'ดึงจากสลิป ' + pnd1PeriodLabel + ' (' + pnd1EmpCount + ' คน)'
       : 'ยังไม่มีสลิปที่จ่ายแล้วในงวด ' + pnd1PeriodLabel;
     const pullPnd1FromPayroll = () => {
       if (!pnd1HasSlips) return;
       const income = pyRound2(pnd1PaidSlips.reduce((a, sl) => a + Number(sl.total_earning || 0), 0));
       this.setState(st => ({ taxForms: Object.assign({}, st.taxForms, {
         pnd1: Object.assign({}, st.taxForms.pnd1, {
-          period: pnd1PeriodLabel, empCount: String(pnd1PaidSlips.length), income: String(income)
+          period: pnd1PeriodLabel, empCount: String(pnd1EmpCount), income: String(income)
         }) }) }));
     };
     const setPnd3Payee = setTaxField('pnd3','payee'), setPnd3Amount = setTaxField('pnd3','amount'), setPnd3Rate = setTaxField('pnd3','rate');
@@ -9120,6 +9173,7 @@ class Component extends DCLogic {
       slipImageOpen, slipImageSrc, closeSlipImage, saveSlipImage, viewSlipImage,
       payrollEmpRows, empForm, empSsoStyle, empSsoLabel, empSaveLabel, empEditing,
       setEmpName, setEmpSalary, setEmpDaily, setEmpStart, setEmpNote, toggleEmpSso, saveEmployee, cancelEmpEdit,
+      toggleEmpSplit, setEmpFirst, empSplitOn, empSplitStyle, empSplitLabel,
       payrollCalCells, payrollCalLabel, payrollPrevCal: pyShiftCal(-1), payrollNextCal: pyShiftCal(1),
       holForm, holSaveLabel, holEditing, setHolDate, setHolName, setHolMult, saveHoliday, deleteHoliday,
       holidayOpen, holidayTickRows,
