@@ -4875,6 +4875,17 @@ class Component extends DCLogic {
     if (m[b] != null) return m[b];
     return b === DEFAULT_BRANCH ? (this.state.monthlyBudget || 0) : 0;
   }
+  /** งบรายจ่ายอื่นของสาขาที่เปิดอยู่ (0 = ยังไม่ตั้ง ไม่เตือน) และยอดใช้ไปของเดือนปฏิทินนี้
+   *  คิดเดือนนี้เสมอ ไม่ตามตัวกรองช่วงเวลา — ให้ตรงกับการ์ดในหน้ารายจ่าย */
+  branchOpexBudget() { return Number((this.state.opexBudgetByBranch || {})[this.activeBranch()]) || 0; }
+  opexMonthSpent() {
+    const now = new Date();
+    return this.ofBranch(this.state.expRows || []).filter(r => {
+      if (!isOpexExpenseCat(r.mainCat)) return false;
+      const d = beShortToDate(r.date);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).reduce((a, r) => a + (Number(r.amount) || 0), 0);
+  }
   saveSetting = async (key, value) => {
     try { await supabaseClient.from('app_settings').upsert({ key, value: String(value), updated_at: new Date().toISOString() }); }
     catch (err) { /* non-fatal */ }
@@ -6254,6 +6265,9 @@ class Component extends DCLogic {
     if (ovExpenseTotal > 0 && this.branchBudget() && ovExpenseTotal > this.branchBudget()) {
       ceoAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + ovFmt(ovExpenseTotal) + ' / งบ ' + ovFmt(this.branchBudget()), icon:'triangle-alert', bg:'#FBF5E6', border:'#F2E6C8', iconBg:'#F8F0DC', iconFg:'#B98317' });
     }
+    if (this.branchOpexBudget() && this.opexMonthSpent() > this.branchOpexBudget()) {
+      ceoAlerts.push({ title:'รายจ่ายอื่นเกินงบเดือนนี้', detail:'ไม่รวมวัตถุดิบ · ค่าเช่า · ค่าแรง — ใช้ไป ' + ovFmt(this.opexMonthSpent()) + ' / งบ ' + ovFmt(this.branchOpexBudget()), icon:'triangle-alert', bg:'#FBF5E6', border:'#F2E6C8', iconBg:'#F8F0DC', iconFg:'#B98317' });
+    }
     const ovReceivable = ovRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (ovReceivable > 0) {
       ceoAlerts.push({ title:'มียอดค้างรับจาก Platform', detail:'ค่าค้างรับ ' + ovFmt(ovReceivable), icon:'clock', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C' });
@@ -6535,6 +6549,9 @@ class Component extends DCLogic {
     }
     if (this.branchBudget() && finExpenseTotal > this.branchBudget()) {
       financeAlerts.push({ title:'รายจ่ายเกินงบประมาณเดือนนี้', detail:'ใช้ไป ' + fmtFin(finExpenseTotal) + ' / งบ ' + fmtFin(this.branchBudget()), icon:'triangle-alert', accent:'#BE4F4F', border:'rgba(226,97,108,0.4)', iconBg:'rgba(226,97,108,0.18)', iconFg:'#DBA3A8', titleColor:'#DBA3A8' });
+    }
+    if (this.branchOpexBudget() && this.opexMonthSpent() > this.branchOpexBudget()) {
+      financeAlerts.push({ title:'รายจ่ายอื่นเกินงบเดือนนี้', detail:'ไม่รวมวัตถุดิบ · ค่าเช่า · ค่าแรง — ใช้ไป ' + fmtFin(this.opexMonthSpent()) + ' / งบ ' + fmtFin(this.branchOpexBudget()), icon:'triangle-alert', accent:'#BE4F4F', border:'rgba(226,97,108,0.4)', iconBg:'rgba(226,97,108,0.18)', iconFg:'#DBA3A8', titleColor:'#DBA3A8' });
     }
 
     const categoryRows = [];
@@ -7041,6 +7058,9 @@ class Component extends DCLogic {
     const inexAlerts = [];
     if (this.branchBudget() && inexExpenseTotal > this.branchBudget()) {
       inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายเกินงบประมาณเดือนนี้', desc:'ใช้ไป ' + inexFmt(inexExpenseTotal) + ' / งบ ' + inexFmt(this.branchBudget()), action:'ดูรายละเอียด', actionColor:'#B14A4A', onClick: goPage('expenserec') });
+    }
+    if (this.branchOpexBudget() && this.opexMonthSpent() > this.branchOpexBudget()) {
+      inexAlerts.push({ icon:'triangle-alert', bg:'#F9E7EA', fg:'#B14A4A', title:'รายจ่ายอื่นเกินงบเดือนนี้', desc:'ไม่รวมวัตถุดิบ · ค่าเช่า · ค่าแรง — ใช้ไป ' + inexFmt(this.opexMonthSpent()) + ' / งบ ' + inexFmt(this.branchOpexBudget()), action:'ดูรายละเอียด', actionColor:'#B14A4A', onClick: goPage('expenserec') });
     }
     const inexReceivable = inexRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (inexReceivable > 0) {
