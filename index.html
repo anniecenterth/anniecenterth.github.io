@@ -923,7 +923,7 @@
           <div onClick="{{ closeSlipEditor }}" style="cursor:pointer;color:#8089A0;font-size:13px">ปิด</div>
         </div>
         <sc-if value="{{ slipEditorLocked }}" hint-placeholder-val="{{ false }}">
-          <div style="background:#E6F3ED;border:1px solid #C4E0D2;color:#26654A;border-radius:11px;padding:11px 15px;font-size:13px;margin-bottom:14px">จ่ายแล้ว — แก้ไม่ได้ ถ้าต้องแก้ให้กดยกเลิกการจ่ายก่อน</div>
+          <div style="background:#E6F3ED;border:1px solid #C4E0D2;color:#26654A;border-radius:11px;padding:11px 15px;font-size:13px;margin-bottom:14px">จ่ายแล้ว — แก้ไม่ได้ ถ้าต้องแก้ให้กดยกเลิกการจ่าย (สลิปและรายจ่ายจะถูกลบ แล้วสร้างสลิปใหม่)</div>
         </sc-if>
         <div style="display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 1fr 34px;gap:8px;font-size:11.5px;color:#8089A0;padding-bottom:6px;border-bottom:1px solid #EFF0F3">
           <div>รายการ</div><div>จำนวน</div><div>ราคา/หน่วย</div><div style="text-align:right">ยอด</div><div></div>
@@ -950,7 +950,7 @@
           <div onClick="{{ viewSlipImage }}" style="border:1px solid #DFE2E7;background:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;color:#5A6478;cursor:pointer">ดูเป็นภาพ</div>
           <div onClick="{{ saveSlipDraft }}" style="border:1px solid #DFE2E7;background:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;color:#5A6478;cursor:pointer">บันทึกร่าง</div>
           <div onClick="{{ paySlip }}" style="background:#2E7D5B;color:#fff;border-radius:11px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">จ่ายเงิน & ลงรายจ่าย</div>
-          <div onClick="{{ unpaySlip }}" style="border:1px solid #F0D2D2;background:#fff;color:#B14A4A;border-radius:11px;padding:10px 18px;font-size:13.5px;cursor:pointer">ยกเลิกการจ่าย</div>
+          <div onClick="{{ unpaySlip }}" style="border:1px solid #F0D2D2;background:#fff;color:#B14A4A;border-radius:11px;padding:10px 18px;font-size:13.5px;cursor:pointer">{{ unpaySlipLabel }}</div>
         </div>
       </div>
       </sc-if>
@@ -962,6 +962,9 @@
           <div style="font-size:16px;font-weight:700;color:#1B2536">สลิปเงินเดือน</div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <div onClick="{{ saveSlipImage }}" style="display:inline-flex;align-items:center;gap:8px;background:#2C4A7C;color:#fff;border-radius:11px;padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer"><i data-lucide="download" style="width:16px;height:16px"></i>บันทึกภาพ</div>
+            <sc-if value="{{ slipImagePaid }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ unpaySlip }}" style="border:1px solid #F0D2D2;background:#fff;color:#B14A4A;border-radius:11px;padding:10px 18px;font-size:13.5px;cursor:pointer">ยกเลิกการจ่าย</div>
+            </sc-if>
             <div onClick="{{ closeSlipImage }}" style="cursor:pointer;color:#8089A0;font-size:13px">ปิด</div>
           </div>
         </div>
@@ -5596,6 +5599,7 @@ class Component extends DCLogic {
     const slipEditorTitle = pySlipEditing
       ? ((this.state.employees.find(e => e.id === pySlipEditing.employee_id) || {}).name || '') + ' · ' + payrollPeriodLabel + pyInstLabel(pyInstOf(pySlipEditing)) : '';
     const slipEditorLocked = pySlipLocked;
+    const unpaySlipLabel = pySlipLocked ? 'ยกเลิกการจ่าย' : 'ลบสลิป';
     const slipEditorRows = (this.state.slipDraft || []).map((l, i) => ({
       label: l.label, detail: pyLineDetail(l),
       isDeduction: l.kind === 'deduction',
@@ -5669,22 +5673,31 @@ class Component extends DCLogic {
       this.setState({ payrollBusy: false });
     };
 
+    /** ยกเลิก = ลบรายจ่ายที่สลิปนี้สร้าง แล้วลบตัวสลิปทิ้ง แถวกลับเป็น "ยังไม่มีสลิป"
+     *  เดิมแค่เปลี่ยนสถานะกลับเป็นร่าง ผู้ใช้กดแล้วไม่เห็นอะไรหายไป (เจ้าของแจ้ง 15 ก.ย.)
+     *  ลบรายจ่ายทั้งจาก expense_ids และ source_ref เผื่อ id ในสลิปไม่ครบ */
     const unpaySlip = async () => {
-      if (!pySlipEditing || this.state.payrollBusy) return;
-      if (!window.confirm('ยกเลิกการจ่าย และลบรายจ่ายที่สร้างไว้ใช่ไหม')) return;
+      // เปิดได้ 2 ทาง: ตัวแก้สลิป (ร่าง) หรือหน้าดูภาพ (สลิปที่จ่ายแล้วเปิดได้ทางนี้ทางเดียว)
+      const target = pySlipEditing || pyImageSlip;
+      if (!target || this.state.payrollBusy) return;
+      if (!window.confirm(target.status === 'จ่ายแล้ว'
+        ? 'ยกเลิกการจ่าย — ลบสลิปนี้และรายจ่ายที่สร้างไว้ใช่ไหม'
+        : 'ลบสลิปร่างนี้ใช่ไหม')) return;
       this.setState({ payrollBusy: true });
       try {
-        const ids = pySlipEditing.expense_ids || [];
+        const ids = target.expense_ids || [];
         if (ids.length) {
           const del = await supabaseClient.from('expenses').delete().in('id', ids);
           if (del.error) throw del.error;
         }
-        const up = await supabaseClient.from('payslips')
-          .update({ status: 'ร่าง', paid_date: null, expense_ids: [] }).eq('id', pySlipEditing.id);
+        const delRef = await supabaseClient.from('expenses').delete()
+          .eq('source', 'PAYROLL').eq('source_ref', String(target.id));
+        if (delRef.error) throw delRef.error;
+        const up = await supabaseClient.from('payslips').delete().eq('id', target.id);
         if (up.error) throw up.error;
         await this.loadPayroll(); await this.loadExpenses();
-        this.setState({ editingSlipId: null, slipDraft: null });
-      } catch (e) { this.setState({ payrollError: 'ยกเลิกการจ่ายไม่สำเร็จ — ' + (e.message || '') }); }
+        this.setState({ editingSlipId: null, slipDraft: null, slipImageId: null });
+      } catch (e) { this.setState({ payrollError: 'ยกเลิก/ลบสลิปไม่สำเร็จ — ' + (e.message || '') }); }
       this.setState({ payrollBusy: false });
     };
 
@@ -5703,6 +5716,7 @@ class Component extends DCLogic {
       detailOf: pyLineDetail
     }) : null;
     const slipImageOpen = !!pySvgOut;
+    const slipImagePaid = !!(pyImageSlip && pyImageSlip.status === 'จ่ายแล้ว');
     // ฝัง SVG เป็น data URI ด้วย encodeURIComponent — btoa รับภาษาไทยไม่ได้ จะโยน error ทันที
     const slipImageSrc = pySvgOut
       ? 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pySvgOut.svg) : '';
@@ -9169,8 +9183,8 @@ class Component extends DCLogic {
       payrollError: this.state.payrollError,
       slipEditorOpen, slipEditorTitle, slipEditorLocked, slipEditorRows,
       slipEditorEarning, slipEditorDeduction, slipEditorNet,
-      addEarningLine, addDeductionLine, closeSlipEditor, saveSlipDraft, paySlip, unpaySlip,
-      slipImageOpen, slipImageSrc, closeSlipImage, saveSlipImage, viewSlipImage,
+      addEarningLine, addDeductionLine, closeSlipEditor, saveSlipDraft, paySlip, unpaySlip, unpaySlipLabel,
+      slipImageOpen, slipImagePaid, slipImageSrc, closeSlipImage, saveSlipImage, viewSlipImage,
       payrollEmpRows, empForm, empSsoStyle, empSsoLabel, empSaveLabel, empEditing,
       setEmpName, setEmpSalary, setEmpDaily, setEmpStart, setEmpNote, toggleEmpSso, saveEmployee, cancelEmpEdit,
       toggleEmpSplit, setEmpFirst, empSplitOn, empSplitStyle, empSplitLabel,
