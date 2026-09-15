@@ -1563,6 +1563,28 @@
           <div style="font-size:12.5px;color:#9AA3B2">คงเหลือ {{ budgetRemainingPctDisplay }}</div>
         </div>
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:8px">
+            <div style="display:flex;align-items:center;gap:11px;min-width:0"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#F1ECF6;color:#7A5BA8"><i data-lucide="receipt"></i></div><div style="min-width:0"><div style="font-size:13px;color:#7C8699;font-weight:500">งบรายจ่ายอื่นเดือนนี้</div><div style="font-size:11px;color:#A6ADBB">ไม่รวม วัตถุดิบ · ค่าเช่า · ค่าแรง</div></div></div>
+            <sc-if value="{{ opexBudgetEditing }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px;flex:none">
+                <div onClick="{{ confirmOpexBudgetEdit }}" style="color:#2E7D5B;cursor:pointer"><i data-lucide="check" style="width:14px;height:14px"></i></div>
+                <div onClick="{{ cancelOpexBudgetEdit }}" style="color:#B14A4A;cursor:pointer"><i data-lucide="x" style="width:14px;height:14px"></i></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ !opexBudgetEditing }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ startOpexBudgetEdit }}" style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#2C4A7C;font-weight:600;cursor:pointer;flex:none"><i data-lucide="pencil" style="width:12px;height:12px"></i>แก้ไข</div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ opexBudgetEditing }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ opexBudgetDraft }}" onChange="{{ setOpexBudgetDraft }}" inputmode="decimal" placeholder="เช่น 20000" style="width:100%;border:1px solid #DFE2E7;border-radius:8px;padding:6px 9px;font-size:20px;font-weight:700;color:#1B2536;outline:none;margin-bottom:10px;font-family:inherit;box-sizing:border-box"/>
+          </sc-if>
+          <sc-if value="{{ !opexBudgetEditing }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:27px;font-weight:700;color:#1B2536;letter-spacing:-0.5px;margin-bottom:10px">{{ opexBudgetDisplay }}</div>
+          </sc-if>
+          <div style="height:7px;border-radius:5px;background:#EEEAF3;overflow:hidden;margin-bottom:7px"><div style="height:100%;width:{{ opexUsedBar }};border-radius:5px;background:{{ opexBarColor }}"></div></div>
+          <div style="font-size:12px;color:{{ opexUsedColor }}">{{ opexUsedLine }}</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:#ECF1F7;color:#2C4A7C"><i data-lucide="calendar-days"></i></div><span style="font-size:13px;color:#7C8699;font-weight:500">รายจ่ายเฉลี่ย/วัน (MTD)</span></div>
           <div style="font-size:27px;font-weight:700;color:#2C4A7C;letter-spacing:-0.5px;margin-bottom:6px">{{ avgPerDayDisplay }}</div>
           <div style="font-size:12.5px;color:#9AA3B2">{{ daysInMonthDisplay }}</div>
@@ -3652,6 +3674,13 @@ function beShortToISO(beShort) {
 const EXPENSE_BUDGET_KEY = 'bangpho_expense_budget';
 /** คีย์งบประมาณรายจ่ายใน app_settings แยกสาขา — บางโพคงคีย์เดิม 'monthly_budget' ไว้ ไม่ต้องย้ายข้อมูล */
 const budgetKeyOf = code => code === 'main' ? 'monthly_budget' : 'monthly_budget:' + code;
+/** งบรายจ่ายอื่น (เจ้าของกำหนด 15 ก.ย. 2569) = รายจ่ายทั้งหมด ยกเว้น วัตถุดิบทุกหมวด · ค่าเช่า & สาธารณูปโภค · ค่าแรง
+ *  จับจากคำในชื่อหมวดหลัก เพราะชื่อหมวดต่างกันแต่ละสาขา (วัตถุดิบ (COGS) / วัตถุดิบเค้ก · ค่าเช่า & / ค่าเช่าและ) */
+const opexBudgetKeyOf = code => code === 'main' ? 'opex_budget' : 'opex_budget:' + code;
+function isOpexExpenseCat(mainCat) {
+  const c = String(mainCat || '');
+  return !(c.indexOf('วัตถุดิบ') >= 0 || c.indexOf('ค่าเช่า') >= 0 || c.indexOf('สาธารณูปโภค') >= 0 || c.indexOf('ค่าแรง') === 0);
+}
 const DAILY_TARGET_KEY = 'bangpho_daily_target';
 function loadNumber(key, fallback) {
   const raw = window.localStorage.getItem(key);
@@ -4582,7 +4611,7 @@ class Component extends DCLogic {
     cashInQuick: 'ทั้งหมด', inexRecentType: 'ทั้งหมด', inexRecentAll: false,
     expSortKey: 'date', expSortDir: 'desc',
     expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
-    monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', targetEditing: false, targetDraft: '',
+    monthlyBudget: loadNumber(EXPENSE_BUDGET_KEY, 350000), dailyTarget: loadNumber(DAILY_TARGET_KEY, 100000), budgetEditing: false, budgetDraft: '', opexBudgetByBranch: {}, opexBudgetEditing: false, opexBudgetDraft: '', targetEditing: false, targetDraft: '',
     expSearch: '',
     taxFormActive: 'pp30',
     taxForms: loadObject(TAXFORMS_KEY, {
@@ -4829,8 +4858,10 @@ class Component extends DCLogic {
       const map = {}; (data || []).forEach(r => { map[r.key] = r.value; });
       const budgetByBranch = {};
       BRANCH_OPTIONS.forEach(b => { const v = map[budgetKeyOf(b.code)]; if (v != null && v !== '') budgetByBranch[b.code] = Number(v); });
+      const opexBudgetByBranch = {};
+      BRANCH_OPTIONS.forEach(b => { const v = map[opexBudgetKeyOf(b.code)]; if (v != null && v !== '') opexBudgetByBranch[b.code] = Number(v); });
       this.setState({
-        budgetByBranch,
+        budgetByBranch, opexBudgetByBranch,
         monthlyBudget: map.monthly_budget != null ? Number(map.monthly_budget) : this.state.monthlyBudget,
         dailyTarget: map.daily_sales_target != null ? Number(map.daily_sales_target) : this.state.dailyTarget
       });
@@ -7238,6 +7269,21 @@ class Component extends DCLogic {
         monthlyBudget: bb === DEFAULT_BRANCH ? n : st.monthlyBudget, budgetEditing: false }));
     };
     const cancelBudgetEdit = () => this.setState({ budgetEditing: false });
+    // ---- งบรายจ่ายอื่น: ไม่นับวัตถุดิบ · ค่าเช่า & สาธารณูปโภค · ค่าแรง ----
+    const opexRows = mtdRows.filter(r => isOpexExpenseCat(r.mainCat));
+    const opexSpent = opexRows.reduce((sum, r) => sum + r.amount, 0);
+    const opexBudget = Number((this.state.opexBudgetByBranch || {})[this.activeBranch()]) || 0;
+    const opexUsedPct = opexBudget > 0 ? Math.min(999, (opexSpent / opexBudget) * 100) : 0;
+    const opexOver = opexBudget > 0 && opexSpent > opexBudget;
+    const startOpexBudgetEdit = () => this.setState({ opexBudgetEditing: true, opexBudgetDraft: opexBudget ? String(opexBudget) : '' });
+    const setOpexBudgetDraft = e => { const val = e.target.value; this.setState({ opexBudgetDraft: val }); };
+    const confirmOpexBudgetEdit = () => {
+      const n = expNum(this.state.opexBudgetDraft);
+      const bb = this.activeBranch();
+      this.saveSetting(opexBudgetKeyOf(bb), n);
+      this.setState(st => ({ opexBudgetByBranch: { ...(st.opexBudgetByBranch || {}), [bb]: n }, opexBudgetEditing: false }));
+    };
+    const cancelOpexBudgetEdit = () => this.setState({ opexBudgetEditing: false });
     const startTargetEdit = () => this.setState({ targetEditing: true, targetDraft: String(this.state.dailyTarget) });
     const setTargetDraft = e => { const val = e.target.value; this.setState({ targetDraft: val }); };
     const confirmTargetEdit = () => {
@@ -9126,6 +9172,13 @@ class Component extends DCLogic {
       budgetUsedPct: budgetUsedPct.toFixed(1) + '%', budgetUsedPctBar: Math.min(100, budgetUsedPct) + '%', budgetRemainingPctDisplay: budgetRemainingPct.toFixed(1) + '%',
       avgPerDayDisplay: '฿' + expFmt(avgPerDay),
       budgetEditing: this.state.budgetEditing, budgetDraft: this.state.budgetDraft, startBudgetEdit, setBudgetDraft, confirmBudgetEdit, cancelBudgetEdit,
+      opexBudgetEditing: this.state.opexBudgetEditing, opexBudgetDraft: this.state.opexBudgetDraft,
+      startOpexBudgetEdit, setOpexBudgetDraft, confirmOpexBudgetEdit, cancelOpexBudgetEdit,
+      opexBudgetDisplay: opexBudget > 0 ? '฿' + expFmt(opexBudget) : 'ยังไม่ตั้งงบ',
+      opexUsedBar: Math.min(100, opexUsedPct) + '%', opexBarColor: opexOver ? '#B14A4A' : '#7A5BA8',
+      opexUsedLine: 'ใช้ไป ฿' + expFmt(opexSpent) + (opexBudget > 0 ? ' (' + opexUsedPct.toFixed(1) + '%) · '
+        + (opexOver ? 'เกินงบ ฿' + expFmt(opexSpent - opexBudget) : 'คงเหลือ ฿' + expFmt(opexBudget - opexSpent)) : ''),
+      opexUsedColor: opexOver ? '#B14A4A' : '#9AA3B2',
       expError: this.state.expError,
       expSearch: this.state.expSearch, setExpSearch, expCatRows, expCatDonut, expPayRows, expPayDonut, epTotalLabel,
       saleType, saleTypeOpen, toggleSaleType, saleTypeOptions,
