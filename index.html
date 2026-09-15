@@ -8621,8 +8621,10 @@ class Component extends DCLogic {
     const subToday = todayISO();
     const subAddDays = (iso, d) => { const x = new Date(iso + 'T00:00:00'); x.setDate(x.getDate() + d); return dateToISO(x); };
     const subDaysBetween = (aIso, bIso) => Math.round((new Date(bIso) - new Date(aIso)) / 86400000);
+    // นับเฉพาะแถว "ไทยช่วยไทย พลัส" (เงินที่รัฐจ่ายจริง) — ไม่นับออเดอร์ LINE MAN ที่ payment = GOVERNMENT_WALLET
+    // เพราะเงินรัฐของออเดอร์นั้นแยกลงแถวไทยช่วยไทยแล้ว ยอดที่เหลือในแถวแพลตฟอร์มเป็นส่วนลูกค้าจ่าย (เจ้าของสั่ง 15 ก.ย.)
     const subSrc = this.applySalesFilters(this.state.recentRows)
-      .filter(r => r.payment === 'GOVERNMENT_WALLET' || /ไทยช่วยไทย/.test(r.payment || ''));
+      .filter(r => /ไทยช่วยไทย/.test(r.payment || ''));
     const subEnriched = subSrc.map(r => {
       const settle = r.isoDate ? subAddDays(r.isoDate, 3) : null;
       let st = 'รอรับ';
