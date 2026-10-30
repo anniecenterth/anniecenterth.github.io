@@ -1723,7 +1723,7 @@
         </div>
 
         <!-- RECENT -->
-        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
+        <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);min-width:0">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">
             <h3 style="margin:0;font-size:16px;font-weight:600;white-space:nowrap">รายการรายจ่ายล่าสุด</h3>
             <div style="display:flex;align-items:center;gap:9px">
@@ -1735,7 +1735,8 @@
             </div>
           </div>
 
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <div style="overflow-x:auto">
+          <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12px">
             <thead>
               <tr style="color:#8089A0;font-size:11px">
                 <th onClick="{{ expHeadDate.onClick }}" style="{{ expHeadDate.style }}">วันที่{{ expHeadDate.arrow }}</th>
@@ -1745,7 +1746,7 @@
                 <th onClick="{{ expHeadAmount.onClick }}" style="{{ expHeadAmount.style }}">จำนวนเงิน{{ expHeadAmount.arrow }}</th>
                 <th onClick="{{ expHeadPayment.onClick }}" style="{{ expHeadPayment.style }}">วิธีชำระเงิน{{ expHeadPayment.arrow }}</th>
                 <th style="padding:0 5px 11px;font-weight:500;text-align:center">เอกสาร</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:center">จัดการ</th>
+                <th style="padding:0 5px 11px;font-weight:500;text-align:center;position:sticky;right:0;background:#fff;min-width:62px">จัดการ</th>
               </tr>
             </thead>
             <tbody>
@@ -1758,9 +1759,19 @@
                   <td style="padding:10px 5px;text-align:right;font-weight:600;white-space:nowrap">{{ r.amount }}</td>
                   <td style="padding:10px 5px">{{ r.payment }}</td>
                   <td style="padding:10px 5px;text-align:center" title="{{ r.docTitle }}"><i data-lucide="file-text" style="width:15px;height:15px;color:{{ r.docColor }}"></i></td>
-                  <td style="padding:10px 5px;text-align:center">
+                  <td style="padding:10px 5px;text-align:center;position:sticky;right:0;background:#fff">
                     <div style="display:flex;align-items:center;justify-content:center;gap:10px">
-                      <div onClick="{{ r.onDelete }}" style="display:inline-flex;line-height:0;cursor:pointer">
+                      <sc-if value="{{ r.canEdit }}" hint-placeholder-val="{{ true }}">
+                        <div onClick="{{ r.onEdit }}" title="แก้ไขรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer">
+                          <i data-lucide="pencil" style="width:15px;height:15px;color:#2C4A7C"></i>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ r.locked }}" hint-placeholder-val="{{ false }}">
+                        <div title="รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)" style="display:inline-flex;line-height:0;cursor:help">
+                          <i data-lucide="lock" style="width:14px;height:14px;color:#B5BCC9"></i>
+                        </div>
+                      </sc-if>
+                      <div onClick="{{ r.onDelete }}" title="ลบรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer">
                         <i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i>
                       </div>
                     </div>
@@ -1769,6 +1780,7 @@
               </sc-for>
             </tbody>
           </table>
+          </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:12.5px;color:#8089A0">
             <span>แสดง {{ expRowCount }} จาก {{ expTotalCount }} รายการ</span>
@@ -7097,7 +7109,12 @@ class Component extends DCLogic {
       const e2 = this.state.expForm;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time, branch: this.activeBranch(), mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
+      // แก้รายการเดิม: คงเวลา ที่มา (กรอกเอง/Telegram/…) คนบันทึก และสาขาไว้ตามเดิม — เปลี่ยนเฉพาะสิ่งที่ผู้ใช้แก้ในฟอร์ม
+      // ไม่งั้น source_ref ของรายการ Telegram จะหายและเวลาถูกเขียนทับเป็นเวลาที่กดแก้
+      const old = existingId ? (this.state.expRows || []).find(r => r.id === existingId) : null;
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(e2.date), isoDate: e2.date, time: old ? old.time : time,
+               source: old ? old.source : undefined, sourceRef: old ? old.sourceRef : undefined, createdBy: old ? old.createdBy : undefined,
+               branch: old ? old.branch : this.activeBranch(), mainCat: e2.mainCat === 'เลือกหมวดหมู่' ? 'อื่นๆ' : e2.mainCat, subCat: e2.subCat === 'เลือกหมวดหมู่ย่อย' ? '—' : e2.subCat, detail: e2.note || '—', amount: expNum(e2.amount), payment: e2.expPayment === 'เลือก' ? 'เงินสด' : e2.expPayment, attachmentName: e2.attachmentName || '' };
     };
     const saveExp = (keepGoing) => async () => {
       const editingId = this.state.editingExpenseId;
@@ -7130,8 +7147,8 @@ class Component extends DCLogic {
       this.setState({
         editingExpenseId: row.id,
         expForm: {
-          date: beShortToISO(row.date), mainCat: row.mainCat, subCat: row.subCat,
-          expBrand: 'ไม่ระบุ', channel: '', amount: row.amount.toFixed(2),
+          date: row.isoDate || beShortToISO(row.date), mainCat: row.mainCat, subCat: row.subCat,
+          expBrand: 'ไม่ระบุ', channel: '', amount: Number(row.amount).toFixed(2),
           expPayment: row.payment, note: row.detail === '—' ? '' : row.detail,
           asset: false, attachmentName: row.attachmentName || ''
         }
@@ -7258,6 +7275,9 @@ class Component extends DCLogic {
         amount: '฿' + expFmt(r.amount), payment: payPill(r.payment),
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#2C4A7C' : '#C2C9D6',
         onEdit: startEditExpenseRow(r),
+        // รายการที่ระบบสร้างจากสลิปเงินเดือน (source PAYROLL) แก้ที่นี่ไม่ได้ ไม่งั้นยอดไม่ตรงสลิป — ให้ยกเลิกการจ่ายที่หน้าเงินเดือนแล้วจ่ายใหม่
+        canEdit: r.source !== 'PAYROLL' && !isReadOnly,
+        locked: r.source === 'PAYROLL',
         onDelete
       };
     });
