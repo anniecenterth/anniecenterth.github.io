@@ -2705,6 +2705,60 @@
           </div>
         </div>
       </div>
+
+      <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
+        <h3 style="margin:0 0 6px;font-size:16px;font-weight:600">เงินที่รัฐโอนเข้าจริง — กระทบยอด</h3>
+        <div style="font-size:12.5px;color:#8089A0;margin-bottom:14px;line-height:1.6">บันทึกยอดที่เข้าบัญชีแต่ละรอบ พร้อมช่วงวันที่ขายที่รอบนั้นครอบคลุม ระบบรวมยอดรอรับของช่วงนั้นมาเทียบ ต้องตรงทุกสตางค์จึงถือว่ารับครบ</div>
+        <sc-if value="{{ subRcptCanAdd }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:10px">
+            <div><div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">วันที่รัฐโอนเข้า</div><input value="{{ subRcptForm.recv }}" onChange="{{ setSubRcptRecv }}" type="date" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
+            <div><div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ขายตั้งแต่วันที่</div><input value="{{ subRcptForm.from }}" onChange="{{ setSubRcptFrom }}" type="date" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
+            <div><div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ถึงวันที่</div><input value="{{ subRcptForm.to }}" onChange="{{ setSubRcptTo }}" type="date" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
+            <div><div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">ยอดที่ได้รับ (บาท)</div><input value="{{ subRcptForm.amount }}" onChange="{{ setSubRcptAmount }}" inputmode="decimal" placeholder="0.00" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
+            <div><div style="font-size:12px;color:#6B7486;font-weight:500;margin-bottom:7px">เลขอ้างอิง / หมายเหตุ</div><input value="{{ subRcptForm.ref }}" onChange="{{ setSubRcptRef }}" placeholder="ไม่บังคับ" style="width:100%;border:1px solid #DFE2E7;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+            <div onClick="{{ saveSubRcpt }}" style="background:#2C4A7C;color:#fff;border-radius:11px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">บันทึกเงินเข้า</div>
+            <div style="font-size:12.5px;color:#8089A0">{{ subRcptPreview }}</div>
+            <sc-if value="{{ subRcptHasError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#BE4F4F">{{ subRcptError }}</div></sc-if>
+          </div>
+        </sc-if>
+        <div style="overflow-x:auto">
+          <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px">
+            <thead>
+              <tr style="color:#8089A0;font-size:11.5px">
+                <th style="padding:0 8px 12px;font-weight:500;text-align:left">วันที่รับ</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:left">ช่วงที่ขาย</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดรอรับ (ระบบ)</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:right">รับจริง</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ส่วนต่าง</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:left">สถานะ</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:left">อ้างอิง</th>
+                <th style="padding:0 8px 12px;font-weight:500;text-align:left"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ subRcptRows }}" as="r" hint-placeholder-count="3">
+                <tr style="border-top:1px solid #F1F2F4">
+                  <td style="padding:11px 8px;color:#5A6478;white-space:nowrap">{{ r.recv }}</td>
+                  <td style="padding:11px 8px;color:#5A6478;white-space:nowrap">{{ r.range }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#5A6478">{{ r.expected }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#1B2536;font-weight:600">{{ r.amount }}</td>
+                  <td style="padding:11px 8px;text-align:right;color:#5A6478">{{ r.diff }}</td>
+                  <td style="padding:11px 8px"><span style="{{ r.stStyle }}">{{ r.stTxt }}</span></td>
+                  <td style="padding:11px 8px;color:#8089A0">{{ r.ref }}</td>
+                  <td style="padding:11px 8px;text-align:right">
+                    <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ true }}">
+                      <div onClick="{{ r.onDelete }}" title="ลบรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer"><i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i></div>
+                    </sc-if>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <sc-if value="{{ subRcptEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#9AA3B2;padding:14px 0 2px">ยังไม่มีการบันทึกเงินเข้า — ยอดด้านบนยังเป็นประมาณการจากวันขาย + 3 วัน</div></sc-if>
+      </div>
     </div>
     </sc-if>
 
@@ -4636,6 +4690,7 @@ class Component extends DCLogic {
     }),
     expRows: [],
     expError: null,
+    subRcpts: [], subRcptForm: { recv:'', from:'', to:'', amount:'', ref:'' }, subRcptError: null, subRcptBusy: false,
     recentRows: [],
     salesError: null,
     purchaseRows: [], purchaseError: '', procSearch: '', procExpanded: '',
@@ -4681,6 +4736,7 @@ class Component extends DCLogic {
     this.loadPurchases();
     this.loadProducts();
     this.loadPayroll();
+    this.loadSubsidyReceipts();
   };
 
   initAuth = async () => {
@@ -4765,6 +4821,16 @@ class Component extends DCLogic {
       this.setState({ productSalesRows: (r.data || []).map(x => ({ ...x, branch: x.branch || DEFAULT_BRANCH })) });
     } catch (err) {
       this.setState({ productSalesRows: [] });
+    }
+  };
+  // เงินที่รัฐโอนเข้าจริงแต่ละรอบ (กรอกเองในหน้าเงินรัฐรอรับ) — RLS แยกสาขา
+  loadSubsidyReceipts = async () => {
+    try {
+      const r = await supabaseClient.from('subsidy_receipts').select('*').order('received_date', { ascending: false });
+      if (r.error) throw r.error;
+      this.setState({ subRcpts: (r.data || []).map(x => ({ id: x.id, branch: x.branch || DEFAULT_BRANCH, recv: x.received_date, from: x.period_from, to: x.period_to, amount: Number(x.amount) || 0, ref: x.ref || '' })) });
+    } catch (err) {
+      this.setState({ subRcpts: [] });
     }
   };
   loadPurchases = async () => {
@@ -6038,7 +6104,7 @@ class Component extends DCLogic {
       // ล้างข้อมูลที่โหลดไว้ ไม่ให้คนถัดไปเห็นตัวเลขค้างบนจอ
       this.setState({
         authSession: null, authUser: '', authPassword: '', authError: null,
-        recentRows: [], expRows: [], purchases: [], crmMembers: [],
+        recentRows: [], expRows: [], subRcpts: [], purchases: [], crmMembers: [],
         employees: [], holidays: [], holidayWork: [], payslips: [],
         page: 'salesdash'
       });
@@ -6670,7 +6736,7 @@ class Component extends DCLogic {
     }));
     const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcQuickRows.length + ' รายการเงินเข้าจริง';
     // กระทบยอดใหม่: pull everything fresh from Supabase
-    const refreshData = () => { this.loadSales(); this.loadExpenses(); };
+    const refreshData = () => { this.loadSales(); this.loadExpenses(); this.loadSubsidyReceipts(); };
     /** ตัวสลับสาขา — ทุกหน้าอ่านผ่าน ofBranch() จึงเปลี่ยนพร้อมกันทั้งระบบ
      *  ข้อมูลสองสาขาแยกกันเด็ดขาด ไม่มีหน้าไหนรวมยอดข้ามสาขา (เจ้าของร้านกำหนด 9 ก.ย. 2569) */
     const activeBranch = this.activeBranch();
@@ -8716,14 +8782,28 @@ class Component extends DCLogic {
     this.ofBranch(this.state.recentRows).forEach(r => {
       if (r.orderId && !/ไทยช่วยไทย/.test(r.payment || '') && (r.platform === 'LINE MAN' || r.platform === 'Grab')) subCustByOid[r.orderId] = Number(r.gross) || 0;
     });
+    // ---- กระทบยอดกับเงินที่รัฐโอนเข้าจริง (subsidy_receipts) ----
+    // รอบที่รับ 1 รายการ = ยอดเข้าบัญชี + ช่วงวันที่ขายที่รอบนั้นครอบคลุม · ยอดรอรับของช่วง = ผลรวมแถวไทยช่วยไทยในช่วงนั้น
+    // ตรง = ต่างกัน 0 สตางค์พอดี (เจ้าของกำหนด) · ช่วงซ้อนกับรอบอื่น = ยังไม่ถือว่ายืนยัน เพราะนับซ้ำได้
+    const subAllRows = this.salesOnly(this.state.recentRows).filter(r => /ไทยช่วยไทย/.test(r.payment || '') && r.isoDate);
+    const subExpectedOf = (from, to) => Math.round(subAllRows.filter(r => r.isoDate >= from && r.isoDate <= to).reduce((a, r) => a + (Number(r.gross) || 0), 0) * 100) / 100;
+    const subRcptList = this.ofBranch(this.state.subRcpts || []).slice().sort((a, b) => String(b.recv).localeCompare(String(a.recv)));
+    const subRcptCalc = subRcptList.map(g => {
+      const expected = subExpectedOf(g.from, g.to);
+      const diff = Math.round((Number(g.amount) - expected) * 100) / 100;
+      const overlap = subRcptList.some(o => o.id !== g.id && o.from <= g.to && o.to >= g.from);
+      return { ...g, expected, diff, overlap, ok: diff === 0 && expected > 0 && !overlap };
+    });
+    const subMatched = subRcptCalc.filter(g => g.ok);
     const subEnriched = subSrc.map(r => {
       const settle = r.isoDate ? subAddDays(r.isoDate, 3) : null;
+      const confirmed = !!r.isoDate && subMatched.some(g => r.isoDate >= g.from && r.isoDate <= g.to);
       // ยังไม่มีข้อมูลเงินเข้าบัญชีจริง — ถึงกำหนดแล้วถือว่ารับแล้ว (ประมาณการ)
       // เดิมมีกฎ "เลยกำหนด 14 วัน = เกินกำหนด" ซึ่งทำให้ทุกรอบที่เก่ากว่า 14 วันขึ้นแดงทั้งที่ไม่รู้ว่าเงินเข้าหรือยัง
-      const st = settle && settle <= subToday ? 'รับแล้ว' : 'รอรับ';
+      const st = confirmed || (settle && settle <= subToday) ? 'รับแล้ว' : 'รอรับ';
       const parentOid = String(r.orderId || '').replace(/ · ไทยช่วยไทย$/, '');
       const cust = parentOid !== r.orderId && subCustByOid[parentOid] != null ? subCustByOid[parentOid] : null;
-      return { plat: r.platform, oid: r.orderId, full: r.gross, gov: Number(r.gross) || 0, cust, settle, st, weight: orderWeightOf(r),
+      return { plat: r.platform, oid: r.orderId, full: r.gross, gov: Number(r.gross) || 0, cust, settle, st, confirmed, weight: orderWeightOf(r),
         dateLabel: r.isoDate ? isoToBEShort(r.isoDate) : (r.date || ''),
         dueLabel: settle ? isoToBEShort(settle) : '—' };
     });
@@ -8739,9 +8819,11 @@ class Component extends DCLogic {
     const subNextSettle = subPending.map(r => r.settle).filter(Boolean).sort()[0];
     const subsidyKpis = [
       { title:'เงินรัฐรอรับ (ประมาณการ)', amount: subFmt(subPending.reduce((a, r) => a + r.full, 0)), sub: subCount(subPending) + ' ออเดอร์รัฐ', icon:'hourglass', bg:'#F8F0DC', fg:'#D98A4C' },
-      { title:'ถึงกำหนดแล้ว (ช่วงที่เลือก)', amount: subFmt(subDone.reduce((a, r) => a + r.full, 0)), sub: subCount(subDone) + ' ออเดอร์ · ยังไม่ได้เทียบบัญชี', icon:'circle-check-big', bg:'#E6F3ED', fg:'#2E7D5B' },
+      { title:'ถึงกำหนดแล้ว (ช่วงที่เลือก)', amount: subFmt(subDone.reduce((a, r) => a + r.full, 0)), sub: subCount(subDone) + ' ออเดอร์ · ' + (subMatched.length ? 'ยืนยันกับเงินเข้าจริง ' + subCount(subDone.filter(r => r.confirmed)) : 'ยังไม่ได้เทียบบัญชี'), icon:'circle-check-big', bg:'#E6F3ED', fg:'#2E7D5B' },
       { title:'รอบจ่ายถัดไป', amount: subNextSettle ? isoToBEShort(subNextSettle) : '–', sub:'รัฐโอนเข้า T+3', icon:'calendar-clock', bg:'#ECF1F7', fg:'#2C4A7C' },
-      { title:'เกินกำหนดรับ', amount: '—', sub: 'ต้องมีข้อมูลเงินเข้าบัญชีจริงก่อน', icon:'triangle-alert', bg:'#EFF0F3', fg:'#9AA3B2' }
+      { title:'ส่วนต่างเงินเข้าจริง', amount: subRcptCalc.length ? (() => { const net = Math.round(subRcptCalc.filter(g => !g.ok).reduce((a, g) => a + g.diff, 0) * 100) / 100; return (net < 0 ? '−' : (net > 0 ? '+' : '')) + subFmt(Math.abs(net)); })() : '—',
+        sub: !subRcptCalc.length ? 'ยังไม่ได้บันทึกเงินเข้าจริง' : (subRcptCalc.some(g => !g.ok) ? subRcptCalc.filter(g => !g.ok).length + ' รอบยังไม่ตรง' : 'ตรงทุกรอบที่บันทึก'),
+        icon:'triangle-alert', bg: subRcptCalc.some(g => !g.ok) ? '#F9E7EA' : '#EFF0F3', fg: subRcptCalc.some(g => !g.ok) ? '#BE4F4F' : '#9AA3B2' }
     ];
     const subStBase = (st) => st === 'รับแล้ว' ? { background:'#E6F3ED', color:'#2E7D5B' } : (st === 'เกินกำหนด' ? { background:'#F9E7EA', color:'#BE4F4F' } : { background:'#F8F0DC', color:'#B98317' });
     const subsidyRows = subEnriched.filter(r => r.st !== 'รับแล้ว').map(r => {
@@ -8757,6 +8839,49 @@ class Component extends DCLogic {
         ? React.createElement('div', { style:{ width:'26px', height:'26px', borderRadius:'50%', background:'#E6F3ED', color:'#2E7D5B', display:'flex', alignItems:'center', justifyContent:'center', flex:'none', fontWeight:700, fontSize:'14px' } }, '✓')
         : React.createElement('div', { style:{ width:'26px', height:'26px', borderRadius:'50%', background:'#fff', border:'2px solid #DCC49B', flex:'none' } })
     }));
+    const sRf = this.state.subRcptForm;
+    const subNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+    const setSubRcpt = k => e => { const val = e.target.value; this.setState(st => ({ subRcptForm: { ...st.subRcptForm, [k]: val }, subRcptError: null })); };
+    const setSubRcptRecv = setSubRcpt('recv'), setSubRcptFrom = setSubRcpt('from'), setSubRcptTo = setSubRcpt('to'), setSubRcptAmount = setSubRcpt('amount'), setSubRcptRef = setSubRcpt('ref');
+    const subRcptPreview = (sRf.from && sRf.to && sRf.to >= sRf.from) ? 'ยอดรอรับของช่วงนี้ในระบบ ' + subFmt(subExpectedOf(sRf.from, sRf.to)) : '';
+    const saveSubRcpt = async () => {
+      const f = this.state.subRcptForm;
+      const amount = Math.round(subNum(f.amount) * 100) / 100;
+      if (!f.recv || !f.from || !f.to) { this.setState({ subRcptError: 'กรอกวันที่รับ และช่วงวันที่ขายให้ครบ' }); return; }
+      if (f.to < f.from) { this.setState({ subRcptError: 'วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม' }); return; }
+      if (!(amount > 0)) { this.setState({ subRcptError: 'กรอกยอดที่ได้รับเป็นตัวเลขมากกว่า 0' }); return; }
+      if (this.state.subRcptBusy) return;
+      this.setState({ subRcptBusy: true, subRcptError: null });
+      try {
+        const res = await supabaseClient.from('subsidy_receipts').insert({ branch: this.activeBranch(), received_date: f.recv, period_from: f.from, period_to: f.to, amount, ref: (f.ref || '').trim() || null }).select().single();
+        if (res.error) throw res.error;
+        const x = res.data;
+        this.setState(st => ({ subRcpts: [{ id: x.id, branch: x.branch || DEFAULT_BRANCH, recv: x.received_date, from: x.period_from, to: x.period_to, amount: Number(x.amount) || 0, ref: x.ref || '' }, ...st.subRcpts],
+          subRcptForm: { recv:'', from:'', to:'', amount:'', ref:'' }, subRcptBusy: false }));
+      } catch (err) {
+        this.setState({ subRcptBusy: false, subRcptError: 'บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง' });
+      }
+    };
+    const subRcptRows = subRcptCalc.map(g => {
+      const stTxt = g.overlap ? 'ช่วงซ้อนกับรอบอื่น' : (g.ok ? 'ตรง' : (g.expected === 0 ? 'ไม่พบยอดรอรับในช่วงนี้' : (g.diff < 0 ? 'รับขาด' : 'รับเกิน')));
+      const stSty = g.ok ? { background:'#E6F3ED', color:'#2E7D5B' } : (g.diff < 0 && !g.overlap ? { background:'#F9E7EA', color:'#BE4F4F' } : { background:'#F8F0DC', color:'#B98317' });
+      const onDelete = async () => {
+        try {
+          const { error } = await supabaseClient.from('subsidy_receipts').delete().eq('id', g.id);
+          if (error) throw error;
+          this.setState(st => ({ subRcpts: st.subRcpts.filter(x => x.id !== g.id), subRcptError: null }));
+        } catch (err) {
+          this.setState({ subRcptError: 'ลบไม่สำเร็จ ลองใหม่อีกครั้ง' });
+        }
+      };
+      return { id: g.id, recv: isoToBEShort(g.recv), range: isoToBEShort(g.from) + (g.to !== g.from ? ' – ' + isoToBEShort(g.to) : ''), ref: g.ref || '—',
+        expected: subFmt(g.expected), amount: subFmt(g.amount), diff: g.diff === 0 ? '฿0.00' : (g.diff > 0 ? '+' : '−') + subFmt(Math.abs(g.diff)),
+        stTxt, stStyle: { ...stSty, fontSize:'11px', fontWeight:600, padding:'3px 9px', borderRadius:'7px', whiteSpace:'nowrap' }, onDelete, canDelete: canWriteHere };
+    });
+    const subRcptCanAdd = !!canWriteHere && !isReadOnly;
+    const subRcptEmpty = subRcptRows.length === 0;
+    const subRcptHasError = !!this.state.subRcptError;
+    const subRcptBusy = !!this.state.subRcptBusy;
 
     // ---- 6. ศูนย์แจ้งเตือน (Anomaly alerts) ----
     const sevMeta = { high:{ c:'#BE4F4F', bg:'#F9E7EA', bd:'#F9E7EA', ic:'#F9E7EA', label:'สูง' }, mid:{ c:'#B98317', bg:'#FBF5E6', bd:'#F2E6C8', ic:'#F8F0DC', label:'กลาง' }, low:{ c:'#2C4A7C', bg:'#F3F6FA', bd:'#DEE6F1', ic:'#DEE6F1', label:'ต่ำ' } };
@@ -9257,6 +9382,7 @@ class Component extends DCLogic {
       importTabs, impTabUpload, impTabAuto, impTabHistory, autoConnections, autoSteps, importHistory, hasImportHistory, importToast, closeToast,
       payoutKpis, payoutPlatforms, payoutRecRows,
       subsidyKpis, subsidyRows, subsidyRounds,
+      subRcptForm: sRf, setSubRcptRecv, setSubRcptFrom, setSubRcptTo, setSubRcptAmount, setSubRcptRef, saveSubRcpt, subRcptPreview, subRcptRows, subRcptCanAdd, subRcptEmpty, subRcptHasError, subRcptError: this.state.subRcptError, subRcptBusy,
       alertItems, alertCounts, alertRules, alertsEmpty, alertCountLabel,
       ownerTaxRows, ownerTaxLabel, ownerYearChips,
       taxFormsList, taxFormsReadyCount, taxFormsDraftCount, taxFormActive, tf,
