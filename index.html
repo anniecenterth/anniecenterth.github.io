@@ -185,6 +185,10 @@
         </div>
       </div>
 
+      <!-- ยอดขายและกำไรจริง (ตัวเลขกลาง) + รายวันของเดือนนี้ -->
+      <div>{{ profitPanelOverview }}</div>
+      <div>{{ finNote }}</div>
+
       <!-- ช่วงเวลาที่การ์ดด้านล่างใช้ + คำเตือนเมื่อข้อมูลของช่วงนั้นยังไม่ครบ -->
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:12.5px;color:#7C8699"><i data-lucide="calendar-range" style="width:15px;height:15px;flex:none"></i><span>{{ ovPeriodNote }}</span></div>
       <sc-if value="{{ ovShowWarn }}">
@@ -1197,6 +1201,7 @@
         <div onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:7px;color:#2E7D5B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
       </div>
 
+      <div>{{ finNote }}</div>
       <!-- KPI grid -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:16px;margin-bottom:18px">
         <sc-for list="{{ inexKpis }}" as="k" hint-placeholder-count="6">
@@ -1855,6 +1860,10 @@
           <div onClick="{{ exportSalesCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E7E9ED;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#5A6478;cursor:pointer"><i data-lucide="download" style="width:16px;height:16px"></i><span>ส่งออก</span></div>
         </div>
       </div>
+
+      <!-- ยอดขายและกำไรจริง (ตัวเลขกลาง profit_morning / profit_days) -->
+      <div>{{ profitPanel }}</div>
+      <div>{{ finNote }}</div>
 
       <!-- filters -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
@@ -3330,11 +3339,14 @@
 
       <div style="max-width:760px;display:flex;flex-direction:column;gap:16px">
 
+        <!-- 0 · ยอดขายและกำไรจริง (ตัวเลขกลาง) -->
+        <div>{{ profitPanel }}</div>
+
         <!-- 1 · ยอดวันนี้ เทียบของจริง -->
         <div style="background:#2C3D5E;color:#fff;border-radius:20px;padding:22px 24px;box-shadow:0 10px 26px rgba(30,34,41,0.14)">
           <div style="font-size:13px;color:#B9C3D8;margin-bottom:2px">{{ mobileHello }}</div>
           <div style="font-size:14.5px;font-weight:600;margin-bottom:18px">{{ mobileToday }}</div>
-          <div style="font-size:12.5px;color:#B9C3D8;margin-bottom:4px">ยอดขายวันนี้</div>
+          <div style="font-size:12.5px;color:#B9C3D8;margin-bottom:4px">ยอดที่ลงในระบบการเงิน วันนี้</div>
           <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px">
             <span style="font-size:38px;font-weight:700;letter-spacing:-1px;line-height:1.05">{{ mobileSales }}</span>
             <span style="font-size:13px;font-weight:700;color:{{ mobileVsColor }};background:#fff;border-radius:8px;padding:3px 10px">{{ mobileVsYesterday }}</span>
@@ -3375,7 +3387,7 @@
 
         <!-- 4 · กำไรที่เชื่อได้ -->
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-          <h3 style="margin:0 0 10px;font-size:15.5px;font-weight:600">กำไรสุทธิเดือนนี้</h3>
+          <h3 style="margin:0 0 10px;font-size:15.5px;font-weight:600">กำไรสุทธิตามระบบการเงิน (เดือนนี้)</h3>
           <div style="font-size:28px;font-weight:700;letter-spacing:-0.6px;color:{{ mobileProfitColor }};margin-bottom:5px">{{ mobileProfit }}</div>
           <div style="font-size:12.5px;color:#8089A0;line-height:1.5">{{ mobileProfitNote }}</div>
         </div>
@@ -4161,7 +4173,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 18 พ.ย.';
+    m.textContent = 'ฐาน: annie-cake 23 พ.ย.';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -4660,6 +4672,182 @@ function pySlipSvg(opts) {
   return { svg: svg, w: W, h: H, net: net, earning: Math.round(sumE * 100) / 100, deduction: Math.round(sumD * 100) / 100 };
 }
 
+/* ════════════ ยอดขายและกำไรจริง — ตัวเลขชุดเดียวของทั้งบริษัท (23 พ.ย. 2569) ════════════
+ *  ที่มา: ฟังก์ชันกลางในฐาน annie-cake (db/177) — profit_morning() กับ profit_days(สาขา, วันที่ 1, เมื่อวาน, true)
+ *  ตัวเลขเดียวกับ Annie วันนี้ และ LEO · นับบิล POS ทุกช่องทาง (หน้าร้าน เดลิเวอรี่ เว็บ ขายส่ง) หักต้นทุน ค่า GP+VAT ของเสีย
+ *  ⚠️ ยอดในตาราง sales / expenses ของ DBD (ฟอร์มลงยอด นำเข้า กระทบยอด) ยังใช้ต่อเหมือนเดิม แต่ห้ามเรียกว่า "ยอดขาย" บนการ์ดหลัก
+ *     เพราะสาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในตารางนั้นตั้งแต่ 16 พ.ย. และไม่มีราชพฤกษ์เลย → ใช้คำว่า "ยอดที่ลงในระบบการเงิน"
+ *  ต้องเรียกด้วย session ที่ล็อกอินแล้ว (ส่วนกลาง หรือเจ้าของสาขา) — คีย์สาธารณะอย่างเดียวถูกปฏิเสธ (42501)
+ *  รหัสสาขาของ DBD (main / chanroad) = branches.slug ของ annie-cake ตรงตัว · ราชพฤกษ์ (ratchaphruek) ไม่มีในตัวเลือกสาขาของ DBD
+ *  จึงแสดงในแถบ "ทุกสาขา" เท่านั้น */
+const FIN_TABLE_LABEL = 'ยอดที่ลงในระบบการเงิน';
+const PROFIT_BRANCH_SHORT = { main: 'บางโพ', ratchaphruek: 'ราชพฤกษ์', chanroad: 'ถนนจันทร์' };
+const pfNum = v => (v === null || v === undefined || v === '' || isNaN(Number(v))) ? null : Number(v);
+const pfBaht = v => { const n = pfNum(v); return n === null ? '—' : '฿' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+function pfDateShort(iso) {
+  if (!iso || typeof iso !== 'string') return '';
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  return d + ' ' + THAI_MONTHS_ABBR[m - 1] + ' ' + (y + 543);
+}
+function pfRangeShort(from, to) {
+  if (!from || !to) return '';
+  if (from === to) return pfDateShort(from);
+  const [fy, fm, fd] = from.split('-').map(Number);
+  const [ty, tm, td] = to.split('-').map(Number);
+  if (fy === ty && fm === tm) return fd + '–' + td + ' ' + THAI_MONTHS_ABBR[tm - 1] + ' ' + (ty + 543);
+  return pfDateShort(from) + ' – ' + pfDateShort(to);
+}
+/** 42501 = ไม่มีสิทธิ์ (ยังไม่ล็อกอิน / ผู้จัดการ / คีย์สาธารณะ) · PGRST301 / 401 = session หมดอายุ → ให้ล็อกอินใหม่
+ *  อย่างอื่น (เน็ตหลุด 5xx) → ปุ่มลองอีกครั้ง */
+function pfErrKind(err) {
+  const code = err && (err.code || err.status);
+  const msg = String((err && err.message) || '');
+  if (code === '42501' || code === 'PGRST301' || code === 401 || code === 403 || /permission denied|ไม่มีสิทธิ์|JWT/i.test(msg)) return 'auth';
+  return 'net';
+}
+/** สร้างกล่อง "ยอดขายและกำไรจริง" — ใช้ซ้ำในหน้า ยอดขาย · ภาพรวม · มุมมองเจ้าของ
+ *  opt: { st (state), branch (รหัสสาขาที่เปิดอยู่), onRetry, onSignIn, onToggleDays, showDays } */
+function buildProfitPanel(opt) {
+  const h = React.createElement;
+  const st = opt.st;
+  const C = { ink:'#1B2536', sub:'#7C8699', mute:'#9AA3B2', line:'#E7E9ED', soft:'#F1F2F4', navy:'#2C4A7C', green:'#2E7D5B', red:'#B14A4A' };
+  const card = { background:'#fff', border:'1px solid ' + C.line, borderRadius:'18px', padding:'18px 20px', boxShadow:'0 4px 16px rgba(30,34,41,0.03)', minWidth:0 };
+  const btn = { display:'inline-flex', alignItems:'center', gap:'6px', background:'#fff', border:'1px solid ' + C.line, borderRadius:'10px', padding:'7px 13px', fontSize:'12.5px', fontWeight:600, color:C.navy, cursor:'pointer', whiteSpace:'nowrap' };
+  const badge = (complete, label) => h('span', { 'data-pf-label': label || (complete ? 'ครบ' : 'ยังไม่ครบ'), style:{ fontSize:'12px', fontWeight:700, padding:'3px 10px', borderRadius:'8px', whiteSpace:'nowrap',
+    background: complete ? '#E6F3ED' : '#FDF4E7', color: complete ? C.green : '#8A5A22', border:'1px solid ' + (complete ? '#C4E0D2' : '#F0DCBF') } }, label || (complete ? 'ครบ' : 'ยังไม่ครบ'));
+  const title = h('div', { style:{ display:'flex', alignItems:'center', gap:'10px', flexWrap:'wrap', marginBottom:'12px' } },
+    h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:C.ink } }, 'ยอดขายและกำไรจริง — สาขา' + (PROFIT_BRANCH_SHORT[opt.branch] || branchLabel(opt.branch))),
+    h('span', { style:{ background:'#ECF1F7', color:C.navy, fontSize:'11.5px', fontWeight:600, padding:'4px 10px', borderRadius:'8px', whiteSpace:'nowrap' } }, 'ตัวเลขกลาง · เหมือน Annie วันนี้ และ LEO'),
+    h('span', { style:{ flex:'1 1 0' } }),
+    st.profitMorning && st.profitMorning.as_of ? h('span', { style:{ fontSize:'11.5px', color:C.mute, whiteSpace:'nowrap' } }, 'คำนวณเมื่อ ' + pfDateShort(st.profitMorning.as_of.slice(0, 10)) + ' ' + st.profitMorning.as_of.slice(11, 16) + ' น.') : null,
+    h('span', { onClick: opt.onRetry, style:btn }, st.profitLoading ? 'กำลังโหลด…' : 'โหลดใหม่'));
+  const wrap = children => h('div', { 'data-profit-panel':'1', style:{ ...card, marginBottom:'18px', background:'#FBFCFD' } }, title, ...children);
+  const box = (bg, bd, fg, text, action) => h('div', { style:{ display:'flex', alignItems:'center', gap:'12px', flexWrap:'wrap', background:bg, border:'1px solid ' + bd, borderRadius:'12px', padding:'12px 14px', fontSize:'13px', color:fg, lineHeight:1.55 } },
+    h('span', { style:{ flex:'1 1 220px' } }, text), action || null);
+
+  if (st.profitErr === 'auth') return wrap([box('#FDF4E7', '#F0DCBF', '#8A5A22',
+    'ต้องเข้าสู่ระบบด้วยบัญชีส่วนกลาง (admin) หรือบัญชีเจ้าของสาขา จึงจะเห็นยอดขายและกำไรจริง — บัญชีนี้ยังไม่มีสิทธิ์ หรือการเข้าสู่ระบบหมดอายุ',
+    h('span', { onClick: opt.onSignIn, style:btn }, 'เข้าสู่ระบบใหม่'))]);
+  if (st.profitErr === 'net') return wrap([box('#F9E7EA', '#EFC9CE', '#8E2F36',
+    'โหลดยอดขายและกำไรจริงไม่สำเร็จ (อินเทอร์เน็ตหรือระบบขัดข้อง) — ตัวเลขอื่นในหน้านี้ยังใช้ได้',
+    h('span', { onClick: opt.onRetry, style:btn }, 'ลองอีกครั้ง'))]);
+  if (!st.profitMorning) return wrap([h('div', { style:{ fontSize:'13px', color:C.mute, padding:'18px 4px' } }, 'กำลังโหลดยอดขายและกำไรจริง…')]);
+
+  const all = (st.profitMorning.branches || []);
+  const b = all.find(x => x.branch_slug === opt.branch);
+  const rows = [];
+  if (!b) {
+    rows.push(box('#FDF4E7', '#F0DCBF', '#8A5A22', all.length
+      ? 'บัญชีนี้ไม่มีสิทธิ์ดูกำไรของสาขา' + branchLabel(opt.branch) + ' (เห็นได้เฉพาะส่วนกลางและเจ้าของสาขา)'
+      : 'บัญชีนี้ไม่มีสิทธิ์ดูกำไรของสาขาใด (เห็นได้เฉพาะส่วนกลางและเจ้าของสาขา)'));
+  } else {
+    const reasonList = reasons => (reasons && reasons.length)
+      ? h('ul', { style:{ margin:'10px 0 0', paddingLeft:'18px', fontSize:'12.5px', color:'#8A5A22', lineHeight:1.6 } },
+          ...reasons.map(r => h('li', { key:r.code }, r.text + (r.days > 1 ? ' · ' + r.days + ' วัน' : ''))))
+      : null;
+    const line = (label, value, strong) => h('div', { style:{ display:'flex', justifyContent:'space-between', gap:'10px', fontSize:'12.5px', padding:'4px 0', borderTop:'1px solid ' + C.soft } },
+      h('span', { style:{ color:'#5A6478' } }, label), h('span', { style:{ color: strong ? C.ink : '#3A4456', fontWeight: strong ? 700 : 500, whiteSpace:'nowrap' } }, value));
+    const channelLines = t => [
+      pfNum(t.sales_storefront) ? line('หน้าร้าน', pfBaht(t.sales_storefront)) : null,
+      pfNum(t.sales_delivery) ? line('เดลิเวอรี่ (LINE MAN / Grab / ShopeeFood)', pfBaht(t.sales_delivery)) : null,
+      pfNum(t.sales_web) ? line('เว็บ', pfBaht(t.sales_web)) : null,
+      pfNum(t.sales_wholesale) ? line('ขายส่ง', pfBaht(t.sales_wholesale)) : null
+    ];
+    const big = (label, value, color) => h('div', { style:{ minWidth:0 } },
+      h('div', { style:{ fontSize:'12.5px', color:C.sub, marginBottom:'2px' } }, label),
+      h('div', { style:{ fontSize:'24px', fontWeight:700, letterSpacing:'-0.5px', color: color || C.ink, whiteSpace:'nowrap' } }, value));
+    const profitText = (p, mode) => p !== null ? pfBaht(p) : (mode === 'finance' ? 'ยังไม่มีกำไร' : '—');
+    const head = (label, complete, flabel) => h('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'8px', marginBottom:'10px' } },
+      h('span', { style:{ fontSize:'14px', fontWeight:700, color:C.ink } }, label), badge(complete, flabel));
+
+    // ── เมื่อวาน ──
+    const d = b.day || {};
+    const dayBody = [];
+    if (d.mode === 'before_pos' || d.mode === 'not_on_pos') {
+      dayBody.push(h('div', { style:{ fontSize:'13px', color:C.sub } }, 'สาขานี้ยังไม่ได้เริ่มขายผ่าน POS ในวันนั้น'));
+    } else {
+      dayBody.push(h('div', { style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,130px),1fr))', gap:'10px', marginBottom:'8px' } },
+        big(d.mode === 'finance' ? 'ยอดจากระบบการเงิน' : 'ยอดขาย', pfBaht(d.sales)),
+        big('กำไร', profitText(pfNum(d.profit), d.mode), pfNum(d.profit) !== null ? C.green : C.mute)));
+      dayBody.push(...channelLines(d));
+      if (pfNum(d.cost) !== null) dayBody.push(line('ต้นทุนสินค้า', pfBaht(d.cost)));
+      if (pfNum(d.gp)) dayBody.push(line('ค่า GP แอป และ VAT ของ GP', pfBaht(pfNum(d.gp) + (pfNum(d.vat_on_gp) || 0))));
+      if (pfNum(d.waste)) dayBody.push(line('ของเสีย', pfBaht(d.waste)));
+    }
+    const dayCard = h('div', { 'data-pf-card':'yesterday', style:card }, head('เมื่อวาน · ' + pfDateShort(d.date || st.profitMorning.date), d.mode === 'before_pos' ? true : !!d.complete, d.mode === 'before_pos' ? 'ยังไม่ใช้ POS' : d.label), ...dayBody, reasonList(d.reasons));
+
+    // ── เดือนนี้ ──
+    const m = b.month_to_date || {}; const t = m.totals || {}; const ex = t.expenses || {};
+    const mProfit = pfNum(t.profit);
+    const monthBody = [
+      h('div', { style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,130px),1fr))', gap:'10px', marginBottom:'8px' } },
+        big(mProfit === null && pfNum(t.profit_pos_days_only) === null ? 'ยอดจากระบบการเงิน' : 'ยอดขาย', pfBaht(t.sales)),
+        mProfit !== null ? big('กำไร', pfBaht(mProfit), C.green)
+          : pfNum(t.profit_pos_days_only) !== null ? big('กำไร (เฉพาะวันที่ขายผ่าน POS)', pfBaht(t.profit_pos_days_only), C.green)
+          : big('กำไร', 'ยังไม่มีกำไร', C.mute)),
+      ...channelLines(t),
+      line('รายจ่ายร้านที่ลงไว้ (ไม่รวมซื้อวัตถุดิบ)', pfBaht(ex.operating)),
+      line('ลงรายจ่ายล่าสุด', ex.last_expense_date ? pfDateShort(ex.last_expense_date) : 'ยังไม่เคยลง'),
+      pfNum(t.profit_after_expenses) !== null ? line('กำไรหลังหักรายจ่ายร้าน', pfBaht(t.profit_after_expenses), true) : null,
+      line('วันที่ครบ', (t.days_complete || 0) + ' จาก ' + (t.days || 0) + ' วัน')
+    ];
+    const monthCard = h('div', { 'data-pf-card':'month', style:card }, head('เดือนนี้ · ' + pfRangeShort(m.from, m.to), !!m.complete, m.label), ...monthBody, reasonList(m.reasons));
+
+    rows.push(h('div', { style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,280px),1fr))', gap:'14px' } }, dayCard, monthCard));
+
+    // ── รายวันของเดือนนี้ (profit_days) ──
+    rows.push(h('div', { style:{ marginTop:'12px' } },
+      h('span', { onClick: opt.onToggleDays, style:{ ...btn, color:'#5A6478' } }, opt.showDays ? 'ซ่อนรายวัน' : 'ดูรายวันของเดือนนี้')));
+    if (opt.showDays) {
+      if (st.profitDaysErr) rows.push(box('#F9E7EA', '#EFC9CE', '#8E2F36', st.profitDaysErr === 'auth' ? 'บัญชีนี้ไม่มีสิทธิ์ดูรายวันของสาขานี้ หรือการเข้าสู่ระบบหมดอายุ' : 'โหลดรายวันไม่สำเร็จ',
+        st.profitDaysErr === 'auth' ? h('span', { onClick: opt.onSignIn, style:btn }, 'เข้าสู่ระบบใหม่') : h('span', { onClick: opt.onRetry, style:btn }, 'ลองอีกครั้ง')));
+      else if (!st.profitDays || st.profitDays.key !== st.profitDaysKey || st.profitDaysLoading) rows.push(h('div', { style:{ fontSize:'12.5px', color:C.mute, padding:'10px 4px' } }, 'กำลังโหลดรายวัน…'));
+      else {
+        const th = txt => h('th', { style:{ textAlign: txt === 'เหตุผล' || txt === 'วันที่' ? 'left' : 'right', padding:'8px 10px', fontSize:'11.5px', color:C.sub, fontWeight:600, borderBottom:'1px solid ' + C.line, whiteSpace:'nowrap' } }, txt);
+        const td = (v, al, extra) => h('td', { style:{ textAlign: al || 'right', padding:'7px 10px', fontSize:'12.5px', color:'#3A4456', borderBottom:'1px solid ' + C.soft, verticalAlign:'top', ...(extra || {}) } }, v);
+        const days = ((st.profitDays.data || {}).days || []).slice().reverse();
+        rows.push(h('div', { style:{ marginTop:'10px', overflowX:'auto' } },
+          h('table', { style:{ width:'100%', borderCollapse:'collapse', display:'table' } },
+            h('thead', null, h('tr', null, th('วันที่'), th('ยอดขาย'), th('กำไร'), th('สถานะ'), th('เหตุผล'))),
+            h('tbody', null, ...days.map(x => {
+              const pre = x.mode === 'before_pos' || x.mode === 'not_on_pos';
+              return h('tr', { key:x.date },
+                td(pfDateShort(x.date), 'left', { whiteSpace:'nowrap' }),
+                td(pre ? '—' : pfBaht(x.sales), 'right', { whiteSpace:'nowrap' }),
+                td(pre ? '—' : profitText(pfNum(x.profit), x.mode), 'right', { whiteSpace:'nowrap', color: pfNum(x.profit) !== null && !pre ? C.green : C.mute }),
+                td(pre ? h('span', { style:{ fontSize:'12px', color:C.mute } }, 'ยังไม่ใช้ POS') : badge(!!x.complete), 'right'),
+                td(pre ? '' : (x.mode === 'finance' && !(x.reasons || []).length ? 'ยอดจากระบบการเงิน' : (x.reasons || []).map(r => r.text).join(' · ')), 'left', { color:'#8A5A22', minWidth:'200px' }));
+            })))));
+      }
+    }
+  }
+
+  // ── ทุกสาขา เมื่อวาน (มีราชพฤกษ์ด้วย แม้ DBD จะเลือกสาขานี้ไม่ได้) ──
+  if (all.length > 1) {
+    rows.push(h('div', { style:{ marginTop:'14px', display:'flex', flexWrap:'wrap', gap:'8px', alignItems:'flex-start' } },
+      h('span', { style:{ fontSize:'12px', color:C.sub, marginRight:'4px', alignSelf:'center' } }, 'ทุกสาขา เมื่อวาน:'),
+      ...all.map(x => {
+        const dd = x.day || {}; const p = pfNum(dd.profit);
+        const pre = dd.mode === 'before_pos' || dd.mode === 'not_on_pos';
+        return h('div', { key:x.branch_slug, 'data-pf-branch':x.branch_slug, style:{ display:'flex', flexDirection:'column', gap:'4px', maxWidth:'100%', background:'#fff', border:'1px solid ' + C.line, borderRadius:'10px', padding:'6px 10px', fontSize:'12.5px', color:'#3A4456' } },
+          h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'4px 7px' } },
+            h('b', { style:{ color:C.ink, whiteSpace:'nowrap' } }, PROFIT_BRANCH_SHORT[x.branch_slug] || x.branch_name),
+            h('span', null, pre ? 'ยังไม่ใช้ POS' : (dd.mode === 'finance' ? 'ยอดจากระบบการเงิน ' : 'ขาย ') + pfBaht(dd.sales) + ' · กำไร ' + (p !== null ? pfBaht(p) : '—')),
+            pre ? null : badge(!!dd.complete, dd.label)),
+          (!pre && (dd.reasons || []).length) ? h('div', { style:{ fontSize:'11.5px', color:'#8A5A22', lineHeight:1.5 } }, dd.reasons.map(r => r.text).join(' · ')) : null);
+      })));
+  }
+  rows.push(h('div', { style:{ marginTop:'12px', fontSize:'11.5px', color:C.mute, lineHeight:1.55 } },
+    'ยอดขาย = บิลที่ขายสำเร็จใน POS ทุกช่องทาง หลังหักส่วนลด (ถนนจันทร์ = ยอดจากระบบการเงิน) · กำไร = ยอดขาย − ต้นทุนสินค้า − (ค่า GP แอป และ VAT ของ GP) − ของเสีย (ยังไม่หักค่าเช่า ค่าแรง ค่าน้ำไฟ) · "ยังไม่ครบ" = ตัวเลขอาจเปลี่ยน ดูเหตุผลใต้ตัวเลข'));
+  return wrap(rows);
+}
+/** แถบบอกว่าตัวเลขชุดล่างมาจากตารางการเงิน ไม่ใช่ยอดขายจริงของสาขาที่ขายผ่าน POS */
+function buildFinTableNote(h) {
+  return h('div', { 'data-fin-note':'1', style:{ display:'flex', alignItems:'flex-start', gap:'9px', background:'#F6F7F9', border:'1px solid #E7E9ED', borderRadius:'12px', padding:'10px 14px', margin:'0 0 14px', fontSize:'12.5px', color:'#5A6478', lineHeight:1.55 } },
+    h('b', { style:{ color:'#3A4456', whiteSpace:'nowrap' } }, 'ตัวเลขชุดนี้ = ' + FIN_TABLE_LABEL),
+    h('span', null, 'ใช้ลงยอด กระทบยอดเงินเข้า และรายจ่าย · สาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในชุดนี้ตั้งแต่ 16 พ.ย. 2569 — ยอดขายและกำไรจริงดูที่กล่อง "ยอดขายและกำไรจริง"'));
+}
+
 class Component extends DCLogic {
   state = {
     // ---- ระบบเข้าสู่ระบบ ----
@@ -4714,7 +4902,10 @@ class Component extends DCLogic {
     // Storefront (หน้าร้าน) daily batch entry — one amount+discount per payment type,
     // saved together with a single click
     storeBatch: { date: todayISO(), branch: 'บางโพ', brand: BRAND_UNSPEC, amounts: {}, discounts: {}, note: '' },
-    storeFormError: null, storeSaving: false
+    storeFormError: null, storeSaving: false,
+    // ---- ยอดขายและกำไรจริง (ฟังก์ชันกลาง db/177) ----
+    profitMorning: null, profitLoading: false, profitErr: null,
+    profitDays: null, profitDaysKey: '', profitDaysLoading: false, profitDaysErr: null, profitShowDays: null
   };
 
   onDocClick = (e) => {
@@ -4750,6 +4941,54 @@ class Component extends DCLogic {
     this.loadProducts();
     this.loadPayroll();
     this.loadSubsidyReceipts();
+    this.loadProfit();
+  };
+  /** ยอดขายและกำไรจริงจากฟังก์ชันกลาง — เรียกด้วย session ที่ล็อกอินอยู่ (supabaseClient แนบ token ให้เอง)
+   *  อ่านอย่างเดียว ไม่เขียนอะไรลงฐาน · ล้มเหลวแล้วหน้าอื่นยังทำงานต่อได้ */
+  /** _pfGen เพิ่มทุกครั้งที่ออกจากระบบ — ผลที่มาถึงหลังออกจากระบบถูกทิ้ง ไม่ให้ตัวเลขของบัญชีเดิมกลับขึ้นจอ
+   *  _pfSeq / _pdSeq = เลขคำขอล่าสุด — ผลของคำขอเก่า (กดโหลดซ้ำ เปลี่ยนสาขาระหว่างรอ) ถูกทิ้งเสมอ */
+  loadProfit = async () => {
+    const gen = this._pfGen || 0;
+    const seq = (this._pfSeq = (this._pfSeq || 0) + 1);
+    const live = () => gen === (this._pfGen || 0) && seq === this._pfSeq;
+    this.setState({ profitLoading: true, profitErr: null });
+    try {
+      const r = await supabaseClient.rpc('profit_morning');
+      if (r.error) throw r.error;
+      if (!live()) return;
+      this.setState({ profitMorning: r.data || { branches: [] }, profitLoading: false, profitErr: null });
+      this.loadProfitDays(true);
+    } catch (e) {
+      if (!live()) return;
+      this.setState({ profitLoading: false, profitErr: pfErrKind(e) });
+    }
+  };
+  /** รายวันของเดือนนี้ของสาขาที่เปิดอยู่ — วันที่ 1 ของเดือนของ "เมื่อวาน" ถึงเมื่อวาน (วันเดียวกับการ์ด) */
+  profitDaysWanted() {
+    const m = this.state.profitMorning;
+    if (!m || !m.date) return null;
+    const b = (m.branches || []).find(x => x.branch_slug === this.activeBranch());
+    if (!b) return null;
+    const from = m.date.slice(0, 8) + '01', to = m.date;
+    return { id: b.branch_id, from, to, key: b.branch_id + '|' + from + '|' + to };
+  }
+  loadProfitDays = async (force) => {
+    const w = this.profitDaysWanted();
+    if (!w) return;
+    if (!force && w.key === this.state.profitDaysKey) return;
+    const gen = this._pfGen || 0;
+    const seq = (this._pdSeq = (this._pdSeq || 0) + 1);
+    const live = () => gen === (this._pfGen || 0) && seq === this._pdSeq;
+    this.setState({ profitDaysKey: w.key, profitDaysLoading: true, profitDaysErr: null });
+    try {
+      const r = await supabaseClient.rpc('profit_days', { p_branch: w.id, p_from: w.from, p_to: w.to, p_include_finance: true });
+      if (r.error) throw r.error;
+      if (!live()) return;   // มีคำขอใหม่กว่า หรือออกจากระบบไปแล้ว — ทิ้งผลนี้
+      this.setState({ profitDays: { key: w.key, data: r.data }, profitDaysLoading: false });
+    } catch (e) {
+      if (!live()) return;
+      this.setState({ profitDays: null, profitDaysLoading: false, profitDaysErr: pfErrKind(e) });
+    }
   };
 
   initAuth = async () => {
@@ -4990,6 +5229,11 @@ class Component extends DCLogic {
     // รีเฟรชแล้วเด้งกลับหน้ายอดขาย + สาขาบางโพทุกครั้ง (แก้ 11 ก.ย. 2569)
     if (this.state.page !== this._savedPage) { this._savedPage = this.state.page; saveLastPage(this.state.page); }
     if (this.state.activeBranch !== this._savedBranch) { this._savedBranch = this.state.activeBranch; saveLastBranch(this.state.activeBranch); }
+    // เปลี่ยนสาขาแล้ว รายวันของเดือนต้องเป็นของสาขาใหม่ (loadProfitDays ตั้ง key ก่อนรอผล จึงไม่วนซ้ำ)
+    if (this.state.authSession && this.state.profitMorning) {
+      const w = this.profitDaysWanted();
+      if (w && w.key !== this.state.profitDaysKey) this.loadProfitDays();
+    }
   }
   /** วาดไอคอน "ข้างใน" แท็ก <i> แทนการให้ lucide แทนที่ทั้งแท็ก
    *
@@ -6112,6 +6356,7 @@ class Component extends DCLogic {
     };
     const onLoginKeyDown = e => { if (e.key === 'Enter') doLogin(); };
     const doLogout = async () => {
+      this._pfGen = (this._pfGen || 0) + 1;   // ทิ้งผลกำไรที่ยังค้างอยู่ของบัญชีเดิม
       try { await supabaseClient.auth.signOut(); } catch (e) { /* ออกจากระบบฝั่งเว็บให้ได้เสมอ */ }
       try { await crmClient.auth.signOut(); } catch (e) { /* ระบบสมาชิกออกไม่ได้ก็ไม่ควรค้างหน้าจอ */ }
       // ล้างข้อมูลที่โหลดไว้ ไม่ให้คนถัดไปเห็นตัวเลขค้างบนจอ
@@ -6119,6 +6364,7 @@ class Component extends DCLogic {
         authSession: null, authUser: '', authPassword: '', authError: null,
         recentRows: [], expRows: [], subRcpts: [], purchases: [], crmMembers: [],
         employees: [], holidays: [], holidayWork: [], payslips: [],
+        profitMorning: null, profitErr: null, profitLoading: false, profitDays: null, profitDaysKey: '', profitDaysErr: null, profitDaysLoading: false,
         page: 'salesdash'
       });
     };
@@ -6324,11 +6570,11 @@ class Component extends DCLogic {
     const ovWarnText = 'ช่วงนี้ยังไม่มีรายจ่ายบันทึกไว้เลยสักรายการ กำไรขั้นต้นกับกำไรสุทธิจึงเท่ากับเงินเข้าจริงพอดี และ Net Margin ขึ้น 100% — ยังไม่ใช่กำไรจริง พอคีย์วัตถุดิบกับค่าใช้จ่ายเข้าไปตัวเลขจะลดลงมาก';
 
     const kpiOverview = [
-      { title:'ยอดขายวันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, note:'ยอดขายเต็มของวันนี้ ก่อนแอปหักค่าบริการ · เทียบกับเมื่อวาน', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
-      { title:'ยอดขายเดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, note:'ยอดขายรวมทุกช่องทาง หักส่วนลดแล้ว แต่ยังไม่หักค่าบริการแอป', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:FIN_TABLE_LABEL + ' วันนี้', amount:ovFmt(ovSalesToday), delta:dToday.text, deltaColor:dToday.color, arrow:dToday.arrow, note:'ยอดที่ลงในระบบการเงินของวันนี้ ก่อนแอปหักค่าบริการ · เทียบกับเมื่อวาน (ยอดขายจริงดูกล่องด้านบน)', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
+      { title:FIN_TABLE_LABEL + ' เดือนนี้ (MTD)', amount:ovFmt(ovAfterDiscount), delta:'หลังหักส่วนลด · ' + dSales.text, deltaColor:dSales.color, arrow:dSales.arrow, note:'ยอดที่ลงในระบบการเงินทุกช่องทาง หักส่วนลดแล้ว แต่ยังไม่หักค่าบริการแอป', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Sales,'#4A6B9E') },
       { title:'รายจ่ายเดือนนี้', amount:ovFmt(ovExpenseTotal), delta:dExp.text, deltaColor:dExp.color, arrow:dExp.arrow, note:'เฉพาะรายจ่ายที่คีย์เข้าระบบ · ค่าบริการแอปไม่นับตรงนี้ เพราะหักไปแล้วในเงินเข้าจริง', icon:'circle-arrow-down', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(ovDay12Exp,'#4A6B9E') },
-      { title:'กำไรขั้นต้น', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, note:'เงินเข้าจริง ' + ovFmt(ovNet) + ' − ค่าวัตถุดิบ ' + ovFmt(ovCogs), icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
-      { title:'กำไรสุทธิ', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, note:'กำไรขั้นต้น − รายจ่ายอื่นที่ไม่ใช่วัตถุดิบ ' + ovFmt(ovExpenseTotal - ovCogs), icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
+      { title:'กำไรขั้นต้นตามระบบการเงิน', amount:ovFmt(ovGrossProfit), delta:dGP.text, deltaColor:dGP.color, arrow:dGP.arrow, note:'เงินเข้าจริง ' + ovFmt(ovNet) + ' − ค่าวัตถุดิบ ' + ovFmt(ovCogs), icon:'chart-pie', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(ovDay12Profit,'#4E9E77') },
+      { title:'กำไรสุทธิตามระบบการเงิน', amount:ovFmt(ovNetProfit), delta:dNP.text, deltaColor:dNP.color, arrow:dNP.arrow, note:'กำไรขั้นต้น − รายจ่ายอื่นที่ไม่ใช่วัตถุดิบ ' + ovFmt(ovExpenseTotal - ovCogs), icon:'wallet', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(ovDay12Profit,'#8B6FB8') },
       { title:'Net Margin', amount:ovNetMargin.toFixed(1) + '%', delta:dMg.text, deltaColor:dMg.color, arrow:dMg.arrow, note:'กำไรสุทธิ ÷ เงินเข้าจริง (ไม่ใช่ ÷ ยอดขายเต็ม)', icon:'percent', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(ovDay12Margin,'#D98A4C') }
     ];
     const fmtFin = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -6749,7 +6995,7 @@ class Component extends DCLogic {
     }));
     const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcQuickRows.length + ' รายการเงินเข้าจริง';
     // กระทบยอดใหม่: pull everything fresh from Supabase
-    const refreshData = () => { this.loadSales(); this.loadExpenses(); this.loadSubsidyReceipts(); };
+    const refreshData = () => { this.loadSales(); this.loadExpenses(); this.loadSubsidyReceipts(); this.loadProfit(); };
     /** ตัวสลับสาขา — ทุกหน้าอ่านผ่าน ofBranch() จึงเปลี่ยนพร้อมกันทั้งระบบ
      *  ข้อมูลสองสาขาแยกกันเด็ดขาด ไม่มีหน้าไหนรวมยอดข้ามสาขา (เจ้าของร้านกำหนด 9 ก.ย. 2569) */
     const activeBranch = this.activeBranch();
@@ -6840,9 +7086,9 @@ class Component extends DCLogic {
     const inexStorefront = inexRows.filter(r => r.platform === 'หน้าร้าน').reduce((a, r) => a + (r.gross - r.fee), 0);
     const inexPlatformIncome = inexIncomeTotal - inexStorefront;
     const inexKpis = [
-      { title:'รายรับรวม', amount:inexFmt(inexIncomeTotal), delta:inexNoDelta, icon:'trending-up', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#1B2536' },
+      { title:'รายรับที่ลงในระบบการเงิน', amount:inexFmt(inexIncomeTotal), delta:inexNoDelta, icon:'trending-up', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#1B2536' },
       { title:'รายจ่ายรวม', amount:inexFmt(inexExpenseTotal), delta:inexNoDelta, icon:'credit-card', bg:'#ECF1F7', fg:'#2C4A7C', amtColor:'#2C4A7C' },
-      { title:'กำไรสุทธิ', amount:inexFmt(inexNetProfit), delta:inexNoDelta, icon:'coins', bg:'#E6F3ED', fg:'#2E7D5B', amtColor:'#2E7D5B' },
+      { title:'กำไรสุทธิตามระบบการเงิน', amount:inexFmt(inexNetProfit), delta:inexNoDelta, icon:'coins', bg:'#E6F3ED', fg:'#2E7D5B', amtColor:'#2E7D5B' },
       { title:'อัตรากำไรสุทธิ', amount:inexMargin.toFixed(1) + '%', delta:inexNoDelta, icon:'chart-pie', bg:'#F1ECF6', fg:'#7A5BA8', amtColor:'#7A5BA8' },
       { title:'รายรับหน้าร้าน', amount:inexFmt(inexStorefront), delta:inexNoDelta, icon:'store', bg:'#F8F0DC', fg:'#D98A4C', amtColor:'#1B2536' },
       { title:'รายรับแพลตฟอร์ม', amount:inexFmt(inexPlatformIncome), delta:inexNoDelta, icon:'smartphone', bg:'#E7F2F0', fg:'#3E9E92', amtColor:'#1B2536' }
@@ -7454,8 +7700,8 @@ class Component extends DCLogic {
     const dashDayBuckets12 = this.dayBuckets(salesRows, 12);
     const dashOrderBuckets12 = dashDayBuckets12.map(d => d.count);
     const salesDashKpis = [
-      { title:'ยอดขายรวม (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ทุกช่องทางเก็บเป็นยอดหลังหักส่วนลดแล้ว', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#4A6B9E') },
-      { title:'ยอดขายสุทธิ (Net Sales)', amount:fmtB(salesTotalNet), delta:noDelta, icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(dashDayBuckets12.map(d=>d.net),'#4E9E77') },
+      { title:FIN_TABLE_LABEL + ' (หลังหักส่วนลด)', amount:fmtB(salesAfterDiscount), delta:'ทุกช่องทางเก็บเป็นยอดหลังหักส่วนลดแล้ว', icon:'shopping-bag', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.gross),'#4A6B9E') },
+      { title:'ยอดสุทธิในระบบการเงิน (Net)', amount:fmtB(salesTotalNet), delta:noDelta, icon:'wallet', bg:'#E6F3ED', fg:'#2E7D5B', spark:this.spark(dashDayBuckets12.map(d=>d.net),'#4E9E77') },
       { title:'ออเดอร์รวม', amount:String(salesOrderCount), delta:noDelta, icon:'shopping-cart', bg:'#F1ECF6', fg:'#7A5BA8', spark:this.spark(dashOrderBuckets12,'#8B6FB8') },
       { title:'ลูกค้าใหม่', amount:'0', delta:'ยังไม่มีระบบติดตามลูกค้า', icon:'user-plus', bg:'#F8F0DC', fg:'#D98A4C', spark:this.spark(dashOrderBuckets12.map(()=>0),'#D98A4C') },
       { title:'ยอดเฉลี่ย/ออเดอร์', amount:fmtB(salesAvgOrder), delta:noDelta, icon:'trending-up', bg:'#ECF1F7', fg:'#2C4A7C', spark:this.spark(dashDayBuckets12.map(d=>d.count?d.gross/d.count:0),'#4A6B9E') },
@@ -8177,10 +8423,10 @@ class Component extends DCLogic {
     const skRangeSuffix = (this.state.period === 'วันนี้' ? 'วันนี้' : 'ในช่วงที่เลือก')
       + (skPlat === 'ทุกแพลตฟอร์ม' ? '' : ' · ' + skPlat);
     const salesKpis = [
-      { title:'ยอดขาย' + skRangeSuffix, amount:skFmt(skGrossRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
+      { title:FIN_TABLE_LABEL + ' ' + skRangeSuffix, amount:skFmt(skGrossRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'wallet', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'เฉลี่ยต่อวัน (' + skDayCount + ' วันที่มีข้อมูล)', amount:skFmt(skAvgPerDay), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'chart-column', bg:'#ECF1F7', fg:'#2C4A7C', info:false },
       { title:'ออเดอร์' + skRangeSuffix, amount:String(orderCountOf(skMonthRows)), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'users', bg:'#ECF1F7', fg:'#2C4A7C', info:true },
-      { title:'Net Sales ' + skRangeSuffix, amount:skFmt(skNetRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
+      { title:'ยอดสุทธิตามระบบการเงิน ' + skRangeSuffix, amount:skFmt(skNetRange), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'badge-dollar-sign', bg:'#E6F3ED', fg:'#2E7D5B', info:false },
       { title:'Net Payout รอรับ', amount:skFmt(skReceivable), delta:skNoDelta, arrow:'', deltaColor:'#9AA3B2', icon:'file-text', bg:'#F8F0DC', fg:'#D98A4C', info:false }
     ];
     // ---- ตารางรายวันของหน้าร้าน แยกตามวิธีชำระเงิน (เจ้าของร้านกำหนด 6 ช่องนี้ 9 ก.ย. 2569) ----
@@ -9304,7 +9550,20 @@ class Component extends DCLogic {
     alertItems.slice(0, 2).forEach(a => mobileTodos.push({ text: a.title, cta: 'ดูรายละเอียด', onClick: goPage('alerts') }));
     const mobileTodosEmpty = mobileTodos.length === 0;
 
+    // ---- ยอดขายและกำไรจริง (ตัวเลขกลาง) ----
+    const pfOpt = showDaysDefault => ({
+      st: this.state, branch: activeBranch,
+      onRetry: () => this.loadProfit(),
+      onSignIn: doLogout,
+      showDays: this.state.profitShowDays === null ? showDaysDefault : this.state.profitShowDays,
+      onToggleDays: () => this.setState(st0 => ({ profitShowDays: !(st0.profitShowDays === null ? showDaysDefault : st0.profitShowDays) }))
+    });
+    const profitPanel = buildProfitPanel(pfOpt(false));
+    const profitPanelOverview = buildProfitPanel(pfOpt(true));
+    const finNote = buildFinTableNote(React.createElement);
+
     return {
+      profitPanel, profitPanelOverview, finNote,
       page, isOverview: page === 'overview', isSales: page === 'sales', isSalesDash: page === 'salesdash', isExpenseRec: page === 'expenserec', isInex: page === 'inex', isMarketing: page === 'marketing', isMembers: page === 'members', isContent: page === 'content', isCampaign: page === 'campaign', isReconcile: page === 'reconcile', isProducts: page === 'products', isImport: page === 'import', isPayout: page === 'payout', isSubsidy: page === 'subsidy', isTax: page === 'tax', isTaxForms: page === 'taxforms', isAlerts: page === 'alerts', isSettings: page === 'settings', isMobile: page === 'mobile', isDataSources: page === 'datasources', isProcurement: page === 'procurement', isPayroll: page === 'payroll', goSettings: () => this.setState({ page: 'settings' }), noop: () => {},
       rcKpis, rcPlatTiles, rcShareRows, rcShareDonut, rcPlatStatus, rcRows, rcRowCountLabel, rcBankRows, rcAlerts,
       activeBranchLabel, branchDD, isReadOnly, canWriteHere, hasNoAccess, refreshData, exportSubsidyCsv, markAlertsRead, exportActiveTaxForm, exportAllTaxForms, openImportHistory,
