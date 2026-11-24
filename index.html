@@ -2479,7 +2479,7 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <h3 style="margin:0 0 5px;font-size:16px;font-weight:600">การเชื่อมต่อแพลตฟอร์ม</h3>
-            <div style="font-size:13px;color:#8089A0;margin-bottom:18px">ตั้งให้รายงานเข้าระบบเองทุกสิ้นวัน ไม่ต้องโหลด–อัปโหลดด้วยมือ</div>
+            <div style="font-size:13px;color:#8089A0;margin-bottom:18px">ตอนนี้ไม่มีการนำเข้าอัตโนมัติ — รายงานเดลิเวอรี่ลงด้วยไฟล์เท่านั้น</div>
             <div style="display:flex;flex-direction:column;gap:13px">
               <sc-for list="{{ autoConnections }}" as="c" hint-placeholder-count="3">
                 <div style="display:flex;align-items:center;gap:14px;border:1px solid #E7E9ED;border-radius:14px;padding:15px 16px">
@@ -2508,7 +2508,7 @@
             </div>
             <div style="background:#23262D;border-radius:18px;padding:20px;color:#fff">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px"><i data-lucide="clock" style="width:18px;height:18px;color:#C9B3DC"></i><span style="font-weight:600;font-size:14px">สรุปอัตโนมัติทุกเช้า</span></div>
-              <div style="font-size:12.5px;color:#B9BED0;line-height:1.6">ทุก 06:00 น. ระบบจะมีสรุปยอดเมื่อวานรอให้ตรวจ พร้อมแจ้งเตือนผ่าน LINE ของเจ้าของ</div>
+              <div style="font-size:12.5px;color:#B9BED0;line-height:1.6">ยังไม่มีสรุปอัตโนมัติ — ยอดขายและกำไรจริงของเมื่อวานดูที่กล่อง "ยอดขายและกำไรจริง" หน้าภาพรวม</div>
             </div>
           </div>
         </div>
@@ -3413,6 +3413,10 @@
     <!-- ===================== SALES PAGE ===================== -->
     <sc-if value="{{ isSales }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Sales — บันทึกยอดขาย">
+      <!-- ข้อความผิดพลาดของหน้านี้ (โหลด/ลบ/แก้ไม่สำเร็จ) — เดิมส่งค่า salesError มาแต่ไม่มีที่แสดง กดลบไม่สำเร็จแล้วเงียบ -->
+      <sc-if value="{{ salesError }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#F9E7EA;border:1px solid #EBC8CF;color:#B14A4A;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:500;margin-bottom:15px">{{ salesError }}</div>
+      </sc-if>
 
       <!-- header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
@@ -3789,7 +3793,9 @@ function saveObject(key, obj) {
  *  "หน้าร้าน" ไม่ใช่แบรนด์จริง เป็นค่าที่ใช้แทนแถวที่ไม่มีแบรนด์ (ดู BRAND_UNSPEC) */
 const BRANCH_BRANDS = {
   main:     ['AnnieCake', 'หอมมนต์'],
-  chanroad: ['AnnieCake', 'Midnight', 'Lottery']
+  chanroad: ['AnnieCake', 'Midnight', 'Lottery'],
+  // ราชพฤกษ์ เปิด 19 พ.ย. 2569 (POS) · แบรนด์อื่นของสาขานี้ยังไม่ได้ยืนยัน ใส่เฉพาะที่แน่ใจ
+  ratchaphruek: ['AnnieCake']
 };
 /** คำสำคัญ→แบรนด์ ตอนอ่านชื่อร้านจากไฟล์ที่นำเข้า
  *  ผูกสาขาไว้ด้วย เพื่อไม่ให้ชื่อร้านของอีกสาขามาจับแบรนด์ผิดข้ามสาขา
@@ -4173,7 +4179,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 23 พ.ย.';
+    m.textContent = 'ฐาน: annie-cake 24 พ.ย.';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -4195,7 +4201,9 @@ const SALES_VAT_BY_ORDER = {"LMF-260709-704801585":3.94,"LMF-260709-787669571":5
  *  Command Center ทำสาขาบางโพเป็นหลัก จึงตั้ง main เป็นค่าเริ่มต้น */
 const BRANCH_OPTIONS = [
   { code: 'main',     label: 'บางโพ' },
-  { code: 'chanroad', label: 'ถนนจันทร์' }
+  { code: 'chanroad', label: 'ถนนจันทร์' },
+  // ราชพฤกษ์ (slug ตรงกับ branches.slug) — ขึ้นในตัวเลือกสาขาเมื่อบัญชีมีแถวใน user_access ของสาขานี้แล้วเท่านั้น
+  { code: 'ratchaphruek', label: 'ราชพฤกษ์' }
 ];
 const DEFAULT_BRANCH = 'main';
 const branchLabel = code => (BRANCH_OPTIONS.find(b => b.code === code) || {}).label || code || '—';
@@ -4254,7 +4262,7 @@ const BRAND_UNSPEC = 'หน้าร้าน';
 /** ยอดที่ขายหน้าร้านแต่เจ้าของดูแยกเป็นช่องทางของตัวเอง — คนละอย่างกันแต่ละสาขา
  *  บางโพ = ขายส่ง (คีย์เอง ไม่ผ่าน POS) · ถนนจันทร์ = ล็อตเตอรี่ (ขายผ่าน POS)
  *  เก็บใน `sales` เป็น platform='หน้าร้าน' แล้วแยกด้วยชื่อ payment */
-const BRANCH_SPECIAL_PAY = { main: 'ขายส่ง', chanroad: 'ล็อตเตอรี่' };
+const BRANCH_SPECIAL_PAY = { main: 'ขายส่ง', chanroad: 'ล็อตเตอรี่', ratchaphruek: 'ขายส่ง' };
 const NON_BRAND_VALUES = ['หน้าร้าน', 'Delivery', ''];
 const brandName = b => (b == null || NON_BRAND_VALUES.indexOf(b) >= 0) ? BRAND_UNSPEC : b;
 const brandToDb = b => (b == null || b === BRAND_UNSPEC || NON_BRAND_VALUES.indexOf(b) >= 0) ? null : b;
@@ -5193,7 +5201,12 @@ class Component extends DCLogic {
       this.setState({
         budgetByBranch, opexBudgetByBranch,
         monthlyBudget: map.monthly_budget != null ? Number(map.monthly_budget) : this.state.monthlyBudget,
-        dailyTarget: map.daily_sales_target != null ? Number(map.daily_sales_target) : this.state.dailyTarget
+        dailyTarget: map.daily_sales_target != null ? Number(map.daily_sales_target) : this.state.dailyTarget,
+        // ขายส่งเข้าตารางการเงินเองจาก POS ตั้งแต่วันนี้ (งาน wholesale-finance) — ห้ามคีย์ซ้ำ
+        wholesaleFinanceFrom: /^\d{4}-\d{2}-\d{2}$/.test(map.wholesale_finance_from || '') ? map.wholesale_finance_from : '',
+        // แอนนี่สั่งพักการนำเข้ารายงานเดลิเวอรี่ (คีย์ sales_import_paused) — ข้อความเตือน "ขาด N วัน" ต้องไม่ขึ้น
+        // คีย์เป็นข้อความ: ว่าง / false / 0 / off = ไม่ได้พัก (Codex 24 พ.ย.)
+        importPaused: !!map.sales_import_paused && !/^\s*(false|0|off|no)?\s*$/i.test(String(map.sales_import_paused))
       });
     } catch (err) { /* keep defaults; non-fatal */ }
   };
@@ -5217,8 +5230,17 @@ class Component extends DCLogic {
     }).reduce((a, r) => a + (Number(r.amount) || 0), 0);
   }
   saveSetting = async (key, value) => {
-    try { await supabaseClient.from('app_settings').upsert({ key, value: String(value), updated_at: new Date().toISOString() }); }
-    catch (err) { /* non-fatal */ }
+    // เดิมเงียบเมื่อบันทึกไม่ผ่าน (supabase-js ไม่โยน error แต่คืน { error }) — งบ/เป้าบนจอเปลี่ยนแต่ไม่ถูกเก็บ
+    // รีเฟรชแล้วกลับค่าเดิมโดยไม่มีใครรู้ · ตอนนี้บอกให้รู้ทันที (เขียน app_settings ได้เฉพาะบัญชี admin)
+    try {
+      const { error } = await supabaseClient.from('app_settings').upsert({ key, value: String(value), updated_at: new Date().toISOString() });
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.warn('saveSetting failed', key, err);
+      try { window.alert('บันทึกค่าไม่สำเร็จ — ตัวเลขบนจอยังไม่ถูกเก็บ ลองใหม่อีกครั้ง'); } catch (e) { /* ไม่มีหน้าต่างเตือนก็ไม่เป็นไร */ }
+      return false;
+    }
   };
   componentWillUnmount() { document.removeEventListener('click', this.onDocClick); }
   componentDidUpdate() {
@@ -5462,7 +5484,8 @@ class Component extends DCLogic {
     if (saleType && saleType !== 'ทุกประเภท') {
       if (saleType === 'Retail Sales (หน้าร้าน)') out = out.filter(r => r.platform === 'หน้าร้าน');
       else if (saleType === 'Delivery Platform') out = out.filter(r => ['Grab', 'LINE MAN', 'ShopeeFood'].includes(r.platform));
-      else out = out.filter(() => false); // Custom Cake / Wholesale: no data source → empty
+      else if (saleType === 'ขายส่ง') out = out.filter(r => r.payment === 'ขายส่ง');
+      else out = out.filter(() => false); // Custom Cake: no data source → empty
     }
     return out;
   }
@@ -5837,7 +5860,7 @@ class Component extends DCLogic {
     const channelOptions = ['ทุกช่องทาง','หน้าร้าน','Grab','LINE MAN','ShopeeFood', this.specialPay()].map(c => mkOpt(c, channel, { channel: c, channelOpen: false }));
     const saleType = this.state.saleType, saleTypeOpen = this.state.saleTypeOpen;
     const toggleSaleType = () => this.setState(s => ({ saleTypeOpen: !s.saleTypeOpen, periodOpen: false, brandOpen: false, channelOpen: false }));
-    const saleTypeOptions = ['ทุกประเภท','Retail Sales (หน้าร้าน)','Delivery Platform','Custom Cake','Wholesale (บางโพ)'].map(t => mkOpt(t, saleType, { saleType: t, saleTypeOpen: false }));
+    const saleTypeOptions = ['ทุกประเภท','Retail Sales (หน้าร้าน)','Delivery Platform','Custom Cake','ขายส่ง'].map(t => mkOpt(t, saleType, { saleType: t, saleTypeOpen: false }));
     // ============ ระบบเงินเดือน ============
     const pyBaht = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const pyNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
@@ -6618,10 +6641,22 @@ class Component extends DCLogic {
       if (!ovLastByPlatform[r.platform] || r.isoDate > ovLastByPlatform[r.platform]) ovLastByPlatform[r.platform] = r.isoDate;
     });
     const ovDaysAgo = iso => Math.round((new Date(ovTodayISOStr + 'T00:00:00') - new Date(iso + 'T00:00:00')) / 86400000);
+    // ช่วงที่แอนนี่สั่งพักนำเข้ารายงานเดลิเวอรี่ (คีย์ sales_import_paused) Grab/LINE MAN/ShopeeFood "ค้าง" เป็นเรื่องตั้งใจ
+    // ไม่ใช่ข้อมูลหาย — แยกเป็นข้อความบอกสถานะแทนการเตือนทุกวัน
+    const OV_DELIVERY = ['Grab', 'LINE MAN', 'ShopeeFood'];
+    const ovPaused = !!this.state.importPaused;
     const ovStale = Object.keys(ovLastByPlatform)
+      .filter(p => !(ovPaused && OV_DELIVERY.indexOf(p) >= 0))
       .map(p => ({ platform: p, last: ovLastByPlatform[p], gap: ovDaysAgo(ovLastByPlatform[p]) }))
       .filter(x => x.gap >= 2)
       .sort((a, b) => b.gap - a.gap);
+    if (ovPaused) {
+      ceoAlerts.push({
+        title: 'พักนำเข้ารายงานเดลิเวอรี่อยู่ (แอนนี่สั่ง)',
+        detail: 'ตัวเลขชุดนี้ไม่มี Grab · LINE MAN · ShopeeFood ช่วงที่พัก — ยอดเดลิเวอรี่จริงของสาขาที่ใช้ POS ดูที่กล่อง "ยอดขายและกำไรจริง"',
+        icon: 'pause', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C'
+      });
+    }
     if (ovStale.length) {
       ceoAlerts.push({
         title: 'ข้อมูลบางช่องทางไม่อัปเดต',
@@ -7037,7 +7072,15 @@ class Component extends DCLogic {
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
     };
-    const csvRow = arr => arr.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',');
+    // ช่องว่างเป็นค่าว่าง (เดิมบางไฟล์พิมพ์คำว่า null) · ข้อความที่ขึ้นต้นด้วย = + @ หรือ - ที่ไม่ใช่ตัวเลข
+    // ใส่ ' นำหน้า กัน Excel/Sheets ตีความเป็นสูตร (รายละเอียดรายจ่ายพิมพ์เองได้)
+    const csvCell = v => {
+      let t = String(v == null ? '' : v);
+      if (/^[=+@\t\r]/.test(t) || (/^-/.test(t) && isNaN(Number(t)))) t = "'" + t;
+      return '"' + t.replace(/"/g, '""') + '"';
+    };
+    const csvRow = arr => arr.map(csvCell).join(',');
+    const csvBranchTag = () => branchLabel(this.activeBranch());
     const rcBankRows = [];
     const rcAlerts = [];
 
@@ -7131,7 +7174,7 @@ class Component extends DCLogic {
     const exportMonthlyCsv = () => {
       const lines = [csvRow(['เดือน','รายรับหลังส่วนลด (฿)','ค่าธรรมเนียมแพลตฟอร์ม (฿)','รายจ่าย (฿)','กำไรสุทธิ (฿)'])];
       monthlyRows.slice().reverse().forEach(r => lines.push(csvRow([r.label, r._r.income.toFixed(2), r._r.gp.toFixed(2), r._r.exp.toFixed(2), r._r.profit.toFixed(2)])));
-      downloadCsv('สรุปรายเดือน-' + todayISO() + '.csv', lines);
+      downloadCsv('สรุปรายเดือน-' + csvBranchTag() + '-' + todayISO() + '.csv', lines);
     };
     // ---- สมาชิก (CRM) — ข้อมูลจริงจากโปรเจค annie-crm ----
     const crmMembers = this.state.crmMembers, crmTiersRaw = this.state.crmTiers;
@@ -7443,6 +7486,10 @@ class Component extends DCLogic {
     };
     const saveExp = (keepGoing) => async () => {
       const editingId = this.state.editingExpenseId;
+      // ตรวจก่อนบันทึก — เดิมกดบันทึกฟอร์มว่างได้ ได้รายจ่าย ฿0 หมวด "อื่นๆ" เข้าฐาน
+      const ef = this.state.expForm;
+      if (!(expNum(ef.amount) > 0)) { this.setState({ expError: 'กรอกจำนวนเงินก่อนบันทึก' }); return; }
+      if (!ef.mainCat || ef.mainCat === 'เลือกหมวดหมู่') { this.setState({ expError: 'เลือกหมวดหมู่ก่อนบันทึก' }); return; }
       const row = buildExpenseRow(editingId);
       try {
         const query = editingId
@@ -7563,17 +7610,17 @@ class Component extends DCLogic {
     const expPagedFiltered = efiltered.slice(expPageStart, expPageStart + this.state.expPageSize);
 
     const exportExpenseCsv = () => {
-      const header = ['วันที่','เวลา','หมวดหมู่หลัก','หมวดหมู่ย่อย','รายละเอียด','จำนวนเงิน','วิธีชำระเงิน'];
-      const lines = [header.join(',')];
+      const header = ['สาขา','วันที่','เวลา','หมวดหมู่หลัก','หมวดหมู่ย่อย','รายละเอียด','จำนวนเงิน','วิธีชำระเงิน','ที่มา'];
+      const lines = [csvRow(header)];
       efiltered.forEach(r => {
-        lines.push([r.date, r.time, r.mainCat, r.subCat, r.detail, r.amount, r.payment].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
+        lines.push(csvRow([branchLabel(r.branch), r.date, r.time, r.mainCat, r.subCat, r.detail, r.amount, r.payment, r.source || 'MANUAL']));
       });
       const csv = '﻿' + lines.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'รายจ่าย-' + todayISO() + '.csv';
+      a.download = 'รายจ่าย-' + csvBranchTag() + '-' + todayISO() + '.csv';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -8074,15 +8121,31 @@ class Component extends DCLogic {
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       const pre = { 'LINE MAN':'LM', 'Grab':'GRAB', 'ShopeeFood':'SPF', 'หน้าร้าน':'POS' }[ff.platform] || 'LM';
       const orderId = ff.orderId || (pre + '-' + isoToBEShort(ff.date).split('/').reverse().join('') + '-' + String(Math.floor(Math.random()*900)+100));
-      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time, branch: this.activeBranch(), platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
+      // แก้แถวเดิม: คงที่มา สาขา และคนบันทึกไว้ (เดิมเขียน source = null ทับ ทำให้แถวนำเข้ากลายเป็นแถวไม่รู้ที่มา)
+      const old = existingId ? (this.state.recentRows || []).find(r => r.id === existingId) : null;
+      return { id: existingId || crypto.randomUUID(), date: isoToBEShort(ff.date), isoDate: ff.date, time,
+               source: old ? old.source : 'MANUAL_FORM', sourceRef: old ? old.sourceRef : undefined, createdBy: old ? old.createdBy : undefined,
+               branch: old ? old.branch : this.activeBranch(), platform:ff.platform, brand:ff.brand, type:ff.type, orderId, payment:ff.payment, gross:g, fee:fe, net:nt, status:ff.status, attachmentName: ff.attachmentName || '' };
     };
     const saveRow = (keepGoing) => async () => {
       const editingId = this.state.editingSalesId;
       const row = buildSalesRow(editingId);
+      // ตรวจก่อนบันทึก — เดิมไม่มี ยอด 0 หรือช่องว่างก็บันทึกได้
+      if (!(numV(this.state.form.gross) > 0)) { this.setState({ salesError: 'กรอกยอดขายก่อนบันทึก' }); return; }
+      if (row.source === 'POS' || row.source === 'pos_wholesale') {
+        this.setState({ salesError: 'แถวนี้ระบบส่งเข้าเอง (POS) — แก้ที่ POS ไม่ใช่ที่นี่' }); return;
+      }
+      if (row.platform === 'หน้าร้าน' && !editingId) {
+        const why = storeAutoReason(row.branch, row.isoDate, [row.payment]);
+        if (why) { this.setState({ salesError: why }); return; }
+      }
+      const dbRow = mapSaleToDbRow(row);
+      // แก้แถวเดิม: ไม่แตะแถวดิบจากไฟล์และตัวเลขแยกของแพลตฟอร์ม (หน้าจอไม่ได้ถือค่าเหล่านี้ไว้ ส่งไปจะกลายเป็น null)
+      if (editingId) { delete dbRow.raw; delete dbRow.gp; delete dbRow.vat; delete dbRow.discount; delete dbRow.fee_basis; }
       try {
         const query = editingId
-          ? supabaseClient.from('sales').update(mapSaleToDbRow(row)).eq('id', editingId).select().single()
-          : supabaseClient.from('sales').insert(mapSaleToDbRow(row)).select().single();
+          ? supabaseClient.from('sales').update(dbRow).eq('id', editingId).select().single()
+          : supabaseClient.from('sales').insert(dbRow).select().single();
         const { data, error } = await query;
         if (error) throw error;
         const savedRow = mapDbRowToSale(data);
@@ -8134,6 +8197,40 @@ class Component extends DCLogic {
     // ---- storefront (หน้าร้าน) daily batch entry form ----
     // One row per payment type, all saved together. Amounts are ยอดก่อนลด; discounts go
     // to fee so gross/fee/net matches the POS-report convention used everywhere else.
+    /** ยอดหน้าร้านที่ระบบส่งเข้าตารางการเงินเอง — คีย์ซ้ำในฟอร์ม/ตารางไม่ได้ (คืนข้อความเหตุผล หรือ '' ถ้าคีย์ได้)
+     *  1) วัน+ช่องทางนั้นมีแถวที่ระบบส่งมาแล้ว (POS ทุกชั่วโมง / FoodStory ทุกเช้า / ขายส่งจาก POS)
+     *  2) ขายส่งตั้งแต่วันที่ในคีย์ wholesale_finance_from เข้าเองจาก POS ตามวันส่งของ
+     *  3) สาขาที่ใช้ ANNIE POS แล้ว: ตั้งแต่วันแรกที่มียอด "ANNIE POS" ยอดหน้าร้านทุกช่องทางมาจาก POS
+     *     (กันกรณีคีย์วันนี้ก่อน POS ส่งรอบถัดไป แล้วตัวส่งต้องข้ามช่องทางนั้น ทำให้ยอดจริงหาย)
+     *  ถนนจันทร์ (ยังไม่ใช้ POS ถึง ม.ค. 2570) คีย์วันที่ FoodStory ไม่ส่งมาได้ตามเดิม — ตัวส่งไม่ทับยอดที่คีย์เอง */
+    const sbAllStore = this.state.recentRows.filter(r => r.platform === 'หน้าร้าน');
+    const sbFirstAnniePos = {};
+    sbAllStore.forEach(r => {
+      if (r.source === 'POS' && /^ANNIE POS/.test(r.note || '') && r.isoDate) {
+        const b = r.branch || DEFAULT_BRANCH;
+        if (!sbFirstAnniePos[b] || r.isoDate < sbFirstAnniePos[b]) sbFirstAnniePos[b] = r.isoDate;
+      }
+    });
+    const storeAutoReason = (branch, iso, pays) => {
+      if (!iso) return '';
+      const be = isoToBEShort(iso);
+      const fed = sbAllStore.filter(r => (r.branch || DEFAULT_BRANCH) === branch && r.date === be
+        && (r.source === 'POS' || r.source === 'pos_wholesale') && pays.indexOf(r.payment) >= 0);
+      if (fed.length) {
+        return 'วันที่ ' + be + ' มียอด ' + Array.from(new Set(fed.map(r => r.payment))).join(', ')
+          + ' ที่ระบบส่งเข้าเองแล้ว — ไม่ต้องลงซ้ำ (ถ้าตัวเลขผิด ให้แก้ที่ต้นทาง)';
+      }
+      const wf = this.state.wholesaleFinanceFrom;
+      if (pays.indexOf('ขายส่ง') >= 0 && wf && iso >= wf) {
+        return 'ขายส่งตั้งแต่ ' + isoToBEShort(wf) + ' เข้าเองจาก POS ตามวันส่งของ — ไม่ต้องคีย์ในฟอร์มนี้';
+      }
+      const fp = sbFirstAnniePos[branch];
+      if (fp && iso >= fp && pays.some(p => p !== 'ขายส่ง')) {
+        return 'สาขา' + branchLabel(branch) + 'ใช้ ANNIE POS ตั้งแต่ ' + isoToBEShort(fp)
+          + ' ยอดหน้าร้านเข้าเองทุกชั่วโมง — ไม่ต้องลงในฟอร์มนี้';
+      }
+      return '';
+    };
     const STORE_PAY_TYPES = ['Cash', 'K+ Shop', 'QR PromptPay (POS Pay)', 'ไทยช่วยไทย พลัส (หน้าร้าน)', 'Split Amount', this.specialPay()];
     const storeBatch = this.state.storeBatch;
     const sbNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
@@ -8170,7 +8267,15 @@ class Component extends DCLogic {
       const beDate = isoToBEShort(f.date);
       // Same-day same-type rows already saved → confirm overwrite (they get replaced).
       const sbBrand = f.brand || BRAND_UNSPEC;
+      const sbBranch = this.activeBranch();
+      // ยอดที่ระบบส่งเข้าเอง (POS ทุกชั่วโมง · FoodStory ทุกเช้า · ขายส่งจาก POS) ห้ามคีย์ทับหรือซ้ำ
+      // ฟอร์มนี้ใช้ได้เฉพาะวัน/ช่องทางที่ระบบไม่ได้ส่งมา
+      const autoBlock = storeAutoReason(sbBranch, f.date, entries.map(x => x.p));
+      if (autoBlock) { this.setState({ storeFormError: autoBlock }); return; }
+      // เขียนทับได้เฉพาะแถวที่คีย์ด้วยฟอร์มนี้เอง ของสาขาที่เปิดอยู่ — เดิมไม่กรองสาขาและที่มา
+      // ทำให้ลบยอดของอีกสาขาหรือยอดจาก POS ได้
       const dupes = this.state.recentRows.filter(r => r.platform === 'หน้าร้าน' && r.date === beDate
+        && (r.branch || DEFAULT_BRANCH) === sbBranch && r.source === 'MANUAL_FORM'
         && (r.brand || BRAND_UNSPEC) === sbBrand && entries.some(x => x.p === r.payment));
       if (dupes.length && !window.confirm('วันที่ ' + beDate + ' มีข้อมูล ' + dupes.length + ' ประเภทนี้อยู่แล้ว — เขียนทับด้วยค่าที่กรอกใหม่หรือไม่?')) return;
       this.setState({ storeSaving: true, storeFormError: null });
@@ -8181,16 +8286,20 @@ class Component extends DCLogic {
         }
         const note = (f.note || '').trim();
         const dbRows = entries.map(x => mapSaleToDbRow({
-          date: beDate, time: '23:59', branch: this.activeBranch(), platform: 'หน้าร้าน', brand: sbBrand,
+          date: beDate, time: '23:59', branch: sbBranch, platform: 'หน้าร้าน', brand: sbBrand,
           // ใส่ชื่อแบรนด์ใน order_id เมื่อแยกแบรนด์ ไม่งั้นวันเดียวกันหลายแบรนด์จะได้ id ซ้ำกัน
           orderId: x.p + (sbBrand === BRAND_UNSPEC ? '' : ' · ' + sbBrand) + ' (หน้าร้าน ' + beDate + ')',
-          gross: x.amount, fee: x.disc, net: Math.round((x.amount - x.disc) * 100) / 100,
+          // กติกา 27 ส.ค. 2569: ยอดหน้าร้านเก็บ "หลังหักส่วนลด" fee = 0 (salesDiscountTotal ไม่หักซ้ำ)
+          // ยอดก่อนลดกับส่วนลดเก็บไว้ในหมายเหตุให้ตรวจย้อนได้
+          gross: Math.round((x.amount - x.disc) * 100) / 100, fee: 0, net: Math.round((x.amount - x.disc) * 100) / 100,
           status: 'เงินเข้าจริง', type: 'หน้าร้าน', payment: x.p, attachmentName: '', source: 'MANUAL_FORM'
         }));
         // Optional sales.note column (migration 0007) — retry without it so the sale
         // itself is never lost.
         let noteDropped = false;
-        let res = note ? await supabaseClient.from('sales').insert(dbRows.map(r => ({ ...r, note }))).select() : null;
+        const withNote = dbRows.map((r, i) => ({ ...r, note: [note, entries[i].disc > 0 ? 'ก่อนลด ' + entries[i].amount.toFixed(2) + ' · ส่วนลด ' + entries[i].disc.toFixed(2) : ''].filter(Boolean).join(' · ') || null }));
+        const hasNote = withNote.some(r => r.note);
+        let res = hasNote ? await supabaseClient.from('sales').insert(withNote).select() : null;
         if (!res || (res.error && (res.error.code === 'PGRST204' || res.error.code === '42703'))) {
           if (res && res.error) noteDropped = true;
           res = await supabaseClient.from('sales').insert(dbRows).select();
@@ -8350,17 +8459,17 @@ class Component extends DCLogic {
     const pagedFiltered = filtered.slice(pageStart, pageStart + this.state.salesPageSize);
 
     const exportSalesCsv = () => {
-      const header = ['วันที่','เวลา','แพลตฟอร์ม','แบรนด์','Order ID','ยอดขายรวม','ค่าธรรมเนียม','ยอดสุทธิ','สถานะ','ที่มาค่าธรรมเนียม'];
-      const lines = [header.join(',')];
+      const header = ['สาขา','วันที่','เวลา','แพลตฟอร์ม','แบรนด์','Order ID','ยอดขายรวม','ค่าธรรมเนียม','ยอดสุทธิ','สถานะ','ที่มาค่าธรรมเนียม','ที่มาของแถว'];
+      const lines = [csvRow(header)];
       filtered.forEach(r => {
-        lines.push([r.date, r.time, r.platform, r.brand, r.orderId, r.gross, r.fee, r.net, r.status, r.feeBasis ? 'ประมาณ (' + r.feeBasis + ')' : 'รายงานจริง'].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(','));
+        lines.push(csvRow([branchLabel(r.branch), r.date, r.time, r.platform, r.brand, r.orderId, r.gross, r.fee, r.net, r.status, r.feeBasis ? 'ประมาณ (' + r.feeBasis + ')' : 'รายงานจริง', r.source || '']));
       });
       const csv = '﻿' + lines.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'ยอดขาย-' + todayISO() + '.csv';
+      a.download = 'ยอดขาย-' + csvBranchTag() + '-' + todayISO() + '.csv';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -8512,7 +8621,10 @@ class Component extends DCLogic {
     const onSkEditKey = e => { if (e.key === 'Enter') saveSkEdit(); else if (e.key === 'Escape') cancelSkEdit(); };
     const skEditSaveLabel = this.state.skEditSaving ? '…' : '✓';
     const skCellObj = (iso, pay, v) => {
-      const editable = !!iso && SK_EDITABLE_PAYS.indexOf(pay) >= 0 && !isReadOnly;
+      const r0 = iso ? skRowByKey[iso + '|' + pay] : null;
+      // ช่องที่ระบบส่งเข้าเอง แก้ที่นี่ไม่ได้ (POS ส่งซ้ำทุกชั่วโมงจะทับ / ทำยอดซ้ำ) — แก้ที่ต้นทาง
+      const autoFed = (r0 && r0.source && r0.source !== 'MANUAL_FORM') || (!r0 && !!iso && !!storeAutoReason(this.activeBranch(), iso, [pay]));
+      const editable = !!iso && SK_EDITABLE_PAYS.indexOf(pay) >= 0 && !isReadOnly && !autoFed;
       const editing = editable && this.state.skEditKey === (iso + '|' + pay);
       return { text: skCell(v), editing: editing, canEdit: editable && !editing, plain: !editable && !editing,
         onEdit: editable ? startSkEdit(iso, pay, v) : null };
@@ -8906,6 +9018,13 @@ class Component extends DCLogic {
     const importRowsPreview = importRows.slice(0, IMPORT_PREVIEW_LIMIT);
     const confirmImport = async () => {
       const included = importIncluded;
+      // ยอดหน้าร้านเข้าตารางการเงินเองทุกวันแล้ว (ANNIE POS ทุกชั่วโมง · ถนนจันทร์จากอีเมลปิดรอบ FoodStory ทุกเช้า)
+      // ไฟล์รายงาน POS ที่นำเข้าซ้ำจะเป็นแถว source=POS อีกชุด → ยอดหน้าร้านซ้ำ จึงไม่รับไฟล์ชนิดนี้แล้ว
+      if (included.some(r => r.meta && r.meta.label === 'หน้าร้าน')) {
+        this.setState({ importError: 'ไม่ต้องนำเข้าไฟล์ยอดหน้าร้าน (POS) แล้ว — ยอดหน้าร้านเข้าเองทุกวัน ถ้านำเข้าจะนับซ้ำ · เอาไฟล์นี้ออกแล้วนำเข้าเฉพาะไฟล์ของแอป' });
+        return;
+      }
+      if (this.state.importPaused && !window.confirm('แอนนี่สั่งพักการนำเข้ารายงานเดลิเวอรี่ไว้ (18 พ.ย. 2569)\nยอดที่นำเข้าใช้ตรวจเงินโอนเท่านั้น ไม่เปลี่ยนยอดขายและกำไรจริงของสาขาที่ใช้ POS\n\nนำเข้าต่อใช่ไหม')) return;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       // ต้องพาทุกช่องที่ normalizeImportRow คำนวณไว้ไปด้วย — เดิมสร้างออบเจกต์ใหม่แล้วลืม
@@ -8963,20 +9082,29 @@ class Component extends DCLogic {
     ].map(t => ({ label:t.label, icon:t.icon, onClick:setImportTab(t.key), style: t.key === importTab ? { ...impTabBase, background:'#ECF1F7', color:'#223C66' } : { ...impTabBase, color:'#8089A0', background:'transparent' } }));
     const impTabUpload = importTab === 'upload', impTabAuto = importTab === 'auto', impTabHistory = importTab === 'history';
 
+    // แท็บนี้เคยโชว์ที่อยู่อีเมลที่ไม่มีจริงและสวิตช์ "เชื่อมต่อแล้ว" สีเขียว ทั้งที่ไม่มีการนำเข้าอัตโนมัติเลย
+    // (สคริปต์อีเมล Grab/LINE MAN/Shopee พักตั้งแต่ 5 ก.ย. 2569 และเขียนฐาน annie-cake ไม่ได้) — แสดงตามจริง
+    const impPaused = !!this.state.importPaused;
     const autoConnections = [
-      { platform:'Grab', initial:'G', pfg:'#2E7D5B', pbg:'#E6F3ED', method:'อีเมลรายงานอัตโนมัติ', addr:'grab-bangpho@import.anniegroup.co', on:true, last:'วันนี้ 04:33 น.' },
-      { platform:'LINE MAN', initial:'L', pfg:'#7A5BA8', pbg:'#F1ECF6', method:'อีเมลรายงานอัตโนมัติ', addr:'lineman-bangpho@import.anniegroup.co', on:true, last:'วันนี้ 03:10 น.' },
-      { platform:'ShopeeFood', initial:'S', pfg:'#D98A4C', pbg:'#F8F0DC', method:'ดึงผ่าน Partner API', addr:'โทเคนครบกำหนดใน 30 วัน', on:false, last:'—' }
-    ].map(c => ({ ...c,
-      pillStyle: c.on ? { background:'#E6F3ED', color:'#2E7D5B', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px' } : { background:'#F8F0DC', color:'#B98317', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px' },
-      pillText: c.on ? 'เชื่อมต่อแล้ว' : 'รอตั้งค่า',
-      trackStyle: { width:'38px', height:'22px', borderRadius:'11px', background: c.on ? '#2E7D5B' : '#D6DAE3', position:'relative', flex:'none' },
-      knobStyle: { position:'absolute', top:'2px', left: c.on ? '18px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' }
-    }));
+      { platform:'Grab', initial:'G', pfg:'#2E7D5B', pbg:'#E6F3ED' },
+      { platform:'LINE MAN', initial:'L', pfg:'#7A5BA8', pbg:'#F1ECF6' },
+      { platform:'ShopeeFood', initial:'S', pfg:'#D98A4C', pbg:'#F8F0DC' }
+    ].map(c => {
+      const last = this.ofBranch(this.state.recentRows).filter(r => r.platform === c.platform && r.isoDate)
+        .reduce((m, r) => r.isoDate > m ? r.isoDate : m, '');
+      return { ...c,
+        method: 'ไม่มีการนำเข้าอัตโนมัติ',
+        addr: impPaused ? 'พักการนำเข้าอยู่ (แอนนี่สั่ง 18 พ.ย. 2569)' : 'ลงเองด้วยไฟล์ที่แท็บ "นำเข้าไฟล์"',
+        last: last ? isoToBEShort(last) : '—',
+        pillStyle: impPaused ? { background:'#F8F0DC', color:'#B98317', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px' }
+                             : { background:'#EFF0F3', color:'#5A6478', fontSize:'11.5px', fontWeight:600, padding:'4px 11px', borderRadius:'8px' },
+        pillText: impPaused ? 'พักไว้' : 'ลงเอง',
+        trackStyle: { display:'none' }, knobStyle: { display:'none' } };
+    });
     const autoSteps = [
-      { n:'1', t:'แพลตฟอร์มส่งรายงานรายวัน', d:'Grab & LINE MAN ส่งอีเมลรายงานอัตโนมัติทุกตี 3–5 มายังกล่องนำเข้าของร้าน' },
-      { n:'2', t:'ระบบดึง & แปลงให้เอง', d:'ตรวจจับแพลตฟอร์ม กรองแถวที่ไม่ใช่ยอดขาย รวมค่าธรรมเนียม และกันรายการซ้ำ' },
-      { n:'3', t:'รอเพียงกดยืนยัน', d:'ทุกเช้ามีสรุปรอให้ตรวจ — ออเดอร์ปกติเข้าอัตโนมัติ เหลือเฉพาะรายการที่ต้องตรวจ' }
+      { n:'1', t:'ดาวน์โหลดรายงานจากแอป', d:'Grab (Transaction CSV) · LINE MAN (Balance Report) · ShopeeFood (CSV/XLSX) ของแต่ละร้าน' },
+      { n:'2', t:'อัปโหลดที่แท็บ "นำเข้าไฟล์"', d:'ระบบแยกสาขาจากรหัสร้าน ข้ามรายการซ้ำ และบอกรายการที่ข้ามพร้อมเหตุผลก่อนกดยืนยัน' },
+      { n:'3', t:'ใช้ตรวจเงินโอน ไม่ใช่ยอดขาย', d:'สาขาที่ใช้ POS นับยอดเดลิเวอรี่จากบิล POS — รายงานแอปใช้เทียบเงินที่แอปโอนและ GP ที่โดนหักจริง จึงไม่นับซ้ำ' }
     ];
 
     const undoImportBatch = (entry) => async () => {
@@ -9148,18 +9276,33 @@ class Component extends DCLogic {
     const alRows = this.salesOnly(this.state.recentRows);
     const alToday = todayISO();
     const alFmt = n => '฿' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const alByDay = {}; alRows.forEach(r => { if (r.isoDate) alByDay[r.isoDate] = (alByDay[r.isoDate] || 0) + r.gross; });
-    const alTodayGross = alByDay[alToday] || 0;
-    const alPrior7 = []; for (let i = 1; i <= 7; i++) { const x = new Date(alToday + 'T00:00:00'); x.setDate(x.getDate() - i); alPrior7.push(alByDay[dateToISO(x)] || 0); }
-    const alAvg7 = alPrior7.reduce((a, v) => a + v, 0) / 7;
+    // เทียบ "เมื่อวาน" (วันที่จบแล้ว) กับค่าเฉลี่ยของ 7 วันก่อนหน้า เฉพาะยอดหน้าร้าน (รวมขายส่ง) ของสาขาที่เปิดอยู่
+    // เดิมเทียบ "วันนี้" ซึ่งยังขายไม่จบวัน กับยอดทุกช่องทางของวันก่อน ๆ — และตั้งแต่ 16 พ.ย. ตารางการเงินไม่มีเดลิเวอรี่
+    // (พักนำเข้า · สาขา POS นับเดลิเวอรี่จากบิล POS) จึงเตือน "ยอดต่ำ" ทุกวันโดยไม่มีอะไรผิด
+    // วันที่ไม่มียอดเลย (ร้านปิด/ข้อมูลไม่มา) ไม่นับเข้าค่าเฉลี่ย และต้องมีอย่างน้อย 5 วันจึงเทียบ
+    const alShift = d => { const x = new Date(alToday + 'T00:00:00'); x.setDate(x.getDate() + d); return dateToISO(x); };
+    const alByDay = {}; alRows.forEach(r => { if (r.isoDate && r.platform === 'หน้าร้าน') alByDay[r.isoDate] = (alByDay[r.isoDate] || 0) + (Number(r.gross) || 0); });
+    const alYest = alShift(-1);
+    const alYestGross = alByDay[alYest] || 0;
+    // ย้อนหาไม่เกิน 21 วัน เก็บ 7 วันล่าสุดที่มียอด (ข้ามวันร้านปิด/ข้อมูลไม่มา) — Codex 24 พ.ย.
+    const alPrior = []; for (let i = 2; i <= 22 && alPrior.length < 7; i++) { const v = alByDay[alShift(-i)] || 0; if (v > 0) alPrior.push(v); }
+    const alAvg7 = alPrior.length ? alPrior.reduce((a, v) => a + v, 0) / alPrior.length : 0;
+    // สาขายังขายอยู่ = มียอดหน้าร้านอย่างน้อย 1 วันใน 7 วันก่อนเมื่อวาน (ไม่ผูกกับจำนวนวันที่ใช้หาค่าเฉลี่ย)
+    let alTrading = false; for (let i = 2; i <= 8; i++) { if ((alByDay[alShift(-i)] || 0) > 0) alTrading = true; }
     const rawAlerts = [];
-    if (alAvg7 > 0 && alTodayGross < alAvg7 * 0.75) {
-      rawAlerts.push({ sev:'high', title:'ยอดขายวันนี้ต่ำกว่าค่าเฉลี่ย 7 วัน', detail: alFmt(alTodayGross) + ' เทียบค่าเฉลี่ย ' + alFmt(alAvg7), time:'วันนี้', icon:'trending-down', cat:'ยอดขาย' });
+    // ยอดหน้าร้านถนนจันทร์ของเมื่อวานมาถึงราว 07:20 (อีเมลปิดรอบ) — ก่อน 09:00 ยังไม่ถือว่าขาด
+    if (alTrading && alYestGross === 0 && new Date().getHours() >= 9) {
+      rawAlerts.push({ sev:'mid', title:'ยังไม่มียอดหน้าร้านของเมื่อวาน', detail: isoToBEShort(alYest) + ' · ร้านปิด หรือข้อมูลยังไม่เข้า (POS ส่งทุกชั่วโมง · ถนนจันทร์ส่งทุกเช้า)', time:'เมื่อวาน', icon:'calendar-x', cat:'ข้อมูล' });
+    } else if (alPrior.length >= 5 && alYestGross > 0 && alYestGross < alAvg7 * 0.75) {
+      rawAlerts.push({ sev:'high', title:'ยอดหน้าร้านเมื่อวานต่ำกว่าค่าเฉลี่ย 7 วัน', detail: isoToBEShort(alYest) + ' ' + alFmt(alYestGross) + ' เทียบค่าเฉลี่ย ' + alFmt(alAvg7) + ' (เฉพาะวันที่มียอด)', time:'เมื่อวาน', icon:'trending-down', cat:'ยอดขาย' });
     }
-    const alOverdue = alRows.filter(r => (r.payment === 'GOVERNMENT_WALLET' || /ไทยช่วยไทย/.test(r.payment || '')) && r.isoDate)
+    // เงินรัฐค้างรับ: ไม่นับวันที่อยู่ในรอบที่บันทึก "เงินรัฐโอนเข้าจริง" แล้ว — เดิมนับทุกแถวเก่ากว่า 17 วันตลอดไป
+    const alRcpts = this.ofBranch(this.state.subRcpts || []);
+    const alCovered = iso => alRcpts.some(g => g.from && g.to && iso >= g.from && iso <= g.to);
+    const alOverdue = alRows.filter(r => (r.payment === 'GOVERNMENT_WALLET' || /ไทยช่วยไทย/.test(r.payment || '')) && r.isoDate && !alCovered(r.isoDate))
       .filter(r => { const x = new Date(r.isoDate + 'T00:00:00'); x.setDate(x.getDate() + 3); return (new Date(alToday) - x) / 86400000 > 14; });
     if (alOverdue.length) {
-      rawAlerts.push({ sev:'mid', title:'เงินรัฐคนละครึ่งค้างรับเกิน 14 วัน', detail: alOverdue.length + ' ออเดอร์ยังไม่ได้รับเงินอุดหนุน', time:'วันนี้', icon:'hourglass', cat:'การเงิน' });
+      rawAlerts.push({ sev:'mid', title:'เงินรัฐ (ไทยช่วยไทย) ยังไม่ได้บันทึกรับเงิน เกิน 14 วัน', detail: alOverdue.length + ' รายการ · บันทึกเงินที่รัฐโอนเข้าได้ที่หน้า "เงินรัฐรอรับ"', time:'วันนี้', icon:'hourglass', cat:'การเงิน' });
     }
     // ทำเครื่องหมายอ่านแล้ว: remember dismissed alert signatures; an alert reappears
     // only if its content changes (new day / new numbers).
@@ -9184,10 +9327,12 @@ class Component extends DCLogic {
       { label:'รวมทั้งหมด', value: String(alertItems.length), fg:'#2E7D5B', bg:'#E6F3ED' }
     ];
     const alertRules = [
-      { name:'ยอดขายต่ำกว่าค่าเฉลี่ย', cond:'แจ้งเมื่อ > 25%', on:true },
-      { name:'เงินโอนไม่ตรงยอดที่คาด', cond:'แจ้งเมื่อ > ฿500', on:true },
-      { name:'GP/ค่าธรรมเนียมสูงผิดปกติ', cond:'แจ้งเมื่อ > 32%', on:true },
-      { name:'ออเดอร์ยกเลิกพุ่ง', cond:'แจ้งเมื่อ > 15%', on:false }
+      // แสดงตามจริง: เปิดเฉพาะกฎที่มีโค้ดตรวจจริงข้างบน · ที่เหลือยังไม่ได้ทำ (เดิมขึ้นสวิตช์เขียวทั้งที่ไม่มีการตรวจ)
+      { name:'ยอดหน้าร้านเมื่อวานต่ำกว่าค่าเฉลี่ย 7 วัน', cond:'แจ้งเมื่อต่ำกว่า 25%', on:true },
+      { name:'ยังไม่มียอดหน้าร้านของเมื่อวาน', cond:'แจ้งเมื่อไม่มียอดเลย', on:true },
+      { name:'เงินรัฐค้างรับเกิน 14 วัน', cond:'นับเฉพาะวันที่ยังไม่บันทึกรับเงิน', on:true },
+      { name:'เงินโอนไม่ตรงยอดที่คาด', cond:'ยังไม่ได้ทำ (รอข้อมูลกระทบยอด)', on:false },
+      { name:'GP/ค่าธรรมเนียมสูงผิดปกติ', cond:'ยังไม่ได้ทำ', on:false }
     ].map(r => ({ ...r,
       trackStyle: { width:'38px', height:'22px', borderRadius:'11px', background: r.on ? '#2E7D5B' : '#D6DAE3', position:'relative', flex:'none' },
       knobStyle: { position:'absolute', top:'2px', left: r.on ? '18px' : '2px', width:'18px', height:'18px', borderRadius:'50%', background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)' } }));
@@ -9481,15 +9626,16 @@ class Component extends DCLogic {
     const mobAvg30 = mobSum(mob30) / 30;
     const mobileSales = mobFmt(mobSalesToday);
     const mobileCompare = 'เมื่อวาน ' + mobFmt(mobSalesYest) + ' · เฉลี่ย 30 วัน ' + mobFmt(mobAvg30) + '/วัน';
-    const mobDiffPct = mobSalesYest ? (mobSalesToday - mobSalesYest) / mobSalesYest * 100 : null;
-    const mobileVsYesterday = mobDiffPct == null ? 'เมื่อวานไม่มียอด'
+    // ยังไม่มียอดวันนี้ (เช้าก่อนเปิดร้าน / POS ยังไม่ส่งรอบแรก) ไม่ใช่ "ลดลง 100%" — เดิมขึ้นแดงทุกเช้า
+    const mobDiffPct = (mobSalesYest && mobSalesToday > 0) ? (mobSalesToday - mobSalesYest) / mobSalesYest * 100 : null;
+    const mobileVsYesterday = mobDiffPct == null ? (mobSalesToday > 0 ? 'เมื่อวานไม่มียอด' : 'วันนี้ยังไม่มียอดเข้า')
       : (mobDiffPct >= 0 ? '▲ +' : '▼ ') + mobDiffPct.toFixed(0) + '% เทียบเมื่อวาน';
     const mobileVsColor = mobDiffPct == null ? '#8089A0' : (mobDiffPct >= 0 ? '#2E7D5B' : '#B14A4A');
     const mobileSpark = this.spark(Array.from({ length: 7 }, (_, i) => mobSum(mobOn(mobShift(i - 6)))), '#4A6B9E');
     const mobGreeting = (() => { const h = new Date().getHours();
       return h < 11 ? 'สวัสดีตอนเช้า' : (h < 16 ? 'สวัสดีตอนบ่าย' : (h < 20 ? 'สวัสดีตอนเย็น' : 'สวัสดีตอนค่ำ')); })();
     const mobileHello = mobGreeting + ' คุณ Annie';
-    const mobileToday = 'สาขาบางโพ · ' + (() => { const [y, m, d] = mobToday.split('-').map(Number);
+    const mobileToday = 'สาขา' + branchLabel(this.activeBranch()) + ' · ' + (() => { const [y, m, d] = mobToday.split('-').map(Number);
       return d + ' ' + THAI_MONTHS_ABBR[m - 1] + ' ' + String((y + 543) % 100).padStart(2, '0'); })();
 
     // 2 · ข้อมูลยังไม่ครบ — ตัวชี้ขาดว่าตัวเลขบนจอเชื่อได้แค่ไหน
@@ -9497,10 +9643,12 @@ class Component extends DCLogic {
     const mobDaysBehind = iso => iso ? Math.round((new Date(mobToday + 'T00:00:00') - new Date(iso + 'T00:00:00')) / 86400000) : null;
     const mobFreshRaw = [
       { label: 'ยอดหน้าร้าน (POS)', iso: mobLatestOf(mobAll.filter(r => r.platform === 'หน้าร้าน')) },
-      { label: 'ยอดเดลิเวอรี (Grab · LINE MAN · Shopee)', iso: mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')) },
+      { label: 'ยอดเดลิเวอรี (Grab · LINE MAN · Shopee)', iso: mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')), paused: !!this.state.importPaused },
       { label: 'รายจ่าย', iso: mobLatestOf(this.ofBranch(this.state.expRows)) }
     ].map(f => {
       const gap = mobDaysBehind(f.iso);
+      // พักนำเข้าตามที่แอนนี่สั่ง = ตั้งใจ ไม่ใช่ข้อมูลขาด — ไม่ขึ้นแดง
+      if (f.paused) return { label: f.label, value: f.iso ? ('ถึง ' + isoToBEShort(f.iso)) : 'ยังไม่มีข้อมูล', note: 'พักไว้', color: '#8089A0' };
       return { label: f.label,
         value: f.iso ? ('ถึง ' + isoToBEShort(f.iso)) : 'ยังไม่มีข้อมูล',
         note: gap == null ? '' : (gap <= 0 ? 'ล่าสุด' : 'ขาด ' + gap + ' วัน'),
@@ -9538,7 +9686,7 @@ class Component extends DCLogic {
     // 5 · สิ่งที่ต้องทำวันนี้ — สร้างจากช่องว่างของข้อมูลจริง ไม่ใช่รายการตายตัว
     const mobileTodos = [];
     const mobDeliGap = mobDaysBehind(mobLatestOf(mobAll.filter(r => r.platform !== 'หน้าร้าน')));
-    if (mobDeliGap != null && mobDeliGap > 1) {
+    if (mobDeliGap != null && mobDeliGap > 1 && !this.state.importPaused) {
       mobileTodos.push({ text: 'นำเข้ารายงาน Grab / LINE MAN / Shopee ที่ยังขาด ' + mobDeliGap + ' วัน', cta: 'นำเข้ารายงาน', onClick: goPage('import') });
     }
     if (mobExpMonthTotal === 0 || (mobExpGap != null && mobExpGap > 2)) {
