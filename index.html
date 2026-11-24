@@ -460,7 +460,6 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">เงินเข้าระบบตามช่องทาง <span style="color:#9AA3B2;font-weight:500;font-size:13px">(MTD)</span></h3>
-            <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูรายละเอียด</span>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:10px">
             <sc-for list="{{ rcPlatTiles }}" as="p" hint-placeholder-count="5">
@@ -503,7 +502,6 @@
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <h3 style="margin:0;font-size:15.5px;font-weight:600">สถานะเงินเข้าจาก Platform</h3>
-            <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:12px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px">
             <sc-for list="{{ rcPlatStatus }}" as="p" hint-placeholder-count="3">
@@ -543,7 +541,6 @@
                 <i data-lucide="search" style="width:15px;height:15px;color:#9AA3B2;flex:none"></i>
                 <input placeholder="ค้นหารายการ, ช่องทาง, หมายเหตุ..." style="border:none;outline:none;background:transparent;font-size:12px;color:#2B3547;width:100%;font-family:inherit"/>
               </div>
-              <div onClick="{{ goPayout }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="funnel" style="width:15px;height:15px"></i></div>
               <div onClick="{{ togglePeriod }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="calendar" style="width:15px;height:15px"></i></div>
               <div onClick="{{ exportSalesCsv }}" style="width:34px;height:34px;border:1px solid #E7E9ED;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5A6478;cursor:pointer;flex:none"><i data-lucide="download" style="width:15px;height:15px"></i></div>
             </div>
@@ -560,7 +557,6 @@
                 <th style="padding:0 5px 11px;font-weight:500;text-align:right">ยอดเงินเข้า (บาท)</th>
                 <th style="padding:0 5px 11px;font-weight:500">บัญชี</th>
                 <th style="padding:0 5px 11px;font-weight:500;text-align:center">สถานะ</th>
-                <th style="padding:0 5px 11px;font-weight:500;text-align:center">หลักฐาน</th>
                 <th style="padding:0 5px 11px;font-weight:500;text-align:center">จัดการ</th>
               </tr>
             </thead>
@@ -575,7 +571,6 @@
                   <td style="padding:11px 5px;text-align:right;font-weight:600;white-space:nowrap">{{ r.amount }}</td>
                   <td style="padding:11px 5px;color:#5A6478;white-space:nowrap">{{ r.account }}</td>
                   <td style="padding:11px 5px;text-align:center">{{ r.statusTag }}</td>
-                  <td onClick="{{ goPayout }}" style="padding:11px 5px;text-align:center"><i data-lucide="file-text" style="width:15px;height:15px;color:#9AA3B2;cursor:pointer"></i></td>
                   <td style="padding:11px 5px;text-align:center">{{ r.actions }}</td>
                 </tr>
               </sc-for>
@@ -592,7 +587,6 @@
           <div style="background:#fff;border:1px solid #E7E9ED;border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
               <h3 style="margin:0;font-size:15px;font-weight:600">สรุปเงินเข้าบัญชี <span style="color:#9AA3B2;font-weight:500;font-size:12px">(MTD)</span></h3>
-              <span onClick="{{ goPayout }}" style="color:#2C4A7C;font-size:11.5px;font-weight:600;cursor:pointer">ดูทั้งหมด</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:13px">
               <sc-for list="{{ rcBankRows }}" as="b" hint-placeholder-count="3">
@@ -2508,7 +2502,7 @@
             </div>
             <div style="background:#23262D;border-radius:18px;padding:20px;color:#fff">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px"><i data-lucide="clock" style="width:18px;height:18px;color:#C9B3DC"></i><span style="font-weight:600;font-size:14px">สรุปอัตโนมัติทุกเช้า</span></div>
-              <div style="font-size:12.5px;color:#B9BED0;line-height:1.6">ยังไม่มีสรุปอัตโนมัติ — ยอดขายและกำไรจริงของเมื่อวานดูที่กล่อง "ยอดขายและกำไรจริง" หน้าภาพรวม</div>
+              <div style="font-size:12.5px;color:#B9BED0;line-height:1.6">ยังไม่มีสรุปอัตโนมัติ — ยอดขายและกำไรคร่าว ๆ ของเมื่อวานดูที่กล่อง "ยอดขายและกำไรคร่าว ๆ" หน้าภาพรวม</div>
             </div>
           </div>
         </div>
@@ -4179,7 +4173,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 24 พ.ย.';
+    m.textContent = 'ฐาน: annie-cake 24 พ.ย. 14:15';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -4309,9 +4303,13 @@ function loadLastBranch() {
 function saveLastBranch(code) {
   try { if (BRANCH_OPTIONS.some(b => b.code === code)) localStorage.setItem(LAST_BRANCH_KEY, code); } catch (e) { /* ไม่ใช่เรื่องคอขาดบาดตาย */ }
 }
+/* 24 พ.ย. 2569 ซ่อนจากเมนู (ข้อมูลเก่า / หน้าว่าง · เจ้าของอนุมัติ): สินค้าขายดี (ค้าง ส.ค.) · จัดซื้อ (ค้าง ส.ค. · ใบสั่งของอยู่ใน POS) ·
+ *  กระทบยอดเงินโอน (ไม่มีแหล่งข้อมูลจนกว่าจะเชื่อมอีเมลรายงานของแอป) — ตัวหน้ายังอยู่ในไฟล์ เปิดคืนได้โดยใส่เมนูกลับ */
+const HIDDEN_PAGES = { products: 'salesdash', procurement: 'salesdash', payout: 'reconcile' };
 function loadLastPage(fallback) {
   try {
-    const v = localStorage.getItem(LAST_PAGE_KEY);
+    const v0 = localStorage.getItem(LAST_PAGE_KEY);
+    const v = HIDDEN_PAGES[v0] || v0;
     return APP_PAGES.indexOf(v) >= 0 ? v : fallback;
   } catch (e) { return fallback; }
 }
@@ -4689,6 +4687,12 @@ function pySlipSvg(opts) {
  *  รหัสสาขาของ DBD (main / chanroad) = branches.slug ของ annie-cake ตรงตัว · ราชพฤกษ์ (ratchaphruek) ไม่มีในตัวเลือกสาขาของ DBD
  *  จึงแสดงในแถบ "ทุกสาขา" เท่านั้น */
 const FIN_TABLE_LABEL = 'ยอดที่ลงในระบบการเงิน';
+/* 24 พ.ย. 2569 เจ้าของสั่ง: ยอดเดลิเวอรี่จากบิล POS และค่า GP ที่คิดจากอัตรา = ประมาณการ ไว้ดูกำไรคร่าว ๆ เท่านั้น
+ *  ยอดจริงของเดลิเวอรี่มาจากอีเมลรายงานของแอป (ยังไม่ได้เชื่อม) → ห้ามเรียกกล่องนี้ว่า "กำไรจริง" */
+const PROFIT_BOX_NAME = 'ยอดขายและกำไรคร่าว ๆ';
+const PF_PROFIT = 'กำไรคร่าว ๆ';
+const PF_EST = 'ประมาณการ';
+const PF_EST_RATE = 'ประมาณการจากอัตราที่ตั้ง';
 const PROFIT_BRANCH_SHORT = { main: 'บางโพ', ratchaphruek: 'ราชพฤกษ์', chanroad: 'ถนนจันทร์' };
 const pfNum = v => (v === null || v === undefined || v === '' || isNaN(Number(v))) ? null : Number(v);
 const pfBaht = v => { const n = pfNum(v); return n === null ? '—' : '฿' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
@@ -4723,9 +4727,13 @@ function buildProfitPanel(opt) {
   const btn = { display:'inline-flex', alignItems:'center', gap:'6px', background:'#fff', border:'1px solid ' + C.line, borderRadius:'10px', padding:'7px 13px', fontSize:'12.5px', fontWeight:600, color:C.navy, cursor:'pointer', whiteSpace:'nowrap' };
   const badge = (complete, label) => h('span', { 'data-pf-label': label || (complete ? 'ครบ' : 'ยังไม่ครบ'), style:{ fontSize:'12px', fontWeight:700, padding:'3px 10px', borderRadius:'8px', whiteSpace:'nowrap',
     background: complete ? '#E6F3ED' : '#FDF4E7', color: complete ? C.green : '#8A5A22', border:'1px solid ' + (complete ? '#C4E0D2' : '#F0DCBF') } }, label || (complete ? 'ครบ' : 'ยังไม่ครบ'));
+  // สาขาที่มีวันขายผ่าน POS = เดลิเวอรี่และค่า GP ในกล่องนี้เป็นประมาณการ · สาขาที่ยังใช้ตารางการเงินล้วน (ถนนจันทร์) = ยอดจากไฟล์ของแอป
+  const pfSel = ((st.profitMorning || {}).branches || []).find(x => x.branch_slug === opt.branch);
+  const pfPosBranch = !!pfSel && (((pfSel.day || {}).mode === 'pos') || pfNum((((pfSel.month_to_date || {}).totals) || {}).profit_pos_days_only) !== null);
   const title = h('div', { style:{ display:'flex', alignItems:'center', gap:'10px', flexWrap:'wrap', marginBottom:'12px' } },
-    h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:C.ink } }, 'ยอดขายและกำไรจริง — สาขา' + (PROFIT_BRANCH_SHORT[opt.branch] || branchLabel(opt.branch))),
+    h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:C.ink } }, PROFIT_BOX_NAME + ' — สาขา' + (PROFIT_BRANCH_SHORT[opt.branch] || branchLabel(opt.branch))),
     h('span', { style:{ background:'#ECF1F7', color:C.navy, fontSize:'11.5px', fontWeight:600, padding:'4px 10px', borderRadius:'8px', whiteSpace:'nowrap' } }, 'ตัวเลขกลาง · เหมือน Annie วันนี้ และ LEO'),
+    pfPosBranch ? h('span', { 'data-pf-estimate':'1', style:{ background:'#FDF4E7', color:'#8A5A22', border:'1px solid #F0DCBF', fontSize:'11.5px', fontWeight:700, padding:'3px 10px', borderRadius:'8px' } }, 'ประมาณการ · เดลิเวอรี่และค่า GP ยังไม่ใช่ยอดจริงจากแอป') : null,
     h('span', { style:{ flex:'1 1 0' } }),
     st.profitMorning && st.profitMorning.as_of ? h('span', { style:{ fontSize:'11.5px', color:C.mute, whiteSpace:'nowrap' } }, 'คำนวณเมื่อ ' + pfDateShort(st.profitMorning.as_of.slice(0, 10)) + ' ' + st.profitMorning.as_of.slice(11, 16) + ' น.') : null,
     h('span', { onClick: opt.onRetry, style:btn }, st.profitLoading ? 'กำลังโหลด…' : 'โหลดใหม่'));
@@ -4734,12 +4742,12 @@ function buildProfitPanel(opt) {
     h('span', { style:{ flex:'1 1 220px' } }, text), action || null);
 
   if (st.profitErr === 'auth') return wrap([box('#FDF4E7', '#F0DCBF', '#8A5A22',
-    'ต้องเข้าสู่ระบบด้วยบัญชีส่วนกลาง (admin) หรือบัญชีเจ้าของสาขา จึงจะเห็นยอดขายและกำไรจริง — บัญชีนี้ยังไม่มีสิทธิ์ หรือการเข้าสู่ระบบหมดอายุ',
+    'ต้องเข้าสู่ระบบด้วยบัญชีส่วนกลาง (admin) หรือบัญชีเจ้าของสาขา จึงจะเห็น' + PROFIT_BOX_NAME + ' — บัญชีนี้ยังไม่มีสิทธิ์ หรือการเข้าสู่ระบบหมดอายุ',
     h('span', { onClick: opt.onSignIn, style:btn }, 'เข้าสู่ระบบใหม่'))]);
   if (st.profitErr === 'net') return wrap([box('#F9E7EA', '#EFC9CE', '#8E2F36',
-    'โหลดยอดขายและกำไรจริงไม่สำเร็จ (อินเทอร์เน็ตหรือระบบขัดข้อง) — ตัวเลขอื่นในหน้านี้ยังใช้ได้',
+    'โหลด' + PROFIT_BOX_NAME + 'ไม่สำเร็จ (อินเทอร์เน็ตหรือระบบขัดข้อง) — ตัวเลขอื่นในหน้านี้ยังใช้ได้',
     h('span', { onClick: opt.onRetry, style:btn }, 'ลองอีกครั้ง'))]);
-  if (!st.profitMorning) return wrap([h('div', { style:{ fontSize:'13px', color:C.mute, padding:'18px 4px' } }, 'กำลังโหลดยอดขายและกำไรจริง…')]);
+  if (!st.profitMorning) return wrap([h('div', { style:{ fontSize:'13px', color:C.mute, padding:'18px 4px' } }, 'กำลังโหลด' + PROFIT_BOX_NAME + '…')]);
 
   const all = (st.profitMorning.branches || []);
   const b = all.find(x => x.branch_slug === opt.branch);
@@ -4755,9 +4763,10 @@ function buildProfitPanel(opt) {
       : null;
     const line = (label, value, strong) => h('div', { style:{ display:'flex', justifyContent:'space-between', gap:'10px', fontSize:'12.5px', padding:'4px 0', borderTop:'1px solid ' + C.soft } },
       h('span', { style:{ color:'#5A6478' } }, label), h('span', { style:{ color: strong ? C.ink : '#3A4456', fontWeight: strong ? 700 : 500, whiteSpace:'nowrap' } }, value));
-    const channelLines = t => [
+    // est = ป้ายต่อท้ายบรรทัดเดลิเวอรี่ ('' = ยอดจากไฟล์/รายงานของแอป ไม่ใช่ประมาณการ)
+    const channelLines = (t, est) => [
       pfNum(t.sales_storefront) ? line('หน้าร้าน', pfBaht(t.sales_storefront)) : null,
-      pfNum(t.sales_delivery) ? line('เดลิเวอรี่ (LINE MAN / Grab / ShopeeFood)', pfBaht(t.sales_delivery)) : null,
+      pfNum(t.sales_delivery) ? line('เดลิเวอรี่ (LINE MAN / Grab / ShopeeFood)' + (est ? ' · ' + est : ''), pfBaht(t.sales_delivery)) : null,
       pfNum(t.sales_web) ? line('เว็บ', pfBaht(t.sales_web)) : null,
       pfNum(t.sales_wholesale) ? line('ขายส่ง', pfBaht(t.sales_wholesale)) : null
     ];
@@ -4776,10 +4785,10 @@ function buildProfitPanel(opt) {
     } else {
       dayBody.push(h('div', { style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,130px),1fr))', gap:'10px', marginBottom:'8px' } },
         big(d.mode === 'finance' ? 'ยอดจากระบบการเงิน' : 'ยอดขาย', pfBaht(d.sales)),
-        big('กำไร', profitText(pfNum(d.profit), d.mode), pfNum(d.profit) !== null ? C.green : C.mute)));
-      dayBody.push(...channelLines(d));
+        big(PF_PROFIT, profitText(pfNum(d.profit), d.mode), pfNum(d.profit) !== null ? C.green : C.mute)));
+      dayBody.push(...channelLines(d, d.mode === 'finance' ? '' : PF_EST));
       if (pfNum(d.cost) !== null) dayBody.push(line('ต้นทุนสินค้า', pfBaht(d.cost)));
-      if (pfNum(d.gp)) dayBody.push(line('ค่า GP แอป และ VAT ของ GP', pfBaht(pfNum(d.gp) + (pfNum(d.vat_on_gp) || 0))));
+      if (pfNum(d.gp)) dayBody.push(line(d.mode === 'finance' ? 'ค่า GP แอป และ VAT ของ GP' : 'ค่า GP แอป และ VAT ของ GP · ' + PF_EST_RATE, pfBaht(pfNum(d.gp) + (pfNum(d.vat_on_gp) || 0))));
       if (pfNum(d.waste)) dayBody.push(line('ของเสีย', pfBaht(d.waste)));
     }
     const dayCard = h('div', { 'data-pf-card':'yesterday', style:card }, head('เมื่อวาน · ' + pfDateShort(d.date || st.profitMorning.date), d.mode === 'before_pos' ? true : !!d.complete, d.mode === 'before_pos' ? 'ยังไม่ใช้ POS' : d.label), ...dayBody, reasonList(d.reasons));
@@ -4790,13 +4799,14 @@ function buildProfitPanel(opt) {
     const monthBody = [
       h('div', { style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,130px),1fr))', gap:'10px', marginBottom:'8px' } },
         big(mProfit === null && pfNum(t.profit_pos_days_only) === null ? 'ยอดจากระบบการเงิน' : 'ยอดขาย', pfBaht(t.sales)),
-        mProfit !== null ? big('กำไร', pfBaht(mProfit), C.green)
-          : pfNum(t.profit_pos_days_only) !== null ? big('กำไร (เฉพาะวันที่ขายผ่าน POS)', pfBaht(t.profit_pos_days_only), C.green)
-          : big('กำไร', 'ยังไม่มีกำไร', C.mute)),
-      ...channelLines(t),
+        mProfit !== null ? big(PF_PROFIT, pfBaht(mProfit), C.green)
+          : pfNum(t.profit_pos_days_only) !== null ? big(PF_PROFIT + ' (เฉพาะวันที่ขายผ่าน POS)', pfBaht(t.profit_pos_days_only), C.green)
+          : big(PF_PROFIT, 'ยังไม่มีกำไร', C.mute)),
+      // ทั้งเดือนเป็นวัน POS = ประมาณการ · มีวันก่อนใช้ POS ปน (ยอดจากไฟล์แอป) = บอกว่าเฉพาะวันที่ใช้ POS · ไม่ใช้ POS เลย = ไม่ติดป้าย
+      ...channelLines(t, mProfit !== null ? PF_EST : pfNum(t.profit_pos_days_only) !== null ? 'วันที่ใช้ POS เป็น' + PF_EST : ''),
       line('รายจ่ายร้านที่ลงไว้ (ไม่รวมซื้อวัตถุดิบ)', pfBaht(ex.operating)),
       line('ลงรายจ่ายล่าสุด', ex.last_expense_date ? pfDateShort(ex.last_expense_date) : 'ยังไม่เคยลง'),
-      pfNum(t.profit_after_expenses) !== null ? line('กำไรหลังหักรายจ่ายร้าน', pfBaht(t.profit_after_expenses), true) : null,
+      pfNum(t.profit_after_expenses) !== null ? line(PF_PROFIT + ' หลังหักรายจ่ายร้าน', pfBaht(t.profit_after_expenses), true) : null,
       line('วันที่ครบ', (t.days_complete || 0) + ' จาก ' + (t.days || 0) + ' วัน')
     ];
     const monthCard = h('div', { 'data-pf-card':'month', style:card }, head('เดือนนี้ · ' + pfRangeShort(m.from, m.to), !!m.complete, m.label), ...monthBody, reasonList(m.reasons));
@@ -4816,7 +4826,7 @@ function buildProfitPanel(opt) {
         const days = ((st.profitDays.data || {}).days || []).slice().reverse();
         rows.push(h('div', { style:{ marginTop:'10px', overflowX:'auto' } },
           h('table', { style:{ width:'100%', borderCollapse:'collapse', display:'table' } },
-            h('thead', null, h('tr', null, th('วันที่'), th('ยอดขาย'), th('กำไร'), th('สถานะ'), th('เหตุผล'))),
+            h('thead', null, h('tr', null, th('วันที่'), th('ยอดขาย'), th(PF_PROFIT), th('สถานะ'), th('เหตุผล'))),
             h('tbody', null, ...days.map(x => {
               const pre = x.mode === 'before_pos' || x.mode === 'not_on_pos';
               return h('tr', { key:x.date },
@@ -4840,20 +4850,23 @@ function buildProfitPanel(opt) {
         return h('div', { key:x.branch_slug, 'data-pf-branch':x.branch_slug, style:{ display:'flex', flexDirection:'column', gap:'4px', maxWidth:'100%', background:'#fff', border:'1px solid ' + C.line, borderRadius:'10px', padding:'6px 10px', fontSize:'12.5px', color:'#3A4456' } },
           h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'4px 7px' } },
             h('b', { style:{ color:C.ink, whiteSpace:'nowrap' } }, PROFIT_BRANCH_SHORT[x.branch_slug] || x.branch_name),
-            h('span', null, pre ? 'ยังไม่ใช้ POS' : (dd.mode === 'finance' ? 'ยอดจากระบบการเงิน ' : 'ขาย ') + pfBaht(dd.sales) + ' · กำไร ' + (p !== null ? pfBaht(p) : '—')),
+            h('span', null, pre ? 'ยังไม่ใช้ POS' : (dd.mode === 'finance' ? 'ยอดจากระบบการเงิน ' : 'ขาย ') + pfBaht(dd.sales) + ' · ' + PF_PROFIT + ' ' + (p !== null ? pfBaht(p) : '—')),
             pre ? null : badge(!!dd.complete, dd.label)),
           (!pre && (dd.reasons || []).length) ? h('div', { style:{ fontSize:'11.5px', color:'#8A5A22', lineHeight:1.5 } }, dd.reasons.map(r => r.text).join(' · ')) : null);
       })));
   }
   rows.push(h('div', { style:{ marginTop:'12px', fontSize:'11.5px', color:C.mute, lineHeight:1.55 } },
-    'ยอดขาย = บิลที่ขายสำเร็จใน POS ทุกช่องทาง หลังหักส่วนลด (ถนนจันทร์ = ยอดจากระบบการเงิน) · กำไร = ยอดขาย − ต้นทุนสินค้า − (ค่า GP แอป และ VAT ของ GP) − ของเสีย (ยังไม่หักค่าเช่า ค่าแรง ค่าน้ำไฟ) · "ยังไม่ครบ" = ตัวเลขอาจเปลี่ยน ดูเหตุผลใต้ตัวเลข'));
+    (pfPosBranch
+      ? 'กล่องนี้ใช้ดูกำไรคร่าว ๆ: ยอดเดลิเวอรี่มาจากบิลที่ร้านคีย์ใน POS และค่า GP คิดจากอัตราที่ตั้งไว้ จึงเป็นประมาณการ — ยอดจริงของเดลิเวอรี่ (ยอดขาย ค่า GP เงินโอน) มาจากรายงานทางอีเมลของแอปเท่านั้น ซึ่งยังไม่ได้เชื่อมเข้าหน้านี้ · หน้าร้าน เว็บ และขายส่งเป็นยอดจากบิลจริง · '
+      : 'สาขานี้ยังไม่ขายผ่าน POS ตัวเลขของสาขานี้มาจากระบบการเงิน · ในแถบ "ทุกสาขา" สาขาที่ขายผ่าน POS ใช้ยอดเดลิเวอรี่และค่า GP แบบประมาณการ · ') +
+    'ยอดขาย = บิลที่ขายสำเร็จใน POS ทุกช่องทาง หลังหักส่วนลด (ถนนจันทร์ = ยอดจากระบบการเงิน) · กำไรคร่าว ๆ = ยอดขาย − ต้นทุนสินค้า − (ค่า GP แอป และ VAT ของ GP) − ของเสีย (ยังไม่หักค่าเช่า ค่าแรง ค่าน้ำไฟ) · "ยังไม่ครบ" = ตัวเลขอาจเปลี่ยน ดูเหตุผลใต้ตัวเลข'));
   return wrap(rows);
 }
 /** แถบบอกว่าตัวเลขชุดล่างมาจากตารางการเงิน ไม่ใช่ยอดขายจริงของสาขาที่ขายผ่าน POS */
 function buildFinTableNote(h) {
   return h('div', { 'data-fin-note':'1', style:{ display:'flex', alignItems:'flex-start', gap:'9px', background:'#F6F7F9', border:'1px solid #E7E9ED', borderRadius:'12px', padding:'10px 14px', margin:'0 0 14px', fontSize:'12.5px', color:'#5A6478', lineHeight:1.55 } },
     h('b', { style:{ color:'#3A4456', whiteSpace:'nowrap' } }, 'ตัวเลขชุดนี้ = ' + FIN_TABLE_LABEL),
-    h('span', null, 'ใช้ลงยอด กระทบยอดเงินเข้า และรายจ่าย · สาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในชุดนี้ตั้งแต่ 16 พ.ย. 2569 — ยอดขายและกำไรจริงดูที่กล่อง "ยอดขายและกำไรจริง"'));
+    h('span', null, 'ใช้ลงยอด กระทบยอดเงินเข้า และรายจ่าย · สาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในชุดนี้ตั้งแต่ 16 พ.ย. 2569 — ดูกำไรคร่าว ๆ (เดลิเวอรี่เป็นประมาณการ) ที่กล่อง "' + PROFIT_BOX_NAME + '"'));
 }
 
 class Component extends DCLogic {
@@ -6399,15 +6412,13 @@ class Component extends DCLogic {
       { label:'รายรับ', icon:'circle-arrow-down', key:'income', sub:true, page:'sales' },
       { label:'รายจ่าย', icon:'circle-arrow-up', key:'expense', sub:true, page:'expenserec' },
       { label:'เงินเดือน', icon:'wallet', key:'payroll', sub:true, page:'payroll' },
-      { label:'เงินเข้า & กระทบยอด', icon:'badge-check', key:'reconcile', sub:true, page:'reconcile', group:['reconcile','payout'] },
+      { label:'เงินเข้า', icon:'badge-check', key:'reconcile', sub:true, page:'reconcile' },
       { label:'เงินรัฐรอรับ', icon:'landmark', key:'subsidy', sub:true, page:'subsidy' },
       { label:'นำเข้ารายงานออนไลน์', icon:'file-down', key:'import', sub:true, page:'import' },
       { label:'ภาษี', icon:'file-text', key:'tax', sub:true, page:'tax', group:['tax','taxforms'] },
-      { label:'สินค้า', icon:'package', key:'products', page:'products' },
       { label:'การตลาด', icon:'megaphone', key:'marketing', page:'marketing', group:['marketing','campaign','content'] },
       { label:'สมาชิก', icon:'users', key:'members', page:'members' },
       { label:'ศูนย์แจ้งเตือน', icon:'bell-ring', key:'alerts', page:'alerts' },
-      { label:'จัดซื้อ', icon:'shopping-cart', key:'procurement', page:'procurement' },
       { label:'แหล่งข้อมูล', icon:'database', key:'datasources', page:'datasources' },
       { label:'Annie Brain AI', icon:'sparkles', key:'ai' }
     ];
@@ -6497,7 +6508,7 @@ class Component extends DCLogic {
       style: page === t.page ? { ...tabBase, background:'#2C4A7C', color:'#fff' } : { ...tabBase, background:'#fff', border:'1px solid #E7E9ED', color:'#5A6478' }
     }));
     const overviewTabs = mkTabs([{ label:'ภาพรวม', page:'overview' }, { label:'มุมมองเจ้าของ', page:'mobile' }]);
-    const cashInTabs = mkTabs([{ label:'เงินเข้าจริง', page:'reconcile' }, { label:'กระทบยอดเงินโอน', page:'payout' }]);
+    const cashInTabs = [];   // เหลือหน้าเดียว (กระทบยอดเงินโอนซ่อนไว้ 24 พ.ย. 2569) จึงไม่ต้องมีแถบแท็บ
     const taxPageTabs = mkTabs([{ label:'สรุปภาษี & ส่งออก', page:'tax' }, { label:'แบบฟอร์ม ภ.พ./ภ.ง.ด.', page:'taxforms' }]);
     const marketingTabs = mkTabs([{ label:'ภาพรวมการตลาด', page:'marketing' }, { label:'แคมเปญ', page:'campaign' }, { label:'คอนเทนต์', page:'content' }]);
 
@@ -6653,7 +6664,7 @@ class Component extends DCLogic {
     if (ovPaused) {
       ceoAlerts.push({
         title: 'พักนำเข้ารายงานเดลิเวอรี่อยู่ (แอนนี่สั่ง)',
-        detail: 'ตัวเลขชุดนี้ไม่มี Grab · LINE MAN · ShopeeFood ช่วงที่พัก — ยอดเดลิเวอรี่จริงของสาขาที่ใช้ POS ดูที่กล่อง "ยอดขายและกำไรจริง"',
+        detail: 'ตัวเลขชุดนี้ไม่มี Grab · LINE MAN · ShopeeFood ช่วงที่พัก — ยอดเดลิเวอรี่แบบประมาณการของสาขาที่ใช้ POS ดูที่กล่อง "' + PROFIT_BOX_NAME + '"',
         icon: 'pause', bg:'#F3F6FA', border:'#DEE6F1', iconBg:'#DEE6F1', iconFg:'#2C4A7C'
       });
     }
@@ -7444,7 +7455,7 @@ class Component extends DCLogic {
     }
     const inexReceivable = inexRows.filter(r => r.status === 'รอรับเงิน').reduce((a,r)=>a+r.net,0);
     if (inexReceivable > 0) {
-      inexAlerts.push({ icon:'clock', bg:'#FBF5E6', fg:'#B98317', title:'มียอดค้างรับจาก Platform', desc:'ยอดค้างรับ ' + inexFmt(inexReceivable), action:'ตรวจสอบ', actionColor:'#B98317', onClick: goPage('payout') });
+      inexAlerts.push({ icon:'clock', bg:'#FBF5E6', fg:'#B98317', title:'มียอดค้างรับจาก Platform', desc:'ยอดค้างรับ ' + inexFmt(inexReceivable), action:'ตรวจสอบ', actionColor:'#B98317', onClick: goPage('reconcile') });
     }
     // No AI backend exists yet — leave empty rather than show fabricated insights.
     const inexInsights = [];
@@ -9024,7 +9035,7 @@ class Component extends DCLogic {
         this.setState({ importError: 'ไม่ต้องนำเข้าไฟล์ยอดหน้าร้าน (POS) แล้ว — ยอดหน้าร้านเข้าเองทุกวัน ถ้านำเข้าจะนับซ้ำ · เอาไฟล์นี้ออกแล้วนำเข้าเฉพาะไฟล์ของแอป' });
         return;
       }
-      if (this.state.importPaused && !window.confirm('แอนนี่สั่งพักการนำเข้ารายงานเดลิเวอรี่ไว้ (18 พ.ย. 2569)\nยอดที่นำเข้าใช้ตรวจเงินโอนเท่านั้น ไม่เปลี่ยนยอดขายและกำไรจริงของสาขาที่ใช้ POS\n\nนำเข้าต่อใช่ไหม')) return;
+      if (this.state.importPaused && !window.confirm('แอนนี่สั่งพักการนำเข้ารายงานเดลิเวอรี่ไว้ (18 พ.ย. 2569)\nยอดที่นำเข้าใช้ตรวจเงินโอนเท่านั้น ไม่เปลี่ยนตัวเลขในกล่อง "ยอดขายและกำไรคร่าว ๆ" ของสาขาที่ใช้ POS\n\nนำเข้าต่อใช่ไหม')) return;
       const now = new Date();
       const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
       // ต้องพาทุกช่องที่ normalizeImportRow คำนวณไว้ไปด้วย — เดิมสร้างออบเจกต์ใหม่แล้วลืม
@@ -9693,7 +9704,7 @@ class Component extends DCLogic {
       mobileTodos.push({ text: 'คีย์รายจ่ายของเดือนนี้ ยังไม่มีข้อมูลให้คำนวณกำไร', cta: 'คีย์รายจ่าย', onClick: goPage('expenserec') });
     }
     if (mobPending > 0) {
-      mobileTodos.push({ text: 'มีเงินรอรับจากแอป ' + mobFmt(mobPending) + ' ตรวจว่าเข้าบัญชีแล้วหรือยัง', cta: 'กระทบยอด', onClick: goPage('payout') });
+      mobileTodos.push({ text: 'มีเงินรอรับจากแอป ' + mobFmt(mobPending) + ' ตรวจว่าเข้าบัญชีแล้วหรือยัง', cta: 'ดูเงินเข้า', onClick: goPage('reconcile') });
     }
     alertItems.slice(0, 2).forEach(a => mobileTodos.push({ text: a.title, cta: 'ดูรายละเอียด', onClick: goPage('alerts') }));
     const mobileTodosEmpty = mobileTodos.length === 0;
