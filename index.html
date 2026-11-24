@@ -1522,6 +1522,9 @@
         </div>
       </div>
 
+      <!-- เงินสดออกจากลิ้นชัก POS รอยืนยัน (db/210) — ไม่มีอะไรรอ / ฐานยังไม่มีฟังก์ชัน = ไม่แสดง -->
+      <div>{{ cashExpPanel }}</div>
+
       <!-- KPI cards -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:16px;margin-bottom:18px">
         <div style="background:#fff;border:1px solid #E7E9ED;border-radius:16px;padding:17px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
@@ -4175,7 +4178,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 24 พ.ย. 15:10';
+    m.textContent = 'ฐาน: annie-cake 24 พ.ย. 21:50';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -4871,6 +4874,86 @@ function buildFinTableNote(h) {
     h('span', null, 'ใช้ลงยอด กระทบยอดเงินเข้า และรายจ่าย · สาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในชุดนี้ตั้งแต่ 16 พ.ย. 2569 — ดูกำไรคร่าว ๆ (เดลิเวอรี่เป็นประมาณการ) ที่กล่อง "' + PROFIT_BOX_NAME + '"'));
 }
 
+/* ════════════ เงินสดออกจากลิ้นชัก POS → รายจ่าย (db/210 · 24 พ.ย. 2569) ════════════
+ *  ระบบเสนอหมวดจากหมายเหตุที่พนักงานพิมพ์ (ถุง ช้อน ค่ารถ …) · เจ้าของกดยืนยัน/แก้หมวดเองจนกว่าจะมั่นใจ แล้วค่อยเปิด "ลงอัตโนมัติ"
+ *  หมวดที่เลือกได้ = รายการหมวดของฟอร์มรายจ่ายสาขานั้น (ฐานตรวจซ้ำอีกชั้น) · ยืนยันแล้วเป็นแถวในรายจ่าย (source POS_CASH)
+ *  opt: { data, loadErr, err, sel, busy, cats, readOnly, onSel(id, main, sub), onDecide(id, action, main, sub), onAuto(on), onRetry } */
+function buildCashExpPanel(opt) {
+  const h = React.createElement;
+  const d = opt.data;
+  if (!d) {
+    // โหลดไม่สำเร็จ (เน็ต/ระบบขัดข้อง) = บอกและให้ลองใหม่ · ยังไม่โหลด / ฐานยังไม่มีฟังก์ชันนี้ / บัญชีไม่มีสิทธิ์ = ไม่แสดงอะไร
+    if (!opt.loadErr) return null;
+    return h('div', { 'data-cash-panel':'error', style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'10px', background:'#F9E7EA', border:'1px solid #EFC9CE', color:'#8E2F36', borderRadius:'12px', padding:'11px 14px', fontSize:'13px', marginBottom:'18px' } },
+      h('span', { style:{ flex:'1 1 220px' } }, 'โหลดรายการเงินสดออกจากลิ้นชัก POS ไม่สำเร็จ — รายการที่รอยืนยันยังอยู่ครบในระบบ'),
+      h('span', { onClick: opt.onRetry, style:{ background:'#fff', border:'1px solid #E7E9ED', borderRadius:'10px', padding:'7px 13px', fontSize:'12.5px', fontWeight:600, color:'#2C4A7C', cursor:'pointer', whiteSpace:'nowrap' } }, 'ลองอีกครั้ง'));
+  }
+  const pending = d.pending || [], recent = d.recent || [];
+  if (!pending.length && !recent.length && !d.auto) return null;
+  const C = { ink:'#1B2536', sub:'#7C8699', mute:'#9AA3B2', line:'#E7E9ED', soft:'#F1F2F4', navy:'#2C4A7C', green:'#2E7D5B', amber:'#8A5A22' };
+  const baht = v => '฿' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const when = iso => { const p = String(iso || '').split(' '); const q = (p[0] || '').split('-'); return q.length === 3 ? (Number(q[2]) + '/' + q[1] + '/' + String((Number(q[0]) + 543) % 100) + ' ' + (p[1] || '')) : ''; };
+  const btn = (label, onClick, kind, disabled) => h('span', { onClick: disabled ? undefined : onClick, style:{ display:'inline-flex', alignItems:'center', borderRadius:'10px', padding:'7px 13px', fontSize:'12.5px', fontWeight:600, whiteSpace:'nowrap',
+    cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.45 : 1,
+    background: kind === 'primary' ? C.navy : '#fff', color: kind === 'primary' ? '#fff' : (kind === 'quiet' ? '#5A6478' : C.navy), border:'1px solid ' + (kind === 'primary' ? C.navy : C.line) } }, label);
+  const selStyle = { border:'1px solid ' + C.line, borderRadius:'9px', padding:'7px 9px', fontSize:'12.5px', color:C.ink, background:'#fff', maxWidth:'100%', minWidth:0 };
+  const tag = (text, bg, fg, bd) => h('span', { style:{ fontSize:'11.5px', fontWeight:600, padding:'2px 8px', borderRadius:'7px', background:bg, color:fg, border:'1px solid ' + bd, whiteSpace:'nowrap' } }, text);
+  const canWrite = !!d.can_write && !opt.readOnly;
+
+  const rows = pending.map(r => {
+    const pick = opt.sel[r.id] || { main: r.sug_main || '', sub: r.sug_sub || '' };
+    const subs = ((opt.cats.find(c => c[0] === pick.main) || [null, []])[1]) || [];
+    const okPick = !!pick.main && subs.indexOf(pick.sub) >= 0;
+    const busy = opt.busy === r.id;
+    const sugTag = r.sug_state === 'sure' ? tag('ระบบเสนอหมวดให้แล้ว', '#E6F3ED', C.green, '#C4E0D2')
+      : r.sug_state === 'mixed' ? tag('มีหลายอย่างในรายการเดียว — ตรวจหมวดย่อย', '#FDF4E7', C.amber, '#F0DCBF')
+      : r.sug_state === 'agent' ? tag('LEO เสนอ' + (r.sug_why ? ': ' + r.sug_why : ''), '#ECF1F7', C.navy, '#D5DFEC')
+      : tag('ยังไม่มีข้อเสนอ — เลือกหมวดเอง', '#F6F7F9', '#5A6478', C.line);
+    return h('div', { key: r.id, 'data-cash-row': r.id, style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'8px 14px', padding:'12px 0', borderTop:'1px solid ' + C.soft } },
+      h('div', { style:{ flex:'1 1 210px', minWidth:0 } },
+        h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'baseline', gap:'4px 10px' } },
+          h('b', { style:{ fontSize:'15px', color:C.ink, whiteSpace:'nowrap' } }, baht(r.amount)),
+          h('span', { style:{ fontSize:'13px', color:'#3A4456' } }, r.note ? r.note : 'ไม่มีหมายเหตุ')),
+        h('div', { style:{ fontSize:'11.5px', color:C.mute, marginTop:'2px' } }, when(r.at) + (r.by ? ' · ' + r.by : '')),
+        h('div', { style:{ marginTop:'5px', display:'flex', flexWrap:'wrap', gap:'5px' } }, sugTag,
+          Number(r.twin) > 0 ? tag('มีรายจ่ายที่คีย์เองวันเดียวกัน ยอดเท่ากัน — อาจลงไปแล้ว', '#F9E7EA', '#8E2F36', '#EFC9CE') : null)),
+      h('div', { style:{ display:'flex', flexWrap:'wrap', gap:'6px', flex:'1 1 250px', minWidth:0 } },
+        h('select', { value: pick.main, disabled: !canWrite || busy, 'aria-label':'หมวดหมู่หลัก', style: selStyle,
+            onChange: e => opt.onSel(r.id, e.target.value, '') },
+          h('option', { value:'' }, 'เลือกหมวดหมู่หลัก'), ...opt.cats.map(c => h('option', { key:c[0], value:c[0] }, c[0]))),
+        h('select', { value: subs.indexOf(pick.sub) >= 0 ? pick.sub : '', disabled: !canWrite || busy || !pick.main, 'aria-label':'หมวดหมู่ย่อย', style: selStyle,
+            onChange: e => opt.onSel(r.id, pick.main, e.target.value) },
+          h('option', { value:'' }, 'เลือกหมวดหมู่ย่อย'), ...subs.map(x => h('option', { key:x, value:x }, x)))),
+      canWrite ? h('div', { style:{ display:'flex', gap:'6px', flexWrap:'wrap' } },
+        btn(busy ? 'กำลังบันทึก…' : 'ยืนยันเป็นรายจ่าย', () => opt.onDecide(r.id, 'post', pick.main, pick.sub), 'primary', !okPick || busy),
+        btn('ไม่ใช่รายจ่าย / ลงเองแล้ว', () => opt.onDecide(r.id, 'not_expense'), 'quiet', busy)) : null);
+  });
+
+  const recentRows = recent.slice(0, 5).map(r => h('div', { key: r.id, style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'4px 12px', padding:'7px 0', borderTop:'1px solid ' + C.soft, fontSize:'12.5px', color:'#3A4456' } },
+    h('span', { style:{ whiteSpace:'nowrap', color:C.mute } }, when(r.at)),
+    h('b', { style:{ whiteSpace:'nowrap' } }, baht(r.amount)),
+    h('span', null, r.note ? r.note : 'ไม่มีหมายเหตุ'),
+    h('span', { style:{ color: r.state === 'posted' ? C.green : '#5A6478' } }, r.state === 'posted' ? ('→ ' + r.main_cat + ' › ' + r.sub_cat + (r.auto ? ' (ระบบลงเอง)' : '')) : '→ ไม่ใช่รายจ่าย'),
+    h('span', { style:{ flex:'1 1 0' } }),
+    canWrite ? h('span', { onClick: () => opt.onDecide(r.id, 'undo'), style:{ color:C.navy, fontWeight:600, cursor:'pointer', whiteSpace:'nowrap' } }, 'ยกเลิกการตัดสิน') : null));
+
+  const checked = Number(d.checked || 0), agreed = Number(d.agreed || 0);
+  return h('div', { 'data-cash-panel':'1', style:{ background:'#FBFCFD', border:'1px solid ' + C.line, borderRadius:'18px', padding:'18px 20px', marginBottom:'18px', boxShadow:'0 4px 16px rgba(30,34,41,0.03)' } },
+    h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'8px 12px', marginBottom:'4px' } },
+      h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:C.ink } }, 'เงินสดออกจากลิ้นชัก POS' + (pending.length ? ' — รอยืนยัน ' + pending.length + ' รายการ' : '')),
+      d.auto ? tag('ลงอัตโนมัติ: เปิด', '#E6F3ED', C.green, '#C4E0D2') : tag('ลงอัตโนมัติ: ปิด (แอนนี่ยืนยันเองทุกรายการ)', '#F6F7F9', '#5A6478', C.line),
+      h('span', { style:{ flex:'1 1 0' } }),
+      d.can_set_auto && !opt.readOnly ? btn(d.auto ? 'ปิดลงอัตโนมัติ' : 'เปิดลงอัตโนมัติ', () => opt.onAuto(!d.auto)) : null),
+    h('div', { style:{ fontSize:'12.5px', color:C.sub, lineHeight:1.55, marginBottom:'6px' } },
+      'รายการขึ้นเองหลังร้านปิดรอบ · ระบบเสนอหมวดจากคำที่พนักงานพิมพ์ · ยืนยันแล้วจะเป็นแถวในรายจ่าย' +
+      (checked ? ' · ที่ผ่านมาแอนนี่ยืนยันตรงกับที่ระบบเสนอ ' + agreed + ' จาก ' + checked + ' ครั้ง' : '') +
+      (d.auto ? ' · ตอนนี้รายการที่ระบบมั่นใจจะลงเอง รายการอื่นยังรอยืนยันที่นี่' : '')),
+    opt.err ? h('div', { style:{ background:'#F9E7EA', border:'1px solid #EFC9CE', color:'#8E2F36', borderRadius:'10px', padding:'9px 13px', fontSize:'12.5px', margin:'6px 0' } }, opt.err) : null,
+    ...rows,
+    recentRows.length ? h('div', { style:{ marginTop:'10px' } },
+      h('div', { style:{ fontSize:'12px', color:C.sub, fontWeight:600, marginBottom:'2px' } }, 'ตัดสินล่าสุด'), ...recentRows) : null);
+}
+
 class Component extends DCLogic {
   state = {
     // ---- ระบบเข้าสู่ระบบ ----
@@ -4928,7 +5011,9 @@ class Component extends DCLogic {
     storeFormError: null, storeSaving: false,
     // ---- ยอดขายและกำไรจริง (ฟังก์ชันกลาง db/177) ----
     profitMorning: null, profitLoading: false, profitErr: null,
-    profitDays: null, profitDaysKey: '', profitDaysLoading: false, profitDaysErr: null, profitShowDays: null
+    profitDays: null, profitDaysKey: '', profitDaysLoading: false, profitDaysErr: null, profitShowDays: null,
+    // ---- เงินสดออกจากลิ้นชัก POS รอยืนยัน (db/210) ----
+    cashExp: null, cashExpBranch: '', cashExpLoadErr: false, cashExpErr: null, cashExpSel: {}, cashExpBusy: null
   };
 
   onDocClick = (e) => {
@@ -4965,11 +5050,74 @@ class Component extends DCLogic {
     this.loadPayroll();
     this.loadSubsidyReceipts();
     this.loadProfit();
+    this.loadCashExp();
   };
   /** ยอดขายและกำไรจริงจากฟังก์ชันกลาง — เรียกด้วย session ที่ล็อกอินอยู่ (supabaseClient แนบ token ให้เอง)
    *  อ่านอย่างเดียว ไม่เขียนอะไรลงฐาน · ล้มเหลวแล้วหน้าอื่นยังทำงานต่อได้ */
   /** _pfGen เพิ่มทุกครั้งที่ออกจากระบบ — ผลที่มาถึงหลังออกจากระบบถูกทิ้ง ไม่ให้ตัวเลขของบัญชีเดิมกลับขึ้นจอ
    *  _pfSeq / _pdSeq = เลขคำขอล่าสุด — ผลของคำขอเก่า (กดโหลดซ้ำ เปลี่ยนสาขาระหว่างรอ) ถูกทิ้งเสมอ */
+  /** รายการเงินสดออกจากลิ้นชักของสาขาที่เปิดอยู่
+   *  ฐานยังไม่มีฟังก์ชัน (ยังไม่ลง db/210 / ถอยแล้ว) หรือบัญชีไม่มีสิทธิ์ = ไม่แสดงกล่อง · เน็ต/ระบบขัดข้อง = แสดงข้อความ + ปุ่มลองอีกครั้ง
+   *  _ceGen เพิ่มทุกครั้งที่ออกจากระบบหรือเปลี่ยนสาขา · _ceSeq เพิ่มทุกคำขอ — ผลที่มาถึงช้า (สาขาเก่า / บัญชีเก่า) ถูกทิ้ง
+   *  ไม่ล้าง cashExpErr ที่นี่: ข้อความ "บันทึกไม่สำเร็จ" ต้องอยู่จนกว่าจะบันทึกสำเร็จครั้งถัดไป */
+  loadCashExp = async () => {
+    const branch = this.activeBranch();
+    const gen = this._ceGen || 0;
+    const seq = (this._ceSeq = (this._ceSeq || 0) + 1);
+    const live = () => gen === (this._ceGen || 0) && seq === this._ceSeq;
+    this._cashBranch = branch;
+    try {
+      const r = await supabaseClient.rpc('cash_expense_list', { p_branch: branch });
+      if (!live()) return;
+      if (r.error) throw r.error;
+      this.setState({ cashExp: r.data || null, cashExpBranch: branch, cashExpLoadErr: false });
+    } catch (e) {
+      if (!live()) return;
+      const code = String((e && (e.code || e.status)) || '');
+      const quiet = code === 'PGRST202' || code === '42883' || code === '42501' || code === '404' || code === '401' || code === '403';
+      this.setState({ cashExp: null, cashExpBranch: branch, cashExpLoadErr: !quiet });
+    }
+  };
+  cashExpDecide = async (id, action, main, sub) => {
+    if (this.state.cashExpBusy) return;
+    const gen = this._ceGen || 0, branch = this.activeBranch();
+    const same = () => gen === (this._ceGen || 0) && branch === this.activeBranch();
+    this.setState({ cashExpBusy: id, cashExpErr: null });
+    try {
+      const r = await supabaseClient.rpc('cash_expense_decide', { p_cash: id, p_action: action, p_main: main || null, p_sub: sub || null });
+      if (gen !== (this._ceGen || 0)) {                       // ออกจากระบบ / เปลี่ยนสาขาไปแล้ว — ไม่แตะจอถัดไป
+        // สลับสาขาไปแล้วกลับมาสาขาเดิมระหว่างรอ: โหลดรายการใหม่ ไม่ให้แถวที่เพิ่งตัดสินค้างบนจอ
+        if (this.state.authSession && branch === this.activeBranch()) { this.loadCashExp(); this.loadExpenses(); }
+        return;
+      }
+      if (r.error) throw r.error;
+      this.setState(st => { const sel = { ...st.cashExpSel }; delete sel[id]; return { cashExpBusy: null, cashExpSel: sel, cashExpErr: null }; });
+      this.loadCashExp();
+      this.loadExpenses();                                   // แถวรายจ่ายที่เพิ่ง เพิ่ม/ถอน ต้องขึ้นในตารางทันที
+    } catch (e) {
+      if (gen !== (this._ceGen || 0)) return;
+      // เปลี่ยนสาขาไปแล้ว: ไม่ขึ้นข้อความผิดพลาดของสาขาเดิมบนจอสาขาใหม่
+      this.setState({ cashExpBusy: null, cashExpErr: same() ? 'บันทึกไม่สำเร็จ: ' + ((e && e.message) || 'ลองใหม่อีกครั้ง') : null });
+      this.loadCashExp();
+    }
+  };
+  cashExpSetAuto = async (on) => {
+    const msg = on
+      ? 'เปิดลงอัตโนมัติ?\nรายการที่ระบบมั่นใจ (เช่น ถุง ช้อน ค่ารถ) จะเป็นรายจ่ายเองหลังปิดรอบ โดยไม่รอแอนนี่ยืนยัน\nรายการที่ไม่มีหมายเหตุ มีหลายอย่าง หรืออาจคีย์เองไปแล้ว ยังรอยืนยันเหมือนเดิม'
+      : 'ปิดลงอัตโนมัติ?\nทุกรายการจะกลับมารอแอนนี่ยืนยันก่อน';
+    if (!window.confirm(msg)) return;
+    const gen = this._ceGen || 0, branch = this.activeBranch();
+    try {
+      const r = await supabaseClient.rpc('cash_expense_set_auto', { p_branch: branch, p_on: !!on });
+      if (gen !== (this._ceGen || 0)) return;
+      if (r.error) throw r.error;
+      this.setState({ cashExpErr: null });
+      this.loadCashExp();
+    } catch (e) {
+      if (gen !== (this._ceGen || 0)) return;
+      this.setState({ cashExpErr: branch === this.activeBranch() ? 'เปลี่ยนโหมดไม่สำเร็จ: ' + ((e && e.message) || 'ลองใหม่อีกครั้ง') : null });
+    }
+  };
   loadProfit = async () => {
     const gen = this._pfGen || 0;
     const seq = (this._pfSeq = (this._pfSeq || 0) + 1);
@@ -5267,6 +5415,12 @@ class Component extends DCLogic {
     if (this.state.page !== this._savedPage) { this._savedPage = this.state.page; saveLastPage(this.state.page); }
     if (this.state.activeBranch !== this._savedBranch) { this._savedBranch = this.state.activeBranch; saveLastBranch(this.state.activeBranch); }
     // เปลี่ยนสาขาแล้ว รายวันของเดือนต้องเป็นของสาขาใหม่ (loadProfitDays ตั้ง key ก่อนรอผล จึงไม่วนซ้ำ)
+    if (this.state.authSession && this._cashBranch !== undefined && this._cashBranch !== this.activeBranch()) {
+      // เปลี่ยนสาขา: ทิ้งงานที่ค้างของสาขาเดิม (ปุ่มไม่ค้าง ตัวเลือกและข้อความผิดพลาดไม่ตามมาสาขาใหม่) แล้วโหลดของสาขาใหม่
+      this._ceGen = (this._ceGen || 0) + 1;
+      this.loadCashExp();                                   // ตั้ง _cashBranch ทันที จึงไม่วนซ้ำ
+      this.setState({ cashExpBusy: null, cashExpSel: {}, cashExpErr: null });
+    }
     if (this.state.authSession && this.state.profitMorning) {
       const w = this.profitDaysWanted();
       if (w && w.key !== this.state.profitDaysKey) this.loadProfitDays();
@@ -6395,6 +6549,7 @@ class Component extends DCLogic {
     const onLoginKeyDown = e => { if (e.key === 'Enter') doLogin(); };
     const doLogout = async () => {
       this._pfGen = (this._pfGen || 0) + 1;   // ทิ้งผลกำไรที่ยังค้างอยู่ของบัญชีเดิม
+      this._ceGen = (this._ceGen || 0) + 1; this._ceSeq = (this._ceSeq || 0) + 1; this._cashBranch = undefined;   // กล่องเงินสดออกลิ้นชัก: ทิ้งผลที่มาถึงช้า
       try { await supabaseClient.auth.signOut(); } catch (e) { /* ออกจากระบบฝั่งเว็บให้ได้เสมอ */ }
       try { await crmClient.auth.signOut(); } catch (e) { /* ระบบสมาชิกออกไม่ได้ก็ไม่ควรค้างหน้าจอ */ }
       // ล้างข้อมูลที่โหลดไว้ ไม่ให้คนถัดไปเห็นตัวเลขค้างบนจอ
@@ -6403,6 +6558,7 @@ class Component extends DCLogic {
         recentRows: [], expRows: [], subRcpts: [], purchases: [], crmMembers: [],
         employees: [], holidays: [], holidayWork: [], payslips: [],
         profitMorning: null, profitErr: null, profitLoading: false, profitDays: null, profitDaysKey: '', profitDaysErr: null, profitDaysLoading: false,
+        cashExp: null, cashExpBranch: '', cashExpLoadErr: false, cashExpErr: null, cashExpSel: {}, cashExpBusy: null,
         page: 'salesdash'
       });
     };
@@ -7644,8 +7800,9 @@ class Component extends DCLogic {
       // แถวที่ระบบลงเองจากใบสั่งเค้กใน ANNIE POS (source POS_PO · db/198): แก้/ลบที่นี่ไม่ได้ — ลบแล้วระบบจะลงกลับเองคืนถัดไป
       //   ถ้ายอดไม่ถูก ให้แก้ที่ใบสั่งใน POS (ยกเลิกใบสั่ง = ระบบย้อนยอดให้เอง)
       const isPoRow = r.source === 'POS_PO';
+      const isCashRow = r.source === 'POS_CASH';   // มาจากกล่อง "เงินสดออกจากลิ้นชัก" — แก้ด้วย "ยกเลิกการตัดสิน" ในกล่องนั้น
       const onDelete = async () => {
-        if (isPoRow) return;
+        if (isPoRow || isCashRow) return;
         try {
           const { error } = await supabaseClient.from('expenses').delete().eq('id', r.id);
           if (error) throw error;
@@ -7656,7 +7813,7 @@ class Component extends DCLogic {
       };
       const hasDoc = !!r.attachmentName;
       // §17/§21: ที่มาของแถว + คนบันทึก แสดงใต้รายละเอียด
-      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS' }[r.source] || '';
+      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS', POS_CASH:'เงินสดจากลิ้นชัก POS' }[r.source] || '';
       const meta = [srcLabel, r.createdBy].filter(Boolean).join(' · ');
       return {
         date: r.date, time: r.time, mainCat: r.mainCat, subCat: r.subCat, detail: r.detail,
@@ -7665,10 +7822,10 @@ class Component extends DCLogic {
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#2C4A7C' : '#C2C9D6',
         onEdit: startEditExpenseRow(r),
         // รายการที่ระบบสร้างจากสลิปเงินเดือน (source PAYROLL) แก้ที่นี่ไม่ได้ ไม่งั้นยอดไม่ตรงสลิป — ให้ยกเลิกการจ่ายที่หน้าเงินเดือนแล้วจ่ายใหม่
-        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isReadOnly,
-        locked: r.source === 'PAYROLL' || isPoRow,
-        lockTitle: isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
-        canDelete: !isPoRow,
+        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isCashRow && !isReadOnly,
+        locked: r.source === 'PAYROLL' || isPoRow || isCashRow,
+        lockTitle: isCashRow ? 'มาจากเงินสดออกลิ้นชัก POS — ถ้าหมวดผิด กด "ยกเลิกการตัดสิน" ในกล่องเงินสดออกจากลิ้นชัก แล้วยืนยันใหม่' : isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
+        canDelete: !isPoRow && !isCashRow,
         onDelete
       };
     });
@@ -9728,6 +9885,14 @@ class Component extends DCLogic {
     const profitPanel = buildProfitPanel(pfOpt(false));
     const profitPanelOverview = buildProfitPanel(pfOpt(true));
     const finNote = buildFinTableNote(React.createElement);
+    // กล่องนี้เป็นของสาขาที่โหลดมาเท่านั้น (เปลี่ยนสาขาแล้วยังไม่โหลดเสร็จ = ไม่โชว์ของสาขาเก่า)
+    const cashExpPanel = buildCashExpPanel({
+      data: this.state.cashExpBranch === activeBranch ? this.state.cashExp : null,
+      loadErr: this.state.cashExpBranch === activeBranch && this.state.cashExpLoadErr, err: this.state.cashExpErr, onRetry: () => this.loadCashExp(),
+      sel: this.state.cashExpSel, busy: this.state.cashExpBusy, cats: this.expenseCats(), readOnly: isReadOnly,
+      onSel: (id, main, sub) => this.setState(st => ({ cashExpSel: { ...st.cashExpSel, [id]: { main, sub } } })),
+      onDecide: this.cashExpDecide, onAuto: this.cashExpSetAuto
+    });
 
     return {
       profitPanel, profitPanelOverview, finNote,
@@ -9843,7 +10008,7 @@ class Component extends DCLogic {
       mobileTodos, mobileTodosEmpty,
       isLoggedIn, showLogin, authLoading, authUserValue, authPasswordValue, authError, authButtonLabel, authBusy,
       setAuthUser, setAuthPassword, doLogin, onLoginKeyDown, doLogout,
-      navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs,
+      navItems, overviewTabs, cashInTabs, taxPageTabs, marketingTabs, cashExpPanel,
       // ---- ระบบเงินเดือน ----
       payrollTabs, isPayrollTabSlips, isPayrollTabEmps, isPayrollTabCal,
       payrollPeriodLabel, payrollPrevPeriod: pyShiftPeriod(-1), payrollNextPeriod: pyShiftPeriod(1),
