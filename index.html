@@ -1766,13 +1766,15 @@
                         </div>
                       </sc-if>
                       <sc-if value="{{ r.locked }}" hint-placeholder-val="{{ false }}">
-                        <div title="รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)" style="display:inline-flex;line-height:0;cursor:help">
+                        <div title="{{ r.lockTitle }}" style="display:inline-flex;line-height:0;cursor:help">
                           <i data-lucide="lock" style="width:14px;height:14px;color:#B5BCC9"></i>
                         </div>
                       </sc-if>
-                      <div onClick="{{ r.onDelete }}" title="ลบรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer">
-                        <i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i>
-                      </div>
+                      <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ true }}">
+                        <div onClick="{{ r.onDelete }}" title="ลบรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer">
+                          <i data-lucide="trash-2" style="width:15px;height:15px;color:#B99090"></i>
+                        </div>
+                      </sc-if>
                     </div>
                   </td>
                 </tr>
@@ -4173,7 +4175,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 24 พ.ย. 14:15';
+    m.textContent = 'ฐาน: annie-cake 24 พ.ย. 15:10';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -7639,7 +7641,11 @@ class Component extends DCLogic {
     };
 
     const expDisplayRows = expPagedFiltered.map((r) => {
+      // แถวที่ระบบลงเองจากใบสั่งเค้กใน ANNIE POS (source POS_PO · db/198): แก้/ลบที่นี่ไม่ได้ — ลบแล้วระบบจะลงกลับเองคืนถัดไป
+      //   ถ้ายอดไม่ถูก ให้แก้ที่ใบสั่งใน POS (ยกเลิกใบสั่ง = ระบบย้อนยอดให้เอง)
+      const isPoRow = r.source === 'POS_PO';
       const onDelete = async () => {
+        if (isPoRow) return;
         try {
           const { error } = await supabaseClient.from('expenses').delete().eq('id', r.id);
           if (error) throw error;
@@ -7650,7 +7656,7 @@ class Component extends DCLogic {
       };
       const hasDoc = !!r.attachmentName;
       // §17/§21: ที่มาของแถว + คนบันทึก แสดงใต้รายละเอียด
-      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า' }[r.source] || '';
+      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS' }[r.source] || '';
       const meta = [srcLabel, r.createdBy].filter(Boolean).join(' · ');
       return {
         date: r.date, time: r.time, mainCat: r.mainCat, subCat: r.subCat, detail: r.detail,
@@ -7659,8 +7665,10 @@ class Component extends DCLogic {
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#2C4A7C' : '#C2C9D6',
         onEdit: startEditExpenseRow(r),
         // รายการที่ระบบสร้างจากสลิปเงินเดือน (source PAYROLL) แก้ที่นี่ไม่ได้ ไม่งั้นยอดไม่ตรงสลิป — ให้ยกเลิกการจ่ายที่หน้าเงินเดือนแล้วจ่ายใหม่
-        canEdit: r.source !== 'PAYROLL' && !isReadOnly,
-        locked: r.source === 'PAYROLL',
+        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isReadOnly,
+        locked: r.source === 'PAYROLL' || isPoRow,
+        lockTitle: isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
+        canDelete: !isPoRow,
         onDelete
       };
     });
