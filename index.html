@@ -851,6 +851,8 @@
       <!-- เงินสดออกจากลิ้นชัก POS รอยืนยัน (db/210) — ไม่มีอะไรรอ / ฐานยังไม่มีฟังก์ชัน = ไม่แสดง -->
       <div>{{ expSummaryPanel }}</div>
       <div>{{ cashExpPanel }}</div>
+      <!-- บิลประจำเดือน (27 พ.ย. 2569) — ขึ้นตั้งแต่ 1 ธ.ค. 2569 -->
+      <div>{{ billsPanel }}</div>
 
       <!-- สรุปเดือนนี้ก้อนเดียว + เงินไปไหน (แทนการ์ดตัวเลข 6 ใบ · แอนนี่ 24 พ.ย. 2569 "ใช้แนวนี้") -->
       <div>{{ expWherePanel }}</div>
@@ -2931,7 +2933,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 27 พ.ย. ประกันสังคม';
+    m.textContent = 'ฐาน: annie-cake 27 พ.ย. บิลประจำเดือน';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -3819,6 +3821,67 @@ function dbdSsoPlan(slips, ym, sentRows) {
     rows: rows
   };
 }
+/* บิลประจำเดือน (แอนนี่ 27 พ.ย. 2569 "ใช้ ทำเลย") — ร่างขึ้นทุกวันที่ 1 ตั้งแต่ ธ.ค. 2569 · ไม่เติมย้อนหลัง
+ * ยอดคงที่ = ใส่ไว้ให้ · ยอดเปลี่ยน (fixed null) = แอนนี่ใส่ยอดจริง · นับเป็นรายจ่ายวันที่กด "จ่ายแล้ว" (ตั้งต้นวันที่ 1 แก้ได้)
+ * แถวที่ลง: source 'MONTHLY' · source_ref 'bill:<สาขา>:<YYYY-MM>:<key>' · หมวด ค่าเช่า & สาธารณูปโภค › sub */
+var DBD_BILLS_FROM = '2026-12';
+var DBD_MONTHLY_BILLS = {
+  main: [
+    { key: 'rent',  label: 'ค่าเช่าร้าน',         sub: 'ค่าเช่าร้าน',          fixed: 12000 },
+    { key: 'tax',   label: 'ภาษีตึก',             sub: 'อื่นๆ',                fixed: 650 },
+    { key: 'elec',  label: 'ค่าไฟ',               sub: 'ค่าไฟ',                fixed: null },
+    { key: 'water', label: 'ค่าน้ำ',              sub: 'ค่าน้ำ',               fixed: null },
+    { key: 'net',   label: 'เน็ต / โทรศัพท์',      sub: 'อินเทอร์เน็ต/โทรศัพท์', fixed: null }
+  ],
+  ratchaphruek: [
+    { key: 'phone', label: 'ค่าโทรศัพท์',          sub: 'อินเทอร์เน็ต/โทรศัพท์', fixed: null }
+  ]
+};
+var DBD_BILLS_MAIN = 'ค่าเช่า & สาธารณูปโภค';
+/** rows: รายจ่ายของสาขานี้ (shape ของหน้า: isoDate, amount, mainCat, subCat, source, sourceRef) · today 'YYYY-MM-DD'
+ *  คืน { months: [{ ym, label, current, bills: [...] }] } — เดือนนี้ทุกใบ + เดือนก่อนหน้า (ตั้งแต่ ธ.ค. 69) เฉพาะใบที่ยังไม่จ่าย */
+function dbdBillsPlan(branch, rows, today) {
+  var list = DBD_MONTHLY_BILLS[branch] || [];
+  var MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  var cur = String(today || '').slice(0, 7);
+  if (!list.length || !/^\d{4}-\d{2}$/.test(cur) || cur < DBD_BILLS_FROM) return { months: [] };
+  var label = function (ym) { return MON[Number(ym.slice(5, 7)) - 1] + ' ' + String((Number(ym.slice(0, 4)) + 543) % 100); };
+  var prev = function (ym) { var y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7)) - 1; if (m === 0) { y -= 1; m = 12; } return y + '-' + String(m).padStart(2, '0'); };
+  var r2 = function (n) { return Math.round((Number(n) || 0) * 100) / 100; };
+  var yms = [], ym = cur;
+  while (ym >= DBD_BILLS_FROM && yms.length < 3) { yms.push(ym); ym = prev(ym); }
+  var months = [];
+  yms.forEach(function (m) {
+    var bills = list.map(function (b) {
+      var ref = 'bill:' + branch + ':' + m + ':' + b.key;
+      var mine = (rows || []).filter(function (x) { return x && x.source === 'MONTHLY' && String(x.sourceRef || '') === ref; });
+      var typed = r2((rows || []).filter(function (x) {
+        // พิมพ์เอง = ฟอร์ม / บอต Telegram / แถวเก่าที่ไม่มี source เท่านั้น (ไม่นับแถวที่ระบบลงเอง เช่น POS_CASH นำเข้า) — Codex 27 พ.ย.
+        return x && (!x.source || x.source === 'MANUAL' || x.source === 'MANUAL_FORM' || x.source === 'TELEGRAM') && String(x.isoDate || '').slice(0, 7) === m && x.mainCat === DBD_BILLS_MAIN && x.subCat === b.sub;
+      }).reduce(function (a, x) { return a + (Number(x.amount) || 0); }, 0));
+      return {
+        key: b.key, label: b.label, sub: b.sub, main: DBD_BILLS_MAIN, fixed: b.fixed, ref: ref, ym: m,
+        paid: mine.length > 0, paidAmount: r2(mine.reduce(function (a, x) { return a + (Number(x.amount) || 0); }, 0)),
+        paidDate: mine.length ? mine.map(function (x) { return x.isoDate || ''; }).sort()[0] : null,
+        doubled: mine.length > 1, typed: typed,
+        detail: 'บิลประจำเดือน ' + label(m) + ' · ' + b.label
+      };
+    });
+    if (m !== cur) bills = bills.filter(function (b) { return !b.paid; });
+    if (bills.length) months.push({ ym: m, label: label(m), current: m === cur, bills: bills });
+  });
+  return { months: months };
+}
+/** ตรวจก่อนลง: ยอด > 0 · วันที่อยู่ในช่วง วันที่ 1 ของเดือนบิล … วันนี้ */
+function dbdBillCheck(bill, amountText, date, today) {
+  var a = Number(String(amountText == null ? '' : amountText).replace(/,/g, '').trim());
+  if (!(a > 0) || !isFinite(a)) return { ok: false, err: 'ใส่ยอดจริงของ' + bill.label + 'ก่อน' };
+  if (a > 1000000) return { ok: false, err: 'ยอด' + bill.label + 'สูงผิดปกติ — ตรวจตัวเลขอีกครั้ง' };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))) return { ok: false, err: 'เลือกวันที่จ่ายก่อน' };
+  if (date < bill.ym + '-01') return { ok: false, err: 'วันที่จ่ายต้องไม่ก่อนเดือนของบิล' };
+  if (date > today) return { ok: false, err: 'วันที่จ่ายเป็นวันข้างหน้าไม่ได้ — กดหลังจ่ายแล้ว' };
+  return { ok: true, amount: Math.round(a * 100) / 100 };
+}
 /* DBD-PURE-END */
 /** กราฟแท่งยอดขายรายวันของ "หน้าแรก" — แท่งทึบ = จริง · แท่งลาย (สีเดียวกัน) = ประมาณการ วางต่อบนแท่งจริงโดยเว้นช่อง 2px
  *  opt: { days:[{ iso, label, title, real, est }], target (บาท/วัน หรือ null), fmt (บาท), hover (ลำดับแท่งที่ชี้อยู่ หรือ null), onHover(i|null),
@@ -4287,6 +4350,50 @@ function buildFinTableNote(h) {
     h('span', null, 'ใช้ลงยอด กระทบยอดเงินเข้า และรายจ่าย · สาขาที่ขายผ่าน POS ไม่มีเดลิเวอรี่ในชุดนี้ตั้งแต่ 16 พ.ย. 2569 — ดูกำไรคร่าว ๆ (เดลิเวอรี่เป็นประมาณการ) ที่ขั้นบันไดด้านบนของหน้านี้ และที่หน้าแรก'));
 }
 
+/* ════════════ บิลประจำเดือน (แอนนี่ 27 พ.ย. 2569) ════════════
+ *  o: { plan (dbdBillsPlan), draft {ref:{amount,date}}, busy, err, readOnly, branchLabel, fmt, onAmount(ref,v), onDate(ref,v), onPay(bill), onUndo(bill) } */
+function buildBillsPanel(o) {
+  const h = React.createElement;
+  const months = (o.plan && o.plan.months) || [];
+  if (!months.length) return null;
+  const C = { ink:'#28252b', sub:'#716a75', line:'#e9e1e6', navy:'#bd336b', green:'#17613f', amber:'#a84a00', red:'#b3261e' };
+  const be = iso => { const q = String(iso || '').split('-'); return q.length === 3 ? Number(q[2]) + '/' + Number(q[1]) + '/' + String((Number(q[0]) + 543) % 100) : ''; };
+  const inp = { border:'1px solid ' + C.line, borderRadius:'9px', padding:'7px 9px', fontSize:'13px', color:C.ink, background:'#fff', fontFamily:'inherit', outline:'none', minWidth:0 };
+  const btn = (label, onClick, act, primary) => h('button', { type:'button', 'data-act': act, disabled: !!o.busy, onClick,
+    style:{ flex:'none', background: primary ? C.navy : '#fff', color: primary ? '#fff' : C.red, border:'1px solid ' + (primary ? C.navy : '#f3c8c4'), borderRadius:'10px', padding:'7px 14px', fontSize:'13px', fontWeight:600, fontFamily:'inherit', cursor: o.busy ? 'default' : 'pointer', whiteSpace:'nowrap', opacity: o.busy ? 0.6 : 1 } }, label);
+  const row = (b, m) => {
+    const d = (o.draft || {})[b.ref] || {};
+    const amountVal = d.amount != null ? d.amount : (b.fixed != null ? String(b.fixed) : '');
+    const dateVal = d.date || (b.ym + '-01');
+    const warn = [];
+    if (b.doubled) warn.push('ลงไว้ซ้ำ ' + o.fmt(b.paidAmount) + ' — กดยกเลิกแล้วลงใหม่');
+    if (b.typed > 0) warn.push((m.current ? 'เดือนนี้' : m.label) + ' มี "' + b.sub + '" ที่พิมพ์เองแล้ว ' + o.fmt(b.typed) + (b.paid ? ' — ถ้าเป็นบิลเดียวกัน ลบแถวที่พิมพ์เอง' : ' — ถ้าเป็นบิลเดียวกัน ไม่ต้องกดจ่ายซ้ำ'));
+    return h('div', { key: b.ref, 'data-bill': b.ref, style:{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:'8px 12px', padding:'10px 0', borderTop:'1px solid #f0eaee' } },
+      h('div', { style:{ flex:'1 1 150px', minWidth:0 } },
+        h('div', { style:{ fontSize:'13.5px', fontWeight:600, color:C.ink } }, b.label),
+        h('div', { style:{ fontSize:'12px', color:C.sub } }, b.fixed != null ? 'ยอดเท่าเดิมทุกเดือน' : 'ใส่ยอดจริงจากบิล'),
+        warn.length ? h('div', { style:{ fontSize:'12px', color:C.amber, marginTop:'2px', lineHeight:1.5 } }, warn.join(' · ')) : null),
+      b.paid
+        ? h(React.Fragment, null,
+            h('span', { 'data-fig': 'bill.' + b.key, style:{ fontSize:'13.5px', fontWeight:600, color:C.ink, fontVariantNumeric:'tabular-nums' } }, o.fmt(b.paidAmount)),
+            h('span', { style:{ fontSize:'12px', fontWeight:600, padding:'3px 10px', borderRadius:'8px', background:'#e3f4eb', color:C.green, whiteSpace:'nowrap' } }, 'จ่ายแล้ว ' + be(b.paidDate)),
+            o.readOnly ? null : btn('ยกเลิก', () => o.onUndo(b), 'bill.undo.' + b.key, false))
+        : o.readOnly
+          ? h('span', { style:{ fontSize:'12px', fontWeight:600, padding:'3px 10px', borderRadius:'8px', background:'#ffe8d4', color:C.amber } }, 'ยังไม่จ่าย')
+          : h(React.Fragment, null,
+              h('input', { 'data-act': 'bill.amount.' + b.key, value: amountVal, onChange: e => o.onAmount(b.ref, e.target.value), inputMode:'decimal', placeholder:'ยอด', 'aria-label': 'ยอด' + b.label, style:{ ...inp, width:'110px', textAlign:'right' } }),
+              h('input', { 'data-act': 'bill.date.' + b.key, type:'date', value: dateVal, onChange: e => o.onDate(b.ref, e.target.value), 'aria-label': 'วันที่จ่าย' + b.label, style: inp }),
+              btn('จ่ายแล้ว', () => o.onPay(b, amountVal, dateVal), 'bill.pay.' + b.key, true)));
+  };
+  return h('div', { 'data-keep':'ex.bills', style:{ background:'#fff', border:'1px solid #e9e1e6', borderRadius:'18px', padding:'18px 22px', marginBottom:'18px', boxShadow:'0 4px 16px rgba(30,34,41,0.03)' } },
+    h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:600, color:C.ink } }, 'บิลประจำเดือน · สาขา' + o.branchLabel),
+    h('div', { style:{ fontSize:'12.5px', color:C.sub, marginTop:'3px', lineHeight:1.55 } }, 'กด "จ่ายแล้ว" หลังจ่ายบิล ระบบลงรายจ่าย ค่าเช่า & สาธารณูปโภค วันที่ที่เลือก · ยังไม่กด = ยังไม่นับ · บิลพวกนี้ไม่ต้องพิมพ์ในฟอร์มอีก'),
+    o.err ? h('div', { 'data-bill-err':'1', style:{ background:'#fdecea', border:'1px solid #f3c8c4', color:C.red, borderRadius:'10px', padding:'8px 12px', fontSize:'12.5px', marginTop:'10px' } }, o.err) : null,
+    ...months.map(m => h('div', { key: m.ym, style:{ marginTop:'12px' } },
+      h('div', { style:{ fontSize:'13px', fontWeight:600, color: m.current ? C.ink : C.amber, marginBottom:'2px' } }, m.current ? 'เดือน ' + m.label : 'ค้างจาก ' + m.label),
+      ...m.bills.map(b => row(b, m)))));
+}
+
 /* ════════════ เงินสดออกจากลิ้นชัก POS → รายจ่าย (db/210 · 24 พ.ย. 2569) ════════════
  *  ระบบเสนอหมวดจากหมายเหตุที่พนักงานพิมพ์ (ถุง ช้อน ค่ารถ …) · เจ้าของกดยืนยัน/แก้หมวดเองจนกว่าจะมั่นใจ แล้วค่อยเปิด "ลงอัตโนมัติ"
  *  หมวดที่เลือกได้ = รายการหมวดของฟอร์มรายจ่ายสาขานั้น (ฐานตรวจซ้ำอีกชั้น) · ยืนยันแล้วเป็นแถวในรายจ่าย (source POS_CASH)
@@ -4547,7 +4654,7 @@ class Component extends DCLogic {
     editingHolId: null, openHolidayId: null,
     editingSlipId: null, slipDraft: null, payrollBusy: false,
     slipImageId: null,
-    expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10,
+    expListDD: null, expPeriodFilter: 'ทั้งหมด', expPage: 1, expPageSize: 10, billDraft: {}, billBusy: false, billErr: null,
     cashInQuick: 'ทั้งหมด', inexRecentType: 'ทั้งหมด', inexRecentAll: false,
     expSortKey: 'date', expSortDir: 'desc',
     expRangeFrom: '', expRangeTo: '', salesRangeFrom: '', salesRangeTo: '',
@@ -7499,9 +7606,10 @@ class Component extends DCLogic {
       //   ถ้ายอดไม่ถูก ให้แก้ที่ใบสั่งใน POS (ยกเลิกใบสั่ง = ระบบย้อนยอดให้เอง)
       const isPoRow = r.source === 'POS_PO';
       const isCashRow = r.source === 'POS_CASH';
+      const isBillRow = r.source === 'MONTHLY';   // บิลประจำเดือน — ยกเลิกได้ที่การ์ดบิลประจำเดือนเท่านั้น
       const isSsoRow = r.source === 'SSO';   // ประกันสังคมจากหน้าเงินเดือน — ยกเลิกได้ที่การ์ดประกันสังคมในหน้าเงินเดือนเท่านั้น   // มาจากกล่อง "เงินสดออกจากลิ้นชัก" — แก้ด้วย "ยกเลิกการตัดสิน" ในกล่องนั้น
       const onDelete = async () => {
-        if (isPoRow || isCashRow || isSsoRow) return;
+        if (isPoRow || isCashRow || isSsoRow || isBillRow) return;
         try {
           const { error } = await supabaseClient.from('expenses').delete().eq('id', r.id);
           if (error) throw error;
@@ -7512,7 +7620,7 @@ class Component extends DCLogic {
       };
       const hasDoc = !!r.attachmentName;
       // §17/§21: ที่มาของแถว + คนบันทึก แสดงใต้รายละเอียด
-      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS', POS_CASH:'เงินสดจากลิ้นชัก POS', SSO:'ประกันสังคมจากหน้าเงินเดือน' }[r.source] || '';
+      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS', POS_CASH:'เงินสดจากลิ้นชัก POS', SSO:'ประกันสังคมจากหน้าเงินเดือน', MONTHLY:'บิลประจำเดือน' }[r.source] || '';
       const meta = [srcLabel, r.createdBy].filter(Boolean).join(' · ');
       return {
         id: r.id, paymentText: r.payment, hasDoc,
@@ -7522,10 +7630,10 @@ class Component extends DCLogic {
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#bd336b' : '#b5adb8',
         onEdit: startEditExpenseRow(r),
         // รายการที่ระบบสร้างจากสลิปเงินเดือน (source PAYROLL) แก้ที่นี่ไม่ได้ ไม่งั้นยอดไม่ตรงสลิป — ให้ยกเลิกการจ่ายที่หน้าเงินเดือนแล้วจ่ายใหม่
-        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isCashRow && !isSsoRow && !isReadOnly,
-        locked: r.source === 'PAYROLL' || isPoRow || isCashRow || isSsoRow,
-        lockTitle: isSsoRow ? 'ประกันสังคมจากหน้าเงินเดือน — ถ้าผิด กด "ยกเลิกการส่ง" ที่การ์ดประกันสังคมในหน้าเงินเดือน แล้วส่งใหม่' : isCashRow ? 'มาจากเงินสดออกลิ้นชัก POS — ถ้าหมวดผิด กด "ยกเลิกการตัดสิน" ในกล่องเงินสดออกจากลิ้นชัก แล้วยืนยันใหม่' : isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
-        canDelete: !isPoRow && !isCashRow && !isSsoRow && !isReadOnly,
+        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isCashRow && !isSsoRow && !isBillRow && !isReadOnly,
+        locked: r.source === 'PAYROLL' || isPoRow || isCashRow || isSsoRow || isBillRow,
+        lockTitle: isBillRow ? 'บิลประจำเดือน — ถ้าผิด กด "ยกเลิก" ที่การ์ดบิลประจำเดือน แล้วลงใหม่' : isSsoRow ? 'ประกันสังคมจากหน้าเงินเดือน — ถ้าผิด กด "ยกเลิกการส่ง" ที่การ์ดประกันสังคมในหน้าเงินเดือน แล้วส่งใหม่' : isCashRow ? 'มาจากเงินสดออกลิ้นชัก POS — ถ้าหมวดผิด กด "ยกเลิกการตัดสิน" ในกล่องเงินสดออกจากลิ้นชัก แล้วยืนยันใหม่' : isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
+        canDelete: !isPoRow && !isCashRow && !isSsoRow && !isBillRow && !isReadOnly,
         onDelete
       };
     });
@@ -9956,6 +10064,51 @@ class Component extends DCLogic {
       onSel: (id, main, sub) => this.setState(st => ({ cashExpSel: { ...st.cashExpSel, [id]: { main, sub } } })),
       onDecide: this.cashExpDecide, onAuto: this.cashExpSetAuto
     });
+    // ---- บิลประจำเดือน (27 พ.ย. 2569) — ปุ่มขึ้นเฉพาะเมื่อโหลดสิทธิ์แล้วและบัญชีนี้เขียนสาขานี้ได้ ----
+    const billRowsHere = (this.state.expRows || []).filter(r => (r.branch || DEFAULT_BRANCH) === activeBranch);
+    const billPlan = dbdBillsPlan(activeBranch, billRowsHere, todayISO());
+    const billReadOnly = !(this.state.accessLoaded && accessRows.some(r => r.branch === activeBranch && r.can_write));
+    const billPay = async (b, amountText, date) => {
+      if (billReadOnly || this.state.billBusy) return;
+      const chk = dbdBillCheck(b, amountText, date, todayISO());
+      if (!chk.ok) { this.setState({ billErr: chk.err }); return; }
+      if (!window.confirm('ลงรายจ่าย ' + b.label + ' ' + expBaht(chk.amount) + ' วันที่ ' + isoToBEShort(date) + ' ใช่ไหม')) return;
+      this.setState({ billBusy: true });
+      try {
+        // กันลงซ้ำ: ถามฐานจริงก่อน ไม่เชื่อแค่ข้อมูลที่โหลดไว้ในหน้า
+        const q = await supabaseClient.from('expenses').select('id').eq('source', 'MONTHLY').eq('source_ref', b.ref);
+        if (q.error) throw q.error;
+        if ((q.data || []).length) throw new Error(b.label + ' เดือนนี้ลงไว้แล้ว');
+        const ins = await supabaseClient.from('expenses').insert([{
+          date: isoToBEShort(date), time: '00:00', expense_date: date,
+          main_cat: b.main, sub_cat: b.sub, amount: chk.amount, payment: 'โอนเงิน', detail: b.detail,
+          source: 'MONTHLY', source_ref: b.ref, created_by: null, attachment_name: null, branch: activeBranch
+        }]).select('id');
+        if (ins.error) throw ins.error;
+        await this.loadExpenses();
+        this.setState(st => { const d = { ...(st.billDraft || {}) }; delete d[b.ref]; return { billDraft: d, billErr: null }; });
+      } catch (e) { this.setState({ billErr: 'ลง ' + b.label + ' ไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ billBusy: false });
+    };
+    const billUndo = async b => {
+      if (billReadOnly || this.state.billBusy) return;
+      if (!window.confirm('ยกเลิก ' + b.label + ' ' + expBaht(b.paidAmount) + ' — ลบรายจ่ายที่ลงไว้ใช่ไหม')) return;
+      this.setState({ billBusy: true });
+      try {
+        const del = await supabaseClient.from('expenses').delete().eq('source', 'MONTHLY').eq('source_ref', b.ref);
+        if (del.error) throw del.error;
+        await this.loadExpenses();
+        this.setState({ billErr: null });
+      } catch (e) { this.setState({ billErr: 'ยกเลิกไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ billBusy: false });
+    };
+    const billsPanel = buildBillsPanel({
+      plan: billPlan, draft: this.state.billDraft, busy: this.state.billBusy, err: this.state.billErr, readOnly: billReadOnly,
+      branchLabel: activeBranchLabel, fmt: expBaht,
+      onAmount: (ref, v) => this.setState(st => ({ billDraft: { ...(st.billDraft || {}), [ref]: { ...((st.billDraft || {})[ref] || {}), amount: v } } })),
+      onDate: (ref, v) => this.setState(st => ({ billDraft: { ...(st.billDraft || {}), [ref]: { ...((st.billDraft || {})[ref] || {}), date: v } } })),
+      onPay: billPay, onUndo: billUndo
+    });
 
     return {
       profitPanel, profitPanelOverview, finNote,
@@ -10078,7 +10231,7 @@ class Component extends DCLogic {
       sdListLabel: this.state.sdListOpen ? 'ซ่อนรายการยอดขายทั้งหมด' : 'รายการยอดขายทั้งหมด', k7OpenLabel: this.state.k7Open ? 'ปิดฟอร์มบันทึกยอด' : 'บันทึกยอด',
       homePanel, homePeriodChips, homePeriodLabel, homeReachLine, homeTargetCanEdit: canWriteHere && !this.state.targetEditing, homeTargetEditing: canWriteHere && !!this.state.targetEditing,
       menuMain, menuOther, otherOpen, otherToggle, otherChevron, barItems, barOtherStyle, sheetOpen, sheetItems, openSheet, closeSheet, stopClick, branchChips,
-      overviewTabs, cashInTabs, taxPageTabs, marketingTabs, cashExpPanel,
+      overviewTabs, cashInTabs, taxPageTabs, marketingTabs, cashExpPanel, billsPanel,
       expSummaryPanel, expWherePanel, expListPanel, expFormShown, expFormMoreShown, openExpenseForm, closeExpenseForm, toggleExpFormMore, expFormMoreLabel,
       // ---- ระบบเงินเดือน ----
       payrollTabs, isPayrollTabSlips, isPayrollTabEmps, isPayrollTabCal,
