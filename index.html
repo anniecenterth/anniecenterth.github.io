@@ -855,9 +855,12 @@
       <div>{{ billsPanel }}</div>
 
       <!-- สรุปเดือนนี้ก้อนเดียว + เงินไปไหน (แทนการ์ดตัวเลข 6 ใบ · แอนนี่ 24 พ.ย. 2569 "ใช้แนวนี้") -->
-      <div>{{ expWherePanel }}</div>
+      <!-- หน้าแบบกระชับ 27 พ.ย. 2569: "เงินไปไหน" กับ "จ่ายด้วยอะไร" วางข้างกันเมื่อจอกว้างพอ -->
+      <div style="display:flex;flex-wrap:wrap;gap:0 12px;align-items:flex-start">
+      <div style="flex:1.3 1 460px;min-width:0">{{ expWherePanel }}</div>
       <!-- ขั้น 3: กล่อง "เดือนนี้ลงรายจ่ายครบแล้ว" + แท่ง "จ่ายด้วยอะไร" -->
-      <div>{{ expPayPanel }}</div>
+      <div style="flex:1 1 360px;min-width:0">{{ expPayPanel }}</div>
+      </div>
 
       <!-- form + recent -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:18px;align-items:start">
@@ -1093,7 +1096,7 @@
       <div>{{ salesHeroPanel }}</div>
 
       <!-- filters: อยู่หลังป้าย "ตัวกรอง" — ตัวเลือกสองตัวเดิม ไม่เปลี่ยน -->
-      <div style="display:flex;align-items:center;gap:12px;margin:18px 0;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px;margin:12px 0;flex-wrap:wrap">
         <div data-act="filter.open" onClick="{{ toggleSdFilters }}" style="{{ sdFilterChipStyle }}"><i data-lucide="sliders-horizontal" style="width:15px;height:15px"></i><span>{{ sdFilterChipLabel }}</span></div>
         <sc-if value="{{ sdFiltersOpen }}" hint-placeholder-val="{{ false }}">
         <div data-brand-dd="1" style="position:relative">
@@ -1122,12 +1125,15 @@
 
       <!-- กล่องตัวเลข 6 กล่อง · กราฟแนวโน้ม · กราฟวงกลม 3 วง เลิกแสดง (ยอดอยู่ในกล่องบนและตารางด้านล่าง) — โค้ดยังอยู่จนถึงขั้นเก็บกวาด -->
 
+      <!-- แบรนด์×ช่องทาง กับ สรุปแพลตฟอร์ม วางคู่กันเมื่อจอกว้างพอ (27 พ.ย. 2569 หน้าแบบกระชับ) · จอแคบเรียงลง -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">
       <!-- brand x channel matrix -->
-      <div data-keep="K2" style="background:#fff;border:1px solid #e9e1e6;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h3 style="margin:0;font-size:16px;font-weight:600">ยอดขายแยกตามแบรนด์ และช่องทาง <span style="color:#716a75;font-weight:500;font-size:13px">(MTD)</span></h3>
+      <div data-keep="K2" style="background:#fff;border:1px solid #e9e1e6;border-radius:16px;padding:14px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);flex:1 1 100%;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <h3 style="margin:0;font-size:15px;font-weight:600">ยอดขายแยกตามแบรนด์ และช่องทาง <span style="color:#716a75;font-weight:500;font-size:13px">(MTD)</span></h3>
           <span data-act="K2.all" onClick="{{ goSalesPage }}" style="display:flex;align-items:center;gap:6px;background:#f8e8ef;color:#bd336b;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer">ดูรายงานยอดขายทั้งหมด <i data-lucide="arrow-right" style="width:14px;height:14px"></i></span>
         </div>
+        <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead>
             <tr style="color:#716a75;font-size:11.5px;text-align:right">
@@ -1147,28 +1153,29 @@
           <tbody>
             <sc-for list="{{ dashMatrixRows }}" as="r" hint-placeholder-count="4">
               <tr style="border-top:1px solid #f0eaee;color:#28252b;font-weight:{{ r.weight }}">
-                <td style="padding:13px 8px"><span style="display:inline-flex;align-items:center;gap:10px"><span style="width:22px;height:22px;border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;background:{{ r.dotBg }};color:{{ r.dotFg }}"><i data-lucide="cake-slice" style="width:13px;height:13px"></i></span>{{ r.brand }}</span></td>
-                <td style="padding:13px 8px;text-align:right">{{ r.storefront }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.wholesale }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.subsidy }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.grab }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.lineman }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.shopee }}</td>
-                <td style="padding:13px 8px;text-align:right;font-weight:600">{{ r.total }}</td>
-                <td style="padding:13px 8px;text-align:right;color:#716a75">{{ r.pct }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.orders }}</td>
-                <td style="padding:13px 8px;text-align:right">{{ r.avg }}</td>
+                <td style="padding:8px 8px"><span style="display:inline-flex;align-items:center;gap:10px"><span style="width:22px;height:22px;border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;background:{{ r.dotBg }};color:{{ r.dotFg }}"><i data-lucide="cake-slice" style="width:13px;height:13px"></i></span>{{ r.brand }}</span></td>
+                <td style="padding:8px 8px;text-align:right">{{ r.storefront }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.wholesale }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.subsidy }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.grab }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.lineman }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.shopee }}</td>
+                <td style="padding:8px 8px;text-align:right;font-weight:600">{{ r.total }}</td>
+                <td style="padding:8px 8px;text-align:right;color:#716a75">{{ r.pct }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.orders }}</td>
+                <td style="padding:8px 8px;text-align:right">{{ r.avg }}</td>
               </tr>
             </sc-for>
           </tbody>
         </table>
+        </div>
       </div>
 
-      <!-- platform summary (full width, bottom) -->
-      <div data-keep="K4" style="background:#fff;border:1px solid #e9e1e6;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
-        <h3 style="margin:0 0 14px;font-size:16px;font-weight:600">สรุปยอดแพลตฟอร์ม <span style="color:#716a75;font-weight:500;font-size:13px">(MTD)</span></h3>
+      <!-- platform summary -->
+      <div data-keep="K4" style="background:#fff;border:1px solid #e9e1e6;border-radius:16px;padding:14px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);flex:0 1 auto;max-width:100%;min-width:0">
+        <h3 style="margin:0 0 10px;font-size:15px;font-weight:600">สรุปยอดแพลตฟอร์ม <span style="color:#716a75;font-weight:500;font-size:13px">(MTD)</span></h3>
         <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:440px">
           <thead>
             <tr style="color:#716a75;font-size:11.5px;text-align:right">
               <th style="padding:0 8px 12px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
@@ -1181,25 +1188,26 @@
           <tbody>
             <sc-for list="{{ dashPayoutRows }}" as="p" hint-placeholder-count="4">
               <tr style="border-top:1px solid #f0eaee;color:#28252b;font-weight:{{ p.weight }}">
-                <td style="padding:12px 8px">{{ p.platform }}</td>
-                <td style="padding:12px 8px;text-align:right;white-space:nowrap">{{ p.gross }}</td>
-                <td style="padding:12px 8px;text-align:right;color:#b3261e;white-space:nowrap">{{ p.service }}</td>
+                <td style="padding:8px 8px">{{ p.platform }}</td>
+                <td style="padding:8px 8px;text-align:right;white-space:nowrap">{{ p.gross }}</td>
+                <td style="padding:8px 8px;text-align:right;color:#b3261e;white-space:nowrap">{{ p.service }}</td>
                 <td style="{{ p.netStyle }}">{{ p.net }}</td>
-                <td style="padding:12px 8px;text-align:center">{{ p.statusTag }}</td>
+                <td style="padding:8px 8px;text-align:center">{{ p.statusTag }}</td>
               </tr>
             </sc-for>
           </tbody>
         </table>
         </div>
       </div>
+      </div>
 
-      <!-- สมุดรายวัน — 1 แถว 1 วัน ตามช่วงเวลาที่เลือกด้านบน -->
-      <div data-keep="K3" style="background:#fff;border:1px solid #e9e1e6;border-radius:18px;padding:20px 22px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:18px">
+      <!-- สมุดรายวัน — 1 แถว 1 วัน ตามช่วงเวลาที่เลือกด้านบน · ยาวเกิน 10 วัน = พับเหลือ 7 วันล่าสุด กด "ดูทั้งหมด" (แถวรวมนับทุกวันเสมอ) -->
+      <div data-keep="K3" style="background:#fff;border:1px solid #e9e1e6;border-radius:16px;padding:14px 18px;box-shadow:0 4px 16px rgba(30,34,41,0.03);margin-top:12px">
         <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px">
           <h3 style="margin:0;font-size:16px;font-weight:600">สมุดรายวัน</h3>
           <span style="font-size:12.5px;color:#716a75">{{ dailyReportNote }}</span>
         </div>
-        <div style="font-size:12px;color:#716a75;margin-bottom:14px">ตัวเลขรายรับเป็นเงินที่เข้าจริง (หลังหักค่าคอมและ VAT แล้ว) · คงเหลือ = รับ − จ่าย</div>
+        <div style="font-size:12px;color:#716a75;margin-bottom:10px">ตัวเลขรายรับเป็นเงินที่เข้าจริง (หลังหักค่าคอมและ VAT แล้ว) · คงเหลือ = รับ − จ่าย</div>
         <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:2100px">
           <thead>
@@ -1212,7 +1220,7 @@
           <tbody>
             <sc-for list="{{ dailyReportRows }}" as="d" hint-placeholder-count="14">
               <tr style="{{ d.rowStyle }}">
-                <td style="padding:9px 8px;white-space:nowrap"><span style="font-weight:600">{{ d.day }}</span> <span style="color:#716a75;font-size:11px">{{ d.month }}</span></td>
+                <td style="padding:6px 8px;white-space:nowrap"><span style="font-weight:600">{{ d.day }}</span> <span style="color:#716a75;font-size:11px">{{ d.month }}</span></td>
                 <sc-for list="{{ d.cells }}" as="c" hint-placeholder-count="21">
                   <td style="{{ c.style }}">{{ c.v }}</td>
                 </sc-for>
@@ -1227,6 +1235,9 @@
           </tbody>
         </table>
         </div>
+        <sc-if value="{{ dailyBookFoldable }}" hint-placeholder-val="{{ false }}">
+          <div data-act="K3.fold" onClick="{{ toggleDailyBook }}" style="display:inline-block;margin-top:10px;font-size:12.5px;font-weight:600;color:#bd336b;background:#f8e8ef;border-radius:9px;padding:6px 12px;cursor:pointer">{{ dailyBookFoldLabel }}</div>
+        </sc-if>
       </div>
 
       <!-- ยอดขายหน้าร้านรายวัน (K6) — ย้ายมาจากหน้า รายรับ ทั้งก้อน ไม่แก้ข้างใน -->
@@ -1320,6 +1331,9 @@
             </tbody>
           </table>
           </div>
+          <sc-if value="{{ skFoldable }}" hint-placeholder-val="{{ false }}">
+            <div data-act="K6.fold" onClick="{{ toggleSalesDaily }}" style="display:inline-block;margin-top:10px;font-size:12.5px;font-weight:600;color:#bd336b;background:#f8e8ef;border-radius:9px;padding:6px 12px;cursor:pointer">{{ salesDailyFoldLabel }}</div>
+          </sc-if>
         </sc-if>
         <sc-if value="{{ !salesDailyHasRows }}" hint-placeholder-val="{{ false }}">
           <div style="padding:34px 10px;text-align:center;color:#716a75;font-size:13px">ช่วงวันที่ที่เลือกยังไม่มียอดขายหน้าร้าน</div>
@@ -2933,7 +2947,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 27 พ.ย. บิลประจำเดือน';
+    m.textContent = 'ฐาน: annie-cake 27 พ.ย. หน้ากระชับ';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -3882,6 +3896,43 @@ function dbdBillCheck(bill, amountText, date, today) {
   if (date > today) return { ok: false, err: 'วันที่จ่ายเป็นวันข้างหน้าไม่ได้ — กดหลังจ่ายแล้ว' };
   return { ok: true, amount: Math.round(a * 100) / 100 };
 }
+/* หน้ายอดขายแบบกระชับ (แอนนี่ 27 พ.ย. 2569 "ใช้ ทำเลย") — แยกยอดตามช่องทาง สำหรับกราฟแท่งหลายสีและกล่อง "ยอดมาจากไหน"
+ *  ช่องทาง: หน้าร้าน (แถวหน้าร้านที่ไม่ใช่ขายส่ง) · ขายส่ง (แถวหน้าร้านที่ payment = ขายส่ง) · Grab / LINE MAN / ShopeeFood · อื่น ๆ นับรวมหน้าร้าน
+ *  รวมทุกช่องทาง = ยอดรวมของแถวชุดเดียวกัน (ไม่มีอะไรหายหรือนับซ้ำ) */
+var DBD_DELIVERY_PLATS = ['Grab', 'LINE MAN', 'ShopeeFood'];
+function dbdSalesBucket(r, wholesalePay) {
+  var pl = r && r.platform;
+  if (DBD_DELIVERY_PLATS.indexOf(pl) >= 0) return pl;
+  return (pl === 'หน้าร้าน' && wholesalePay && r.payment === wholesalePay) ? 'ws' : 'store';
+}
+/** แยกยอดรายวันตามช่องทาง: { iso: { store, ws, deliv } } */
+function dbdDayParts(rows, wholesalePay) {
+  var out = {};
+  (rows || []).forEach(function (r) {
+    if (!r || !r.isoDate) return;
+    var b = dbdSalesBucket(r, wholesalePay), v = Number(r.gross) || 0;
+    var d = out[r.isoDate] || (out[r.isoDate] = { store: 0, ws: 0, deliv: 0 });
+    if (b === 'store') d.store += v; else if (b === 'ws') d.ws += v; else d.deliv += v;
+  });
+  return out;
+}
+/** กล่อง "ยอดมาจากไหน": [{ key, label, amount, pct, kind:'store'|'ws'|'deliv'|'est' }] — ไม่แสดงช่องทางที่เป็น 0 · % ของ (ยอดจริง + ประมาณการ) */
+function dbdSalesSources(rows, wholesalePay, estTotal) {
+  var sum = { store: 0, ws: 0, Grab: 0, 'LINE MAN': 0, ShopeeFood: 0 };
+  (rows || []).forEach(function (r) { if (r) sum[dbdSalesBucket(r, wholesalePay)] += Number(r.gross) || 0; });
+  var est = Number(estTotal) > 0 ? Number(estTotal) : 0;
+  var list = [
+    { key: 'store', label: 'หน้าร้าน', amount: sum.store, kind: 'store' },
+    { key: 'LINE MAN', label: 'LINE MAN', amount: sum['LINE MAN'], kind: 'deliv' },
+    { key: 'Grab', label: 'Grab', amount: sum.Grab, kind: 'deliv' },
+    { key: 'ShopeeFood', label: 'ShopeeFood', amount: sum.ShopeeFood, kind: 'deliv' },
+    { key: 'est', label: 'เดลิเวอรี่ ประมาณการ', amount: est, kind: 'est' },
+    { key: 'ws', label: 'ขายส่ง', amount: sum.ws, kind: 'ws' }
+  ].filter(function (x) { return Math.abs(x.amount) >= 0.005; });
+  var total = list.reduce(function (a, x) { return a + x.amount; }, 0);
+  list.forEach(function (x) { x.amount = Math.round(x.amount * 100) / 100; x.pct = total > 0 ? Math.round(x.amount / total * 100) : 0; });
+  return { rows: list, total: Math.round(total * 100) / 100 };
+}
 /* DBD-PURE-END */
 /** กราฟแท่งยอดขายรายวันของ "หน้าแรก" — แท่งทึบ = จริง · แท่งลาย (สีเดียวกัน) = ประมาณการ วางต่อบนแท่งจริงโดยเว้นช่อง 2px
  *  opt: { days:[{ iso, label, title, real, est }], target (บาท/วัน หรือ null), fmt (บาท), hover (ลำดับแท่งที่ชี้อยู่ หรือ null), onHover(i|null),
@@ -3891,7 +3942,8 @@ function buildDayBars(opt) {
   const h = React.createElement;
   const days = opt.days || [], n = days.length;
   const num = v => Number(v) || 0;
-  const W = opt.compact ? 380 : 720, H = opt.compact ? 220 : 236, ml = opt.compact ? 34 : 44, mr = opt.compact ? 6 : 12, mt = 22, mb = 24, cw = W - ml - mr, ch = H - mt - mb;
+  // short: หน้าที่จัดแบบกระชับ (ยอดขาย 27 พ.ย.) — กราฟเตี้ยลง · parts ของแต่ละวัน = แท่งจริงแยกสีตามช่องทาง (รวมกัน = real)
+  const W = opt.compact ? 380 : 720, H = opt.compact ? (opt.short ? 190 : 220) : (opt.short ? 190 : 236), ml = opt.compact ? 34 : 44, mr = opt.compact ? 6 : 12, mt = 22, mb = 24, cw = W - ml - mr, ch = H - mt - mb;
   const tot = days.map(d => num(d.real) + num(d.est));
   const maxTot = tot.reduce((a, v) => Math.max(a, v), 0);
   const target = num(opt.target) > 0 ? num(opt.target) : null;
@@ -3905,9 +3957,10 @@ function buildDayBars(opt) {
   const slot = n ? cw / n : cw, bw = Math.max(2, Math.min(24, slot * 0.62));
   const kfmt = v => v === 0 ? '0' : (v % 1000 === 0 ? (v / 1000) + 'K' : (v / 1000).toFixed(1) + 'K');
   const roundTop = (x, yy, w, hh) => { const r = Math.min(4, w / 2, hh); return 'M' + x + ',' + (yy + hh) + ' V' + (yy + r) + ' Q' + x + ',' + yy + ' ' + (x + r) + ',' + yy + ' H' + (x + w - r) + ' Q' + (x + w) + ',' + yy + ' ' + (x + w) + ',' + (yy + r) + ' V' + (yy + hh) + ' Z'; };
+  const estColor = opt.estColor || '#bd336b', hatchId = 'dbdHatch' + (opt.id ? '-' + opt.id : '');
   const els = [
-    h('defs', { key:'defs' }, h('pattern', { id:'dbdHatch', patternUnits:'userSpaceOnUse', width:6, height:6, patternTransform:'rotate(45)' },
-      h('rect', { width:6, height:6, fill:'#f8e8ef' }), h('line', { x1:0, y1:0, x2:0, y2:6, stroke:'#bd336b', strokeWidth:2.6 })))
+    h('defs', { key:'defs' }, h('pattern', { id: hatchId, patternUnits:'userSpaceOnUse', width:6, height:6, patternTransform:'rotate(45)' },
+      h('rect', { width:6, height:6, fill: opt.estBg || (estColor === '#bd336b' ? '#f8e8ef' : '#fdf1dd') }), h('line', { x1:0, y1:0, x2:0, y2:6, stroke: estColor, strokeWidth:2.6 })))
   ];
   for (let v = 0; v <= top + 0.5; v += step) {
     els.push(h('line', { key:'g' + v, x1:ml, x2:W - mr, y1:y(v), y2:y(v), stroke: v === 0 ? '#e9e1e6' : '#f0eaee', strokeWidth:1 }));
@@ -3921,8 +3974,23 @@ function buildDayBars(opt) {
     const cx = ml + (i + 0.5) * slot, x = cx - bw / 2, real = num(d.real), est = num(d.est);
     const hr = real > 0 ? Math.max(1, (real / top) * ch) : 0, he = est > 0 ? Math.max(2, (est / top) * ch) : 0;
     const gap = hr > 0 && he > 0 ? 2 : 0;
-    if (hr > 0) els.push(h('path', { key:'r' + i, d: roundTop(x, mt + ch - hr, bw, hr), fill:'#bd336b' }));
-    if (he > 0) els.push(h('path', { key:'e' + i, d: roundTop(x + 0.5, mt + ch - hr - gap - he, bw - 1, he), fill:'url(#dbdHatch)', stroke:'#bd336b', strokeWidth:1 }));
+    // แยกสีเฉพาะเมื่อทุกชิ้นเป็นบวกและรวมกันเท่ายอดจริงของวัน (มีชิ้นติดลบ เช่น คืนเงิน = แท่งสีเดียว · Codex 27 พ.ย.)
+    const allParts = (d.parts || []).filter(p => num(p.v) !== 0);
+    const stackOk = allParts.every(p => num(p.v) > 0) && Math.abs(allParts.reduce((a, p) => a + num(p.v), 0) - real) < 0.01;
+    const parts = stackOk ? allParts : [];
+    if (hr > 0 && parts.length > 1) {
+      // แท่งจริงแยกสี: ล่าง → บน ตามลำดับที่ให้มา · ชิ้นบนสุดมนหัว · ความสูงรวม = hr เท่าแท่งสีเดียวเดิม
+      const sum = parts.reduce((a, p) => a + num(p.v), 0);
+      let yb = mt + ch;
+      parts.forEach((p, j) => {
+        const hp = j === parts.length - 1 ? (yb - (mt + ch - hr)) : hr * num(p.v) / sum;
+        if (hp <= 0) return;
+        els.push(j === parts.length - 1 ? h('path', { key:'r' + i + '.' + j, d: roundTop(x, yb - hp, bw, hp), fill: p.color })
+          : h('rect', { key:'r' + i + '.' + j, x, y: yb - hp, width: bw, height: hp, fill: p.color }));
+        yb -= hp;
+      });
+    } else if (hr > 0) els.push(h('path', { key:'r' + i, d: roundTop(x, mt + ch - hr, bw, hr), fill: parts.length === 1 ? parts[0].color : '#bd336b' }));
+    if (he > 0) els.push(h('path', { key:'e' + i, d: roundTop(x + 0.5, mt + ch - hr - gap - he, bw - 1, he), fill:'url(#' + hatchId + ')', stroke: estColor, strokeWidth:1 }));
     if (i % every === 0) els.push(h('text', { key:'x' + i, x:cx, y:H - 7, textAnchor:'middle', fontSize:11, fill:'#716a75' }, d.label));
     if (i === peakAt) els.push(h('text', { key:'pk', x: Math.min(Math.max(cx, ml + 34), W - mr - 34), y: Math.max(12, mt + ch - hr - gap - he - 6), textAnchor:'middle', fontSize:11.5, fontWeight:700, fill:'#28252b' }, '฿' + Math.round(tot[i]).toLocaleString('en-US')));
   });
@@ -3936,9 +4004,10 @@ function buildDayBars(opt) {
   if (hover !== null) {
     const d = days[hover], real = num(d.real), est = num(d.est);
     const leftPct = (ml + (hover + 0.5) * slot) / W * 100;
-    const row = (k, v, strong) => h('div', { style:{ display:'flex', justifyContent:'space-between', gap:'14px', fontWeight: strong ? 700 : 500 } }, h('span', null, k), h('span', { style:{ fontVariantNumeric:'tabular-nums' } }, v));
+    const row = (k, v, strong) => h('div', { key: k, style:{ display:'flex', justifyContent:'space-between', gap:'14px', fontWeight: strong ? 700 : 500 } }, h('span', null, k), h('span', { style:{ fontVariantNumeric:'tabular-nums' } }, v));
     tip = h('div', { 'data-keep':(opt.id || 'home') + '.tip', style:{ position:'absolute', top:'0', left: leftPct + '%', transform:'translateX(' + (leftPct < 20 ? '-12%' : leftPct > 80 ? '-88%' : '-50%') + ')', background:'#28252b', color:'#ffffff', borderRadius:'10px', padding:'8px 11px', fontSize:'12px', lineHeight:1.55, pointerEvents:'none', whiteSpace:'nowrap', zIndex:5, boxShadow:'0 8px 20px rgba(30,34,41,0.12)' } },
       h('div', { style:{ fontWeight:700, marginBottom:'2px' } }, d.title || d.iso),
+      ...((d.parts || []).filter(p => num(p.v) !== 0).length > 1 ? d.parts.filter(p => num(p.v) !== 0).map(p => row(p.label, opt.fmt(p.v), false)) : []),
       row('จริง', opt.fmt(real), est <= 0),
       est > 0 ? row('ประมาณการ', opt.fmt(est), false) : null,
       est > 0 ? row('รวม', opt.fmt(real + est), true) : null);
@@ -3967,69 +4036,62 @@ function buildHomePanel(opt) {
 
   const banner = opt.banner ? h('div', { 'data-keep':'home.banner', style:{ background:'#ffe8d4', border:'1px solid #f3cfae', color:'#a84a00', borderRadius:'12px', padding:'10px 14px', fontSize:'13px', lineHeight:1.55, marginBottom:'14px' } }, opt.banner) : null;
 
-  // ── ขายได้ (จริง) + ประมาณการ แยกบรรทัด ไม่บวกเข้ากัน ──
+  // จัดแบบกระชับ (แอนนี่ 27 พ.ย. 2569 "ปรับทุกหน้าเลย"): ตัวเลข 6 ตัวแถบเดียว (ขายได้ · ประมาณการ · รวมคร่าว ๆ | กำไรคร่าว ๆ · รายจ่ายร้าน · ซื้อเค้ก)
+  // · "ต้องทำวันนี้" กับกราฟรายวันวางข้างกัน · ตัวเลข ป้าย และ data-fig ชุดเดิมทุกตัว
+  const note = (text, key) => text ? h('div', { key, style:{ fontSize:'11.5px', color:'#716a75', lineHeight:1.45, marginTop:'2px' } }, text) : null;
+  const tile = (key, labelText, mark, markId, figId, value, size, notes, color) => h('div', { key, 'data-tile': key, style:{ flex:'1 1 150px', minWidth:0, padding:'12px 16px', borderLeft:'1px solid #f0eaee', marginLeft:'-1px' } },
+    h('div', { style:{ display:'flex', alignItems:'center', gap:'4px 6px', flexWrap:'wrap', minHeight:'20px' } },
+      h('span', { style:{ fontSize:'12.5px', color:'#716a75', fontWeight:500 } }, labelText), mark ? pill(mark, markId) : null),
+    h('div', { 'data-fig': figId, style:{ fontSize: size, fontWeight:700, color: color || '#28252b', letterSpacing:'-0.3px', lineHeight:1.25, marginTop:'2px', fontVariantNumeric:'tabular-nums', overflowWrap:'anywhere' } }, value),
+    ...(notes || []));
   const est = opt.estimate, estShown = !!est && !est.hidden;
   const disc = opt.discount && Number(opt.discount.total) > 0 ? Number(opt.discount.total) : 0;
-  const heroLeft = h('div', { style:{ flex:'1 1 250px', minWidth:0 } },
-    label('ขายได้', 'real', 'home.sales.mark'),
-    figure('home.sales', baht(opt.sales.value), '34px'),
-    disc ? small('ส่วนลด ' + baht(disc) + ' · หลังส่วนลด ' + baht(opt.sales.value - disc), 'd') : null,
-    small(opt.sales.reachNote, 'r'));
-  let heroRight = null;
+  const heroTiles = [tile('sales', 'ขายได้', 'real', 'home.sales.mark', 'home.sales', baht(opt.sales.value), '24px',
+    [disc ? note('ส่วนลด ' + baht(disc) + ' · หลังส่วนลด ' + baht(opt.sales.value - disc), 'd') : null, note(opt.sales.reachNote, 'r')], MONEY_IN)];
   if (est) {
-    const body = estShown
-      ? [figure('home.estimate', baht(est.total), '26px'), small(est.from ? 'จากบิล POS ' + opt.estimateRange : 'ทุกวันที่ขายผ่าน POS ในช่วงนี้มีรายงานจากแอปแล้ว', 'n')]
-      : est.hidden === 'outside'
-        ? [small(opt.estimateNote, 'n')]
-        : [figure('home.estimate', '—', '26px'), small(opt.estimateNote, 'n')];
-    heroRight = h('div', { style:{ flex:'1 1 250px', minWidth:0 } },
-      label('เดลิเวอรี่ที่ยังไม่มีรายงานแอป', estShown ? 'est' : 'part', 'home.estimate.mark'), ...body);
+    const notes = estShown ? [note(est.from ? 'จากบิล POS ' + opt.estimateRange : 'ทุกวันที่ขายผ่าน POS ในช่วงนี้มีรายงานจากแอปแล้ว', 'n')] : [note(opt.estimateNote, 'n')];
+    if (estShown || est.hidden !== 'outside') heroTiles.push(tile('est', 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป', estShown ? 'est' : 'part', 'home.estimate.mark', 'home.estimate', estShown ? baht(est.total) : '—', '19px', notes));
+    else heroTiles.push(h('div', { key:'est', style:{ flex:'1 1 150px', minWidth:0, padding:'12px 16px', borderLeft:'1px solid #f0eaee', marginLeft:'-1px' } },
+      h('div', { style:{ display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap', minHeight:'20px' } }, h('span', { style:{ fontSize:'12.5px', color:'#716a75', fontWeight:500 } }, 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป'), pill('part', 'home.estimate.mark')), ...notes));
   }
-  const total = estShown ? h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'12px', flexWrap:'wrap', borderTop:'1px solid #f0eaee', marginTop:'16px', paddingTop:'12px', fontSize:'13px', color:'#716a75' } },
-    h('span', null, 'รวมคร่าว ๆ (จริง + ประมาณการ)'),
-    h('span', { 'data-fig':'home.total', style:{ fontSize:'15px', fontWeight:700, color:'#4a444d', fontVariantNumeric:'tabular-nums' } }, baht(opt.sales.value + est.total))) : null;
-  const hero = h('div', { 'data-keep':'home.hero', style:CARD },
-    h('div', { style:{ display:'flex', gap:'18px 36px', flexWrap:'wrap' } }, heroLeft, heroRight), total);
+  if (estShown) heroTiles.push(tile('total', 'รวมคร่าว ๆ', null, null, 'home.total', baht(opt.sales.value + est.total), '19px', [note('จริง + ประมาณการ', 'n')]));
+  const hero = h('div', { 'data-keep':'home.hero', style:{ flex:'3 1 460px', minWidth:0, display:'flex', flexWrap:'wrap' } }, ...heroTiles);
 
-  // ── 3 กล่อง ──
   const p = opt.profit;
   const profitKind = p.value === null ? 'part' : p.isEstimate ? 'est' : 'real';
   const profitSub = p.value === null ? p.reason
     : p.rangeLabel + ' · ก่อนหักรายจ่ายร้าน' + (Number(p.accessory) > 0 ? ' · ยังไม่หักอุปกรณ์และของแถม (ขายไป ' + baht(p.accessory) + ')' : '');
   const se = opt.shopExpense;
-  const tiles = h('div', { 'data-keep':'home.tiles', style:{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,210px),1fr))', gap:'14px', marginBottom:'14px' } },
-    h('div', { style:TILE }, label('กำไรคร่าว ๆ', profitKind, 'home.profit.mark'),
-      figure('home.profit', p.value === null ? (p.dash ? '—' : 'ยังบอกไม่ได้') : baht(p.value), p.value === null && !p.dash ? '20px' : '24px'), small(profitSub, 's')),
-    h('div', { style:TILE }, label('รายจ่ายร้าน', se.complete ? 'real' : 'part', 'home.shopExpense.mark'),
-      figure('home.shopExpense', baht(se.value), '24px'), small(se.toLabel, 's')),
-    h('div', { style:TILE }, label('ซื้อเค้กเข้าร้าน', 'real', 'home.cakes.mark'),
-      figure('home.cakes', baht(opt.cakes.value), '24px'), small(opt.cakes.note, 's')));
+  const tiles = h('div', { 'data-keep':'home.tiles', style:{ flex:'3 1 460px', minWidth:0, display:'flex', flexWrap:'wrap' } },
+    tile('profit', 'กำไรคร่าว ๆ', profitKind, 'home.profit.mark', 'home.profit', p.value === null ? (p.dash ? '—' : 'ยังบอกไม่ได้') : baht(p.value), p.value === null && !p.dash ? '17px' : '19px', [note(profitSub, 's')], p.value === null ? '#716a75' : (Number(p.value) < 0 ? MONEY_OUT : MONEY_IN)),
+    tile('shopExpense', 'รายจ่ายร้าน', se.complete ? 'real' : 'part', 'home.shopExpense.mark', 'home.shopExpense', baht(se.value), '19px', [note(se.toLabel, 's')], MONEY_OUT),
+    tile('cakes', 'ซื้อเค้กเข้าร้าน', 'real', 'home.cakes.mark', 'home.cakes', baht(opt.cakes.value), '19px', [note(opt.cakes.note, 's')], MONEY_OUT));
+  const strip = h('div', { style:{ ...CARD, padding:0, overflow:'hidden', marginBottom:'12px', display:'flex', flexWrap:'wrap' } }, hero, tiles);
 
   // ── ต้องทำวันนี้ (ลิงก์อย่างเดียว ไม่บันทึกอะไร) ──
   const GO = { cash:'ดูและยืนยัน', expense:'ลงรายจ่าย', payroll:'ไปหน้าเงินเดือน', subsidy:'ไปหน้าเงินรัฐรอรับ', storefront:'ลงยอดหน้าร้าน', budget:'ดูรายจ่าย', opex:'ดูรายจ่าย' };
   const todos = opt.todos || [];
-  const todoRows = todos.map((t, i) => h('div', { key:t.id, style:{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px 16px', flexWrap:'wrap', padding:'11px 0', borderTop: i ? '1px solid #f0eaee' : 'none' } },
-    h('div', { style:{ minWidth:0, flex:'1 1 220px' } },
-      h('div', { style:{ fontSize:'14px', fontWeight:600, color:'#28252b', lineHeight:1.45 } }, t.text),
-      t.sub ? h('div', { style:{ fontSize:'12.5px', color:'#716a75', marginTop:'1px' } }, t.sub) : null),
-    h('button', { type:'button', 'data-act':'home.todo.' + t.id, onClick: opt.onGo(t.page), style:{ flex:'none', display:'inline-block', background: i ? '#ffffff' : '#bd336b', color: i ? '#bd336b' : '#ffffff', border:'1px solid ' + (i ? '#e6b3c8' : '#bd336b'), borderRadius:'10px', padding:'7px 14px', fontSize:'13px', fontWeight:600, fontFamily:'inherit', lineHeight:'inherit', cursor:'pointer', whiteSpace:'nowrap' } }, GO[t.id] || 'เปิดดู')));
-  const todoCard = h('div', { 'data-keep':'home.todos', style:CARD },
-    h('div', { style:{ display:'flex', alignItems:'center', gap:'9px', marginBottom: todos.length ? '4px' : '8px' } },
-      h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:'#28252b' } }, 'ต้องทำวันนี้'),
+  const todoRows = todos.map((t, i) => h('div', { key:t.id, style:{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'8px 12px', flexWrap:'wrap', padding:'9px 0', borderTop: i ? '1px solid #f0eaee' : 'none' } },
+    h('div', { style:{ minWidth:0, flex:'1 1 180px' } },
+      h('div', { style:{ fontSize:'13.5px', fontWeight:600, color:'#28252b', lineHeight:1.45 } }, t.text),
+      t.sub ? h('div', { style:{ fontSize:'12px', color:'#716a75', marginTop:'1px' } }, t.sub) : null),
+    h('button', { type:'button', 'data-act':'home.todo.' + t.id, onClick: opt.onGo(t.page), style:{ flex:'none', display:'inline-block', background: i ? '#ffffff' : '#bd336b', color: i ? '#bd336b' : '#ffffff', border:'1px solid ' + (i ? '#e6b3c8' : '#bd336b'), borderRadius:'10px', padding:'6px 12px', fontSize:'12.5px', fontWeight:600, fontFamily:'inherit', lineHeight:'inherit', cursor:'pointer', whiteSpace:'nowrap' } }, GO[t.id] || 'เปิดดู')));
+  const todoCard = h('div', { 'data-keep':'home.todos', style:{ ...CARD, padding:'14px 18px', marginBottom:0, flex:'1 1 320px' } },
+    h('div', { style:{ display:'flex', alignItems:'center', gap:'9px', marginBottom: todos.length ? '2px' : '8px' } },
+      h('h3', { style:{ margin:0, fontSize:'15px', fontWeight:700, color:'#28252b' } }, 'ต้องทำวันนี้'),
       todos.length ? h('span', { style:{ background:'#efeaee', color:'#4a444d', fontSize:'11.5px', fontWeight:700, padding:'2px 10px', borderRadius:'999px' } }, todos.length + ' เรื่อง') : null),
     todos.length ? todoRows : h('div', { style:{ fontSize:'13.5px', color:'#716a75' } }, 'ไม่มีอะไรค้าง'));
 
-  // ── กราฟรายวัน ──
-  const sw = hatched => h('span', { style:{ width:'12px', height:'12px', borderRadius:'3px', display:'inline-block', flex:'none', background: hatched ? 'repeating-linear-gradient(45deg,' + '#bd336b' + ' 0 2px,' + '#f8e8ef' + ' 2px 5px)' : '#bd336b', border: hatched ? '1px solid #bd336b' : 'none' } });
-  const legend = opt.chartHasEst ? h('div', { style:{ display:'flex', gap:'6px 18px', flexWrap:'wrap', fontSize:'12px', color:'#716a75', marginBottom:'8px' } },
-    h('span', { style:{ display:'inline-flex', alignItems:'center', gap:'6px' } }, sw(false), 'จริง (ตามตารางใน DBD)'),
-    h('span', { style:{ display:'inline-flex', alignItems:'center', gap:'6px' } }, sw(true), 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป (ประมาณการ)')) : null;
-  const chartCard = h('div', { 'data-keep':'home.chart', style:{ ...CARD, marginBottom:0 } },
-    h('h3', { style:{ margin:'0 0 8px', fontSize:'16px', fontWeight:700, color:'#28252b' } }, opt.chartTitle),
-    legend,
+  // ── กราฟรายวัน (เตี้ยลง แยกสีตามช่องทางเหมือนหน้ายอดขาย) ──
+  const sw = (c, hatched) => h('span', { style:{ width:'10px', height:'10px', borderRadius:'3px', display:'inline-block', flex:'none', background: hatched ? 'repeating-linear-gradient(45deg,' + c + ' 0 2px,' + MONEY_IN_COLS.estBg + ' 2px 5px)' : c, border: hatched ? '1px solid ' + c : 'none' } });
+  const legendItems = (opt.legend || []).map(x => h('span', { key: x.label, style:{ display:'inline-flex', alignItems:'center', gap:'5px' } }, sw(x.color, !!x.hatched), x.label));
+  const legend = legendItems.length ? h('div', { style:{ display:'flex', gap:'4px 14px', flexWrap:'wrap', fontSize:'11.5px', color:'#716a75' } }, ...legendItems) : null;
+  const chartCard = h('div', { 'data-keep':'home.chart', style:{ ...CARD, padding:'14px 18px', marginBottom:0, flex:'2 1 520px' } },
+    h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'6px 12px', flexWrap:'wrap', marginBottom:'6px' } },
+      h('h3', { style:{ margin:0, fontSize:'15px', fontWeight:700, color:'#28252b' } }, opt.chartTitle), legend),
     opt.chartEmpty ? h('div', { style:{ fontSize:'13.5px', color:'#716a75', padding:'18px 0' } }, 'ยังไม่มียอดขายในช่วงนี้') : opt.chart);
 
-  return h('div', null, banner, hero, tiles, todoCard, chartCard);
+  return h('div', null, banner, strip, h('div', { style:{ display:'flex', flexWrap:'wrap', gap:'12px', alignItems:'stretch' } }, todoCard, chartCard));
 }
 
 /** ชิ้นส่วนหน้าตาที่ใช้ซ้ำของหน้าที่แปลงแล้ว (ขั้น 2 เป็นต้นไป): การ์ด · ป้าย จริง/ประมาณการ/ยังไม่ครบ · ตัวเลขหัว · บรรทัดเล็ก
@@ -4057,44 +4119,61 @@ function dbdKit() {
  *         estimate: null | { total, from, to } | { hidden:'filter'|'outside'|'loading'|'auth'|'net' }, estimateNote, estimateRange,
  *         chart, chartHasEst, chartEmpty } */
 function buildSalesHero(opt) {
+  // จัดแบบกระชับ (แอนนี่ 27 พ.ย. 2569 "การ์ดใหญ่ เต็มหน้า" → ตัวอย่างที่เห็นแล้ว "ใช้ ทำเลย"): ตัวเลข 6 ตัวแถวเดียว · กราฟเตี้ยแยกสี + กล่อง "ยอดมาจากไหน" ข้างกัน
+  // ตัวเลขและป้าย จริง/ประมาณการ/ยังไม่ครบ ชุดเดิมทุกตัว (data-fig เดิม) — เปลี่ยนแค่การจัดวาง
   const k = dbdKit(), h = k.h, baht = opt.fmt;
   const est = opt.estimate, estShown = !!est && !est.hidden;
   const disc = Number(opt.discount) > 0 ? Number(opt.discount) : 0;
-  const left = h('div', { style:{ flex:'1 1 250px', minWidth:0 } },
-    k.label('ยอดขาย', opt.salesComplete ? 'real' : 'part', 'sd.sales.mark'),
-    k.figure('sd.sales', baht(opt.sales), '34px'),
-    disc ? k.small('ส่วนลด ' + baht(disc) + ' · หลังส่วนลด ' + baht(opt.sales - disc), 'd') : null,
-    k.small(opt.reachNote, 'r'));
-  let right = null;
-  if (est && est.hidden === 'filter') right = h('div', { style:{ flex:'1 1 250px', minWidth:0, alignSelf:'center' } }, k.small(opt.estimateNote, 'n'));
+  const note = (text, key) => text ? h('div', { key, style:{ fontSize:'11.5px', color:'#716a75', lineHeight:1.45, marginTop:'2px' } }, text) : null;
+  const tile = (key, labelText, mark, markId, figId, value, size, notes, color) => h('div', { key, 'data-tile': key, style:{ flex:'1 1 150px', minWidth:0, padding:'12px 16px', borderLeft:'1px solid #f0eaee', marginLeft:'-1px' } },
+    h('div', { style:{ display:'flex', alignItems:'center', gap:'4px 6px', flexWrap:'wrap', minHeight:'20px' } },
+      h('span', { style:{ fontSize:'12.5px', color:'#716a75', fontWeight:500 } }, labelText), mark ? k.pill(mark, markId) : null),
+    h('div', { 'data-fig': figId, style:{ fontSize: size, fontWeight:700, color: color || '#28252b', letterSpacing:'-0.3px', lineHeight:1.25, marginTop:'2px', fontVariantNumeric:'tabular-nums', overflowWrap:'anywhere' } }, value),
+    ...(notes || []));
+  const tiles = [
+    tile('sales', 'ยอดขาย', opt.salesComplete ? 'real' : 'part', 'sd.sales.mark', 'sd.sales', baht(opt.sales), '24px',
+      [disc ? note('ส่วนลด ' + baht(disc) + ' · หลังส่วนลด ' + baht(opt.sales - disc), 'd') : null, note(opt.reachNote, 'r')], MONEY_IN)
+  ];
+  if (est && est.hidden === 'filter') tiles.push(h('div', { key:'est', style:{ flex:'1 1 150px', minWidth:0, padding:'12px 16px', borderLeft:'1px solid #f0eaee', marginLeft:'-1px', alignSelf:'center' } }, note(opt.estimateNote, 'n')));
   else if (est) {
-    const body = estShown
-      ? [k.figure('sd.estimate', baht(est.total), '26px'), k.small(est.from ? 'จากบิล POS ' + opt.estimateRange : 'ทุกวันที่ขายผ่าน POS ในช่วงนี้มีรายงานจากแอปแล้ว', 'n')]
-      : est.hidden === 'outside' ? [k.small(opt.estimateNote, 'n')] : [k.figure('sd.estimate', '—', '26px'), k.small(opt.estimateNote, 'n')];
-    right = h('div', { style:{ flex:'1 1 250px', minWidth:0 } }, k.label('เดลิเวอรี่ที่ยังไม่มีรายงานแอป', estShown ? 'est' : 'part', 'sd.estimate.mark'), ...body);
+    const notes = estShown ? [note(est.from ? 'จากบิล POS ' + opt.estimateRange : 'ทุกวันที่ขายผ่าน POS ในช่วงนี้มีรายงานจากแอปแล้ว', 'n')] : [note(opt.estimateNote, 'n')];
+    if (estShown || est.hidden !== 'outside') tiles.push(tile('est', 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป', estShown ? 'est' : 'part', 'sd.estimate.mark', 'sd.estimate', estShown ? baht(est.total) : '—', '19px', notes));
+    else tiles.push(h('div', { key:'est', style:{ flex:'1 1 150px', minWidth:0, padding:'12px 16px', borderLeft:'1px solid #f0eaee', marginLeft:'-1px' } },
+      h('div', { style:{ display:'flex', alignItems:'center', gap:'6px', minHeight:'20px' } }, h('span', { style:{ fontSize:'12.5px', color:'#716a75', fontWeight:500 } }, 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป'), k.pill('part', 'sd.estimate.mark')), ...notes));
   }
-  const stat = (text, id, value, note) => h('div', { style:{ flex:'1 1 150px', minWidth:0 } },
-    h('div', { style:{ display:'flex', alignItems:'center', gap:'7px', flexWrap:'wrap', marginBottom:'3px' } },
-      h('span', { style:{ fontSize:'12.5px', color:'#716a75', fontWeight:500 } }, text), k.pill('real', id + '.mark')),
-    h('div', { 'data-fig': id, style:{ fontSize:'18px', fontWeight:700, color:'#28252b', fontVariantNumeric:'tabular-nums' } }, value),
-    note ? h('div', { style:{ fontSize:'11.5px', color:'#716a75', marginTop:'1px' } }, note) : null);
-  const stats = h('div', { style:{ display:'flex', gap:'14px 28px', flexWrap:'wrap', borderTop:'1px solid #f0eaee', marginTop:'16px', paddingTop:'14px' } },
-    stat('ออเดอร์', 'sd.orders', Number(opt.orders || 0).toLocaleString('en-US')),
-    stat('เฉลี่ยต่อออเดอร์', 'sd.avgOrder', baht(opt.avgOrder)),
-    stat('เฉลี่ยต่อวัน', 'sd.avgDay', baht(opt.avgDay), opt.daysWithSales ? 'จาก ' + opt.daysWithSales + ' วันที่มียอด' : ''));
-  const total = estShown ? h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'12px', flexWrap:'wrap', borderTop:'1px solid #f0eaee', marginTop:'14px', paddingTop:'12px', fontSize:'13px', color:'#716a75' } },
-    h('span', null, 'รวมคร่าว ๆ (จริง + ประมาณการ)'),
-    h('span', { 'data-fig':'sd.total', style:{ fontSize:'15px', fontWeight:700, color:'#4a444d', fontVariantNumeric:'tabular-nums' } }, baht(opt.sales + est.total))) : null;
-  const hero = h('div', { 'data-keep':'sd.hero', style:{ ...k.CARD, marginBottom:'14px' } },
-    h('div', { style:{ display:'flex', gap:'18px 36px', flexWrap:'wrap' } }, left, right), stats, total);
-  const legend = opt.chartHasEst ? h('div', { style:{ display:'flex', gap:'6px 18px', flexWrap:'wrap', fontSize:'12px', color:'#716a75', marginBottom:'8px' } },
-    h('span', { style:{ display:'inline-flex', alignItems:'center', gap:'6px' } }, k.swatch(false), 'จริง (ตามตารางใน DBD)'),
-    h('span', { style:{ display:'inline-flex', alignItems:'center', gap:'6px' } }, k.swatch(true), 'เดลิเวอรี่ที่ยังไม่มีรายงานแอป (ประมาณการ)')) : null;
-  const chartCard = h('div', { 'data-keep':'sd.chart', style:k.CARD },
-    h('h3', { style:{ margin:'0 0 8px', fontSize:'16px', fontWeight:700, color:'#28252b' } }, 'ยอดขายรายวัน'),
-    legend,
+  if (estShown) tiles.push(tile('total', 'รวมคร่าว ๆ', null, null, 'sd.total', baht(opt.sales + est.total), '19px', [note('จริง + ประมาณการ', 'n')]));
+  tiles.push(tile('orders', 'ออเดอร์', 'real', 'sd.orders.mark', 'sd.orders', Number(opt.orders || 0).toLocaleString('en-US'), '19px'));
+  tiles.push(tile('avgOrder', 'เฉลี่ยต่อออเดอร์', 'real', 'sd.avgOrder.mark', 'sd.avgOrder', baht(opt.avgOrder), '19px'));
+  tiles.push(tile('avgDay', 'เฉลี่ยต่อวัน', 'real', 'sd.avgDay.mark', 'sd.avgDay', baht(opt.avgDay), '19px', [opt.daysWithSales ? note('จาก ' + opt.daysWithSales + ' วันที่มียอด', 'n') : null]));
+  const hero = h('div', { 'data-keep':'sd.hero', style:{ ...k.CARD, padding:0, overflow:'hidden', marginBottom:'12px', display:'flex', flexWrap:'wrap' } }, ...tiles);
+  const sw = (bg, hatched, key) => h('span', { key, style:{ width:'10px', height:'10px', borderRadius:'3px', display:'inline-block', flex:'none',
+    background: hatched ? 'repeating-linear-gradient(45deg,' + bg + ' 0 2px,' + MONEY_IN_COLS.estBg + ' 2px 5px)' : bg, border: hatched ? '1px solid ' + bg : 'none' } });
+  const legendItems = (opt.legend || []).map(x => h('span', { key: x.label, style:{ display:'inline-flex', alignItems:'center', gap:'5px' } }, sw(x.color, !!x.hatched), x.label));
+  const legend = legendItems.length ? h('div', { style:{ display:'flex', gap:'4px 14px', flexWrap:'wrap', fontSize:'11.5px', color:'#716a75' } }, ...legendItems) : null;
+  const chartCard = h('div', { 'data-keep':'sd.chart', style:{ ...k.CARD, padding:'14px 18px', flex:'2 1 520px' } },
+    h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'6px 12px', flexWrap:'wrap', marginBottom:'6px' } },
+      h('h3', { style:{ margin:0, fontSize:'15px', fontWeight:700, color:'#28252b' } }, 'ยอดขายรายวัน'), legend),
     opt.chartEmpty ? h('div', { style:{ fontSize:'13.5px', color:'#716a75', padding:'18px 0' } }, 'ยังไม่มียอดขายในช่วงนี้') : opt.chart);
-  return h('div', null, k.banner(opt.banner, 'sd.banner'), hero, chartCard);
+  const src = opt.sources || { rows: [], total: 0 };
+  const maxSrc = Math.max(1, ...src.rows.map(r => Math.abs(r.amount)));
+  const srcCard = src.rows.length ? h('div', { 'data-keep':'sd.sources', style:{ ...k.CARD, padding:'14px 18px', flex:'1 1 300px' } },
+    h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'8px', marginBottom:'10px' } },
+      h('h3', { style:{ margin:0, fontSize:'15px', fontWeight:700, color:'#28252b' } }, 'ยอดมาจากไหน'),
+      h('span', { style:{ fontSize:'12px', color:'#716a75' } }, 'รวม ', h('b', { 'data-fig':'sd.sources.total', style:{ color: MONEY_IN } }, baht(src.total)))),
+    h('div', { style:{ display:'grid', gridTemplateColumns:'minmax(84px,max-content) minmax(40px,1fr) auto 34px', gap:'8px 10px', alignItems:'center', fontSize:'12.5px', color:'#28252b' } },
+      ...src.rows.map(r => {
+        const sc = opt.sourceColors || {}, c = sc[r.key] || sc[r.kind] || '#bd336b';   // สีตามแพลตฟอร์มก่อน แล้วค่อยตามชนิด
+        return h(React.Fragment, { key: r.key },
+          h('span', { style:{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' } }, r.label),
+          h('div', { style:{ height:'9px', borderRadius:'6px', background:'#f0eaee', overflow:'hidden' } },
+            h('div', { style:{ width: Math.max(2, Math.abs(r.amount) / maxSrc * 100) + '%', height:'100%', borderRadius:'6px',
+              background: r.kind === 'est' ? 'repeating-linear-gradient(45deg,' + c + ' 0 2px,' + MONEY_IN_COLS.estBg + ' 2px 5px)' : c } })),
+          h('span', { 'data-fig': 'sd.src.' + r.key, style:{ textAlign:'right', fontWeight:600, color: r.amount < 0 ? MONEY_OUT : MONEY_IN, whiteSpace:'nowrap', fontVariantNumeric:'tabular-nums' } }, baht(r.amount)),
+          h('span', { style:{ textAlign:'right', fontSize:'11.5px', color:'#716a75' } }, r.pct + '%'));
+      })),
+    src.rows.some(r => r.kind === 'est') ? h('div', { style:{ fontSize:'11.5px', color:'#716a75', marginTop:'10px', lineHeight:1.5 } }, 'แถบลาย = เดลิเวอรี่ที่ยังไม่มีรายงานแอป (ประมาณการ)') : null) : null;
+  return h('div', null, k.banner(opt.banner, 'sd.banner'), hero,
+    h('div', { style:{ display:'flex', flexWrap:'wrap', gap:'12px', alignItems:'stretch' } }, chartCard, srcCard));
 }
 
 /** สร้างกล่อง "ยอดขายและกำไรจริง" — ใช้ซ้ำในหน้า ยอดขาย · ภาพรวม · มุมมองเจ้าของ
@@ -4280,23 +4359,25 @@ function buildHomeAllPanel(o) {
  *       days { title, range, list, open, onToggle } } */
 function buildPlPanel(o) {
   const k = dbdKit(), h = k.h;
-  const parts = [];
+  const parts = [], pair = [];
   if (o.note) parts.push(h('div', { key:'note', 'data-keep':'pl.note', style:{ ...k.CARD, marginBottom:'14px', fontSize:'13.5px', color:'#4a444d', lineHeight:1.6 } }, o.note));
   if (o.none) parts.push(h('div', { key:'none', 'data-keep':'pl.none', style:{ ...k.CARD, marginBottom:'14px' } },
     h('div', { style:{ fontSize:'15px', fontWeight:600, color:'#28252b' } }, 'สาขานี้ยังไม่มีต้นทุนจาก POS'),
     k.small(o.none, 's')));
   if (o.ladder) {
     const L = o.ladder;
-    const line = (x, i) => h('div', { key:x.id, style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'4px 14px', flexWrap:'wrap', padding: x.total ? '12px 0 11px' : '9px 0',
+    const line = (x, i) => h('div', { key:x.id, style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'4px 14px', flexWrap:'wrap', padding: x.total ? '9px 0 8px' : '6px 0',
         borderTop: i === 0 ? 'none' : x.total ? '2px solid #e9e1e6' : '1px solid #f0eaee' } },
       h('div', { style:{ minWidth:0, flex:'1 1 220px' } },
         h('div', { style:{ display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' } },
           h('span', { style:{ fontSize: x.total ? '14.5px' : '13.5px', fontWeight: x.total ? 700 : 500, color: x.total ? '#28252b' : '#4a444d' } }, x.label), k.pill(x.mark, 'pl.' + x.id + '.mark')),
-        x.sub ? h('div', { style:{ fontSize:'12.5px', color:'#716a75', marginTop:'3px', lineHeight:1.5 } }, x.sub) : null),
-      h('div', { 'data-fig':'pl.' + x.id, style:{ fontSize: x.total ? '20px' : '15px', fontWeight: x.total ? 700 : 600, color: x.muted ? '#716a75' : '#28252b', fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' } }, x.text));
-    parts.push(h('div', { key:'ladder', 'data-keep':'pl.ladder', style:{ ...k.CARD, marginBottom:'14px' } },
-      h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'4px 12px', flexWrap:'wrap', marginBottom:'6px' } },
-        h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:'#28252b' } }, L.title),
+        x.sub ? h('div', { style:{ fontSize:'12px', color:'#716a75', marginTop:'1px', lineHeight:1.45 } }, x.sub) : null),
+      h('div', { 'data-fig':'pl.' + x.id, style:{ fontSize: x.total ? '19px' : '14.5px', fontWeight: x.total ? 700 : 600,
+        // เงินเข้า เขียว · หัก (เงินออก) แดง · กำไร เขียว / ติดลบ แดง
+        color: x.muted ? '#716a75' : (x.id === 'shop' || x.id === 'delivery') ? MONEY_IN : (x.id === 'rough' || x.id === 'after') ? (Number(x.value) < 0 ? MONEY_OUT : MONEY_IN) : MONEY_OUT, fontVariantNumeric:'tabular-nums', whiteSpace:'nowrap' } }, x.text));
+    pair.push(h('div', { key:'ladder', 'data-keep':'pl.ladder', style:{ ...k.CARD, padding:'14px 18px', flex:'1.3 1 460px' } },
+      h('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'4px 12px', flexWrap:'wrap', marginBottom:'4px' } },
+        h('h3', { style:{ margin:0, fontSize:'15px', fontWeight:700, color:'#28252b' } }, L.title),
         h('span', { style:{ fontSize:'12.5px', color:'#716a75' } }, L.range)),
       ...L.lines.map(line),
       k.small(L.foot, 'foot')));
@@ -4319,7 +4400,7 @@ function buildPlPanel(o) {
       } else if (r.go && !r.ok) {
         side = h('span', { 'data-act':'pl.go.' + r.id, onClick: () => c.onGo(r.go), style: link }, r.go === 'payroll' ? 'ไปหน้าเงินเดือน →' : 'ไปหน้ารายจ่าย →');
       }
-      return h('div', { key:r.id, 'data-pl-row':r.id, style:{ display:'flex', alignItems:'flex-start', gap:'10px', padding:'10px 0', borderTop: i === 0 ? 'none' : '1px solid #f0eaee' } },
+      return h('div', { key:r.id, 'data-pl-row':r.id, style:{ display:'flex', alignItems:'flex-start', gap:'10px', padding:'7px 0', borderTop: i === 0 ? 'none' : '1px solid #f0eaee' } },
         icon(r.ok),
         h('div', { style:{ flex:'1 1 0', minWidth:0, display:'flex', alignItems:'center', justifyContent:'space-between', gap:'6px 14px', flexWrap:'wrap' } },
           h('div', { style:{ minWidth:0, flex:'1 1 220px' } },
@@ -4327,19 +4408,25 @@ function buildPlPanel(o) {
             r.sub ? h('div', { style:{ fontSize:'12.5px', color:'#716a75', marginTop:'2px', lineHeight:1.5 } }, r.sub) : null),
           side));
     };
-    parts.push(h('div', { key:'check', 'data-keep':'pl.check', style:{ ...k.CARD, marginBottom:'14px' } },
-      h('h3', { style:{ margin:'0 0 4px', fontSize:'16px', fontWeight:700, color:'#28252b' } }, c.title),
+    pair.push(h('div', { key:'check', 'data-keep':'pl.check', style:{ ...k.CARD, padding:'14px 18px', flex:'1 1 360px' } },
+      h('h3', { style:{ margin:'0 0 2px', fontSize:'15px', fontWeight:700, color:'#28252b' } }, c.title),
       ...c.rows.map(row)));
   }
+  // ขั้นบันได กับ "ยังขาดอะไร" วางข้างกันเมื่อจอกว้างพอ (หน้าแบบกระชับ 27 พ.ย. 2569)
+  if (pair.length) parts.push(h('div', { key:'pair', style:{ display:'flex', flexWrap:'wrap', gap:'12px', alignItems:'flex-start', marginBottom:'12px' } }, ...pair));
   if (o.days) {
     const d = o.days;
-    parts.push(h('div', { key:'days', 'data-keep':'pl.days', style:{ ...k.CARD, marginBottom:'14px' } },
+    // พับ: เกิน 10 วัน = แสดง 7 วันล่าสุด (รายการเรียงเก่าไปใหม่ ตารางกลับลำดับให้) · กด "ดูทั้งหมด" เห็นครบ
+    const foldable = (d.list || []).length > 10, folded = foldable && !d.all;
+    parts.push(h('div', { key:'days', 'data-keep':'pl.days', style:{ ...k.CARD, padding:'14px 18px', marginBottom:'12px' } },
       h('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:'6px 12px', flexWrap:'wrap' } },
         h('div', { style:{ minWidth:0 } },
           h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:700, color:'#28252b' } }, d.title),
           h('div', { style:{ fontSize:'12.5px', color:'#716a75', marginTop:'2px' } }, d.range)),
         h('span', { 'data-act':'pl.days.toggle', onClick: d.onToggle, style:{ display:'inline-flex', alignItems:'center', background:'#ffffff', border:'1px solid #e9e1e6', borderRadius:'10px', padding:'6px 13px', fontSize:'13px', fontWeight:500, color:'#4a444d', cursor:'pointer', whiteSpace:'nowrap' } }, d.open ? 'ซ่อนรายวัน' : 'ดูรายวัน')),
-      d.open ? buildPfDaysTable(d.list) : null));
+      d.open ? buildPfDaysTable(folded ? d.list.slice(-7) : d.list) : null,
+      d.open && foldable ? h('span', { 'data-act':'pl.days.fold', onClick: d.onAll, style:{ display:'inline-block', marginTop:'10px', fontSize:'12.5px', fontWeight:600, color:'#bd336b', background:'#f8e8ef', borderRadius:'9px', padding:'6px 12px', cursor:'pointer' } },
+        folded ? 'ดูทั้งหมด (' + d.list.length + ' วัน) ▾' : 'ย่อเหลือ 7 วันล่าสุด ▴') : null));
   }
   return h('div', null, ...parts);
 }
@@ -4488,8 +4575,14 @@ const EXP_CAT_COLORS = { 'วัตถุดิบ (COGS)':'#716a75', 'บรร
 const expCatColor = c => EXP_CAT_COLORS[c] || '#716a75';
 const expIsRawCat = c => String(c || '').indexOf('วัตถุดิบ') === 0;
 const expBaht = v => '฿' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/* สีเงิน (แอนนี่ 27 พ.ย. 2569 "ยอด + เป็นสีเขียว เช่น รายรับ กำไร · ลบ เป็นสีแดง เช่น รายจ่าย · ใช้สีพื้นฐานที่เข้าใจง่าย")
+ *  เงินเข้า (ยอดขาย รายรับ กำไร) = เขียว · เงินออก (รายจ่าย ต้นทุน ค่าแอป) และยอดติดลบ = แดง */
+const MONEY_IN = '#15803D', MONEY_OUT = '#C62828';
+// กราฟแยกช่องทาง (แอนนี่ 27 พ.ย.): หน้าร้าน เขียว · ขายส่ง ชมพู · เดลิเวอรี่ ส้ม · ประมาณการ ส้มลาย — ตัวเลขหัวยังเป็น เขียว = เงินเข้า / แดง = เงินออก
+const MONEY_IN_COLS = { store: '#16A34A', ws: '#DB2777', deliv: '#F59E0B', est: '#F59E0B', estBg: '#FEF3DC' };
 const EXP_UI = { ink:'#28252b', sub:'#716a75', mute:'#716a75', line:'#e9e1e6', soft:'#f0eaee', navy:'#bd336b', green:'#17613f', red:'#b3261e' };
-const EXP_CARD = { background:'#fff', border:'1px solid #e9e1e6', borderRadius:'18px', padding:'20px 22px', marginBottom:'18px', boxShadow:'0 4px 16px rgba(30,34,41,0.03)' };
+// หน้าแบบกระชับ 27 พ.ย. 2569: ขอบใน 14/18 · ระยะห่างการ์ด 12
+const EXP_CARD = { background:'#fff', border:'1px solid #e9e1e6', borderRadius:'16px', padding:'14px 18px', marginBottom:'12px', boxShadow:'0 4px 16px rgba(30,34,41,0.03)' };
 
 /** การ์ดสรุป: ยอดรวมเดือนนี้ก้อนเดียว + งบ 2 แถบ (งบรวม · งบรายจ่ายอื่น) — แทนการ์ดตัวเลข 6 ใบ */
 function buildExpSummaryPanel(o) {
@@ -4511,17 +4604,18 @@ function buildExpSummaryPanel(o) {
           h('span', { style:{ color: over ? C.red : C.sub, fontWeight: over ? 600 : 400 } }, over ? 'เกินงบ ' + expBaht(b.spent - b.budget) : 'เหลือ ' + expBaht(b.budget - b.spent)),
           o.readOnly ? null : link('แก้งบ', b.onStart, b.act + '.edit'))),
       h('div', { style:{ height: b.thin ? '6px' : '9px', borderRadius:'6px', background:C.soft, overflow:'hidden', marginTop:'7px' } },
-        h('div', { style:{ width: Math.max(0, Math.min(100, pct)) + '%', height:'100%', borderRadius:'6px', background: over ? C.red : C.navy } })));
+        h('div', { style:{ width: Math.max(0, Math.min(100, pct)) + '%', height:'100%', borderRadius:'6px', background: over ? MONEY_OUT : '#EF9A9A' } })));
   };
   const pill = (label, value) => h('span', { style:{ background:'#faf8fa', borderRadius:'9px', padding:'5px 10px', fontSize:'12.5px', color:'#4a444d', whiteSpace:'nowrap' } },
     label + ' ', h('b', { style:{ color:C.ink } }, value));
-  return h('div', { 'data-exp-summary':'1', style: EXP_CARD },
-    h('div', { style:{ fontSize:'13px', color:C.sub, fontWeight:500 } }, 'รายจ่ายเดือนนี้ · สาขา' + o.branchLabel),
-    h('div', { 'data-exp-total':'1', style:{ fontSize:'32px', fontWeight:700, color:C.ink, lineHeight:1.25, letterSpacing:'-0.01em', overflowWrap:'anywhere' } }, expBaht(o.mtd)),
-    h('div', { style:{ fontSize:'13px', color:C.sub, marginTop:'2px' } },
-      o.mtdCount + ' รายการ · วันนี้ ' + expBaht(o.today) + (o.todayCount ? ' (' + o.todayCount + ' รายการ)' : '') + ' · เฉลี่ยวันละ ' + expBaht(o.avg)),
-    h('div', { style:{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'10px' } }, pill('รายจ่ายร้าน', expBaht(o.shop)), pill('ซื้อเค้กและวัตถุดิบ', expBaht(o.raw))),
-    h('div', { style:{ marginTop:'16px', display:'flex', flexDirection:'column', gap:'13px' } }, budgetRow(o.budget), budgetRow(o.opex)));
+  return h('div', { 'data-exp-summary':'1', style:{ ...EXP_CARD, display:'flex', flexWrap:'wrap', gap:'12px 28px', alignItems:'center' } },
+    h('div', { style:{ flex:'1 1 280px', minWidth:0 } },
+      h('div', { style:{ fontSize:'12.5px', color:C.sub, fontWeight:500 } }, 'รายจ่ายเดือนนี้ · สาขา' + o.branchLabel),
+      h('div', { 'data-exp-total':'1', style:{ fontSize:'26px', fontWeight:700, color: MONEY_OUT, lineHeight:1.25, letterSpacing:'-0.01em', overflowWrap:'anywhere' } }, expBaht(o.mtd)),
+      h('div', { style:{ fontSize:'12.5px', color:C.sub, marginTop:'1px' } },
+        o.mtdCount + ' รายการ · วันนี้ ' + expBaht(o.today) + (o.todayCount ? ' (' + o.todayCount + ' รายการ)' : '') + ' · เฉลี่ยวันละ ' + expBaht(o.avg)),
+      h('div', { style:{ display:'flex', flexWrap:'wrap', gap:'6px', marginTop:'8px' } }, pill('รายจ่ายร้าน', expBaht(o.shop)), pill('ซื้อเค้กและวัตถุดิบ', expBaht(o.raw)))),
+    h('div', { style:{ flex:'1.4 1 360px', minWidth:0, display:'flex', flexDirection:'column', gap:'11px' } }, budgetRow(o.budget), budgetRow(o.opex)));
 }
 
 /** หน้า รายจ่าย (ขั้น 3): กล่อง "เดือนนี้ลงรายจ่ายครบแล้ว" (R4 ข้อ 3) + แท่ง "จ่ายด้วยอะไร เดือนนี้"
@@ -4533,7 +4627,7 @@ function buildExpPayPanel(o) {
   let box = null;
   if (c) {
     const state = h('span', { 'data-fig':'ex.complete', style:{ display:'inline-block', background: c.done ? '#e3f4eb' : '#efeaee', color: c.done ? '#17613f' : '#4a444d', fontSize:'11.5px', fontWeight:700, padding:'2px 10px', borderRadius:'999px', whiteSpace:'nowrap' } }, c.done ? 'ลงครบแล้ว' : 'ยังไม่ได้กด');
-    box = h('div', { 'data-keep':'ex.complete.box', style:{ ...k.CARD, marginBottom:'18px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px 16px', flexWrap:'wrap' } },
+    box = h('div', { 'data-keep':'ex.complete.box', style:{ ...k.CARD, padding:'14px 18px', marginBottom:'12px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px 16px', flexWrap:'wrap' } },
       h('div', { style:{ minWidth:0, flex:'1 1 260px' } },
         h('div', { style:{ display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' } },
           h('span', { style:{ fontSize:'14px', fontWeight:600, color:'#28252b' } }, c.done ? 'ลงรายจ่ายของ ' + c.monthLabel + ' ครบแล้ว' : 'รายจ่ายของ ' + c.monthLabel + ' ลงครบหรือยัง'), state),
@@ -4545,16 +4639,16 @@ function buildExpPayPanel(o) {
   const rows = o.rows || [];
   if (!rows.length) return box ? h('div', null, box) : null;
   const max = Math.max(1, ...rows.map(r => r.amount));
-  const pay = h('div', { 'data-keep':'ex.pay', style:{ ...k.CARD, marginBottom:'18px' } },
+  const pay = h('div', { 'data-keep':'ex.pay', style:{ ...k.CARD, padding:'14px 18px', marginBottom:'12px' } },
     h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'baseline', justifyContent:'space-between', gap:'4px 12px', marginBottom:'12px' } },
       h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:600, color:'#28252b' } }, 'จ่ายด้วยอะไร เดือนนี้'),
-      h('span', { style:{ fontSize:'12.5px', color:'#716a75' } }, 'รวม ', h('b', { 'data-fig':'ex.pay.total', style:{ color:'#28252b' } }, o.fmt(o.total)))),
-    h('div', { style:{ display:'grid', gridTemplateColumns:'minmax(92px,170px) minmax(0,1fr) auto', gap:'10px 12px', alignItems:'center', fontSize:'13px', color:'#28252b' } },
+      h('span', { style:{ fontSize:'12.5px', color:'#716a75' } }, 'รวม ', h('b', { 'data-fig':'ex.pay.total', style:{ color: MONEY_OUT } }, o.fmt(o.total)))),
+    h('div', { style:{ display:'grid', gridTemplateColumns:'minmax(80px,150px) minmax(0,1fr) auto', gap:'7px 12px', alignItems:'center', fontSize:'13px', color:'#28252b' } },
       ...rows.map(r => h(React.Fragment, { key: r.name },
         h('span', { style:{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } }, r.name),
         h('div', { style:{ height:'9px', borderRadius:'6px', background:'#f0eaee', overflow:'hidden' } },
-          h('div', { style:{ width: (r.amount > 0 ? Math.max(2, (r.amount / max) * 100) : 0) + '%', height:'100%', borderRadius:'6px', background:'#bd336b' } })),
-        h('span', { 'data-fig':'ex.pay.' + r.name, style:{ textAlign:'right', whiteSpace:'nowrap', fontWeight:600, fontVariantNumeric:'tabular-nums' } }, o.fmt(r.amount))))));
+          h('div', { style:{ width: (r.amount > 0 ? Math.max(2, (r.amount / max) * 100) : 0) + '%', height:'100%', borderRadius:'6px', background: MONEY_OUT } })),
+        h('span', { 'data-fig':'ex.pay.' + r.name, style:{ textAlign:'right', whiteSpace:'nowrap', fontWeight:600, color: MONEY_OUT, fontVariantNumeric:'tabular-nums' } }, o.fmt(r.amount))))));
   return h('div', null, box, pay);
 }
 
@@ -4567,14 +4661,14 @@ function buildExpWherePanel(o) {
     h('div', { style:{ display:'flex', flexWrap:'wrap', alignItems:'baseline', justifyContent:'space-between', gap:'4px 12px', marginBottom:'12px' } },
       h('h3', { style:{ margin:0, fontSize:'16px', fontWeight:600, color:C.ink } }, 'เงินไปไหน เดือนนี้'),
       o.rows.length ? h('span', { style:{ fontSize:'12.5px', color:C.sub } }, 'แตะหมวดเพื่อดูรายการของหมวดนั้น') : null),
-    o.rows.length ? h('div', { style:{ display:'grid', gridTemplateColumns:'minmax(92px,170px) minmax(0,1fr) auto', gap:'10px 12px', alignItems:'center', fontSize:'13px', color:C.ink } },
+    o.rows.length ? h('div', { style:{ display:'grid', gridTemplateColumns:'minmax(92px,170px) minmax(0,1fr) auto', gap:'7px 12px', alignItems:'center', fontSize:'13px', color:C.ink } },
       ...o.rows.map(r => h(React.Fragment, { key: r.cat },
         h('span', { onClick: () => o.onPick(r.cat), title:'ดูรายการของหมวดนี้', style:{ display:'flex', alignItems:'center', gap:'8px', cursor:'pointer', minWidth:0, fontWeight: o.picked === r.cat ? 700 : 400 } },
           h('span', { 'aria-hidden':'true', style:{ width:'10px', height:'10px', borderRadius:'50%', background: expCatColor(r.cat), flex:'none' } }),
           h('span', { style:{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' } }, r.cat)),
         h('div', { onClick: () => o.onPick(r.cat), style:{ height:'9px', borderRadius:'6px', background:C.soft, overflow:'hidden', cursor:'pointer' } },
-          h('div', { style:{ width: Math.max(2, (r.amount / max) * 100) + '%', height:'100%', borderRadius:'6px', background: expCatColor(r.cat) } })),
-        h('span', { style:{ textAlign:'right', whiteSpace:'nowrap', fontWeight:600 } }, expBaht(r.amount)))))
+          h('div', { style:{ width: Math.max(2, (r.amount / max) * 100) + '%', height:'100%', borderRadius:'6px', background: MONEY_OUT } })),
+        h('span', { style:{ textAlign:'right', whiteSpace:'nowrap', fontWeight:600, color: MONEY_OUT } }, expBaht(r.amount)))))
       : h('div', { style:{ fontSize:'13px', color:C.sub } }, 'เดือนนี้ยังไม่มีรายจ่ายร้าน'),
     o.raw > 0 ? h('div', { style:{ fontSize:'12.5px', color:C.sub, marginTop:'12px', lineHeight:1.55 } },
       'ซื้อเค้กและวัตถุดิบ ' + expBaht(o.raw) + ' แสดงแยก — ต้นทุนถูกคิดตอนขายแล้ว จึงไม่หักจากกำไรซ้ำ') : null);
@@ -7995,13 +8089,13 @@ class Component extends DCLogic {
     const dailyReportHeads = [{ label:'วันที่', style:'padding:0 8px 10px;font-weight:500;text-align:left;white-space:nowrap' }]
       .concat(DR_POS_COLS.map(c => drNumHead(c.label)))
       .concat(DR_PLATFORM_COLS.map(c => drNumHead(c.label)))
-      .concat([drNumHead('รวมรับ', '#bd336b')])
+      .concat([drNumHead('รวมรับ', MONEY_IN)])
       .concat(drExpCats.map(c => drNumHead(DR_EXP_SHORT[c] || c, '#b3261e')))
       .concat([drNumHead('รวมจ่าย', '#b3261e'), drNumHead('คงเหลือ', '#28252b')]);
 
     // ช่องรายรับใช้สีปกติ · ช่องรายจ่ายเป็นสีแดงทั้งคอลัมน์ (เจ้าของร้านกำหนด 9 ก.ย. 2569)
     // ช่อง 0.00 ยังเป็นเทาทั้งสองฝั่ง เพราะแปลว่า "ไม่มีรายการ" ไม่ใช่ยอดจริง
-    const drCell = (v, opt, red) => ({ v: drFmt(v), style: 'padding:9px 8px;text-align:right;white-space:nowrap;'
+    const drCell = (v, opt, red) => ({ v: drFmt(v), style: 'padding:6px 8px;text-align:right;white-space:nowrap;'
       + (v ? ((red || v < 0) ? 'color:#b3261e;' : '') : 'color:#b5adb8;') + (opt || '') });
     const drTotals = { in:{}, exp:{}, income:0, expense:0, left:0 };
     const dailyReportRows = drDates.map(iso => {
@@ -8013,7 +8107,7 @@ class Component extends DCLogic {
         drTotals.in[c.key] = (drTotals.in[c.key] || 0) + v;
         cells.push(drCell(v));
       });
-      cells.push(drCell(income, 'font-weight:600;color:' + (income < 0 ? '#b3261e' : '#bd336b') + ';'));
+      cells.push(drCell(income, 'font-weight:600;color:' + (income < 0 ? MONEY_OUT : MONEY_IN) + ';'));
       drExpCats.forEach(c => {
         const v = b.exp[c] || 0; expense += v;
         drTotals.exp[c] = (drTotals.exp[c] || 0) + v;
@@ -8021,7 +8115,7 @@ class Component extends DCLogic {
       });
       cells.push(drCell(expense, 'font-weight:600;color:#b3261e;'));
       const left = income - expense;
-      cells.push({ v: drFmt(left), style: 'padding:9px 8px;text-align:right;white-space:nowrap;font-weight:700;color:'
+      cells.push({ v: drFmt(left), style: 'padding:6px 8px;text-align:right;white-space:nowrap;font-weight:700;color:'
         + (left < 0 ? '#b3261e' : (left > 0 ? '#17613f' : '#b5adb8')) });
       drTotals.income += income; drTotals.expense += expense; drTotals.left += left;
       const d = new Date(iso + 'T00:00:00');
@@ -8030,11 +8124,17 @@ class Component extends DCLogic {
         rowStyle: { borderTop:'1px solid #f0eaee', color:'#28252b', background: (income || expense) ? 'transparent' : '#faf8fa' }
       };
     });
+    // พับ: เกิน 10 วัน = แสดง 7 วันล่าสุด (แถวรวมยังนับทุกวัน) · กด "ดูทั้งหมด" เห็นครบ — ตัวเลขทุกวันยังอยู่ ไม่ได้ตัดทิ้ง
+    const dailyBookFoldable = dailyReportRows.length > 10;
+    const dailyBookFolded = dailyBookFoldable && !this.state.dailyBookAll;
+    if (dailyBookFolded) dailyReportRows.forEach((r, i) => { if (i < dailyReportRows.length - 7) r.rowStyle = { ...r.rowStyle, display:'none' }; });
+    const dailyBookFoldLabel = dailyBookFolded ? 'ดูทั้งหมด (' + dailyReportRows.length + ' วัน) ▾' : 'ย่อเหลือ 7 วันล่าสุด ▴';
+    const toggleDailyBook = () => this.setState(st => ({ dailyBookAll: !st.dailyBookAll }));
 
     const drTotCell = (v, opt) => ({ v: drFmt(v), style: 'padding:11px 8px;text-align:right;white-space:nowrap;font-weight:700;'
       + (v < 0 ? 'color:#b3261e;' : '') + (opt || '') });
     const dailyReportTotalCells = DR_POS_COLS.concat(DR_PLATFORM_COLS).map(c => drTotCell(drTotals.in[c.key] || 0))
-      .concat([drTotCell(drTotals.income, 'color:' + (drTotals.income < 0 ? '#b3261e' : '#bd336b') + ';')])
+      .concat([drTotCell(drTotals.income, 'color:' + (drTotals.income < 0 ? MONEY_OUT : MONEY_IN) + ';')])
       .concat(drExpCats.map(c => drTotCell(drTotals.exp[c] || 0, 'color:#b3261e;')))
       .concat([drTotCell(drTotals.expense, 'color:#b3261e;'),
                drTotCell(drTotals.left, 'color:' + (drTotals.left < 0 ? '#b3261e' : '#17613f') + ';')]);
@@ -8627,12 +8727,18 @@ class Component extends DCLogic {
       salesDailyRows.push(totalRow);
     }
     const salesDailyHasRows = salesDailyRows.length > 0;
-    const salesDailyRowsStyled = salesDailyRows.map(r => ({
+    // พับ (27 พ.ย. 2569 หน้าแบบกระชับ): เกิน 10 วัน = แสดง 7 วันล่าสุด + แถวรวม (นับทุกวัน) · ช่องที่กำลังแก้อยู่ไม่ถูกพับ
+    const skFoldable = skDayKeys.length > 10;
+    const skFolded = skFoldable && !this.state.skDailyAll;
+    const salesDailyRowsStyled = salesDailyRows.map((r, i) => ({
       ...r,
       rowStyle: r.isTotal
         ? { borderTop: '2px solid #e9e1e6', background: '#faf8fa', fontWeight: 700, color: '#28252b' }
-        : { borderTop: '1px solid #f0eaee', color: '#28252b' }
+        : { borderTop: '1px solid #f0eaee', color: '#28252b',
+            ...(skFolded && i >= 7 && !SK_PAY_FIELDS.some(f => r[f] && r[f].editing) ? { display: 'none' } : {}) }
     }));
+    const salesDailyFoldLabel = skFolded ? 'ดูทั้งหมด (' + skDayKeys.length + ' วัน) ▾' : 'ย่อเหลือ 7 วันล่าสุด ▴';
+    const toggleSalesDaily = () => this.setState(st => ({ skDailyAll: !st.skDailyAll }));
 
     const skPlatformColors = { 'Grab':'#35875A', 'LINE MAN':'#7B62A8', 'ShopeeFood':'#C96245', 'หน้าร้าน':'#9e2858' };
     const skPlatformOrder = ['Grab','LINE MAN','ShopeeFood','หน้าร้าน'];
@@ -9775,7 +9881,19 @@ class Component extends DCLogic {
     { const end = dbdDayNum(hmRng.to); let start = hmBounded ? dbdDayNum(hmRng.from) : end - 30; if (end - start > 61) start = end - 61; for (let dn = start; dn <= end; dn++) hmDayList.push(dbdDayIso(dn)); }
     const hmRealBy = {}; ovRows.forEach(r => { if (r.isoDate) hmRealBy[r.isoDate] = (hmRealBy[r.isoDate] || 0) + (Number(r.gross) || 0); });
     const hmEstBy = hmEstShown ? (hmEstimate.byDate || {}) : {};
-    const hmBars = hmDayList.map(iso => ({ iso, label: String(Number(iso.slice(8))), title: hmD(iso), real: hmRealBy[iso] || 0, est: Number(hmEstBy[iso]) || 0 }));
+    // แยกสีตามช่องทางเหมือนหน้ายอดขาย (27 พ.ย. 2569)
+    const HM_COL = MONEY_IN_COLS;
+    const hmWsPay = this.specialPay();
+    const hmParts = dbdDayParts(ovRows, hmWsPay);
+    const hmBars = hmDayList.map(iso => {
+      const pp = hmParts[iso] || { store: 0, ws: 0, deliv: 0 };
+      return { iso, label: String(Number(iso.slice(8))), title: hmD(iso), real: hmRealBy[iso] || 0, est: Number(hmEstBy[iso]) || 0,
+        parts: [{ v: pp.store, color: HM_COL.store, label: 'หน้าร้าน' }, { v: pp.ws, color: HM_COL.ws, label: hmWsPay }, { v: pp.deliv, color: HM_COL.deliv, label: 'เดลิเวอรี่' }] };
+    });
+    const hmLegend = [{ label: 'หน้าร้าน', color: HM_COL.store }]
+      .concat(hmBars.some(b => b.parts[1].v > 0) ? [{ label: hmWsPay, color: HM_COL.ws }] : [])
+      .concat(hmBars.some(b => b.parts[2].v > 0) ? [{ label: 'เดลิเวอรี่ (รายงานแอป)', color: HM_COL.deliv }] : [])
+      .concat(hmBars.some(b => b.est > 0) ? [{ label: 'เดลิเวอรี่ ประมาณการ', color: HM_COL.est, hatched: true }] : []);
     const hmRangeText = hmBounded ? pfRangeShort(hmRng.from, hmRng.to) : hmRng0 ? 'ถึง ' + pfDateShort(hmRng.to) : 'ทุกช่วงเวลา';
     const homePanel = buildHomePanel({
       fmt: ovFmt, banner: hmBanner,
@@ -9788,7 +9906,8 @@ class Component extends DCLogic {
       cakes: { value: hmCakes, note: hmRangeText },
       todos: hmTodos, onGo: pg => go(pg),
       chartTitle: 'ยอดขายรายวัน', chartHasEst: hmBars.some(x => x.est > 0), chartEmpty: !hmBars.some(x => x.real > 0 || x.est > 0),
-      chart: buildDayBars({ days: hmBars, target: this.state.dailyTarget, fmt: ovFmt, hover: this.state.homeHover, onHover: i => this.setState({ homeHover: i }),
+      legend: hmLegend,
+      chart: buildDayBars({ short: true, estColor: HM_COL.est, estBg: HM_COL.estBg, days: hmBars, target: this.state.dailyTarget, fmt: ovFmt, hover: this.state.homeHover, onHover: i => this.setState({ homeHover: i }),
         compact: typeof window !== 'undefined' && window.innerWidth <= 640 })
     });
     const HM_CHIP = { border:'1px solid #e9e1e6', background:'#ffffff', borderRadius:'10px', padding:'6px 13px', fontSize:'13px', color:'#4a444d', fontWeight:500, cursor:'pointer', whiteSpace:'nowrap' };
@@ -9867,7 +9986,21 @@ class Component extends DCLogic {
     const sdEstShown = !!sdEstimate && !sdEstimate.hidden;
     const sdRealBy = {}; salesRows.forEach(r => { if (r.isoDate) sdRealBy[r.isoDate] = (sdRealBy[r.isoDate] || 0) + (Number(r.gross) || 0); });
     const sdEstBy = sdEstShown ? (sdEstimate.byDate || {}) : {};
-    const sdBars = hmDayList.map(iso => ({ iso, label: String(Number(iso.slice(8))), title: hmD(iso), real: sdRealBy[iso] || 0, est: Number(sdEstBy[iso]) || 0 }));
+    // แท่งจริงแยกสีตามช่องทาง (27 พ.ย. 2569): หน้าร้าน · ขายส่ง · เดลิเวอรี่ที่มีรายงานแอป — รวมกัน = ยอดจริงของวันเดิม
+    const SD_COL = MONEY_IN_COLS;   // เงินเข้า = เขียว (เข้ม → อ่อน: หน้าร้าน · ช่องพิเศษ · เดลิเวอรี่ · ประมาณการลาย)
+    const sdWsPay = this.specialPay();
+    const sdParts = dbdDayParts(salesRows, sdWsPay);
+    const sdBars = hmDayList.map(iso => {
+      const pp = sdParts[iso] || { store: 0, ws: 0, deliv: 0 };
+      return { iso, label: String(Number(iso.slice(8))), title: hmD(iso), real: sdRealBy[iso] || 0, est: Number(sdEstBy[iso]) || 0,
+        parts: [{ v: pp.store, color: SD_COL.store, label: 'หน้าร้าน' }, { v: pp.ws, color: SD_COL.ws, label: sdWsPay }, { v: pp.deliv, color: SD_COL.deliv, label: 'เดลิเวอรี่' }] };
+    });
+    const sdSources = dbdSalesSources(salesRows, sdWsPay, sdEstShown ? sdEstimate.total : 0);
+    sdSources.rows.forEach(r => { if (r.key === 'ws') r.label = sdWsPay; });   // บางสาขาช่องพิเศษไม่ใช่ขายส่ง (ถนนจันทร์ = ล็อตเตอรี่)
+    const sdLegend = [{ label: 'หน้าร้าน', color: SD_COL.store }]
+      .concat(sdBars.some(b => b.parts[1].v > 0) ? [{ label: sdWsPay, color: SD_COL.ws }] : [])
+      .concat(sdBars.some(b => b.parts[2].v > 0) ? [{ label: 'เดลิเวอรี่ (รายงานแอป)', color: SD_COL.deliv }] : [])
+      .concat(sdBars.some(b => b.est > 0) ? [{ label: 'เดลิเวอรี่ ประมาณการ', color: SD_COL.est, hatched: true }] : []);
     const salesHeroPanel = buildSalesHero({
       fmt: ovFmt, banner: sdBanner,
       sales: salesTotalGross, salesComplete: !sdBehind,
@@ -9876,7 +10009,9 @@ class Component extends DCLogic {
       estimate: sdEstimate, estimateNote: sdEstimate && sdEstimate.hidden === 'filter' ? 'ประมาณการไม่แยกตามตัวกรอง' : hmEstNote,
       estimateRange: sdEstShown && sdEstimate.from ? pfRangeShort(sdEstimate.from, sdEstimate.to) : '',
       chartHasEst: sdBars.some(x => x.est > 0), chartEmpty: !sdBars.some(x => x.real > 0 || x.est > 0),
-      chart: buildDayBars({ id: 'sd', days: sdBars, target: sdFiltered ? null : this.state.dailyTarget, fmt: ovFmt, hover: this.state.sdHover, onHover: i => this.setState({ sdHover: i }),
+      // กล่อง "ยอดมาจากไหน" สีตามแพลตฟอร์ม (แอนนี่ 27 พ.ย.): LINE MAN เขียวอ่อน · Grab เขียวเข้ม · ShopeeFood ส้ม · ประมาณการ (ไม่แยกแอป) เทาลาย
+      legend: sdLegend, sources: sdSources, sourceColors: { ...SD_COL, 'LINE MAN': '#8BD17C', Grab: '#0B7A3E', ShopeeFood: '#F2600C', est: '#9E9E9E' },
+      chart: buildDayBars({ id: 'sd', short: true, estColor: SD_COL.est, estBg: SD_COL.estBg, days: sdBars, target: sdFiltered ? null : this.state.dailyTarget, fmt: ovFmt, hover: this.state.sdHover, onHover: i => this.setState({ sdHover: i }),
         compact: typeof window !== 'undefined' && window.innerWidth <= 640 })
     });
     const sdFiltersOpen = this.state.sdFilterOpen == null ? sdFiltered : !!this.state.sdFilterOpen;
@@ -9952,7 +10087,8 @@ class Component extends DCLogic {
       const plLad = dbdLadder(plPd);
       const plDaysOpen = this.state.profitShowDays !== false;
       plOpt.days = { title: 'กำไรคร่าว ๆ รายวัน', range: pfRangeShort(plW.from, plW.to), list: plPd.days || [], open: plDaysOpen,
-        onToggle: () => this.setState(st0 => ({ profitShowDays: st0.profitShowDays === false })) };
+        onToggle: () => this.setState(st0 => ({ profitShowDays: st0.profitShowDays === false })),
+        all: !!this.state.plDaysAll, onAll: () => this.setState(st0 => ({ plDaysAll: !st0.plDaysAll })) };
       if (!plLad) plOpt.none = 'เดือนที่เลือกไม่มีวันที่ขายผ่าน POS จึงยังคิดกำไรคร่าว ๆ ไม่ได้ · ตารางด้านล่างยังดูได้ตามปกติ';
       else {
         // เงินเดือนของเดือนที่เลือก: นับทีละงวด (คนจ่าย 2 งวด = 2 งวด) ของพนักงานที่ทำงานอยู่ในเดือนนั้น + สลิปของเดือนนั้นที่มีอยู่แล้ว · งวดที่ยังไม่ได้สร้างสลิป = ยังไม่จ่าย
@@ -9970,7 +10106,7 @@ class Component extends DCLogic {
         const plR4 = dbdAfterExpenses({ period: { from: plStart, to: plIsCur ? plW.to : plEnd }, today: plIsCur ? plW.to : hmToday, monthStart: plStart, monthEnd: plEnd,
           posFrom: plLad.posFrom, ownerMarkedComplete: plMarked, unpaidSlips: this.state.payrollError ? null : plUnpaid,
           daysCompleteBeforeExpenses: plPd.complete_before_expenses === true, profitAfterExpenses: plT.profit_after_expenses, fmt: hmD });
-        const plLine = (n, id, label, mark, more) => ({ id, label, mark: n === null ? 'part' : mark, text: n === null ? '—' : plBaht(n), muted: n === null, ...(more || {}) });
+        const plLine = (n, id, label, mark, more) => ({ id, label, mark: n === null ? 'part' : mark, text: n === null ? '—' : plBaht(n), muted: n === null, value: n, ...(more || {}) });
         const plAcc = plLad.accessory || 0;
         plOpt.ladder = {
           title: 'กำไร-ขาดทุน ' + plLabel, range: 'นับเฉพาะวันที่ขายผ่าน POS · ' + pfRangeShort(plLad.from, plLad.to),
@@ -10173,13 +10309,13 @@ class Component extends DCLogic {
       salesKpis, platformTabs, platformDD, brandDD, typeDD, paymentDD, statusDD,
       form: f, netSales, netPayout, setGross, setDiscount, setFee, setPromo, setNote, setOrderId,
       dateOpen, toggleDate, setDate, dateDisplay: isoToBEFull(f.date),
-      salesDailyRows: salesDailyRowsStyled, salesDailyHasRows, headerDateDisplay,
+      salesDailyRows: salesDailyRowsStyled, salesDailyHasRows, headerDateDisplay, skFoldable, salesDailyFoldLabel, toggleSalesDaily,
       clearForm, saveRow: saveRow(false), saveAndContinue: saveRow(true), displayRows, rowCount, salesTotalCount, salesSearch: this.state.salesSearch, setSearch,
       isEditingSales, salesFormTitle, clearButtonLabel, saveButtonLabel: isEditingSales ? 'บันทึกการแก้ไข' : 'บันทึกรายการ',
       salesStatusDD, salesPeriodDD, salesPageSizeDD, resetSalesFilters,
       salesHeadDate, salesHeadPlatform, salesHeadBrand, salesHeadOrderId, salesHeadGross, salesHeadNet, salesHeadStatus,
       salesRangeOpen, salesRangeFrom, salesRangeTo, setSalesRangeFrom, setSalesRangeTo, clearSalesRange,
-      dailyReportRows, dailyReportHeads, dailyReportTotalCells, dailyReportNote,
+      dailyReportRows, dailyReportHeads, dailyReportTotalCells, dailyReportNote, dailyBookFoldable, dailyBookFoldLabel, toggleDailyBook,
       salesPage, salesTotalPages, salesPrevPage, salesNextPage, salesHasPrev: salesPage > 1, salesHasNext: salesPage < salesTotalPages,
       scrollToSalesForm, exportSalesCsv,
       storeBatch, storeBatchRows, storeBatchTotals, storeFormError: this.state.storeFormError,
