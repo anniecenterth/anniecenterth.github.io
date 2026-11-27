@@ -351,6 +351,33 @@
           <div style="background:#fff;border:1px dashed #e9e1e6;border-radius:18px;padding:34px;text-align:center;color:#716a75;font-size:13.5px">ยังไม่มีพนักงาน — ไปที่แท็บ "พนักงาน" เพื่อเพิ่มคนแรกก่อน</div>
         </sc-if>
       </div>
+      <!-- ประกันสังคมที่ต้องนำส่งของเดือนนี้ (27 พ.ย. 2569) — ลงรายจ่ายวันที่ส่งเงินจริง -->
+      <sc-if value="{{ ssoShow }}" hint-placeholder-val="{{ false }}">
+      <div data-keep="K10.sso" style="background:#fff;border:1px solid #e9e1e6;border-radius:18px;padding:18px 20px;margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div style="font-size:15px;font-weight:700;color:#28252b">ประกันสังคม ที่ต้องส่งของสลิป {{ payrollPeriodLabel }}</div>
+          <span style="{{ ssoPillStyle }}">{{ ssoPill }}</span>
+        </div>
+        <div style="display:flex;gap:10px 26px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:#4a444d">
+          <div>ส่วนลูกจ้าง (หักจากสลิป) <b style="color:#28252b">{{ ssoEmployee }}</b></div>
+          <div>ส่วนนายจ้าง <b style="color:#28252b">{{ ssoEmployer }}</b></div>
+          <div style="font-size:14px">รวมต้องส่ง <b style="color:#28252b">{{ ssoTotal }}</b></div>
+        </div>
+        <div style="margin-top:8px;font-size:12.5px;color:#716a75;line-height:1.6">{{ ssoNote }}</div>
+        <sc-if value="{{ ssoCanSend }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+            <div style="font-size:12.5px;color:#716a75">วันที่โอนให้ประกันสังคม</div>
+            <input data-act="K10.sso.date" value="{{ ssoDateValue }}" onChange="{{ setSsoDate }}" type="date" style="border:1px solid #e9e1e6;border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;outline:none"/>
+            <div data-act="K10.sso.send" onClick="{{ ssoSend }}" style="background:#17613f;color:#fff;border-radius:11px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">ส่งแล้ว & ลงรายจ่าย</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ ssoCanUndo }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:flex-end;margin-top:12px">
+            <div data-act="K10.sso.undo" onClick="{{ ssoUndo }}" style="border:1px solid #f3c8c4;background:#fff;color:#b3261e;border-radius:11px;padding:8px 16px;font-size:13px;cursor:pointer">ยกเลิกการส่ง</div>
+          </div>
+        </sc-if>
+      </div>
+      </sc-if>
       </sc-if>
 
       <!-- ---------- ตัวแก้สลิป ---------- -->
@@ -2904,7 +2931,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 26 พ.ย. 18:37';
+    m.textContent = 'ฐาน: annie-cake 27 พ.ย. ประกันสังคม';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -3744,6 +3771,53 @@ function dbdPlChecklist(input) {
       : row('accessory', false, 'ยังไม่หักอุปกรณ์และของแถม (ขายไป ' + baht(Number(input.accessorySales)) + ')', 'ลงเป็นรายจ่ายหมวด "อุปกรณ์และของแถม" ที่หน้ารายจ่าย', null, 'expenserec'));
   }
   return out;
+}
+/** ประกันสังคมที่ต้องนำส่งของเดือนสลิป ym ('YYYY-MM') ของสาขาเดียว (27 พ.ย. 2569 · แบบ docs/superpowers/specs/2026-11-27-dbd-auto-lines-design.md)
+ *  กติกาเจ้าของร้าน (สเปกเงินเดือน 1 ก.ย. ข้อ 4): ประกันสังคมที่หักไว้ และส่วนนายจ้าง เป็นรายจ่าย "วันที่นำส่งจริง" ไม่ใช่วันจ่ายเงินเดือน
+ *  slips    = สลิปของเดือนนั้น [{ status, lines: [{ kind, label, amount }] }]
+ *  sentRows = รายจ่ายที่ลงไว้แล้วของเดือนนั้น (source 'SSO') [{ amount, isoDate, sourceRef }] — sourceRef ลงท้าย ':emp' / ':er'
+ *  ส่วนลูกจ้าง = ผลรวมบรรทัดหัก "ประกันสังคม…" ของสลิปที่จ่ายแล้ว (ตัวเลขในสลิปจริง รวมที่แก้มือ)
+ *  ส่วนนายจ้าง = เท่ากับส่วนลูกจ้างของแต่ละใบ (อัตราเดียวกัน 5% ฐานเดียวกัน เพดานเดียวกัน 750)
+ *  สลิปที่บรรทัดประกันสังคมผิดรูป (มากกว่า 1 บรรทัด · ติดลบ · เกิน 750) = bad → ส่งไม่ได้จนกว่าจะแก้สลิป
+ *  คืน { employee, employer, total, ssoSlips, unpaid, bad, due, sent, sentTotal, sentDate, mismatch, canSend, rows } */
+function dbdSsoPlan(slips, ym, sentRows) {
+  var r2 = function (n) { return Math.round((Number(n) || 0) * 100) / 100; };
+  var ssoLines = function (s) {
+    return (s && s.lines || []).filter(function (l) { return l && l.kind === 'deduction' && /^ประกันสังคม/.test(String(l.label || '')); });
+  };
+  var employee = 0, ssoSlips = 0, unpaid = 0, bad = 0;
+  (slips || []).forEach(function (s) {
+    var ls = ssoLines(s);
+    if (!ls.length) return;
+    var v = Number(ls[0].amount) || 0;
+    if (ls.length > 1 || v < 0 || v > 750) { bad += 1; return; }
+    if (!(v > 0)) return;
+    if (s.status === 'จ่ายแล้ว') { employee += v; ssoSlips += 1; } else unpaid += 1;
+  });
+  employee = r2(employee);
+  var employer = employee;
+  var total = r2(employee + employer);
+  var y = Number(String(ym).slice(0, 4)), m = Number(String(ym).slice(5, 7));
+  var ny = m === 12 ? y + 1 : y, nm = m === 12 ? 1 : m + 1;
+  var due = ny + '-' + String(nm).padStart(2, '0') + '-15';
+  var sent = (sentRows || []).length > 0;
+  var sentTotal = r2((sentRows || []).reduce(function (a, x) { return a + (Number(x.amount) || 0); }, 0));
+  var sentDate = sent ? (sentRows || []).map(function (x) { return x.isoDate || ''; }).sort()[0] || null : null;
+  var rows = [];
+  if (employee > 0) rows.push({ part: 'emp', sub: 'เงินเดือนประจำ', amount: employee });
+  if (employer > 0) rows.push({ part: 'er', sub: 'ประกันสังคม (ส่วนนายจ้าง)', amount: employer });
+  // ลงไว้ถูกรูป = มีแถวละส่วนตรงกับที่ต้องลงพอดี (ยอดของแต่ละส่วน วันที่เดียวกัน) — ไม่ใช่แค่ยอดรวมเท่ากัน
+  var sentOk = sent && (sentRows || []).length === rows.length && rows.every(function (w) {
+    var hit = (sentRows || []).filter(function (x) { return String(x.sourceRef || '').slice(-(w.part.length + 1)) === ':' + w.part; });
+    return hit.length === 1 && Math.abs((Number(hit[0].amount) || 0) - w.amount) < 0.01;
+  }) && (sentRows || []).every(function (x) { return (x.isoDate || '') === sentDate; });
+  return {
+    employee: employee, employer: employer, total: total, ssoSlips: ssoSlips, unpaid: unpaid, bad: bad, due: due,
+    sent: sent, sentTotal: sentTotal, sentDate: sentDate,
+    mismatch: sent && !sentOk,
+    canSend: !sent && total > 0 && unpaid === 0 && bad === 0,
+    rows: rows
+  };
 }
 /* DBD-PURE-END */
 /** กราฟแท่งยอดขายรายวันของ "หน้าแรก" — แท่งทึบ = จริง · แท่งลาย (สีเดียวกัน) = ประมาณการ วางต่อบนแท่งจริงโดยเว้นช่อง 2px
@@ -5894,6 +5968,76 @@ class Component extends DCLogic {
     const payrollHasEmployees = pyActiveEmps.length > 0;
     const payrollNoEmployees = pyActiveEmps.length === 0;
 
+    // ---- ประกันสังคมที่ต้องนำส่งของเดือนนี้ (27 พ.ย. 2569) ----
+    // สลิปลงรายจ่ายเฉพาะเงินที่จ่ายพนักงานจริง (หักประกันสังคมแล้ว) ส่วนที่หักไว้ + ส่วนนายจ้าง ลงวันที่นำส่งจริง (สเปกเงินเดือน ข้อ 4)
+    // แถวที่ลง: source 'SSO' · source_ref 'sso:<สาขา>:<YYYY-MM>:emp' / ':er' — เดือนละ 2 แถว ยกเลิกได้ที่นี่ที่เดียว
+    const ssoBranch = this.activeBranch();
+    const ssoRefs = ['emp', 'er'].map(p => 'sso:' + ssoBranch + ':' + pyPeriod + ':' + p);
+    const ssoMonthSlips = this.ofBranch(this.state.payslips).filter(s2 => String(s2.period).slice(0, 10) === pyPeriodDate);
+    const ssoSentRows = this.ofBranch(this.state.expRows || []).filter(r => r.source === 'SSO' && ssoRefs.indexOf(String(r.sourceRef || '')) >= 0);
+    const sso = dbdSsoPlan(ssoMonthSlips, pyPeriod, ssoSentRows);
+    const ssoAccess = this.state.accessRows || [];
+    // ปุ่มขึ้นเฉพาะเมื่อโหลดสิทธิ์แล้วและบัญชีนี้เขียนสาขานี้ได้ (ยังไม่รู้ = ไม่ให้กด)
+    const ssoReadOnly = !(this.state.accessLoaded && ssoAccess.some(r => r.branch === ssoBranch && r.can_write));
+    const ssoShow = sso.total > 0 || sso.sent || sso.unpaid > 0 || sso.bad > 0;
+    const ssoOverdue = !sso.sent && sso.total > 0 && todayISO() > sso.due;
+    const ssoPill = sso.sent ? 'ส่งแล้ว ' + isoToBEShort(sso.sentDate || '') : (ssoOverdue ? 'เลยกำหนด ' : 'ส่งภายใน ') + isoToBEShort(sso.due);
+    const ssoPillStyle = 'font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;'
+      + (sso.sent ? 'background:#e3f4eb;color:#17613f' : ssoOverdue ? 'background:#fdecea;color:#b3261e' : 'background:#ffe8d4;color:#a84a00');
+    const ssoNote = sso.sent && sso.mismatch
+      ? 'ที่ลงไว้ (' + pyBaht(sso.sentTotal) + ') ไม่ตรงกับสลิปที่จ่ายแล้วตอนนี้ (' + pyBaht(sso.total) + ') — ถ้าจ่ายหรือแก้สลิปหลังส่ง กด "ยกเลิกการส่ง" แล้วกดส่งใหม่ · ถ้ายอดที่โอนจริงต่างจากสลิป (ค่าปรับ เศษ) อย่าแก้สลิปให้ตรง แจ้งผมก่อน'
+      : sso.bad > 0
+        ? 'สลิป ' + sso.bad + ' ใบมีบรรทัดประกันสังคมผิดรูป (มากกว่า 1 บรรทัด ติดลบ หรือเกิน ฿750) — แก้สลิปก่อน ถึงจะกดส่งได้'
+      : sso.unpaid > 0
+        ? 'มีสลิปที่หักประกันสังคมยังไม่จ่าย ' + sso.unpaid + ' ใบ — จ่ายสลิปให้ครบก่อน ถึงจะกดส่งได้'
+        : sso.sent
+          ? 'ลงรายจ่ายแล้ว ' + pyBaht(sso.sentTotal) + ' (ส่วนลูกจ้าง → ค่าแรง › เงินเดือนประจำ · ส่วนนายจ้าง → ค่าแรง › ประกันสังคม (ส่วนนายจ้าง))'
+          : 'กดเมื่อโอนเงินให้ประกันสังคมแล้ว ระบบลงรายจ่ายวันที่ที่เลือก: ส่วนลูกจ้าง → ค่าแรง › เงินเดือนประจำ · ส่วนนายจ้าง → ค่าแรง › ประกันสังคม (ส่วนนายจ้าง)';
+    const ssoCanSend = sso.canSend && !ssoReadOnly;
+    const ssoCanUndo = sso.sent && !ssoReadOnly;
+    const ssoDateValue = this.state.ssoDate || todayISO();
+    const setSsoDate = e => this.setState({ ssoDate: e.target.value });
+    const ssoSend = async () => {
+      if (!ssoCanSend || this.state.payrollBusy) return;
+      const d = ssoDateValue;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { this.setState({ payrollError: 'เลือกวันที่ส่งเงินก่อน' }); return; }
+      if (d < pyPeriodDate) { this.setState({ payrollError: 'วันที่ส่งเงินต้องไม่ก่อนเดือนของสลิป' }); return; }
+      if (d > todayISO()) { this.setState({ payrollError: 'วันที่ส่งเงินเป็นวันข้างหน้าไม่ได้ — กดหลังโอนเงินแล้ว' }); return; }
+      if (!window.confirm('ลงรายจ่ายประกันสังคม ' + payrollPeriodLabel + ' รวม ' + pyBaht(sso.total) + ' วันที่ ' + isoToBEShort(d) + ' ใช่ไหม')) return;
+      this.setState({ payrollBusy: true });
+      try {
+        // กันลงซ้ำ: ถามฐานจริงก่อน ไม่เชื่อแค่ข้อมูลที่โหลดไว้ในหน้า
+        const chk = await supabaseClient.from('expenses').select('id').eq('source', 'SSO').in('source_ref', ssoRefs);
+        if (chk.error) throw chk.error;
+        if ((chk.data || []).length) throw new Error('เดือนนี้ลงประกันสังคมไว้แล้ว');
+        const rows = sso.rows.map(r => ({
+          date: isoToBEShort(d), time: '00:00', expense_date: d,
+          main_cat: 'ค่าแรง', sub_cat: r.sub, amount: r.amount, payment: 'โอนเงิน',
+          detail: 'ประกันสังคม ' + payrollPeriodLabel + ' · ' + (r.part === 'emp' ? 'ส่วนลูกจ้างที่หักจากสลิป' : 'ส่วนนายจ้าง'),
+          source: 'SSO', source_ref: 'sso:' + ssoBranch + ':' + pyPeriod + ':' + r.part,
+          created_by: null, attachment_name: null, branch: ssoBranch
+        }));
+        const ins = await supabaseClient.from('expenses').insert(rows).select('id');
+        if (ins.error) throw ins.error;
+        await this.loadExpenses();
+        this.setState({ payrollError: null });
+      } catch (e) { this.setState({ payrollError: 'ลงประกันสังคมไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+    const ssoUndo = async () => {
+      if (!ssoCanUndo || this.state.payrollBusy) return;
+      if (!window.confirm('ยกเลิกการส่งประกันสังคม ' + payrollPeriodLabel + ' — ลบรายจ่าย 2 แถวที่ลงไว้ใช่ไหม')) return;
+      this.setState({ payrollBusy: true });
+      try {
+        const del = await supabaseClient.from('expenses').delete().eq('source', 'SSO').in('source_ref', ssoRefs);
+        if (del.error) throw del.error;
+        await this.loadExpenses();
+        this.setState({ payrollError: null });
+      } catch (e) { this.setState({ payrollError: 'ยกเลิกไม่สำเร็จ — ' + (e.message || '') }); }
+      this.setState({ payrollBusy: false });
+    };
+    const ssoEmployee = pyBaht(sso.employee), ssoEmployer = pyBaht(sso.employer), ssoTotal = pyBaht(sso.total);
+
     // ---- แท็บพนักงาน ----
     const setEmpF = k => e => { const v = e.target.value; this.setState(st => ({ empForm: Object.assign({}, st.empForm, { [k]: v }) })); };
     const setEmpName = setEmpF('name'), setEmpSalary = setEmpF('base_salary'), setEmpDaily = setEmpF('daily_rate'),
@@ -7354,9 +7498,10 @@ class Component extends DCLogic {
       // แถวที่ระบบลงเองจากใบสั่งเค้กใน ANNIE POS (source POS_PO · db/198): แก้/ลบที่นี่ไม่ได้ — ลบแล้วระบบจะลงกลับเองคืนถัดไป
       //   ถ้ายอดไม่ถูก ให้แก้ที่ใบสั่งใน POS (ยกเลิกใบสั่ง = ระบบย้อนยอดให้เอง)
       const isPoRow = r.source === 'POS_PO';
-      const isCashRow = r.source === 'POS_CASH';   // มาจากกล่อง "เงินสดออกจากลิ้นชัก" — แก้ด้วย "ยกเลิกการตัดสิน" ในกล่องนั้น
+      const isCashRow = r.source === 'POS_CASH';
+      const isSsoRow = r.source === 'SSO';   // ประกันสังคมจากหน้าเงินเดือน — ยกเลิกได้ที่การ์ดประกันสังคมในหน้าเงินเดือนเท่านั้น   // มาจากกล่อง "เงินสดออกจากลิ้นชัก" — แก้ด้วย "ยกเลิกการตัดสิน" ในกล่องนั้น
       const onDelete = async () => {
-        if (isPoRow || isCashRow) return;
+        if (isPoRow || isCashRow || isSsoRow) return;
         try {
           const { error } = await supabaseClient.from('expenses').delete().eq('id', r.id);
           if (error) throw error;
@@ -7367,7 +7512,7 @@ class Component extends DCLogic {
       };
       const hasDoc = !!r.attachmentName;
       // §17/§21: ที่มาของแถว + คนบันทึก แสดงใต้รายละเอียด
-      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS', POS_CASH:'เงินสดจากลิ้นชัก POS' }[r.source] || '';
+      const srcLabel = { TELEGRAM:'Telegram', MANUAL:'กรอกเอง', MANUAL_FORM:'กรอกเอง', POS:'POS', PLATFORM_IMPORT:'นำเข้า', POS_PO:'ลงอัตโนมัติจากใบสั่งเค้กใน POS', POS_CASH:'เงินสดจากลิ้นชัก POS', SSO:'ประกันสังคมจากหน้าเงินเดือน' }[r.source] || '';
       const meta = [srcLabel, r.createdBy].filter(Boolean).join(' · ');
       return {
         id: r.id, paymentText: r.payment, hasDoc,
@@ -7377,10 +7522,10 @@ class Component extends DCLogic {
         docTitle: hasDoc ? r.attachmentName : 'ไม่มีเอกสาร', docColor: hasDoc ? '#bd336b' : '#b5adb8',
         onEdit: startEditExpenseRow(r),
         // รายการที่ระบบสร้างจากสลิปเงินเดือน (source PAYROLL) แก้ที่นี่ไม่ได้ ไม่งั้นยอดไม่ตรงสลิป — ให้ยกเลิกการจ่ายที่หน้าเงินเดือนแล้วจ่ายใหม่
-        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isCashRow && !isReadOnly,
-        locked: r.source === 'PAYROLL' || isPoRow || isCashRow,
-        lockTitle: isCashRow ? 'มาจากเงินสดออกลิ้นชัก POS — ถ้าหมวดผิด กด "ยกเลิกการตัดสิน" ในกล่องเงินสดออกจากลิ้นชัก แล้วยืนยันใหม่' : isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
-        canDelete: !isPoRow && !isCashRow && !isReadOnly,
+        canEdit: r.source !== 'PAYROLL' && !isPoRow && !isCashRow && !isSsoRow && !isReadOnly,
+        locked: r.source === 'PAYROLL' || isPoRow || isCashRow || isSsoRow,
+        lockTitle: isSsoRow ? 'ประกันสังคมจากหน้าเงินเดือน — ถ้าผิด กด "ยกเลิกการส่ง" ที่การ์ดประกันสังคมในหน้าเงินเดือน แล้วส่งใหม่' : isCashRow ? 'มาจากเงินสดออกลิ้นชัก POS — ถ้าหมวดผิด กด "ยกเลิกการตัดสิน" ในกล่องเงินสดออกจากลิ้นชัก แล้วยืนยันใหม่' : isPoRow ? 'ระบบลงเองจากใบสั่งเค้กใน ANNIE POS — แก้ที่ใบสั่งใน POS (ลบที่นี่ไม่ได้ ระบบจะลงกลับเอง)' : 'รายการจากหน้าเงินเดือน — แก้ที่หน้าเงินเดือน (ยกเลิกการจ่ายแล้วจ่ายใหม่)',
+        canDelete: !isPoRow && !isCashRow && !isSsoRow && !isReadOnly,
         onDelete
       };
     });
@@ -9939,6 +10084,7 @@ class Component extends DCLogic {
       payrollTabs, isPayrollTabSlips, isPayrollTabEmps, isPayrollTabCal,
       payrollPeriodLabel, payrollPrevPeriod: pyShiftPeriod(-1), payrollNextPeriod: pyShiftPeriod(1),
       payrollSlipRows, payrollTotalNet, payrollPaidCount, payrollHasEmployees, payrollNoEmployees,
+      ssoShow, ssoPill, ssoPillStyle, ssoNote, ssoCanSend, ssoCanUndo, ssoDateValue, setSsoDate, ssoSend, ssoUndo, ssoEmployee, ssoEmployer, ssoTotal,
       payrollError: this.state.payrollError,
       slipEditorOpen, slipEditorTitle, slipEditorLocked, slipEditorRows,
       slipEditorEarning, slipEditorDeduction, slipEditorNet,
