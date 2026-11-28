@@ -733,7 +733,7 @@
       <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin:28px 0 12px">
         <div style="min-width:0">
           <h2 style="margin:0;font-size:18px;font-weight:700;color:#1E1B21;line-height:1.3">ตารางสรุปจากระบบการเงิน</h2>
-          <div style="font-size:12.5px;color:#77717D;margin-top:2px">ดูตามช่วงเวลาและตัวกรองด้านล่าง · {{ homePeriodLabel }}</div>
+          <div style="font-size:12.5px;color:#77717D;margin-top:2px">ดูตามช่วงเวลา · {{ homePeriodLabel }}</div>
         </div>
         <div data-period-dd="1" style="position:relative;display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end;background:rgba(30,27,33,0.06);border-radius:999px;padding:3px">
           <sc-for list="{{ homePeriodChips }}" as="c" hint-placeholder-count="4">
@@ -774,87 +774,20 @@
 
       <!-- filters -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
-        <div data-brand-dd="1" style="position:relative">
-          <div data-act="filter.brand" onClick="{{ toggleBrand }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E6E4E9;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="tag" style="width:17px;height:17px;color:#77717D"></i><span style="color:#77717D">แบรนด์:</span><span style="font-weight:600">{{ brand }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#77717D"></i></div>
-          <sc-if value="{{ brandOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E6E4E9;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
-              <sc-for list="{{ brandOptions }}" as="opt" hint-placeholder-count="4">
-                <div data-act="filter.brand.opt.{{ $index }}" onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
-        <div data-channel-dd="1" style="position:relative">
-          <div data-act="filter.channel" onClick="{{ toggleChannel }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E6E4E9;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="grid-2x2" style="width:17px;height:17px;color:#77717D"></i><span style="color:#77717D">ช่องทาง:</span><span style="font-weight:600">{{ channel }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#77717D"></i></div>
-          <sc-if value="{{ channelOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E6E4E9;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:190px">
-              <sc-for list="{{ channelOptions }}" as="opt" hint-placeholder-count="6">
-                <div data-act="filter.channel.opt.{{ $index }}" onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
-        <div data-inexcat-dd="1" style="position:relative">
-          <div data-act="filter.expcat" onClick="{{ toggleInexExpCat }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E6E4E9;border-radius:11px;padding:10px 14px;font-size:13.5px;cursor:pointer"><i data-lucide="layers" style="width:17px;height:17px;color:#77717D"></i><span style="color:#77717D">หมวดค่าใช้จ่าย:</span><span style="font-weight:600">{{ inexExpCat }}</span><i data-lucide="chevron-down" style="width:15px;height:15px;color:#77717D"></i></div>
-          <sc-if value="{{ inexExpCatOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="position:absolute;top:48px;left:0;z-index:40;background:#fff;border:1px solid #E6E4E9;border-radius:12px;box-shadow:0 14px 32px rgba(30,34,41,0.10);padding:6px;min-width:220px;max-height:320px;overflow-y:auto">
-              <sc-for list="{{ inexExpCatOptions }}" as="opt" hint-placeholder-count="6">
-                <div data-act="filter.expcat.opt.{{ $index }}" onClick="{{ opt.onClick }}" style="{{ opt.style }}"><span>{{ opt.label }}</span>{{ opt.check }}</div>
-              </sc-for>
-            </div>
-          </sc-if>
-        </div>
+        <!-- ตัวกรองแบรนด์ / ช่องทาง / หมวดค่าใช้จ่าย เอาออก 28 พ.ย. 2569: ใช้กับการ์ด "สรุปรายรับ-รายจ่ายตามหมวด" ที่รวมเข้ารายงานด้านล่างแล้วเท่านั้น -->
         <div style="flex:1"></div>
         <div data-act="refresh" onClick="{{ refreshData }}" style="display:flex;align-items:center;gap:7px;color:#1B7A4B;font-size:12.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="width:15px;height:15px"></i><span>{{ dataAsOfLabel }}</span></div>
       </div>
 
       <div>{{ finNote }}</div>
 
-      <!-- สรุปรายรับ-รายจ่ายตามหมวด (K5) -->
-      <div data-keep="K5" style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:20px 22px;margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;margin-bottom:14px">
-          <h3 style="margin:0;font-size:16px;font-weight:600">สรุปรายรับ-รายจ่ายตามหมวด</h3>
-          <sc-if value="{{ k5Part }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;background:#EDECEF;color:#4A4550;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap">ยังไม่ครบ</span></sc-if>
-        </div>
-        <div style="overflow-x:auto">
-        <table style="display:table;width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px">
-          <thead>
-            <tr style="color:#77717D;font-size:11px;text-align:right">
-              <th style="padding:0 6px 11px;font-weight:500;text-align:left">หมวด</th>
-              <th style="padding:0 6px 11px;font-weight:500">รายรับ (บาท)</th>
-              <th style="padding:0 6px 11px;font-weight:500">รายจ่าย (บาท)</th>
-              <th style="padding:0 6px 11px;font-weight:500">สุทธิ (บาท)</th>
-              <th style="padding:0 6px 11px;font-weight:500">% ต่อรายรับ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <sc-for list="{{ inexSummary }}" as="r" hint-placeholder-count="8">
-              <tr style="border-top:1px solid #EFEDF1;color:#1E1B21">
-                <td style="padding:10px 6px">{{ r.cat }}</td>
-                <td style="padding:10px 6px;text-align:right;white-space:nowrap">{{ r.income }}</td>
-                <td style="padding:10px 6px;text-align:right;white-space:nowrap;color:#77717D">{{ r.expense }}</td>
-                <td style="padding:10px 6px;text-align:right;white-space:nowrap;font-weight:600;color:{{ r.netColor }}">{{ r.net }}</td>
-                <td style="padding:10px 6px;text-align:right;color:#77717D">{{ r.pct }}</td>
-              </tr>
-            </sc-for>
-            <tr style="border-top:2px solid #EFEDF1;color:#1E1B21;font-weight:700;background:#F8F7F9">
-              <td style="padding:12px 6px">รวมทั้งหมด</td>
-              <td style="padding:12px 6px;text-align:right;color:{{ inexIncomeTotalColor }}">{{ inexIncomeTotalLabel }}</td>
-              <td style="padding:12px 6px;text-align:right;color:{{ inexExpenseTotalColor }}">{{ inexExpenseTotalLabel }}</td>
-              <td style="padding:12px 6px;text-align:right;color:{{ inexNetProfitColor }}">{{ inexNetProfitLabel }}</td>
-              <td style="padding:12px 6px;text-align:right">{{ inexMarginLabel }}</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-        <div style="font-size:12.5px;color:#77717D;line-height:1.55;margin-top:12px">{{ k5Note }}</div>
-      </div>
-
+      <!-- "สรุปรายรับ-รายจ่ายตามหมวด" (K5) รวมเข้ารายงานด้านล่างแล้ว (แอนนี่ 28 พ.ย. 2569 "ข้อมูลทั้ง 2 การ์ดเหมือนกัน … รวมข้อมูล และลบทิ้งได้เลย"):
+           % ต่อรายรับ = คอลัมน์ใหม่ของรายงาน · สุทธิ = แถว "คงเหลือ (รับ − จ่าย)" · ป้ายยังไม่ครบ + หมายเหตุ ย้ายไปหัว/ท้ายรายงาน -->
 
       <!-- รายงานสรุปรายรับ-รายจ่าย แบบงบรายเดือน -->
       <div data-keep="K1" style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:20px 22px;margin-bottom:18px">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px">
-          <h3 style="margin:0;font-size:16px;font-weight:600">รายงานสรุปรายรับ-รายจ่าย</h3>
+          <h3 style="margin:0;font-size:16px;font-weight:600;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap">รายงานสรุปรายรับ-รายจ่าย<sc-if value="{{ k5Part }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;background:#EDECEF;color:#4A4550;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap">ยังไม่ครบ</span></sc-if></h3>
           <span style="font-size:12.5px;color:#77717D">{{ reportCumLabel }}</span>
         </div>
         <div style="font-size:12px;color:#77717D;margin-bottom:14px">ยอดขายเป็นยอดเต็มก่อนหักค่าบริการ · ค่าบริการแพลตฟอร์มแยกเป็นหมวดรายจ่าย · คอลัมน์ (+)/(−) เทียบเดือนก่อน</div>
@@ -865,6 +798,7 @@
               <th style="padding:10px;font-weight:600;text-align:left;white-space:nowrap;border-bottom:1px solid #E6E4E9">รายการ</th>
               <th style="padding:10px;font-weight:600;text-align:center;white-space:nowrap;border-bottom:1px solid #E6E4E9">รหัสบัญชี</th>
               <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #E6E4E9">{{ reportCurLabel }}</th>
+              <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #E6E4E9">% ต่อรายรับ</th>
               <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #E6E4E9">{{ reportPrevLabel }}</th>
               <th style="padding:10px 6px;font-weight:600;text-align:center;white-space:nowrap;border-bottom:1px solid #E6E4E9">(+)<br/>(−)</th>
               <th style="padding:10px;font-weight:600;text-align:right;white-space:nowrap;border-bottom:1px solid #E6E4E9">สูงหรือต่ำกว่า<br/>เดือนก่อน</th>
@@ -877,6 +811,7 @@
                 <td style="{{ r.nameStyle }}">{{ r.name }}<sc-if value="{{ r.reach }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;margin-left:8px;background:#EDECEF;color:#4A4550;font-size:11px;font-weight:700;padding:1px 9px;border-radius:999px;white-space:nowrap">{{ r.reach }}</span></sc-if></td>
                 <td style="{{ r.signStyle }}">{{ r.code }}</td>
                 <td style="{{ r.numStyle }}">{{ r.cur }}</td>
+                <td style="{{ r.pctStyle }}">{{ r.pct }}</td>
                 <td style="{{ r.numStyle }}">{{ r.prev }}</td>
                 <td style="{{ r.signStyle }}">{{ r.sign }}</td>
                 <td style="{{ r.diffStyle }}">{{ r.diff }}</td>
@@ -886,6 +821,7 @@
           </tbody>
         </table>
         </div>
+        <div style="font-size:12.5px;color:#77717D;line-height:1.55;margin-top:12px">{{ k5Note }}</div>
       </div>
 
       <!-- monthly summary -->
@@ -2114,135 +2050,7 @@
     </sc-if>
 
 
-    <!-- ===================== เงินรัฐรอรับ SUBSIDY PAGE ===================== -->
-    <sc-if value="{{ isSubsidy }}" hint-placeholder-val="{{ false }}">
-    <div data-keep="page.subsidy" data-screen-label="Subsidy — เงินรัฐรอรับ">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px 24px;margin-bottom:18px;flex-wrap:wrap">
-        <div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-            <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.4px;color:#1E1B21">เงินรัฐรอรับ</h1>
-            <span style="background:#F8ECD6;color:#8A560A;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px">ไทยช่วยไทย พลัส</span>
-          </div>
-          <div style="font-size:13.5px;color:#77717D">ติดตามเงินอุดหนุนรัฐที่ยังไม่เข้าบัญชี — ส่วนที่รัฐจ่ายแยกรอบจากลูกค้า</div>
-        </div>
-        <div data-act="export.subsidy.0" onClick="{{ exportSubsidyCsv }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E6E4E9;border-radius:12px;padding:10px 15px;font-size:13.5px;color:#4A4550;cursor:pointer;flex:none"><i data-lucide="external-link" style="width:16px;height:16px"></i><span>ส่งออกรายการ</span></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;margin-bottom:18px">
-        <sc-for list="{{ subsidyKpis }}" as="k" hint-placeholder-count="4">
-          <div style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:17px 18px;">
-            <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px"><div style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ k.bg }};color:{{ k.fg }}"><i data-lucide="{{ k.icon }}"></i></div><span style="font-size:13px;color:#77717D;font-weight:500;line-height:1.3">{{ k.title }}</span></div>
-            <div style="font-size:25px;font-weight:700;color:#1E1B21;letter-spacing:-0.5px;margin-bottom:5px">{{ k.amount }}</div>
-            <div style="font-size:12px;color:#77717D">{{ k.sub }}</div>
-          </div>
-        </sc-for>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start">
-        <div style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:20px 22px;">
-          <h3 style="margin:0 0 6px;font-size:16px;font-weight:600">ออเดอร์ที่รอเงินอุดหนุน</h3>
-          <div style="font-size:11.5px;color:#8A560A;background:#F8ECD6;border:1px solid #EDDABC;border-radius:9px;padding:8px 11px;margin-bottom:13px;line-height:1.5">หมายเหตุ: ยอดเงินรัฐเป็นค่าประมาณการ (T+3) — ออเดอร์ Grab/LINE MAN แยกลูกค้าจ่าย/รัฐอุดหนุนแล้ว · แถวหน้าร้านเป็นยอดรวมทั้งวัน · รอตรวจสอบกับใบสรุปการโอนจริง</div>
-          <table style="width:100%;border-collapse:collapse;font-size:12.5px">
-            <thead>
-              <tr style="background:#F8F7F9;color:#4A4550;font-size:11.5px">
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">วันที่</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">แพลตฟอร์ม</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">Order ID</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดเต็ม</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ลูกค้าจ่าย</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">รัฐอุดหนุน</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">กำหนดรับ</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ subsidyRows }}" as="r" hint-placeholder-count="7">
-                <tr style="border-top:1px solid #EFEDF1">
-                  <td style="padding:11px 8px;color:#4A4550;white-space:nowrap">{{ r.date }}</td>
-                  <td style="padding:11px 8px"><span style="background:{{ r.pbg }};color:{{ r.pfg }};font-size:11px;font-weight:600;padding:3px 9px;border-radius:7px;white-space:nowrap">{{ r.plat }}</span></td>
-                  <td style="padding:11px 8px;color:#4A4550;font-weight:500;white-space:nowrap">{{ r.oid }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#1E1B21;font-weight:600">{{ r.full }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#4A4550">{{ r.cust }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#8A560A;font-weight:600">{{ r.gov }}</td>
-                  <td style="padding:11px 8px;color:#4A4550;white-space:nowrap">{{ r.due }}</td>
-                  <td style="padding:11px 8px"><span style="{{ r.stStyle }}">{{ r.st }}</span></td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </div>
-        <div style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:20px 22px;">
-          <h3 style="margin:0 0 16px;font-size:16px;font-weight:600">รอบจ่ายเงินอุดหนุน</h3>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <sc-for list="{{ subsidyRounds }}" as="r" hint-placeholder-count="3">
-              <div style="display:flex;gap:13px">
-                <div style="display:flex;flex-direction:column;align-items:center;flex:none">
-                  {{ r.circle }}
-                  <div style="width:2px;flex:1;background:#F8F7F9;min-height:18px;margin:3px 0"></div>
-                </div>
-                <div style="padding-bottom:14px"><div style="font-size:13.5px;font-weight:600;color:#1E1B21">{{ r.round }}</div><div style="font-size:15px;font-weight:700;color:#8A560A;margin:2px 0">{{ r.amount }}</div><div style="font-size:11.5px;color:#77717D">{{ r.date }}</div></div>
-              </div>
-            </sc-for>
-          </div>
-          <div style="background:#F8ECD6;border:1px solid #EDDABC;border-radius:12px;padding:13px 15px;margin-top:8px">
-            <div style="font-size:12.5px;color:#8A560A;line-height:1.6">ระบบคาดว่าเงินรัฐเข้า 3 วันหลังวันขาย (ยังไม่ได้ยืนยันกับยอดโอนจริง) หากเลยกำหนดแล้วเงินยังไม่เข้า ควรตรวจสอบกับแพลตฟอร์ม</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="background:#fff;border:none;box-shadow:inset 0 0 0 1px rgba(30,27,33,0.08), 0 1px 2px rgba(30,27,33,0.04), 0 12px 30px -20px rgba(30,27,33,0.28);border-radius:18px;padding:20px 22px;margin-top:18px">
-        <h3 style="margin:0 0 6px;font-size:16px;font-weight:600">เงินที่รัฐโอนเข้าจริง — กระทบยอด</h3>
-        <div style="font-size:12.5px;color:#77717D;margin-bottom:14px;line-height:1.6">บันทึกยอดที่เข้าบัญชีแต่ละรอบ พร้อมช่วงวันที่ขายที่รอบนั้นครอบคลุม ระบบรวมยอดรอรับของช่วงนั้นมาเทียบ ต้องตรงทุกสตางค์จึงถือว่ารับครบ</div>
-        <sc-if value="{{ subRcptCanAdd }}" hint-placeholder-val="{{ true }}">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:10px">
-            <div><div style="font-size:12px;color:#77717D;font-weight:500;margin-bottom:7px">วันที่รัฐโอนเข้า</div><input value="{{ subRcptForm.recv }}" onChange="{{ setSubRcptRecv }}" type="date" style="width:100%;border:1px solid #E6E4E9;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
-            <div><div style="font-size:12px;color:#77717D;font-weight:500;margin-bottom:7px">ขายตั้งแต่วันที่</div><input value="{{ subRcptForm.from }}" onChange="{{ setSubRcptFrom }}" type="date" style="width:100%;border:1px solid #E6E4E9;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
-            <div><div style="font-size:12px;color:#77717D;font-weight:500;margin-bottom:7px">ถึงวันที่</div><input value="{{ subRcptForm.to }}" onChange="{{ setSubRcptTo }}" type="date" style="width:100%;border:1px solid #E6E4E9;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
-            <div><div style="font-size:12px;color:#77717D;font-weight:500;margin-bottom:7px">ยอดที่ได้รับ (บาท)</div><input value="{{ subRcptForm.amount }}" onChange="{{ setSubRcptAmount }}" inputmode="decimal" placeholder="0.00" style="width:100%;border:1px solid #E6E4E9;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
-            <div><div style="font-size:12px;color:#77717D;font-weight:500;margin-bottom:7px">เลขอ้างอิง / หมายเหตุ</div><input value="{{ subRcptForm.ref }}" onChange="{{ setSubRcptRef }}" placeholder="ไม่บังคับ" style="width:100%;border:1px solid #E6E4E9;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px">
-            <div onClick="{{ saveSubRcpt }}" style="background:#1B7A4B;color:#fff;box-shadow:0 10px 18px -10px rgba(27,122,75,0.7);border-radius:11px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer">บันทึกเงินเข้า</div>
-            <div style="font-size:12.5px;color:#77717D">{{ subRcptPreview }}</div>
-            <sc-if value="{{ subRcptHasError }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#B3362A">{{ subRcptError }}</div></sc-if>
-          </div>
-        </sc-if>
-        <div style="overflow-x:auto">
-          <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:12.5px">
-            <thead>
-              <tr style="background:#F8F7F9;color:#4A4550;font-size:11.5px">
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">วันที่รับ</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">ช่วงที่ขาย</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ยอดรอรับ (ระบบ)</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">รับจริง</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:right">ส่วนต่าง</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">สถานะ</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left">อ้างอิง</th>
-                <th style="padding:0 8px 12px;font-weight:500;text-align:left"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ subRcptRows }}" as="r" hint-placeholder-count="3">
-                <tr style="border-top:1px solid #EFEDF1">
-                  <td style="padding:11px 8px;color:#4A4550;white-space:nowrap">{{ r.recv }}</td>
-                  <td style="padding:11px 8px;color:#4A4550;white-space:nowrap">{{ r.range }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#4A4550">{{ r.expected }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#1E1B21;font-weight:600">{{ r.amount }}</td>
-                  <td style="padding:11px 8px;text-align:right;color:#4A4550">{{ r.diff }}</td>
-                  <td style="padding:11px 8px"><span style="{{ r.stStyle }}">{{ r.stTxt }}</span></td>
-                  <td style="padding:11px 8px;color:#77717D">{{ r.ref }}</td>
-                  <td style="padding:11px 8px;text-align:right">
-                    <sc-if value="{{ r.canDelete }}" hint-placeholder-val="{{ true }}">
-                      <div onClick="{{ r.onDelete }}" title="ลบรายการนี้" style="display:inline-flex;line-height:0;cursor:pointer"><i data-lucide="trash-2" style="width:15px;height:15px;color:#77717D"></i></div>
-                    </sc-if>
-                  </td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </div>
-        <sc-if value="{{ subRcptEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#77717D;padding:14px 0 2px">ยังไม่มีการบันทึกเงินเข้า — ยอดด้านบนยังเป็นประมาณการจากวันขาย + 3 วัน</div></sc-if>
-      </div>
-    </div>
-    </sc-if>
+    <!-- เงินรัฐรอรับ เลิกใช้ (แอนนี่ 28 พ.ย. 2569 "ลบฟังก์ชั่นเงินรอรับทิ้ง และเอาออกทั้งหมด ไม่จำเป็นต้องกระทบยอดเงินรัฐแล้ว") — หน้าเอาออกแล้ว ?page=subsidy พาไปหน้าแรก -->
 
     <!-- ===================== ภาษี & ส่งออก TAX PAGE ===================== -->
     <sc-if value="{{ isTax }}" hint-placeholder-val="{{ false }}">
@@ -3107,7 +2915,7 @@ const crmClient = window.supabase.createClient(CRM_URL, CRM_PUBLISHABLE_KEY);
     m.id = 'db-version-mark';
     m.title = 'ฐานข้อมูลที่หน้านี้ใช้';
     m.style.cssText = 'position:fixed;right:6px;bottom:4px;z-index:2147483647;font:11px/1.2 system-ui,sans-serif;color:#9a8f99;pointer-events:none';
-    m.textContent = 'ฐาน: annie-cake 28 พ.ย. หน้าตาใหม่';
+    m.textContent = 'ฐาน: annie-cake 28 พ.ย. รวมรายงาน · ไม่มีเงินรัฐ';
     document.body.appendChild(m);
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
@@ -3802,8 +3610,7 @@ function dbdTodos(input) {
     if (gap > 2) out.push({ id: 'expense', text: 'รายจ่ายร้านยังไม่ได้ลง ' + gap + ' วัน', sub: 'ลงล่าสุด ' + fmt(input.shopExpenseTo), page: 'expenserec' });
   }
   if (Number(input.unpaidSlips) > 0) out.push({ id: 'payroll', text: ['เงินเดือน', input.payrollLabel, 'ยังไม่ได้จ่ายในระบบ', Number(input.unpaidSlips), 'รายการ'].filter(function (x) { return x !== null && x !== undefined && x !== ''; }).join(' '), sub: '', page: 'payroll' });
-  var subsidy = input.subsidyOverdue || {};
-  if (Number(subsidy.count) > 0) out.push({ id: 'subsidy', text: 'เงินรัฐค้างรับเกิน 14 วัน ' + baht(subsidy.sum), sub: Number(subsidy.count) + ' รายการ', page: 'subsidy' });
+  // (เรื่อง "เงินรัฐค้างรับ" เอาออก 28 พ.ย. 2569 — เงินรัฐรอรับ เลิกใช้ (แอนนี่ 28 พ.ย. 2569 "ลบฟังก์ชั่นเงินรอรับทิ้ง และเอาออกทั้งหมด ไม่จำเป็นต้องกระทบยอดเงินรัฐแล้ว"))
   if (input.storefrontMissingYesterday) out.push({ id: 'storefront', text: 'ยังไม่มียอดหน้าร้านของเมื่อวาน', sub: '', page: 'sales' });
   if (input.budget && input.budget.text) out.push({ id: 'budget', text: input.budget.text, sub: input.budget.sub || '', page: 'expenserec' });
   if (input.opex && input.opex.text) out.push({ id: 'opex', text: input.opex.text, sub: input.opex.sub || '', page: 'expenserec' });
@@ -3815,7 +3622,8 @@ function dbdTodos(input) {
 function dbdPageRedirects() {
   return { products: 'salesdash', procurement: 'salesdash', payout: 'salesdash', overview: 'home', mobile: 'home', alerts: 'home', settings: 'home',
     sales: 'salesdash', reconcile: 'salesdash',            // ขั้น 2 (26 พ.ย.): รายรับ และ เงินเข้า อยู่ในหน้า ยอดขาย
-    marketing: 'expenserec', campaign: 'expenserec', content: 'expenserec' };   // ขั้น 3: หน้าการตลาด 3 หน้าเลิกใช้ (ค่าโฆษณาอยู่ในหมวด การตลาด ของรายจ่าย)
+    marketing: 'expenserec', campaign: 'expenserec', content: 'expenserec',
+    subsidy: 'home' };   // เงินรัฐรอรับ เลิกใช้ (แอนนี่ 28 พ.ย. 2569 "ลบฟังก์ชั่นเงินรอรับทิ้ง และเอาออกทั้งหมด ไม่จำเป็นต้องกระทบยอดเงินรัฐแล้ว")   // ขั้น 3: หน้าการตลาด 3 หน้าเลิกใช้ (ค่าโฆษณาอยู่ในหมวด การตลาด ของรายจ่าย)
 }
 /** ชื่อหน้าที่ต้องเปิดจริงของชื่อหน้า p — ชื่อที่ไม่อยู่ในตารางคืนตัวเดิม */
 function dbdPage(p) {
@@ -3832,7 +3640,7 @@ function dbdMenu() {
     { page: 'expenserec', label: 'รายจ่าย', icon: 'circle-arrow-up' },
     { page: 'payroll', label: 'เงินเดือน', icon: 'wallet' },
     { page: 'inex', label: 'กำไร-ขาดทุน', icon: 'arrow-left-right' },
-    { page: 'subsidy', label: 'เงินรัฐรอรับ', icon: 'landmark', other: true },
+    // เงินรัฐรอรับ เลิกใช้ (แอนนี่ 28 พ.ย. 2569 "ลบฟังก์ชั่นเงินรอรับทิ้ง และเอาออกทั้งหมด ไม่จำเป็นต้องกระทบยอดเงินรัฐแล้ว")
     { page: 'tax', label: 'ภาษี & ส่งออก', icon: 'file-text', other: true, group: ['tax', 'taxforms'] },
     { page: 'import', label: 'นำเข้ารายงานแอป', icon: 'file-down', other: true },
     // สมาชิก ออกจากเมนูแล้ว (แอนนี่ 28 พ.ย. 2569 "เอาสมาชิกออก") — หน้ายังอยู่ เปิดด้วยลิงก์ ?page=members ได้
@@ -5384,7 +5192,6 @@ class Component extends DCLogic {
     this.loadPurchases();
     this.loadProducts();
     this.loadPayroll();
-    this.loadSubsidyReceipts();
     this.loadProfit();
     this.loadCashExp();
   };
@@ -7356,7 +7163,9 @@ class Component extends DCLogic {
     const rpPick = (rows, ym) => rows.filter(r => rpMonthOf(r.isoDate) === ym);
     const rpSalesCur = rpPick(rpSalesAll, rpCurMonth), rpSalesPrev = rpPick(rpSalesAll, rpPrevMonth);
     const rpExpCur = rpPick(rpExpAll, rpCurMonth), rpExpPrev = rpPick(rpExpAll, rpPrevMonth);
-    const rpServiceOf = r => (Number(r.gp) || 0) + (Number(r.vat) || 0) + (Number(r.discount) || 0);
+    // ค่าบริการแพลตฟอร์ม = ยอดที่แอปหักจริง (r.fee) ตัวเดียวกับการ์ดยอดมาจากไหน · สรุปรายเดือน · กำไร-ขาดทุน (28 พ.ย. 2569)
+    //   เดิมใช้ GP + VAT + ส่วนลด ซึ่งขาดยอดโปรโมชันที่แอปหัก (บางโพ พ.ย. ต่างกัน ฿1,439.89: LINE MAN ฿160.50 · ShopeeFood ฿1,279.39)
+    const rpServiceOf = r => Number(r.fee) || 0;
 
     const rpRows = [];
     const rpLine = (code, name, cur, prev, cum, kind, deliv) => {
@@ -7365,7 +7174,7 @@ class Component extends DCLogic {
       const signOf = c => 'padding:9px 6px;text-align:center;white-space:nowrap;font-size:11px;color:' + c + (kind === 'head' ? ';background:#F8F7F9' : '');
       const diffOf = c => 'padding:9px 10px;text-align:right;white-space:nowrap;font-weight:' + (kind === 'sum' || kind === 'head' ? '700' : '600') + ';color:' + c + (kind === 'head' ? ';background:#F8F7F9' : '');
       rpRows.push({
-        code, name, cur: rpFmt(cur), prev: rpFmt(prev), cum: rpFmt(cum),
+        _cur: cur, _kind: kind, code, name, cur: rpFmt(cur), prev: rpFmt(prev), cum: rpFmt(cum),
         sign: diff === 0 ? '' : (diff > 0 ? '(+)' : '(-)'),
         diff: rpFmt(Math.abs(diff)),
         nameStyle: 'padding:9px 10px;white-space:nowrap;'
@@ -7437,6 +7246,12 @@ class Component extends DCLogic {
       rpStore.cur + rpPlat.cur - rpSvc.cur - rpExp.cur,
       rpStore.prev + rpPlat.prev - rpSvc.prev - rpExp.prev,
       rpStore.cum + rpPlat.cum - rpSvc.cum - rpExp.cum, 'sum');
+    // % ต่อรายรับ (ย้ายมาจากการ์ดตามหมวด 28 พ.ย. 2569) = ยอดเดือนนี้ ÷ รวมรายรับทั้งสิ้นของเดือนนี้ · แถวหัวหมวดไม่มี
+    const rpIncomeCur = rpStore.cur + rpPlat.cur;
+    rpRows.forEach(r => {
+      r.pct = r._kind === 'head' || !rpIncomeCur ? '' : (r._cur / rpIncomeCur * 100).toFixed(1) + '%';
+      r.pctStyle = 'padding:9px 10px;text-align:right;white-space:nowrap;color:#77717D;' + (r._kind === 'head' ? 'background:#F8F7F9;' : r._kind === 'sum' ? 'font-weight:700;' : '');
+    });
     const reportRows = rpRows;
     const reportCurLabel = rpMonthLabel(rpCurMonth);
     const reportPrevLabel = rpMonthLabel(rpPrevMonth);
@@ -7658,7 +7473,7 @@ class Component extends DCLogic {
     }));
     const rcRowCountLabel = 'แสดง ' + rcRows.length + ' จาก ' + rcQuickRows.length + ' รายการเงินเข้าจริง';
     // กระทบยอดใหม่: pull everything fresh from Supabase
-    const refreshData = () => { this.loadSales(); this.loadExpenses(); this.loadSubsidyReceipts(); this.loadProfit(); };
+    const refreshData = () => { this.loadSales(); this.loadExpenses(); this.loadProfit(); };
     /** ตัวสลับสาขา — ทุกหน้าอ่านผ่าน ofBranch() จึงเปลี่ยนพร้อมกันทั้งระบบ
      *  ข้อมูลสองสาขาแยกกันเด็ดขาด ไม่มีหน้าไหนรวมยอดข้ามสาขา (เจ้าของร้านกำหนด 9 ก.ย. 2569) */
     const activeBranch = this.activeBranch();
@@ -10006,14 +9821,7 @@ class Component extends DCLogic {
     } else if (alPrior.length >= 5 && alYestGross > 0 && alYestGross < alAvg7 * 0.75) {
       rawAlerts.push({ sev:'high', title:'ยอดหน้าร้านเมื่อวานต่ำกว่าค่าเฉลี่ย 7 วัน', detail: isoToBEShort(alYest) + ' ' + alFmt(alYestGross) + ' เทียบค่าเฉลี่ย ' + alFmt(alAvg7) + ' (เฉพาะวันที่มียอด)', time:'เมื่อวาน', icon:'trending-down', cat:'ยอดขาย' });
     }
-    // เงินรัฐค้างรับ: ไม่นับวันที่อยู่ในรอบที่บันทึก "เงินรัฐโอนเข้าจริง" แล้ว — เดิมนับทุกแถวเก่ากว่า 17 วันตลอดไป
-    const alRcpts = this.ofBranch(this.state.subRcpts || []);
-    const alCovered = iso => alRcpts.some(g => g.from && g.to && iso >= g.from && iso <= g.to);
-    const alOverdue = alRows.filter(r => (r.payment === 'GOVERNMENT_WALLET' || /ไทยช่วยไทย/.test(r.payment || '')) && r.isoDate && !alCovered(r.isoDate))
-      .filter(r => { const x = new Date(r.isoDate + 'T00:00:00'); x.setDate(x.getDate() + 3); return (new Date(alToday) - x) / 86400000 > 14; });
-    if (alOverdue.length) {
-      rawAlerts.push({ sev:'mid', title:'เงินรัฐ (ไทยช่วยไทย) ยังไม่ได้บันทึกรับเงิน เกิน 14 วัน', detail: alOverdue.length + ' รายการ · บันทึกเงินที่รัฐโอนเข้าได้ที่หน้า "เงินรัฐรอรับ"', time:'วันนี้', icon:'hourglass', cat:'การเงิน' });
-    }
+    const alOverdue = [];   // เงินรัฐรอรับ เลิกใช้ (แอนนี่ 28 พ.ย. 2569 "ลบฟังก์ชั่นเงินรอรับทิ้ง และเอาออกทั้งหมด ไม่จำเป็นต้องกระทบยอดเงินรัฐแล้ว")
     // ทำเครื่องหมายอ่านแล้ว: remember dismissed alert signatures; an alert reappears
     // only if its content changes (new day / new numbers).
     const ALERTS_READ_KEY = 'bangpho_alerts_read';
@@ -10040,7 +9848,6 @@ class Component extends DCLogic {
       // แสดงตามจริง: เปิดเฉพาะกฎที่มีโค้ดตรวจจริงข้างบน · ที่เหลือยังไม่ได้ทำ (เดิมขึ้นสวิตช์เขียวทั้งที่ไม่มีการตรวจ)
       { name:'ยอดหน้าร้านเมื่อวานต่ำกว่าค่าเฉลี่ย 7 วัน', cond:'แจ้งเมื่อต่ำกว่า 25%', on:true },
       { name:'ยังไม่มียอดหน้าร้านของเมื่อวาน', cond:'แจ้งเมื่อไม่มียอดเลย', on:true },
-      { name:'เงินรัฐค้างรับเกิน 14 วัน', cond:'นับเฉพาะวันที่ยังไม่บันทึกรับเงิน', on:true },
       { name:'เงินโอนไม่ตรงยอดที่คาด', cond:'ยังไม่ได้ทำ (รอข้อมูลกระทบยอด)', on:false },
       { name:'GP/ค่าธรรมเนียมสูงผิดปกติ', cond:'ยังไม่ได้ทำ', on:false }
     ].map(r => ({ ...r,
